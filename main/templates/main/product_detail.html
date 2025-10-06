@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 
@@ -17,10 +18,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
     <!-- Фавикон и иконки (начало) -->
-    <link rel="shortcut icon" href="img/icon/favicon_5.ico" type="image/x-icon">
-    <link rel="icon" href="template/img/favicon/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="template/img/favicon/apple-touch-icon.png">
-    <link rel="manifest" href="template/img/favicon/manifest.webmanifest">
+    <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="{% static 'images/icon/_iiiiapple.png' %}" />
+    <link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/icon/_iiii176.png' %}" />
+    <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/icon/_iiii1156.png' %}" />
+    <link rel="apple-touch-startup-image" href="{% static 'images/icon/_iiii1.png' %}" />
     <!-- Фавикон и иконки (конец) -->
 
     <!-- Мета для Facebook (начало) -->
@@ -33,12 +35,12 @@
     <!-- Мета для Facebook (конец) -->
 
     <!-- Подключение стилей (начало) -->
-    <link rel="stylesheet" type="text/css" href="template/css/loaders/loader.css">
-    <link rel="stylesheet" type="text/css" href="template/css/plugins.css">
-    <link rel="stylesheet" type="text/css" href="template/css/main_site.css">
-    <link rel="stylesheet" type="text/css" href="faw_main-models.css">
-    <link rel="stylesheet" type="text/css" href="site_main.css">
-    <link rel="stylesheet" type="text/css" href="more_info.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/faw_main-models.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/more_info.css' %}">
     <!-- Стили Leaflet для карты в футере -->
 
 
@@ -54,218 +56,7 @@
 
 <body>
     <!-- Меню и шапка (начало) -->
-    <nav id="header" class="mxd-nav__wrap" data-lenis-prevent="">
-
-        <!-- Логотип в шапке (начало) -->
-        <div class="mxd-header__logo loading__fade">
-            <a href="site_main.html" class="mxd-logo">
-                <img src="faw_site-img/LOGO-VUM.png" class="mxd-logo__image" alt="FAW Logo">
-                <!-- <span class="mxd-logo__text">Faw</span> -->
-            </a>
-        </div>
-        <!-- Логотип в шапке (конец) -->
-
-        <!-- Навигация для десктопа (начало) -->
-        <div class="mxd-header__nav loading__fade">
-            <ul class="desktop-menu">
-                <li class="desktop-menu__item active">
-                    <a href="site_main.html" class="desktop-menu__link">Bosh sahifa</a>
-                </li>
-                <li class="desktop-menu__item">
-                    <a href="#" class="desktop-menu__link">
-                        Dilerlar
-                        <span class="desktop-menu__arrow">▼</span>
-                    </a>
-                    <ul class="desktop-submenu">
-                        <li class="desktop-submenu__item">
-                            <a href="site_dealers.html" class="desktop-submenu__link">Diler topish</a>
-                        </li>
-                        <li class="desktop-submenu__item">
-                            <a href="become_potential_dealer.html" class="desktop-submenu__link">Diler bo'lish</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="desktop-menu__item">
-                    <a href="site_news.html" class="desktop-menu__link">Kompaniya yangiliklari</a>
-                </li>
-                <li class="desktop-menu__item">
-                    <a href="faw_main-models.html" class="desktop-menu__link">
-                        Modellar
-                        <span class="desktop-menu__arrow">▼</span>
-                    </a>
-                    <ul class="desktop-submenu">
-                        <li class="desktop-submenu__item">
-                            <a href="faw_main-models.html" class="desktop-submenu__link">Shatakchi mashinalar</a>
-                        </li>
-                        <li class="desktop-submenu__item">
-                            <a href="faw_main-models.html" class="desktop-submenu__link">Samosvallar</a>
-                        </li>
-                        <li class="desktop-submenu__item">
-                            <a href="faw_main-models.html" class="desktop-submenu__link">Maxsus texnika</a>
-                        </li>
-                        <li class="desktop-submenu__item">
-                            <a href="faw_main-models.html" class="desktop-submenu__link">Avtofurgonlar</a>
-                        </li>
-                        <li class="desktop-submenu__item">
-                            <a href="faw_main-models.html" class="desktop-submenu__link">Shassilar</a>
-                        </li>
-                        <li class="desktop-submenu__item">
-                            <a href="faw_main-models.html" class="desktop-submenu__link">Tiger V</a>
-                        </li>
-                        <li class="desktop-submenu__item">
-                            <a href="faw_main-models.html" class="desktop-submenu__link">Tiger VR</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="desktop-menu__item">
-                    <a href="site_about.html" class="desktop-menu__link">Kompaniya haqida</a>
-                </li>
-                <li class="desktop-menu__item">
-                    <a href="site_lizing.html" class="desktop-menu__link">Lizing</a>
-                </li>
-                <li class="desktop-menu__item">
-                    <a href="site_service.html" class="desktop-menu__link">Servis</a>
-                </li>
-                <li class="desktop-menu__item">
-                    <a href="site_contact.html" class="desktop-menu__link">Bo'glanish</a>
-                </li>
-                <li class="desktop-menu__item">
-                    <a href="jobs-page.html" class="desktop-menu__link">Vakansiya</a>
-                </li>
-            </ul>
-        </div>
-        <!-- Навигация для десктопа (конец) -->
-
-        <!-- Элементы управления шапкой (начало) -->
-        <div class="mxd-header__controls loading__fade">
-            <div class="language-switcher">
-                <span class="language-current">UZ</span>
-                <span class="language-arrow">▼</span>
-                <div class="language-dropdown">
-                    <a href="#" class="language-option" data-lang="uz">O'zbek</a>
-                    <a href="#" class="language-option" data-lang="ru">Русский</a>
-                    <a href="#" class="language-option" data-lang="en">English</a>
-                </div>
-            </div>
-            <button id="color-switcher" class="mxd-color-switcher" type="button" role="switch"
-                aria-label="light/dark mode" aria-checked="true"></button>
-            <a class="btn btn-anim btn-default btn-mobile-icon btn-outline slide-right-up" style="gap: 0;"
-                href="#faw-main-contact-form" aria-label="Перейти к форме связи">
-                <span class="btn-caption"></span>
-                <i class="ph-bold ph-arrow-up-right"></i>
-            </a>
-        </div>
-        <!-- Элементы управления шапкой (конец) -->
-
-        <!-- Гамбургер (начало) -->
-        <div class="mxd-nav__contain loading__fade">
-            <a href="#0" class="mxd-nav__hamburger">
-                <!-- flip element -->
-                <div class="hamburger__base"></div>
-                <div class="hamburger__line"></div>
-                <div class="hamburger__line"></div>
-            </a>
-        </div>
-        <!-- Гамбургер (конец) -->
-
-        <!-- Основная мобильная навигация (начало) -->
-        <div class="mxd-menu__wrapper">
-            <!-- background active layer -->
-            <div class="mxd-menu__base"></div>
-            <!-- menu container -->
-            <div class="mxd-menu__contain">
-                <div class="mxd-menu__inner">
-                    <!-- left side -->
-                    <div class="mxd-menu__left">
-                        <p class="mxd-menu__caption menu-fade-in">🚚 FAW Trucks Uzbekistan<br>Ishonchli transport
-                            yechimlari</p>
-                        <div class="main-menu">
-                            <nav class="main-menu__content">
-                                <ul id="main-menu" class="main-menu__accordion">
-                                    <li class="main-menu__item">
-                                        <a class="main-menu__link btn btn-anim" href="site_main.html">
-                                            <span class="btn-caption">Bosh sahifa</span>
-                                        </a>
-                                    </li>
-                                    <li class="main-menu__item">
-                                        <div class="main-menu__toggle">
-                                            <span class="main-menu__link btn btn-anim">
-                                                <span class="btn-caption">Dilerlar</span>
-                                            </span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" version="1.1"
-                                                viewBox="0 0 20 20">
-                                                <path
-                                                    d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0-1.2,0-1.7.2H.4c-.2,0-.4.2-.4.4s.2.4.4.4h4.1c.4,0,1.7.2,1.7.2.6,0,1.1.2,1.6.6.4.3.8.7,1.1,1.1.3.5.5,1,.6,1.6,0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4h0Z" />
-                                            </svg>
-                                        </div>
-                                        <ul class="submenu">
-                                            <li class="submenu__item">
-                                                <a href="site_dealers.html">Diler topish</a>
-                                            </li>
-                                            <li class="submenu__item">
-                                                <a href="become_potential_dealer.html">Diler bo'lish</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li class="main-menu__item">
-                                        <a class="main-menu__link btn btn-anim" href="site_news.html">
-                                            <span class="btn-caption">Kompaniya yangiliklari</span>
-                                        </a>
-                                    </li>
-                                    <li class="main-menu__item">
-                                        <div class="main-menu__toggle">
-                                            <span class="main-menu__link btn btn-anim">
-                                                <span class="btn-caption">Modellar</span>
-                                            </span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" version="1.1"
-                                                viewBox="0 0 20 20">
-                                                <path
-                                                    d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0-1.2,0-1.7.2H.4c-.2,0-.4.2-.4.4s.2.4.4.4h4.1c.4,0,1.7.2,1.7.2.6,0,1.1.2,1.6.6.4.3.8.7,1.1,1.1.3.5.5,1,.6,1.6,0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4h0Z" />
-                                            </svg>
-                                        </div>
-                                        <ul class="submenu">
-                                            <li class="submenu__item">
-                                                <a href="faw_main-models.html">Yuk mashinalari</a>
-                                            </li>
-                                            <li class="submenu__item">
-                                                <a href="faw_main-models.html">Avtobuslar</a>
-                                            </li>
-                                            <li class="submenu__item">
-                                                <a href="faw_main-models.html">Maxsus texnika</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li class="main-menu__item">
-                                        <a class="main-menu__link btn btn-anim" href="site_about.html">
-                                            <span class="btn-caption">Kompaniya haqida</span>
-                                        </a>
-                                    </li>
-                                    <li class="main-menu__item">
-                                        <a class="main-menu__link btn btn-anim" href="site_contact.html">
-                                            <span class="btn-caption">Bog'lanish</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-                    <!-- нижняя информационная строка -->
-                    <div class="mxd-menu__data menu-fade-in">
-                        <p class="t-xsmall">
-                            FAW Trucks Uzbekistan
-                            <i class="ph-fill ph-heart t-additional"></i>
-                        </p>
-                        <p class="t-xsmall">
-                            <i class="ph ph-copyright"></i>
-                            2025
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Основная мобильная навигация (конец) -->
-
-    </nav>
+    {% include 'main/includes/header.html' %}
     <!-- Меню и шапка (конец) -->
 
     <!-- Контент страницы (начало) -->
@@ -317,13 +108,13 @@
                                     </div>
                                 </div>
                                 <div class="car-img_block">
-                                    <img src="faw_site-img/more_info.png" class="mxd-hero-06__car-image"
+                                    <img src="{% static 'images/more_info.png' %}" class="mxd-hero-06__car-image"
                                         alt="Samosval FAW Tiger V 4x2">
                                 </div>
                                 <div class="car-img_block-info">
                                     <div class="car-specs-grid">
                                         <div class="car-spec-item">
-                                            <img src="faw_site-img/icons/more-info_icons/004-temperature.svg"
+                                            <img src="{% static 'images/icons/more-info_icons/004-temperature.svg' %}"
                                                 class="car-spec-icon" alt="icon">
                                             <div class="car-spec-content">
                                                 <div class="car-spec-label">Iqlim nazorati</div>
@@ -332,7 +123,7 @@
                                         </div>
 
                                         <div class="car-spec-item">
-                                            <img src="faw_site-img/icons/more-info_icons/003-races.svg"
+                                            <img src="{% static 'images/icons/more-info_icons/003-races.svg' %}"
                                                 class="car-spec-icon" alt="icon">
                                             <div class="car-spec-content">
                                                 <div class="car-spec-label">Kruiz nazorati</div>
@@ -341,7 +132,7 @@
                                         </div>
 
                                         <div class="car-spec-item">
-                                            <img src="faw_site-img/icons/more-info_icons/002-windows.svg"
+                                            <img src="{% static 'images/icons/more-info_icons/002-windows.svg' %}"
                                                 class="car-spec-icon" alt="icon">
                                             <div class="car-spec-content">
                                                 <div class="car-spec-label">Elektr-shisha ko'targichlar</div>
@@ -350,7 +141,7 @@
                                         </div>
 
                                         <div class="car-spec-item">
-                                            <img src="faw_site-img/icons/more-info_icons/005-bluetooth.svg"
+                                            <img src="{% static 'images/icons/more-info_icons/005-bluetooth.svg' %}"
                                                 class="car-spec-icon" alt="icon">
                                             <div class="car-spec-content">
                                                 <div class="car-spec-label">Bluetooth + USB</div>
@@ -359,7 +150,7 @@
                                         </div>
 
                                         <div class="car-spec-item">
-                                            <img src="faw_site-img/icons/more-info_icons/006-radio.svg"
+                                            <img src="{% static 'images/icons/more-info_icons/006-radio.svg' %}"
                                                 class="car-spec-icon" alt="icon">
                                             <div class="car-spec-content">
                                                 <div class="car-spec-label">Radio</div>
@@ -368,7 +159,7 @@
                                         </div>
 
                                         <div class="car-spec-item">
-                                            <img src="faw_site-img/icons/more-info_icons/007-remote-access.svg"
+                                            <img src="{% static 'images/icons/more-info_icons/007-remote-access.svg' %}"
                                                 class="car-spec-icon" alt="icon">
                                             <div class="car-spec-content">
                                                 <div class="car-spec-label">MB pulti</div>
@@ -377,7 +168,7 @@
                                         </div>
 
                                         <div class="car-spec-item">
-                                            <img src="faw_site-img/icons/more-info_icons/008-car-seat.svg"
+                                            <img src="{% static 'images/icons/more-info_icons/008-car-seat.svg' %}"
                                                 class="car-spec-icon" alt="icon">
                                             <div class="car-spec-content">
                                                 <div class="car-spec-label">Pnevmo ilgakli o'rindiq</div>
@@ -386,7 +177,7 @@
                                         </div>
 
                                         <div class="car-spec-item">
-                                            <img src="faw_site-img/icons/more-info_icons/001-sleeping.svg"
+                                            <img src="{% static 'images/icons/more-info_icons/001-sleeping.svg' %}"
                                                 class="car-spec-icon" alt="icon">
                                             <div class="car-spec-content">
                                                 <div class="car-spec-label">Yotog joyi</div>
@@ -416,10 +207,10 @@
                                     <!-- Хлебные крошки -->
                                     <div aria-label="breadcrumb">
                                         <ol class="breadcrumb-ol">
-                                            <li><a href="/site_main.html">Bosh sahifa</a></li>
+                                            <li><a href="{% static 'home' %}">Bosh sahifa</a></li>
                                             <li><a href="javascript:void(0)">Modellar</a></li>
-                                            <li class="active"><a href="/sedelniye_tyagachi.html">Shatakchi
-                                                    mashinalar</a></li>
+                                            <li class="active"><a
+                                                    href="{% static 'products/<int:product_id>/' %}">Shatakchi mashinalar</a></li>
                                         </ol>
                                     </div>
                                 </div>
@@ -559,7 +350,7 @@
                                     <div class="slide-content">
                                         <!-- Картинка -->
                                         <div class="slide-image">
-                                            <img src="faw_site-img/faw-truck_1.png" alt="Services Image">
+                                            <img src="{% static 'images/faw-truck_1.png' %}" alt="Services Image">
                                         </div>
                                     </div>
                                 </div>
@@ -568,7 +359,7 @@
                                     <div class="slide-content">
                                         <!-- Картинка -->
                                         <div class="slide-image">
-                                            <img src="faw_site-img/faw-truck_2.png" alt="About Us Image">
+                                            <img src="{% static 'images/faw-truck_2.png' %}" alt="About Us Image">
                                         </div>
                                     </div>
                                 </div>
@@ -577,7 +368,7 @@
                                     <div class="slide-content">
                                         <!-- Картинка -->
                                         <div class="slide-image">
-                                            <img src="faw_site-img/faw-truck_3.png" alt="Team Image">
+                                            <img src="{% static 'images/faw-truck_3.png' %}" alt="Team Image">
                                         </div>
                                     </div>
                                 </div>
@@ -586,7 +377,7 @@
                                     <div class="slide-content">
                                         <!-- Картинка -->
                                         <div class="slide-image">
-                                            <img src="faw_site-img/faw-truck_1.png" alt="Pricing Image">
+                                            <img src="{% static 'images/faw-truck_1.png' %}" alt="Pricing Image">
                                         </div>
                                     </div>
                                 </div>
@@ -615,176 +406,7 @@
     <!-- Контент страницы (конец) -->
 
     <!-- Футер (начало) -->
-    <footer id="mxd-footer" class="mxd-footer">
-
-        <!-- Футер — полноширинный текст (начало) -->
-        <div class="mxd-footer__text-wrap">
-            <div class="fullwidth-text__tl-trigger"></div>
-            <div class="mxd-footer__fullwidth-text personal anim-top-to-bottom">
-                <h1 class="footer-title">FAW TRUCKS</h1>
-            </div>
-        </div>
-        <!-- Футер — полноширинный текст (конец) -->
-
-        <!-- Футер — информационные колонки (начало) -->
-        <div class="mxd-footer__footer-blocks">
-            <!-- Первый столбец -->
-            <div class="footer-blocks__column animate-card-3">
-                <div class="footer-blocks__card fullheight-card">
-                    <!-- Footer navigatsiyasi -->
-                    <div class="footer-blocks__nav">
-                        <ul class="footer-nav">
-                            <li class="footer-nav__item anim-uni-in-up">
-                                <a href="#" class="footer-nav__link btn-anim">
-                                    <span class="btn-caption">Bosh sahifa</span>
-                                </a>
-                            </li>
-                            <li class="footer-nav__item anim-uni-in-up">
-                                <a href="#" class="footer-nav__link btn-anim">
-                                    <span class="btn-caption">Biz haqimizda</span>
-                                </a>
-                            </li>
-                            <li class="footer-nav__item anim-uni-in-up">
-                                <a href="#" class="footer-nav__link btn-anim">
-                                    <span class="btn-caption">Yuk mashinalari</span>
-                                </a>
-                                <p class="footer-nav__counter">
-                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20px"
-                                        height="20px" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill="currentColor"
-                                            d="M19.6,9.6c0,0-3,0-4,0c-0.4,0-1.8-0.2-1.8-0.2c-0.6-0.1-1.1-0.2-1.6-0.6c-0.5-0.3-0.9-0.8-1.2-1.2
-                                      c-0.3-0.4-0.4-0.9-0.5-1.4c0,0-0.1-1.1-0.2-1.5c-0.1-1.1,0-4.4,0-4.4C10.4,0.2,10.2,0,10,0S9.6,0.2,9.6,0.4c0,0,0.1,3.3,0,4.4
-                                      c0,0.4-0.2,1.5-0.2,1.5C9.4,6.7,9.2,7.2,9,7.6C8.7,8.1,8.2,8.5,7.8,8.9c-0.5,0.3-1,0.5-1.6,0.6c0,0-1.2,0.1-1.7,0.2
-                                      c-1,0.1-4.2,0-4.2,0C0.2,9.6,0,9.8,0,10c0,0.2,0.2,0.4,0.4,0.4c0,0,3.1-0.1,4.2,0c0.4,0,1.7,0.2,1.7,0.2c0.6,0.1,1.1,0.2,1.6,0.6
-                                      c0.4,0.3,0.8,0.7,1.1,1.1c0.3,0.5,0.5,1,0.6,1.6c0,0,0.1,1.3,0.2,1.7c0,1,0,4.1,0,4.1c0,0.2,0.2,0.4,0.4,0.4s0.4-0.2,0.4-0.4
-                                      c0,0,0-3.1,0-4.1c0-0.4,0.2-1.7,0.2-1.7c0.1-0.6,0.2-1.1,0.6-1.6c0.3-0.4,0.7-0.8,1.1-1.1c0.5-0.3,1-0.5,1.6-0.6
-                                      c0,0,1.3-0.1,1.8-0.2c1,0,4,0,4,0c0.2,0,0.4-0.2,0.4-0.4C20,9.8,19.8,9.6,19.6,9.6L19.6,9.6z"></path>
-                                    </svg>
-                                    <span>25</span>
-                                </p>
-                            </li>
-                            <li class="footer-nav__item anim-uni-in-up">
-                                <a href="#" class="footer-nav__link btn-anim">
-                                    <span class="btn-caption">Xizmatlar</span>
-                                </a>
-                            </li>
-                            <li class="footer-nav__item anim-uni-in-up">
-                                <a href="#" class="footer-nav__link btn-anim">
-                                    <span class="btn-caption">Yangiliklar</span>
-                                </a>
-                            </li>
-                            <li class="footer-nav__item anim-uni-in-up">
-                                <a href="#" class="footer-nav__link btn-anim">
-                                    <span class="btn-caption">Aloqa</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- Havolalar -->
-                    <div class="footer-blocks__links anim-uni-in-up">
-                        <a class="btn btn-line-xsmall btn-muted slide-right anim-no-delay" href="#">
-                            <span class="btn-caption">Maxfiylik siyosati</span>
-                        </a>
-                        <a class="btn btn-line-xsmall btn-muted slide-right anim-no-delay" href="#">
-                            <span class="btn-caption">Foydalanish shartlari</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Второй столбец -->
-            <div class="footer-blocks__column animate-card-3">
-                <div class="footer-blocks__card">
-                    <p class="mxd-point-subtitle anim-uni-in-up">
-                        <i class="ph-fill ph-envelope"></i>
-                        <a href="mailto:info@fawtrucks.uz?subject=FAW%20TRUCKS%20bo'yicha%20so'rov"><span
-                                style="font-weight: bold;">eMail: </span>info@fawtrucks.uz</a>
-                    </p>
-                    <p class="mxd-point-subtitle anim-uni-in-up">
-                        <i class="ph-fill ph-phone"></i>
-                        <a href="tel:+998712345678"><span style="font-weight: bold;">Telefon: </span>+998 71
-                            234-56-78</a>
-                    </p>
-                    <p class="mxd-point-subtitle anim-uni-in-up">
-                        <i class="ph-fill ph-map-pin"></i>
-                        <a href="https://yandex.uz/maps/-/CHxF6XPZ" target="_blank" rel="noopener noreferrer"><span
-                                style="font-weight: bold;">Manzil: </span>Toshkent,Abdulla Kaxxar ko'chasi 2А,</a>
-                    </p>
-                </div>
-
-                <div class="footer-blocks__card card-maps" style="padding:0;overflow: hidden;height: 100%;">
-                    <!-- Встроенная карта Yandex (растянута на всю карточку, уменьшен зум) -->
-                    <div style="position:relative;overflow:hidden;width:100%;height:100%;">
-                        <a href="https://yandex.uz/maps/org/187051650206/?utm_medium=mapframe&utm_source=maps"
-                            target="_blank" rel="noopener noreferrer"
-                            style="color:#eee;font-size:12px;position:absolute;top:0px;">Faw Trucks</a>
-                        <a href="https://yandex.uz/maps/10335/tashkent/category/car_dealership/184105322/?utm_medium=mapframe&utm_source=maps"
-                            target="_blank" rel="noopener noreferrer"
-                            style="color:#eee;font-size:12px;position:absolute;top:14px;">Автосалон в Ташкенте</a>
-                        <iframe
-                            src="https://yandex.uz/map-widget/v1/?ll=69.264431%2C41.271680&mode=poi&poi%5Bpoint%5D=69.264339%2C41.271780&poi%5Buri%5D=ymapsbm1%3A%2F%2Forg%3Foid%3D187051650206&z=16"
-                            width="100%" height="100%" frameborder="1" allowfullscreen="true"
-                            style="position:relative;border:0;min-height:220px;"></iframe>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Третий столбец -->
-            <div class="footer-blocks__column animate-card-3">
-                <div class="footer-blocks__card fullheight-card">
-                    <div class="footer-blocks__block">
-                        <div class="footer-blocks__title anim-uni-in-up">
-                            <p class="footer-blocks__title-l">Ijtimoiy tarmoqlar</p>
-                        </div>
-
-                        <div class="footer-blocks__socials">
-                            <ul class="footer-socials">
-                                <li class="footer-socials__item anim-uni-in-up">
-                                    <img src="faw_site-img/icons/main-social__icon/facebook.png" alt=""
-                                        class="footer-socials__icon">
-                                    <a href="https://www.facebook.com/fawtrucksuz" class="footer-socials__link"
-                                        target="_blank">Facebook</a>
-                                </li>
-                                <li class="footer-socials__item anim-uni-in-up">
-                                    <img src="faw_site-img/icons/main-social__icon/instagram.png" alt=""
-                                        class="footer-socials__icon">
-                                    <a href="https://www.instagram.com/fawtrucks.uz" class="footer-socials__link"
-                                        target="_blank">Instagram</a>
-                                </li>
-                                <li class="footer-socials__item anim-uni-in-up">
-                                    <img src="faw_site-img/icons/main-social__icon/telegram.png" alt=""
-                                        class="footer-socials__icon">
-                                    <a href="https://t.me/fawtrucksuz" class="footer-socials__link"
-                                        target="_blank">Telegram</a>
-                                </li>
-                                <li class="footer-socials__item anim-uni-in-up">
-                                    <img src="faw_site-img/icons/main-social__icon/youtube.png" alt=""
-                                        class="footer-socials__icon">
-                                    <a href="https://www.youtube.com/c/fawtrucksuz" class="footer-socials__link"
-                                        target="_blank">YouTube</a>
-                                </li>
-                                <li class="footer-socials__item anim-uni-in-up">
-                                    <img src="faw_site-img/icons/main-social__icon/linkedin.png" alt=""
-                                        class="footer-socials__icon">
-                                    <a href="https://www.linkedin.com/company/faw-trucks-uzbekistan"
-                                        class="footer-socials__link" target="_blank">LinkedIn</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="footer-blocks__links anim-uni-in-up">
-                        <p class="t-xsmall t-muted">
-                            <a class="no-effect" href="#" target="_blank">FAW TRUCKS</a>
-                            © 2025 - Barcha huquqlar himoyalangan
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Футер — информационные колонки (конец) -->
-
-    </footer>
+    {% include 'main/includes/footer.html' %}
     <!-- Футер (конец) -->
 
     <!-- Кнопка «вверх» (начало) -->
@@ -879,10 +501,10 @@
         </div>
     </div>
     <!-- Подключение скриптов (начало) -->
-    <script src="template/js/libs.min.js"></script>
-    <script src="template/js/app.js"></script>
+    <script src="{% static 'js/libs.min.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
     <!-- Счётчики FAW (инициализация) -->
-    <script src="faw-js/faw.js"></script>
+    <script src="{% static 'js/faw.js' %}"></script>
     <script>
         // Универсальный плавный скролл, сразу учитывающий высоту фиксированного хедера
         (function () {
