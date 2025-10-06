@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="45" fill="#27AE60" opacity="0.8"/>
+  <circle cx="50" cy="35" r="15" fill="white" opacity="0.9"/>
+  <path d="M25 75 Q50 65 75 75 L75 90 L25 90 Z" fill="white" opacity="0.9"/>
+  <text x="50" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#666">Client 2</text>
+</svg>

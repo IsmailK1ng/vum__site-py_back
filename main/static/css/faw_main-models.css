@@ -1,0 +1,804 @@
+/* =================================
+   ОСНОВНЫЕ СТИЛИ СТРАНИЦЫ
+   ================================= */
+.mxd-page-content {
+    padding-top: 0 !important;
+}
+
+.mxd-container {
+    padding: 0 !important;
+}
+
+.mxd-section.padding-stacked-section {
+    padding: 0;
+}
+
+/* =================================
+   HERO СЕКЦИЯ
+   ================================= */
+.mxd-hero-06 {
+    height: auto;
+}
+
+.mxd-hero-06__content {
+    margin: 4rem 0 0;
+    height: 60vh;
+}
+
+.mxd-hero-06__top {
+    padding: 0;
+    margin: 0;
+}
+
+.mxd-hero-06__data {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end !important;
+    align-items: flex-start;
+    position: relative;
+}
+
+.mxd-hero-06__img img {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 45%;
+    z-index: 1;
+}
+
+.mxd-hero-06__btn-mobile {
+    padding: 10px;
+}
+
+.hero-06-headline__descr {
+    margin-bottom: 2.4rem;
+    padding: 10px;
+    color: white;
+    z-index: 2;
+}
+
+/* =================================
+   ЗАГОЛОВКИ И ТЕКСТ
+   ================================= */
+.mxd-section-title {
+    margin-top: 10rem;
+}
+
+.models_title {
+    color: #000000;
+    z-index: 2;
+}
+
+.mxd-section-models__title h2 {
+    color: #000000;
+}
+
+.mxd-section-title__hrdescr {
+    color: #000000;
+}
+
+/* =================================
+   СЕТКА И КОНТЕЙНЕРЫ
+   ================================= */
+.mxd-grid-item {
+    padding: 0 5.5rem;
+    margin-top: 3rem;
+}
+
+.container-fluid .row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5em;
+}
+
+.models-list_section {
+    margin: 0 80px;
+}
+
+/* =================================
+   ХЛЕБНЫЕ КРОШКИ
+   ================================= */
+.breadcrumb-ol {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    border-radius: 8px;
+    height: 100%;
+}
+
+.breadcrumb-ol li {
+    margin: 0 5px;
+    font-size: 20px;
+    color: #555;
+    font-family: inherit;
+}
+
+.breadcrumb-ol li a {
+    text-decoration: none;
+    color: #000000;
+}
+
+.breadcrumb-ol li a:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb-ol li::after {
+    content: "›";
+    margin-left: 5px;
+    font-style: 25px;
+    color: #535353;
+}
+
+.breadcrumb-ol li.active a {
+    font-weight: bold;
+    color: #000;
+    text-decoration: underline;
+}
+
+.breadcrumb-ol li.active::after {
+    content: "";
+}
+
+/* =================================
+   ФИЛЬТРЫ И ПОИСК
+   ================================= */
+.section-filter {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 10rem;
+}
+
+.filter-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 12px;
+}
+
+.filter-search {
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.filter-search__input {
+    margin-left: 20px;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    outline: none;
+    border-radius: 20px 0px 0px 20px;
+    font-size: 16px;
+    width: 200px;
+    max-height: 50px;
+    height: 100%;
+}
+
+.filter-search__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 0;
+    width: 50px;
+    max-height: 50px;
+    height: 100%;
+    padding: 10px 12px 10px 10px;
+    border-radius: 0px 20px 20px 0px;
+    background: black;
+    border: none;
+    cursor: pointer;
+}
+
+/* =================================
+   ПЕРЕКЛЮЧАТЕЛЬ GRID/LIST
+   ================================= */
+.grid-switcher {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    width: 50px;
+}
+
+.switcher-grid_btn,
+.switcher-list_btn {
+    background: black;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    position: absolute;
+}
+
+/* =================================
+   КАРТОЧКИ ГРУЗОВИКОВ (GRID VIEW)
+   ================================= */
+.faw-truck-card-container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+    justify-content: center;
+}
+
+.faw-truck-card {
+    max-width: 400px;
+    margin: 0 auto;
+    min-width: 350px;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.faw-truck-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0px 0px 20px 2px rgb(0 0 0 / 60%);
+}
+
+.truck-image-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 400px;
+    background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 100%);
+    text-align: center;
+}
+
+.truck-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.truck-image-container::before {
+    position: absolute;
+    content: "FAW";
+    bottom: 10px;
+    left: 10px;
+    background: white;
+    padding: 5px 15px;
+    border-radius: 10px 0;
+    color: #000;
+}
+
+.truck-info {
+    max-height: 276px;
+    height: 100%;
+    background: linear-gradient(312deg, #353941 0%, #000000 100%);
+    color: #fff;
+    padding: 15px;
+    position: relative;
+}
+
+.truck-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 25px;
+    text-align: center;
+    color: #fff;
+}
+
+.truck-specs {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.spec-item {
+    max-width: 65px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: background 0.3s;
+}
+
+.spec-icon {
+    width: 55px;
+    height: 45px;
+    margin-bottom: 10px;
+    fill: #fff;
+    opacity: 1;
+}
+
+.spec-value {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #fff;
+    word-break: break-all;
+    hyphens: auto;
+    overflow-wrap: break-word;
+}
+
+.spec-label {
+    font-size: 12px;
+    opacity: 0.8;
+    color: #e2e8f0;
+}
+
+.truck-cta {
+    text-align: center;
+}
+
+.btn-details {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    padding: 10px 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 18px;
+    transition: all 0.3s;
+    backdrop-filter: blur(10px);
+}
+
+.btn-details:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* =================================
+   СТЕКАЮЩИЕ КАРТОЧКИ (LIST VIEW)
+   ================================= */
+.stack-item {
+    display: flex;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+}
+
+.stack-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 400px;
+}
+
+.content__block {
+    position: relative;
+    width: 100%;
+    min-height: 400px;
+}
+
+.services-stack {
+    position: relative;
+    width: 100%;
+    min-height: 400px;
+}
+
+.in-content-stack {
+    min-height: 600px;
+}
+
+.mxd-services-stack__inner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    box-shadow: 0 0 15px -5px whitesmoke;
+}
+
+.mxd-services-stack__title {
+    flex-shrink: 0;
+    min-height: auto;
+}
+
+.mxd-services-stack__title h3 {
+    line-height: 1.2;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.mxd-services-stack__info {
+    flex-shrink: 0;
+}
+
+.stack-item:last-child .mxd-services-stack__inner {
+    min-height: 400px;
+}
+
+/* =================================
+   ТЕГИ И КНОПКИ
+   ================================= */
+.tag-default {
+    height: 5.2rem;
+    width: 145px;
+}
+
+.tag-default img {
+    height: 30px !important;
+    width: auto;
+}
+
+.tag-outline-opposite {
+    background-color: #00000000;
+    border-style: solid;
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+.btn-additional {
+    background: #000;
+    border: none;
+    color: #fff;
+}
+
+/* =================================
+   ТЕМНАЯ ТЕМА
+   ================================= */
+body[data-theme="dark"] .hero-05-title__item {
+    color: #ffffff;
+}
+
+/* =================================
+   МЕДИА ЗАПРОСЫ
+   ================================= */
+/* Desktop Medium */
+@media (max-width: 1200px) {
+    .mxd-hero-06 {
+        height: auto;
+    }
+}
+
+/* Desktop Small */
+@media (max-width: 1100px) {
+    .spec-icon {
+        width: 40px;
+        height: 35px;
+        margin-bottom: 5px;
+        fill: #fff;
+        opacity: 1;
+    }
+
+    .truck-title {
+        font-size: 20px;
+    }
+}
+
+/* Tablet Landscape */
+@media (max-width: 996px) {
+    .stack-item {
+        height: 80%;
+        min-height: 350px;
+    }
+
+    .mxd-services-stack__inner {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        min-height: 350px;
+        padding: 2.6rem 3rem 0 3rem;
+        z-index: 0;
+        border-radius: var(--_radius-l);
+        align-content: flex-start;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+
+    .mxd-services-stack__title {
+        margin-bottom: 3.4rem;
+        padding-right: 2.6rem;
+        width: 50%;
+    }
+
+    .mxd-services-stack__info {
+        width: 55%;
+        margin-bottom: 3.3rem;
+    }
+
+    .services-stack__image {
+        position: absolute;
+        top: 0px;
+        right: 0;
+        width: 45%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+    }
+
+    .services-stack__image img {
+        width: 100%;
+        object-fit: cover;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+}
+
+/* Desktop Large */
+@media only screen and (min-width: 992px) {
+    .services-stack__image .service-img {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        height: 100%;
+        width: 40%;
+        object-fit: cover;
+    }
+}
+
+/* Tablet Portrait */
+@media (max-width: 768px) {
+    .mxd-hero-06__content {
+        height: 50vh;
+    }
+
+    .stack-item {
+        height: 70%;
+        min-height: 300px;
+    }
+
+    .mxd-services-stack__inner {
+        min-height: 300px;
+    }
+
+    .mxd-services-stack__title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 12px;
+    }
+
+    .mxd-services-stack__title h3 {
+        font-size: 20px;
+    }
+
+    .tag-default {
+        height: 4.2rem;
+        width: 110px;
+    }
+
+    .tag-default img {
+        height: 20px !important;
+        width: auto;
+    }
+}
+
+/* Mobile Landscape */
+@media (max-width: 576px) {
+    .mxd-hero-06__content {
+        height: 60vh;
+    }
+
+    .mxd-hero-06__img img {
+        display: none;
+    }
+}
+
+/* Mobile Portrait */
+@media (max-width: 480px) {
+    .faw-truck-card-container {
+        grid-template-columns: none;
+        justify-content: center;
+    }
+
+    .faw-truck-card {
+        min-width: unset;
+        margin: 10px;
+        max-width: 300px;
+        width: 100%;
+        height: auto;
+    }
+
+    .truck-info {
+        max-height: none;
+        height: 100%;
+    }
+
+    .mxd-grid-item {
+        padding: 0;
+    }
+
+    .truck-specs {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .truck-title {
+        font-size: 20px;
+    }
+
+    .spec-value {
+        font-size: 16px;
+    }
+}
+
+/* ===== Пагинация из site_news.css ===== */
+.mxd-blog-pagination {
+    position: relative;
+    margin-top: 5rem;
+    margin-bottom: 2.4rem;
+}
+
+.blog-pagination-number.active {
+    font-size: 4rem;
+    font-weight: var(--fw-semibold);
+}
+
+.mxd-blog-pagination__inner {
+    position: relative;
+}
+
+.mxd-blog-pagination__items {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    font: normal var(--fw-medium) 1.8rem/3.3rem var(--_font-accent);
+}
+
+.blog-pagination-control {
+    position: absolute;
+    top: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font: normal var(--fw-regular) 1.8rem/1.2 var(--_font-accent);
+    color: var(--t-muted);
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+}
+
+.blog-pagination-control:hover {
+    color: var(--t-bright);
+    background: var(--bg-card);
+    transform: scale(1.05);
+}
+
+.blog-pagination-control.prev {
+    left: 0;
+}
+
+.blog-pagination-control.next {
+    right: 0;
+}
+
+.blog-pagination-control .btn-caption {
+    display: none !important;
+}
+
+.mxd-blog-pagination__items .blog-pagination-number {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    font: normal var(--fw-regular) 2rem/3.3rem var(--_font-accent);
+    color: var(--t-bright);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.mxd-blog-pagination__items .blog-pagination-number:hover {
+    background: var(--bg-card-hover);
+    transform: scale(1.1);
+    color: var(--primary);
+}
+
+/* Дополнительные стили пагинации из site_news.css */
+.blog-pagination-number {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    font: normal var(--fw-regular) 2rem/3.3rem var(--_font-accent);
+    color: var(--t-bright);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.blog-pagination-number.active {
+    font-size: 4rem;
+    font-weight: var(--fw-semibold);
+}
+
+.blog-pagination-number.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.blog-pagination-control {
+    position: absolute;
+    top: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font: normal var(--fw-regular) 1.8rem/1.2 var(--_font-accent);
+    color: var(--t-muted);
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+}
+
+.blog-pagination-control.prev {
+    left: 0;
+}
+
+.blog-pagination-control.next {
+    right: 0;
+}
+
+.blog-pagination-control.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.blog-pagination-control .btn-caption {
+    display: none !important;
+}
+
+.blog-pagination-control i {
+    font-size: 2.2rem;
+    transition: transform 0.3s ease;
+}
+
+.blog-pagination-control:hover i {
+    transform: translateX(0);
+}
+
+.blog-pagination-control.prev:hover i {
+    transform: translateX(-4px);
+}
+
+.blog-pagination-control.next:hover i {
+    transform: translateX(4px);
+}
+
+@media only screen and (min-width: 768px) {
+    .blog-pagination-control .btn-caption {
+        display: inline-block !important;
+    }
+}
+
+@media only screen and (min-width: 1200px) {
+    .mxd-blog-pagination {
+        margin: 3rem 6.5rem;
+    }
+}

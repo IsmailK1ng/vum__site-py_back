@@ -1,0 +1,927 @@
+/* =================================
+   СТИЛИ ДЛЯ БЛОКА ПОДРОБНОЙ ИНФОРМАЦИИ
+   ================================= */
+
+.mxd-section {
+    width: auto;
+}
+
+.mxd-hero-06__top {
+    position: unset;
+    margin: 0 100px;
+}
+
+.section-more_info .breadcrumb-ol {
+    padding: 0;
+    margin: 0 80px;
+    margin-bottom: 10rem;
+}
+
+.section-more_info .breadcrumb-ol::after {
+    content: "";
+    width: 100%;
+    height: 2px;
+    background: #3a3a3a;
+}
+
+.mxd-hero-06__content {
+    height: auto;
+    position: unset;
+    margin: 0;
+    flex-direction: column;
+    overflow: visible;
+}
+
+.mxd-hero-06__car {
+    padding: 0 10px 10px;
+    position: relative;
+}
+
+.mxd-hero-06__data {
+    display: flex;
+    align-self: start;
+    justify-content: flex-start !important;
+    margin-top: 9rem;
+    width: 100%;
+}
+
+.mxd-grid-item {
+    padding: 0;
+}
+
+.mxd-section-models__title h2 {
+    font-size: 7rem;
+    text-shadow: none;
+    padding-right: 10px;
+}
+
+.more_info-link {
+    font-size: 5rem;
+}
+
+.more_info-link a {
+    color: black;
+    text-decoration: underline;
+    font-weight: 400;
+}
+
+.hero-06-headline__descr {
+    display: block;
+    margin: 0;
+    padding: 0;
+    text-shadow: none;
+}
+
+.mxd-section-models__title {
+    font-weight: bold;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.mxd-section-models__title ul {
+    display: flex;
+    gap: 12px;
+}
+
+.car-img_block {
+    height: auto;
+    object-fit: cover;
+}
+
+.car-img_block img {
+    width: 100%;
+    max-width: 750px;
+    object-fit: cover;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+/* =================================
+   БЛОК ХАРАКТЕРИСТИК АВТОМОБИЛЯ
+   ================================= */
+
+.car-img_block-info {
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 25px;
+    min-width: 300px;
+    max-width: 500px;
+    box-shadow: 7px 9px 5px 0px rgb(0 0 0 / 10%);
+    border: 1px solid rgb(235 235 235 / 82%);
+    z-index: 10;
+}
+
+.car-specs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.car-spec-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.car-spec-item:hover {
+    background: rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
+}
+
+.car-spec-icon {
+    width: 32px;
+    height: 32px;
+    opacity: 0.8;
+    flex-shrink: 0;
+}
+
+.car-spec-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.car-spec-label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+    margin-bottom: 2px;
+    line-height: 1.2;
+}
+
+.car-spec-value {
+    font-size: 14px;
+    color: #1a1a1a;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+/* =================================
+   CSS-ONLY АККОРДЕОН
+   ================================= */
+
+.acardeon-cards_container {
+    margin: 0 80px;
+    margin-top: 40px;
+}
+
+.acardeon-cards_title {
+    font-size: 5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    position: relative;
+}
+
+.acardeon-cards_title::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #3a3a3a;
+}
+
+.acardeon-cards_block {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Скрываем чекбокс */
+.accordion-checkbox {
+    display: none;
+}
+
+.acardeon-card {
+    border-bottom: 1px solid #e9ecef;
+    background: transparent;
+}
+
+.acardeon-card:last-child {
+    border-bottom: none;
+}
+
+.acardeon-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.acardeon-card__header:hover {
+    color: #333;
+}
+
+.acardeon-card__title {
+    font-size: 3rem;
+    font-weight: 600;
+    color: #000000;
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+/* Иконка плюс/крестик */
+.acardeon-card__icon {
+    padding: 5px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.acardeon-card__icon::before {
+    content: '';
+    width: 30px;
+    height: 30px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="%23000" d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0-1.2,0-1.7.2H.4c-.2,0-.4.2-.4.4s.2.4.4.4h4.1c.4,0,1.7.2,1.7.2.6,0,1.1.2,1.6.6.4.3.8.7,1.1,1.1.3.5.5,1,.6,1.6,0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4h0Z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    transition: all 0.3s ease;
+}
+
+/* Hover эффект */
+.acardeon-card__header:hover .acardeon-card__icon {
+    background: #000;
+    border-color: #000;
+}
+
+.acardeon-card__header:hover .acardeon-card__icon::before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="%23fff" d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0-1.2,0-1.7.2H.4c-.2,0-.4.2-.4.4s.2.4.4.4h4.1c.4,0,1.7.2,1.7.2.6,0,1.1.2,1.6.6.4.3.8.7,1.1,1.1.3.5.5,1,.6,1.6,0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4h0Z"/></svg>');
+}
+
+/* Содержимое аккордеона */
+.acardeon-card__content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    padding: 0;
+}
+
+/* Активное состояние - когда чекбокс отмечен */
+.accordion-checkbox:checked+.acardeon-card__header .acardeon-card__title {
+    color: #1a1a1a;
+}
+
+.accordion-checkbox:checked+.acardeon-card__header .acardeon-card__icon::before {
+    transform: rotate(45deg);
+}
+
+.accordion-checkbox:checked~.acardeon-card__content {
+    max-height: 500px;
+    padding: 0 0 30px 0;
+}
+
+/* Стили для списка характеристик */
+.specs-list.custom-marker {
+    list-style: none;
+    padding-left: 0;
+    display: flex;
+    row-gap: 15px;
+    flex-direction: column;
+    margin: 20px 0 0 0;
+}
+
+.specs-list.custom-marker li {
+    position: relative;
+    padding-left: 32px;
+    min-height: 24px;
+    color: #666;
+    line-height: 1.6;
+}
+
+.specs-list.custom-marker li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 20px;
+    height: 20px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="%23000" d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0-1.2,0-1.7.2H.4c-.2,0-.4.2-.4.4s.2.4.4.4h4.1c.4,0,1.7.2,1.7.2.6,0,1.1.2,1.6.6.4.3.8.7,1.1,1.1.3.5.5,1,.6,1.6,0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4h0Z"/></svg>');
+    background-repeat: no-repeat;
+}
+
+.slide-content {
+    padding: 0;
+    height: 100%;
+}
+
+.slide-image {
+    width: 100%;
+    height: 340px;
+}
+
+/* Модальное окно */
+.faw-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 99999;
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.faw-modal.active {
+    display: block;
+}
+
+.faw-modal__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.faw-modal__content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.4s ease;
+}
+
+.faw-modal__close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: #f5f5f5;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    color: #333;
+}
+
+.faw-modal__close:hover {
+    background: #333;
+    color: #fff;
+    transform: rotate(90deg);
+}
+
+.faw-modal__header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.faw-modal__title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 10px 0;
+}
+
+.faw-modal__subtitle {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+}
+
+/* Форма */
+.faw-form__group {
+    margin-bottom: 20px;
+}
+
+.faw-form__input,
+.faw-form__select,
+.faw-form__textarea {
+    width: 100%;
+    padding: 15px 20px;
+    border: 2px solid #e5e5e5;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    background: #fff;
+    color: #333;
+}
+
+.faw-form__input:focus,
+.faw-form__select:focus,
+.faw-form__textarea:focus {
+    outline: none;
+    border-color: #333;
+    background: #fafafa;
+}
+
+.faw-form__select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%23333" d="M6 9L1 4h10z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    padding-right: 45px;
+}
+
+.faw-form__textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.faw-form__submit {
+    width: 100%;
+    padding: 18px 30px;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.faw-form__submit:hover {
+    background: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.faw-form__submit svg {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+}
+
+.faw-form__submit:hover svg {
+    transform: translate(3px, -3px);
+}
+
+.section-galery {
+    margin: 0 80px;
+}
+
+/* Модальное окно галереи */
+.gallery-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99999;
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+.gallery-modal.active {
+  display: block;
+}
+.gallery-modal__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+}
+.gallery-modal__content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 20px;
+  padding: 20px;
+  max-width: 90vw;
+  max-height: 90vh;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: slideUp 0.4s ease;
+}
+.gallery-modal__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: #f5f5f5;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  color: #333;
+  z-index: 2;
+}
+.gallery-modal__close:hover {
+  background: #333;
+  color: #fff;
+  transform: rotate(90deg);
+}
+.gallery-modal__img {
+  max-width: 80vw;
+  max-height: 80vh;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  margin-top: 20px;
+}
+@media (max-width: 768px) {
+  .gallery-modal__content {
+    padding: 10px;
+    border-radius: 12px;
+  }
+  .gallery-modal__img {
+    max-width: 95vw;
+    max-height: 70vh;
+  }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -45%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .faw-modal__content {
+        width: 95%;
+        padding: 30px 20px;
+    }
+
+    .faw-modal__title {
+        font-size: 24px;
+    }
+
+    .faw-modal__close {
+        width: 35px;
+        height: 35px;
+        top: 15px;
+        right: 15px;
+    }
+
+    .faw-form__input,
+    .faw-form__select,
+    .faw-form__textarea {
+        font-size: 14px;
+        padding: 12px 15px;
+    }
+
+    .faw-form__submit {
+        font-size: 14px;
+        padding: 15px 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .faw-modal__content {
+        border-radius: 15px;
+    }
+
+    .faw-modal__title {
+        font-size: 20px;
+    }
+
+    .faw-modal__subtitle {
+        font-size: 12px;
+    }
+}
+
+/* Адаптивность */
+@media screen and (max-width: 768px) {
+    .section-more_info .breadcrumb-ol {
+        margin: 0 20px;
+        margin-bottom: 6rem;
+    }
+
+    .acardeon-cards_container {
+        margin: 0 20px;
+        margin-top: 30px;
+    }
+
+    .acardeon-cards_title {
+        font-size: 3rem;
+        margin-bottom: 30px;
+    }
+
+    .acardeon-card__header {
+        padding: 20px 0;
+    }
+
+    .acardeon-card__title {
+        font-size: 2rem;
+    }
+
+    .acardeon-card__icon {
+        width: 35px;
+        height: 35px;
+        padding: 3px;
+    }
+
+    .acardeon-card__icon::before {
+        width: 25px;
+    }
+
+    .acardeon-card__icon::after {
+        height: 10px;
+    }
+
+    .gallery-modal__content {
+        width: 65vh;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .acardeon-cards_container {
+        margin: 0 25px;
+        margin-top: 25px;
+    }
+
+    .section-more_info .breadcrumb-ol {
+        margin: 0 25px;
+        margin-bottom: 6rem;
+    }
+
+    .section-galery {
+        margin: 0 10px;
+    }
+
+    .acardeon-cards_title {
+        font-size: 2.4rem;
+    }
+
+    .acardeon-card__title {
+        font-size: 1.5rem;
+    }
+
+    .acardeon-card__icon {
+        width: 30px;
+        height: 30px;
+        padding: 2px;
+    }
+}
+/* Темная тема - объединенные стили */
+body[data-theme="dark"] .faw-modal__content {
+    background: #1a1a1a;
+}
+
+body[data-theme="dark"] .faw-modal__title {
+    color: #fff;
+}
+
+body[data-theme="dark"] .faw-modal__subtitle {
+    color: #999;
+}
+
+body[data-theme="dark"] .faw-modal__close {
+    background: #2a2a2a;
+    color: #fff;
+}
+
+body[data-theme="dark"] .faw-modal__close:hover {
+    background: #fff;
+    color: #1a1a1a;
+}
+
+body[data-theme="dark"] .faw-form__input,
+body[data-theme="dark"] .faw-form__select,
+body[data-theme="dark"] .faw-form__textarea {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+    color: #fff;
+}
+
+body[data-theme="dark"] .faw-form__input:focus,
+body[data-theme="dark"] .faw-form__select:focus,
+body[data-theme="dark"] .faw-form__textarea:focus {
+    background: #333;
+    border-color: #666;
+}
+
+body[data-theme="dark"] .faw-form__submit {
+    background: #fff;
+    color: #1a1a1a;
+}
+
+body[data-theme="dark"] .faw-form__submit:hover {
+    background: #f5f5f5;
+}
+
+body[data-theme="dark"] .car-img_block-info {
+    background: rgba(22, 22, 22, 0.95);
+    box-shadow: 7px 9px 5px 0px rgb(225 225 225 / 20%);
+}
+
+body[data-theme="dark"] .car-spec-item {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+body[data-theme="dark"] .car-spec-item:hover {
+    background: rgba(102, 126, 234, 0.2);
+}
+
+body[data-theme="dark"] .car-spec-icon {
+    opacity: 1;
+    filter: brightness(0) invert(1);
+}
+
+body[data-theme="dark"] .car-spec-label {
+    color: #999;
+}
+
+body[data-theme="dark"] .car-spec-value {
+    color: #fff;
+}
+
+body[data-theme="dark"] .specs-list__item {
+    color: #fff;
+}
+
+body[data-theme="dark"] .specs-list.custom-marker li::before {
+    filter: brightness(0) invert(1);
+}
+
+@media screen and (max-width: 1500px) {
+    .mxd-hero-06__top {
+        position: unset;
+        margin: 0 40px;
+    }
+
+    .mxd-section-models__title h2 {
+        font-size: 6rem;
+    }
+
+    .more_info-link {
+        font-size: 4rem;
+    }
+}
+
+@media screen and (max-width: 1400px) {
+    .mxd-section-models__title h2 {
+        font-size: 5rem;
+    }
+
+    .car-img_block img {
+        width: 65%;
+        height: auto;
+        object-fit: cover;
+        position: absolute;
+        bottom: 0;
+        right: -40px;
+    }
+
+    .more_info-link {
+        font-size: 3rem;
+    }
+
+    .car-img_block-info {
+        max-width: 400px;
+    }
+}
+
+/* Адаптация для разных размеров экрана */
+@media screen and (max-width: 1200px) {
+    .car-img_block-info {
+        min-width: 280px;
+        max-width: 350px;
+        padding: 20px;
+    }
+
+    .car-specs-grid {
+        gap: 16px;
+    }
+
+    .car-spec-item {
+        padding: 10px;
+    }
+
+    .mxd-section-models__title h2 {
+        font-size: 4rem;
+    }
+
+    .more_info-link {
+        font-size: 2rem;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .car-img_block img {
+        width: 90%;
+        height: auto;
+        object-fit: cover;
+        position: relative;
+        left: 0;
+    }
+
+
+    .car-img_block-info {
+        position: relative;
+        bottom: unset;
+        left: unset;
+        margin-top: 20px;
+        max-width: 100%;
+        min-width: unset;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .mxd-hero-06__top {
+        position: unset;
+        margin: 0 25px;
+    }
+
+    .car-img_block-info {
+        padding: 18px;
+        border-radius: 16px;
+        margin-top: 15px;
+    }
+
+    .car-specs-grid {
+        gap: 12px;
+    }
+
+    .car-spec-item {
+        padding: 8px;
+        gap: 10px;
+    }
+
+    .car-spec-icon {
+        width: 26px;
+        height: 26px;
+    }
+
+    .car-spec-label {
+        font-size: 11px;
+    }
+
+    .car-spec-value {
+        font-size: 13px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .car-specs-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .car-spec-item {
+        padding: 10px 12px;
+    }
+}
+
+@media screen and (max-width: 360px) {}

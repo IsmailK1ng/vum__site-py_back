@@ -1,0 +1,543 @@
+.faw-history-title h2 {
+    font-size: 4.5rem;
+}
+
+
+
+.hero-00-manifest .mxd-manifest {
+    line-height: 1.5;
+}
+
+.hero-00-manifest b,
+.hero-00-manifest {
+    font-weight: 700 !important;
+}
+
+.faw-history-title {
+    font-weight: bold !important;
+}
+
+.mxd-grid-item {
+    padding: 0 3rem;
+    margin-top: 3rem;
+}
+
+
+.contact-info__description {
+    font: normal var(--fw-regular) 2.5rem / 1.6 var(--_font-accent);
+    color: var(--t-medium);
+    font-weight: 700;
+    margin-bottom: 3rem;
+    max-width: 460px;
+    line-height: 2;
+}
+
+.faw-history-title {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    font-family: var(--_font-accent);
+    margin-bottom: 5rem;
+}
+
+.faw-history-title h2 {
+    font-size: 6rem;
+    font-family: var(--_font-accent);
+    color: #000000;
+    position: relative;
+    display: inline-block;
+
+}
+
+.mt-0 {
+    margin-top: -50px !important;
+}
+
+.mxd-container {
+    padding: 0 11rem;
+    margin-top: 10rem;
+}
+
+
+
+@media only screen and (min-width: 769px) and (max-width: 1450px) {
+    .hero-00-manifest .mxd-manifest {
+        font-size: 3rem;
+        margin: 20px 0px 0px 15px;
+        max-width: 100%;
+
+    }
+
+    .faw-history-title {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        font-family: var(--_font-accent);
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero-00-manifest {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: left;
+        align-content: stretch;
+        flex-wrap: wrap;
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .faw-history-title h2 {
+        font-size: 4.5rem;
+    }
+
+    .mxd-container {
+        padding: 0rem;
+        margin-top: 3rem;
+    }
+
+    .mt-0 {
+        margin-top: 0px !important;
+    }
+
+    .contact-info {
+        position: relative;
+        height: 100%;
+        display: flex;
+        text-align: start;
+    }
+
+    .mxd-grid-item {
+        padding: 0rem;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .hero-00-manifest .mxd-manifest {
+        font-size: 3rem;
+        margin: 20px 0px 0px 15px;
+        max-width: 100%;
+
+    }
+
+    .faw-history-title {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        font-family: var(--_font-accent);
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero-00-manifest {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: left;
+        align-content: stretch;
+        flex-wrap: wrap;
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .faw-history-title h2 {
+        font-size: 4.5rem;
+        font-family: var(--_font-accent);
+        color: #000000;
+        position: relative;
+        display: inline-block;
+    }
+
+    .section-filter {
+        justify-content: flex-start;
+        margin-left: 0px;
+    }
+
+    .mxd-container {
+        padding: 0rem;
+        margin-top: 3rem;
+    }
+
+    .mt-0 {
+        margin-top: 0px !important;
+    }
+
+    .contact-info {
+        position: relative;
+        height: 100%;
+        display: flex;
+        text-align: start;
+    }
+
+    .mxd-grid-item {
+        padding: 0rem;
+    }
+}
+
+@media only screen and (min-width: 628px) and (max-width: 767px) {
+    .hero-00-manifest .mxd-manifest {
+        font-size: 2.8rem;
+        margin: 20px 0px 0px 5px;
+        max-width: 100%;
+
+    }
+
+    .faw-history-title {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        font-family: var(--_font-accent);
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero-00-manifest {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: left;
+        align-content: stretch;
+        flex-wrap: wrap;
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .faw-history-title h2 {
+        font-size: 4rem;
+    }
+
+    .mxd-container {
+        padding: 0rem;
+        margin-top: 3rem;
+    }
+
+    .mt-0 {
+        margin-top: 0px !important;
+    }
+
+    .contact-info {
+        position: relative;
+        height: 100%;
+        display: flex;
+        text-align: start;
+    }
+
+    .mxd-grid-item {
+        padding: 0rem;
+    }
+}
+
+@media only screen and (min-width: 527px) and (max-width: 627px) {
+    .hero-00-manifest .mxd-manifest {
+        font-size: 2.8rem;
+        margin: 20px 0px 0px 5px;
+        max-width: 100%;
+    }
+
+    .faw-history-title {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        font-family: var(--_font-accent);
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero-00-manifest {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: left;
+        align-content: stretch;
+        flex-wrap: wrap;
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .faw-history-title h2 {
+        font-size: 4rem;
+    }
+
+    .mxd-container {
+        padding: 0rem;
+        margin-top: 3rem;
+    }
+
+    .mt-0 {
+        margin-top: 0px !important;
+    }
+
+    .contact-info {
+        position: relative;
+        height: 100%;
+        display: flex;
+        text-align: start;
+    }
+
+    .mxd-grid-item {
+        padding: 0rem;
+    }
+}
+
+@media only screen and (min-width: 426px) and (max-width: 526px) {
+    .hero-00-manifest .mxd-manifest {
+        font-size: 2.5rem;
+        margin: 20px 0px 0px 5px;
+        max-width: 100%;
+
+    }
+
+    .hero-00-manifest {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: left;
+        align-content: stretch;
+        flex-wrap: wrap;
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .faw-history-title h2 {
+        font-size: 4rem;
+    }
+
+    .faw-history-title {
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .mxd-container {
+        padding: 0rem;
+        margin-top: 3rem;
+    }
+
+    .mt-0 {
+        margin-top: 0px !important;
+    }
+
+    .contact-info {
+        position: relative;
+        height: 100%;
+        display: flex;
+        text-align: start;
+    }
+
+    .mxd-grid-item {
+        padding: 0rem;
+    }
+}
+
+@media only screen and (max-width: 425px) {
+    .hero-00-manifest .mxd-manifest {
+        font-size: 2rem;
+        margin: 20px 0px 0px 5px;
+        max-width: 100%;
+
+    }
+
+    .faw-history-title {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        font-family: var(--_font-accent);
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero-00-manifest {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: left;
+        align-content: stretch;
+        flex-wrap: wrap;
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .faw-history-title h2 {
+        font-size: 3.5rem;
+        font-family: var(--_font-accent);
+        color: #000000;
+        position: relative;
+        display: inline-block;
+    }
+
+    .mxd-container {
+        padding: 0rem;
+        margin-top: 3rem;
+    }
+
+    .mt-0 {
+        margin-top: 0px !important;
+    }
+
+    .contact-info {
+        position: relative;
+        height: 100%;
+        display: flex;
+        text-align: start;
+    }
+
+    .mxd-grid-item {
+        padding: 0rem;
+    }
+}
+
+@media only screen and (min-width: 376px) and (max-width: 424px) {
+    .faw-history-title h2 {
+        font-size: 3rem;
+        font-family: var(--_font-accent);
+        color: #000000;
+        position: relative;
+        display: inline-block;
+    }
+
+    .faw-history-title {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        font-family: var(--_font-accent);
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero-00-manifest {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: left;
+        align-content: stretch;
+        flex-wrap: wrap;
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .hero-00-manifest .mxd-manifest {
+        font-size: 2rem;
+        margin: 20px 0px 0px 5px;
+        max-width: 100%;
+    }
+
+    .mxd-container {
+        padding: 0rem;
+        margin-top: 3rem;
+    }
+
+    .mt-0 {
+        margin-top: 0px !important;
+    }
+
+    .contact-info {
+        position: relative;
+        height: 100%;
+        display: flex;
+        text-align: start;
+    }
+
+    .mxd-grid-item {
+        padding: 0rem;
+    }
+}
+
+@media only screen and (min-width: 321px) and (max-width: 375px) {
+    .faw-history-title h2 {
+        font-size: 3rem;
+        font-family: var(--_font-accent);
+        color: #000000;
+        position: relative;
+        display: inline-block;
+    }
+
+    .faw-history-title {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        font-family: var(--_font-accent);
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero-00-manifest .mxd-manifest {
+        font-size: 2rem;
+        margin: 10px;
+        max-width: 100%;
+        padding: 10px;
+    }
+
+    .mxd-container {
+        padding: 0rem;
+        margin-top: 3rem;
+    }
+
+    .mt-0 {
+        margin-top: 0px !important;
+    }
+
+    .contact-info {
+        position: relative;
+        height: 100%;
+        display: flex;
+        text-align: start;
+    }
+
+    .mxd-grid-item {
+        padding: 0rem;
+    }
+}
+
+@media only screen and (max-width: 320px) {
+    .faw-history-title h2 {
+        font-size: 3rem;
+        font-family: var(--_font-accent);
+        color: #000000;
+        position: relative;
+        display: inline-block;
+
+    }
+
+    .faw-history-title {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        font-family: var(--_font-accent);
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero-00-manifest .mxd-manifest {
+        font-size: 2rem;
+        margin: 10px;
+        max-width: 90%;
+        padding: 10px;
+    }
+
+    .mxd-container {
+        padding: 0rem;
+        margin-top: 3rem;
+    }
+
+    .mt-0 {
+        margin-top: 0px !important;
+    }
+
+    .contact-info {
+        position: relative;
+        height: 100%;
+        display: flex;
+        text-align: start;
+    }
+
+    .mxd-grid-item {
+        padding: 0 1rem;
+    }
+}

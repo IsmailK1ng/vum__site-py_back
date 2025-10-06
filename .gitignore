@@ -1,0 +1,43 @@
+# === Python / Django ===
+*.pyc
+__pycache__/
+db.sqlite3
+*.log
+*.pot
+*.py[cod]
+*$py.class
+
+# === Environment ===
+.env
+venv/
+.env.bak
+.env.local
+.env.dev
+.env.prod
+
+# === Django specific ===
+/staticfiles/
+/media/
+/locale/__pycache__/
+/migrations/__pycache__/
+/migrations/*.pyc
+*.mo
+
+# === IDEs ===
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# === OS files ===
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# === Backups ===
+*.bak
+*.swp
+*.~*
+*.tmp
+*.old

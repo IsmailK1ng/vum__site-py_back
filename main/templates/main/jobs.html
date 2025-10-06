@@ -1,0 +1,629 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Заголовок страницы -->
+    <title>Faw Trucks в Узбекистане</title>
+
+    <!-- Мета теги -->
+    <meta name="description" content="Faw Trucks в Узбекистане">
+    <meta name="keywords" content="Faw Trucks в Узбекистане">
+    <meta name="author" content="mix_design">
+
+    <!-- Мета viewport -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!-- Фавикон и иконки (начало) -->
+    <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="{% static 'images/icon/_iiiiapple.png' %}" />
+    <link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/icon/_iiii176.png' %}" />
+    <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/icon/_iiii1156.png' %}" />
+    <link rel="apple-touch-startup-image" href="{% static 'images/icon/_iiii1.png' %}" />
+    <!-- Фавикон и иконки (конец) -->
+
+    <!-- Мета для Facebook (начало) -->
+    <meta property="og:image:height" content="1200">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:title" content="Faw Trucks в Узбекистане">
+    <meta property="og:description" content="Faw Trucks в Узбекистане">
+    <meta property="og:url" content="https://mixdesign.dev/themeforest/rayo">
+    <meta property="og:image" content="https://mixdesign.dev/themeforest/rayo/img/og-image.jpg">
+    <!-- Мета для Facebook (конец) -->
+
+    <!-- Подключение стилей (начало) -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/jobs-page.css' %}">
+    <!-- Стили Leaflet для карты в футере -->
+
+
+    <!-- Цвет браузера (начало) -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
+    <meta name="msapplication-navbutton-color" content="#161616">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Цвет браузера (конец) -->
+
+</head>
+
+<body>
+
+    <!-- Меню и шапка (начало) -->
+    {% include 'main/includes/header.html' %}
+    <!-- Меню и шапка (конец) -->
+
+
+    <!-- Контент страницы (начало) -->
+    <main id="mxd-page-content" class="mxd-page-content">
+        <!-- Хлебные крошки -->
+        <div aria-label="breadcrumb">
+            <ol class="breadcrumb-ol">
+                <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
+                <li class="active"><a href="{% url 'jobs' %}">Vakansiya</a></li>
+            </ol>
+        </div>
+        <!-- Hero Section Start -->
+        <div class="mxd-section">
+            <div class="mxd-hero-09">
+                <div class="mxd-hero-09__wrap loading-wrap">
+                    <div class="mxd-hero-09__headline">
+                        <div class="hero-09-headline__caption loading__item">
+                            <p style="font-size: 4rem;">Bizning safimizga qoshiling</p>
+                        </div>
+                        <div class="hero-09-headline__title loading__item">
+                            <h1>VUM JAMOASI</h1>
+                        </div>
+                    </div>
+                    <div class="mxd-hero-09__objects">
+                        <div class="hero-09-objects__image loading__item">
+                            <img class="mxd-move" src="{% static 'images/jobs-foto.png' %}" alt="Hero Image">
+                        </div>
+                        <div class="hero-09-objects__item item-01 loading__item">
+                            <div class="mxd-counter horizontal">
+                                <p id="stats-counter-1" class="mxd-counter__number mxd-stats-number xsmall">0</p>
+                                <p class="mxd-counter__descr t-140 t-bright t-small">Yil<br>bozorda</p>
+                            </div>
+                        </div>
+                        <div class="hero-09-objects__item item-02 loading__item">
+                            <div class="mxd-counter horizontal">
+                                <p id="stats-counter-2" class="mxd-counter__number mxd-stats-number xsmall">0</p>
+                                <p class="mxd-counter__descr t-140 t-bright t-small">Dan ortiq<br>hodimlar</p>
+                            </div>
+                        </div>
+                        <div class="hero-09-objects__item item-03 loading__item">
+                            <div class="mxd-hero__mark">
+                                <span class="mark-icon"></span>
+                                <span class="mark-text">Yangi imkoniyatlarga ochiladi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Hero Section End -->
+
+        <!-- Секция — превью блога (начало) -->
+        <div class="mxd-section padding-blog">
+
+            <!-- Section - Projects Pinned #02 Start -->
+            <div id="projects" class="mxd-section padding-hero-09 padding-grid-pre-mtext">
+                <div class="mxd-container grid-container">
+
+                    <!-- Block - Projects Pinned #01 with Section Title Start -->
+                    <div class="mxd-block">
+                        <div class="mxd-pinned-projects">
+                            <div class="container-fluid px-0">
+                                <div class="row gx-0 g-5">
+                                    <div class="col-12 col-xl-5 mxd-pinned-projects__static">
+                                        <div class="mxd-pinned-projects__static-inner no-margin">
+
+                                            <!-- Section Title Start -->
+                                            <div class="mxd-section-title no-margin-desktop m-0">
+                                                <div class="container-fluid p-0">
+                                                    <div class="row g-0">
+                                                        <div class="col-12 mxd-grid-item no-margin">
+                                                            <div class="mxd-section-title__title">
+                                                                <h2 class="reveal-type">Ishga qabul uchun ariza</h2>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12 mxd-grid-item no-margin">
+                                                            <div class="mxd-section-title__descr p-0">
+                                                                <p class="anim-uni-in-up">O‘z rezyumeni yuboring — biz
+                                                                    siz bilan bog‘lanamiz!</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12 mxd-grid-item no-margin">
+                                                            <form class="job-application-form" id="job-application-form"
+                                                                enctype="multipart/form-data" autocomplete="off"
+                                                                style="margin-bottom: 5rem;">
+                                                                <div class="form-group">
+                                                                    <label for="region-select"
+                                                                        class="form-label label-job">Viloyat /
+                                                                        shahar</label>
+                                                                    <select id="region-select" name="region"
+                                                                        class="form-control select-job" required>
+                                                                        <option value="" disabled selected>Viloyatni
+                                                                            tanlang*</option>
+                                                                        <option value="Toshkent shahri">Toshkent shahri
+                                                                        </option>
+                                                                        <option value="Andijon viloyati">Andijon
+                                                                            viloyati</option>
+                                                                        <option value="Buxoro viloyati">Buxoro viloyati
+                                                                        </option>
+                                                                        <option value="Fargʻona viloyati">Fargʻona
+                                                                            viloyati</option>
+                                                                        <option value="Jizzax viloyati">Jizzax viloyati
+                                                                        </option>
+                                                                        <option value="Xorazm viloyati">Xorazm viloyati
+                                                                        </option>
+                                                                        <option value="Namangan viloyati">Namangan
+                                                                            viloyati</option>
+                                                                        <option value="Navoiy viloyati">Navoiy viloyati
+                                                                        </option>
+                                                                        <option value="Qashqadaryo viloyati">Qashqadaryo
+                                                                            viloyati</option>
+                                                                        <option value="Samarqand viloyati">Samarqand
+                                                                            viloyati</option>
+                                                                        <option value="Sirdaryo viloyati">Sirdaryo
+                                                                            viloyati</option>
+                                                                        <option value="Surxondaryo viloyati">Surxondaryo
+                                                                            viloyati</option>
+                                                                        <option value="Toshkent viloyati">Toshkent
+                                                                            viloyati</option>
+                                                                        <option value="Qoraqalpogʻiston Respublikasi">
+                                                                            Qoraqalpogʻiston Respublikasi</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group" style="margin-bottom:1.2em;">
+                                                                    <label for="job-select"
+                                                                        class="form-label label-job">Vakansiya</label>
+                                                                    <select id="job-select" name="job"
+                                                                        class="form-control select-job" required>
+                                                                        <option value="" disabled selected>Vakansiyani
+                                                                            tanlang*</option>
+                                                                        <option value="cco">Tijorat direktori (CCO)
+                                                                        </option>
+                                                                        <option value="marketing">Marketing bo'limi
+                                                                            rahbari</option>
+                                                                        <option value="sales">Savdo bo'limi rahbari
+                                                                        </option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="resume-upload" class="form-label"
+                                                                        style="font-weight:600;font-size:1.1em;">Rezyumeni
+                                                                        yuklang</label>
+                                                                    <div id="resume-drop-area" class="resume-drop-area">
+                                                                        <span class="drop-text">Faylni bu yerga tortib
+                                                                            tashlang yoki tanlang</span>
+                                                                        <input type="file" id="resume-upload"
+                                                                            name="resume"
+                                                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                                            style="display:none;">
+                                                                        <button type="button" id="resume-upload-btn"
+                                                                            class="btn btn-anim btn-default btn-outline"
+                                                                            style="margin-top:1rem;">
+                                                                            Faylni tanlash
+                                                                        </button>
+                                                                        <div class="file-hint"
+                                                                            style="font-size:0.95em;color:#888;margin-top:0.5em;">
+                                                                            Format: PDF, DOC, DOCX, JPG, PNG. Uzog'i
+                                                                            10 MB.</div>
+                                                                        <div class="file-selected" id="file-selected"
+                                                                            style="margin-top:0.5em;"></div>
+                                                                        <div class="file-error" id="file-error"
+                                                                            style="color:#c00;font-size:0.95em;margin-top:0.5em;">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <button type="submit"
+                                                                    class="btn btn-anim btn-default btn-outline"
+                                                                    style="margin-top:1.5rem;">
+                                                                    Yuborish
+                                                                </button>
+                                                                <div class="form-success" id="form-success"
+                                                                    style="color:green;font-size:1.1em;margin-top:1em;display:none;">
+                                                                    Rezyume muvaffaqiyatli yuborildi!</div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Section Title Start -->
+
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-xl-7 mxd-pinned-projects__scroll">
+                                        <div class="mxd-pinned-projects__scroll-inner mxd-grid-item no-margin">
+                                            <!-- item -->
+                                            <div class="mxd-project-item">
+                                                <div class="mxd-project-item__promo">
+                                                    <div class="mxd-project-item__name" style="margin-bottom:1.2em;">
+                                                        <span>Вакансия: Коммерческий директор (CCO)</span>
+                                                    </div>
+                                                    <button
+                                                        class="vacancy-toggle-btn btn btn-anim btn-default btn-outline"
+                                                        type="button">
+                                                        <span class="btn-text">Подробнее</span>
+                                                        <span class="arrow"></span>
+                                                    </button>
+                                                    <div class="job-details-block vacancy-details"
+                                                        style="display:none;">
+                                                        <div style="margin-bottom:1.1em;"><b>Обязанности коммерческого
+                                                                директора:</b></div>
+                                                        <ul style="margin-bottom:1.1em;padding-left:1.2em;">
+                                                            <li><b>Разработка и реализация коммерческой
+                                                                    стратегии</b><br><span class="vacancy">Определение
+                                                                    целей роста, продаж, доли рынка и рентабельности.
+                                                                    Формирование стратегии развития продуктовой линейки
+                                                                    FAW, включая запуск новых моделей, локализацию,
+                                                                    ценообразование.</span></li>
+                                                            <li><b>Управление продажами и маркетингом</b><br><span
+                                                                    class="vacancy">Руководство департаментами продаж,
+                                                                    дилерских операций и маркетинга. Внедрение системы
+                                                                    KPI, CRM, управление воронкой продаж. Разработка и
+                                                                    реализация B2B и B2G маркетинговых стратегий.</span>
+                                                            </li>
+                                                            <li><b>Анализ рынка и конкурентной среды</b><br><span
+                                                                    class="vacancy">Мониторинг трендов на рынке
+                                                                    коммерческого транспорта Узбекистана и региона.
+                                                                    Анализ ценовой политики конкурентов (UzAuto Motors,
+                                                                    MAN, ISUZU, Shaanxi, HOWO и др.) и формирование
+                                                                    конкурентных преимуществ FAW.</span></li>
+                                                            <li><b>Финансовый контроль и планирование</b><br><span
+                                                                    class="vacancy">Бюджетирование коммерческой
+                                                                    деятельности. Анализ эффективности каналов продаж.
+                                                                    Совместное планирование с департаментом финансов и
+                                                                    производственным блоком.</span></li>
+                                                            <li><b>Взаимодействие с ключевыми клиентами и
+                                                                    партнёрами</b><br><span class="vacancy">Участие в
+                                                                    стратегических переговорах, тендерах и B2G
+                                                                    контрактах. Расширение партнёрской сети (включая
+                                                                    лизинговые и банковские структуры).</span></li>
+                                                            <li><b>Развитие команды</b><br><span
+                                                                    class="vacancy">Управление, обучение, мотивация и
+                                                                    координация работы команд продаж, дилерского
+                                                                    развития.</span></li>
+                                                            <li><b>Расширение рынков – экспорт продукции</b><br><span
+                                                                    class="vacancy">Поиск новых каналов сбыта в
+                                                                    Узбекистане и странах Центральной Азии. Запуск
+                                                                    экспортных поставок, участие в отраслевых выставках,
+                                                                    форумах.</span></li>
+                                                        </ul>
+                                                        <div style="margin-bottom:1.1em;"><b>Портрет идеального
+                                                                кандидата:</b></div>
+                                                        <ul style="margin-bottom:1.1em;padding-left:1.2em;">
+                                                            <li>Высшее образование (экономика, управление);</li>
+                                                            <li>Успешный опыт управления продажами/коммерцией в
+                                                                автоиндустрии, строительной технике, дистрибуции или
+                                                                смежных B2B-секторах от 5 лет.</li>
+                                                            <li>Глубокое понимание коммерческой специфики:
+                                                                прямые/оптовые продажи, работа с дилерами, лизинг,
+                                                                тендеры, государственные закупки.</li>
+                                                            <li>Навыки стратегического планирования, запуска новых
+                                                                продуктов и рынков.</li>
+                                                            <li>Отличные переговорные навыки, системность и ориентация
+                                                                на результат.</li>
+                                                            <li>Владение узбекским и русским языками обязательно,
+                                                                английский — не ниже Intermediate.</li>
+                                                            <li>Приветствуется опыт работы с китайскими брендами и
+                                                                знание специфики работы с FAW, Dongfeng, JAC и др.</li>
+                                                        </ul>
+                                                        <div style="margin-bottom:1.1em;"><b>Условия работы:</b></div>
+                                                        <ul style="margin-bottom:1.1em;padding-left:1.2em;">
+                                                            <li>Конкурентоспособный оклад + система годовых и
+                                                                квартальных бонусов по KPI.</li>
+                                                            <li>Возможности роста и участия в развитии одного из самых
+                                                                амбициозных проектов в отрасли.</li>
+                                                            <li>Работа в команде профессионалов, поддержка акционеров и
+                                                                международных партнёров.</li>
+                                                            <li>Возможность прямого влияния на стратегию развития
+                                                                компании в Узбекистане и за его пределами.</li>
+                                                        </ul>
+                                                        <div style="margin-bottom:1.1em;"><b>Как подать заявку:</b>
+                                                        </div>
+                                                        <div style="color:#007bff;font-weight:500;">Присылайте своё
+                                                            резюме на <a href="https://hh.uz" target="_blank">hh.uz</a>
+                                                            или на корпоративную почту <a
+                                                                href="mailto:info@faw.uz">info@faw.uz</a> или <a
+                                                                href="tel:+998971983008">+998971983008</a>, отражая
+                                                            опыт: конкретных достижений в продажах, развитии дилерской
+                                                            сети, маркетинге; опыта стратегического планирования и
+                                                            управления командой; успешно реализованных проектов
+                                                            (желательно с цифрами). Только кандидаты с релевантным
+                                                            опытом будут приглашены на интервью.</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- item -->
+                                            <div class="mxd-project-item">
+                                                <div class="mxd-project-item__promo">
+                                                    <div class="mxd-project-item__name" style="margin-bottom:1.2em;">
+                                                        <span>Вакансия: Руководитель отдела маркетинга</span>
+                                                    </div>
+                                                    <button
+                                                        class="vacancy-toggle-btn btn btn-anim btn-default btn-outline"
+                                                        type="button">
+                                                        <span class="btn-text">Подробнее</span>
+                                                        <span class="arrow"></span>
+                                                    </button>
+                                                    <div class="job-details-block vacancy-details"
+                                                        style="display:none;">
+                                                        <div style="margin-bottom:1.1em;"><b>Обязанности:</b></div>
+                                                        <ul style="margin-bottom:1.1em;padding-left:1.2em;">
+                                                            <li>Разработка и реализация маркетинговой стратегии FAW.
+                                                            </li>
+                                                            <li>Планирование и проведение рекламных кампаний,
+                                                                PR-мероприятий, участие в выставках.</li>
+                                                            <li>Анализ рынка, конкурентной среды, трендов и предпочтений
+                                                                клиентов.</li>
+                                                            <li>Управление командой маркетинга, взаимодействие с
+                                                                подрядчиками и агентствами.</li>
+                                                            <li>Контроль бюджета, оценка эффективности каналов
+                                                                продвижения.</li>
+                                                        </ul>
+                                                        <div style="margin-bottom:1.1em;"><b>Требования:</b></div>
+                                                        <ul style="margin-bottom:1.1em;padding-left:1.2em;">
+                                                            <li>Высшее образование (маркетинг, реклама, PR).</li>
+                                                            <li>Опыт работы в маркетинге B2B/автоиндустрии от 3 лет.
+                                                            </li>
+                                                            <li>Навыки управления проектами, креативность, аналитическое
+                                                                мышление.</li>
+                                                            <li>Владение русским и узбекским языками, английский
+                                                                приветствуется.</li>
+                                                        </ul>
+                                                        <div style="margin-bottom:1.1em;"><b>Условия:</b></div>
+                                                        <ul style="margin-bottom:1.1em;padding-left:1.2em;">
+                                                            <li>Оклад + бонусы по результатам проектов.</li>
+                                                            <li>Работа в динамичной команде, возможность
+                                                                профессионального роста.</li>
+                                                        </ul>
+                                                        <div style="color:#007bff;font-weight:500;">Резюме: <a
+                                                                href="mailto:info@faw.uz">info@faw.uz</a> или <a
+                                                                href="tel:+998971983008">+998971983008</a></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- item -->
+                                            <div class="mxd-project-item">
+                                                <div class="mxd-project-item__promo">
+                                                    <div class="mxd-project-item__name" style="margin-bottom:1.2em;">
+                                                        <span>Вакансия: Руководитель отдела продаж</span>
+                                                    </div>
+                                                    <button
+                                                        class="vacancy-toggle-btn btn btn-anim btn-default btn-outline"
+                                                        type="button">
+                                                        <span class="btn-text">Подробнее</span>
+                                                        <span class="arrow"></span>
+                                                    </button>
+                                                    <div class="job-details-block vacancy-details"
+                                                        style="display:none;">
+                                                        <div style="margin-bottom:1.1em;"><b>Обязанности:</b></div>
+                                                        <ul style="margin-bottom:1.1em;padding-left:1.2em;">
+                                                            <li>Организация и управление процессом продаж FAW в
+                                                                Узбекистане.</li>
+                                                            <li>Построение и развитие дилерской сети, обучение и
+                                                                мотивация команды.</li>
+                                                            <li>Внедрение и контроль KPI, CRM, анализ эффективности
+                                                                каналов продаж.</li>
+                                                            <li>Взаимодействие с ключевыми клиентами, участие в
+                                                                переговорах и тендерах.</li>
+                                                            <li>Анализ рынка, конкурентной среды, формирование
+                                                                предложений по развитию.</li>
+                                                        </ul>
+                                                        <div style="margin-bottom:1.1em;"><b>Требования:</b></div>
+                                                        <ul style="margin-bottom:1.1em;padding-left:1.2em;">
+                                                            <li>Высшее образование (экономика, управление, продажи).
+                                                            </li>
+                                                            <li>Опыт работы в продажах B2B/автоиндустрии от 3 лет.</li>
+                                                            <li>Навыки управления командой, стратегическое мышление,
+                                                                ориентация на результат.</li>
+                                                            <li>Владение русским и узбекским языками, английский
+                                                                приветствуется.</li>
+                                                        </ul>
+                                                        <div style="margin-bottom:1.1em;"><b>Условия:</b></div>
+                                                        <ul style="margin-bottom:1.1em;padding-left:1.2em;">
+                                                            <li>Оклад + бонусы по результатам продаж.</li>
+                                                            <li>Возможность карьерного роста, обучение, поддержка
+                                                                руководства.</li>
+                                                        </ul>
+                                                        <div style="color:#007bff;font-weight:500;">Резюме: <a
+                                                                href="mailto:info@faw.uz">info@faw.uz</a> или <a
+                                                                href="tel:+998971983008">+998971983008</a></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Block - Projects Pinned #01 with Section Title Start -->
+                </div>
+            </div>
+        </div>
+        <!-- Section - Projects Pinned #02 End -->
+
+        <!-- Секция — CTA (начало) -->
+        <div class="mxd-section overflow-hidden">
+            <div class="mxd-container">
+
+                <!-- Блок — CTA (начало) -->
+                <div class="mxd-block">
+                    <div class="mxd-promo">
+                        <div class="mxd-promo__inner anim-zoom-out-container">
+                            <!-- background -->
+                            <div class="mxd-promo__bg"></div>
+                            <!-- caption -->
+                            <div class="mxd-promo__content">
+                                <div class="mxd-promo__layout">
+                                    <div class="mxd-promo__icon-section">
+                                        <span class="mxd-promo__icon">
+                                            <img src="{% static 'images/faw-logo.svg' %}" alt="FAW Icon">
+                                            <span class="mxd-promo__icon-tx reveal-type">FAW TRUCKS</span>
+                                        </span>
+                                    </div>
+                                    <div class="mxd-promo__text-section">
+                                        <span class="mxd-promo__caption reveal-type">
+                                            FAW bu – ishonchli texnika. Har qanday iqlimda, har qanday yo'lda
+                                            FAW o'zini ko'rsatadi.
+                                            Buning ortida esa o'z ishini sidqidildan bajarayotgan kuchli va jips
+                                            jamoamiz turibdi.
+                                            Har bir mijoz biz uchun muhim, har bir yuk – mas'uliyat.
+                                            FAW jamoasi – bu tajriba, halollik va xizmatga sadoqat!
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Блок — CTA (конец) -->
+
+            </div>
+        </div>
+        <!-- Секция — CTA (конец) -->
+    </main>
+    <!-- Контент страницы (конец) -->
+
+    <!-- Футер (начало) -->
+    {% include 'main/includes/footer.html' %}
+    <!-- Футер (конец) -->
+
+    <!-- Кнопка «вверх» (начало) -->
+    <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
+        <i class="ph ph-arrow-up"></i>
+    </a>
+    <!-- Кнопка «вверх» (конец) -->
+
+    <!-- Подключение скриптов (начало) -->
+    <script src="{% static 'js/libs.min.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    <!-- Счётчики FAW (инициализация) -->
+    <script src="{% static 'js/faw.js' %}"></script>
+    <script src="{% static 'js/jobs-page.js' %}"></script>
+    <script>
+        // Универсальный плавный скролл, сразу учитывающий высоту фиксированного хедера
+        (function () {
+            function getHeaderHeight() {
+                try { var h = document.getElementById('header'); return h ? h.offsetHeight || 0 : 0; } catch (e) { return 0; }
+            }
+
+            function scrollToElementById(id) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                var headerH = getHeaderHeight();
+                var offset = 18; // отступ под хедером
+                var rect = el.getBoundingClientRect();
+                var targetY = Math.max(0, Math.round(window.pageYOffset + rect.top - headerH - offset));
+                try { window.scrollTo({ top: targetY, behavior: 'smooth' }); }
+                catch (e) { window.scrollTo(0, targetY); }
+            }
+
+            // Делегирование: клики по ссылкам вида href="#id"
+            document.addEventListener('click', function (e) {
+                var a = e.target.closest && e.target.closest('a[href^="#"]');
+                if (!a) return;
+                var href = a.getAttribute('href');
+                if (!href || href === '#') return;
+                var id = href.slice(1);
+                if (!id) return;
+                if (document.getElementById(id)) {
+                    e.preventDefault();
+                    scrollToElementById(id);
+                }
+            }, false);
+        })();
+    </script>
+    <!-- Мобильный фикс: надёжно отключаем инлайн-стили параллакса для маленьких экранов -->
+    <script>
+        (function () {
+            var observer = null;
+            function cleanNode(el) {
+                try {
+                    // сбрасываем распространённые inline-свойства, которые создают абсолютное позиционирование параллакса
+                    el.style.transform = 'none';
+                    el.style.webkitTransform = 'none';
+                    el.style.inset = '';
+                    el.style.top = '';
+                    el.style.left = '';
+                    el.style.right = '';
+                    el.style.bottom = '';
+                    // предпочитаем static, чтобы отменить absolute
+                    el.style.position = 'static';
+                } catch (e) {/* игнорируем ошибки доступа */ }
+            }
+
+            function disableParallaxInline() {
+                if (window.innerWidth > 550) return;
+                var containers = document.querySelectorAll('.mxd-blog-preview__image');
+                containers.forEach(function (container) {
+                    // очищаем контейнер и всех потомков
+                    cleanNode(container);
+                    container.querySelectorAll('*').forEach(function (child) { cleanNode(child); });
+
+                    // гарантируем, что изображение корректно заполнит контейнер
+                    var img = container.querySelector('img');
+                    if (img) {
+                        img.style.transform = 'none';
+                        img.style.webkitTransform = 'none';
+                        img.style.inset = '';
+                        img.style.top = '';
+                        img.style.left = '';
+                        img.style.right = '';
+                        img.style.bottom = '';
+                        img.style.position = 'static';
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'cover';
+                        img.style.objectPosition = 'center center';
+                        img.style.margin = '0';
+                        img.style.display = 'block';
+                    }
+                });
+            }
+
+            function startObserver() {
+                if (window.innerWidth > 550) { if (observer) { observer.disconnect(); observer = null; } return; }
+                if (observer) return; // уже наблюдаем
+                var config = { attributes: true, attributeFilter: ['style'], subtree: true, childList: true };
+                observer = new MutationObserver(function (mutations) {
+                    // при любом изменении атрибутов/добавлении узлов внутри .mxd-blog-preview__image — повторно очищаем
+                    var shouldRun = false;
+                    for (var i = 0; i < mutations.length; i++) {
+                        var m = mutations[i];
+                        if (m.type === 'attributes' || m.type === 'childList') {
+                            if (m.target && m.target.closest && m.target.closest('.mxd-blog-preview__image')) { shouldRun = true; break; }
+                            if (m.addedNodes && m.addedNodes.length) { for (var j = 0; j < m.addedNodes.length; j++) { if (m.addedNodes[j].closest && m.addedNodes[j].closest('.mxd-blog-preview__image')) { shouldRun = true; break; } } }
+                        }
+                    }
+                    if (shouldRun) disableParallaxInline();
+                });
+                // привязываем наблюдатель к каждому контейнеру
+                document.querySelectorAll('.mxd-blog-preview__image').forEach(function (node) { observer.observe(node, config); });
+            }
+
+            // жизненный цикл: инициализация и повторные проверки
+            function init() { disableParallaxInline(); startObserver(); }
+            window.addEventListener('DOMContentLoaded', init);
+            window.addEventListener('load', init);
+            // повторная оценка при изменении размера окна
+            var resizeTimer;
+            window.addEventListener('resize', function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(function () { disableParallaxInline(); startObserver(); }, 200); });
+            // запускаем несколько раз, чтобы поймать поздно инициализирующиеся скрипты
+            var runs = 0; var interval = setInterval(function () { disableParallaxInline(); startObserver(); runs++; if (runs > 12) { clearInterval(interval); } }, 500);
+        })();
+    </script>
+
+    <!-- Load Scripts End -->
+</body>
+
+</html>

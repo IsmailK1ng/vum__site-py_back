@@ -1,0 +1,344 @@
+/* Компактный вид вакансий */
+.mxd-project-item__promo {
+    min-height: 80px;
+    overflow: hidden;
+    transition: max-height 0.3s;
+    position: relative;
+}
+
+.mxd-project-item__promo.open {
+    max-height: max-content;
+    overflow: visible;
+}
+
+.breadcrumb-ol {
+    display: flex;
+    padding: 0 9rem;
+    gap: 10px;
+}
+@media only screen and (min-width: 1200px) {
+.breadcrumb-ol {
+    padding: 0 6rem;
+}
+}
+
+.breadcrumb-ol a {
+    list-style: none;
+    color: black;
+    font-size: 2rem;
+}
+
+.breadcrumb-ol li::after {
+    content: "›";
+    margin-left: 5px;
+    font-style: 25px;
+    font-size: 3rem;
+    color: #535353;
+}
+
+.breadcrumb-ol .active {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.breadcrumb-ol li:last-child::after {
+    content: "";
+}
+
+/* .vacancy-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7em;
+    margin-bottom: 1em;
+    background: #f2f6ff;
+    color: #000000;
+    border: 3px solid #000000;
+    border-radius: 6px;
+    padding: 0.4em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    position: relative;
+    min-width: 160px;
+    user-select: none;
+} */
+
+/* .vacancy-toggle-btn:hover {
+    background: #e6f0ff;
+    color: #000000;
+} */
+
+.vacancy-details {
+    margin-top: 0.5em;
+    animation: fadeInVacancy 0.3s;
+}
+
+.job-details-block.vacancy-details .vacancy-description {
+    color: #333a4d;
+}
+
+@keyframes fadeInVacancy {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стили для формы заявки на работу */
+.job-application-form .form-group {
+    margin-bottom: 1.2em;
+}
+
+.job-application-form .form-label.label-job {
+    font-weight: 600;
+    font-size: 1.08em;
+}
+
+.mxd-project-item__name {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #000000;
+}
+
+.mxd-project-item__promo {
+    padding: 2.2em 2em;
+    background: #fff;
+    color: #000000;
+}
+
+.vacancy-toggle-btn .btn-text {
+    flex: 1 1 auto;
+    font-weight: 500;
+}
+
+.vacancy-toggle-btn .arrow {
+    display: inline-block;
+    width: 1.1em;
+    height: 1.1em;
+    margin-left: 0.2em;
+    border: solid currentColor;
+    border-width: 0 0.18em 0.18em 0;
+    padding: 0.18em;
+    transform: rotate(45deg);
+    transition: transform 0.3s cubic-bezier(.4, 2, .6, 1), color 0.2s;
+    color: #000000;
+    position: relative;
+    top: -5px;
+}
+
+.vacancy-toggle-btn.open .arrow,
+.mxd-project-item__promo.open .vacancy-toggle-btn .arrow {
+    transform: rotate(225deg);
+    box-shadow: 0 2px 16px 0 rgba(0, 0, 0, 0.04);
+    top: 5px;
+}
+
+.job-application-form .select-job {
+    width: 100%;
+    padding: 0.7em 1em;
+    font-size: 1.7rem;
+}
+
+body[data-theme="dark"] .vacancy-toggle-btn .arrow {
+    color: #ffffff;
+}
+
+body[data-theme="dark"] .vacancy-toggle-btn.open .arrow,
+body[data-theme="dark"] .mxd-project-item__promo.open .vacancy-toggle-btn .arrow {
+    font-size: 1em;
+}
+
+.job-application-form .btn {
+    min-width: 160px;
+}
+
+.job-application-form .btn-outline {
+    margin-top: 1rem;
+}
+
+.resume-drop-area {
+    border: 5px dashed #bbb;
+    border-radius: 12px;
+    padding: 2.2em 1.5em;
+    text-align: center;
+    background: #fafafa;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+    min-height: 120px;
+    position: relative;
+}
+
+.resume-drop-area.dragover {
+    border-color: #007bff;
+    background: #e6f0ff;
+}
+
+.resume-drop-area .drop-text {
+    color: #888;
+    font-size: 1.1em;
+    display: block;
+    margin-bottom: 0.7em;
+}
+
+.file-hint {
+    font-size: 0.95em;
+    color: #888;
+    margin-top: 0.5em;
+}
+
+.file-selected {
+    margin-top: 0.5em;
+}
+
+.file-error {
+    color: #c00;
+    font-size: 0.95em;
+    margin-top: 0.5em;
+}
+
+.mxd-section {
+    padding-top: 0rem;
+    display: flex;
+    justify-content: center;
+}
+
+/* Тёмная тема */
+body[data-theme="dark"] .mxd-project-item__promo {
+    background: #23272f;
+    color: #f3f3f3;
+    border-color: #333a4d;
+}
+
+body[data-theme="dark"] .mxd-project-item__name {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+body[data-theme="dark"] .vacancy-toggle-btn {
+    background: #23272f;
+    color: #ffffff;
+    border-color: #ffffff;
+}
+
+body[data-theme="dark"] .vacancy-toggle-btn:hover {
+    background: #1a1d22;
+    color: #98c5ff;
+}
+
+body[data-theme="dark"] .vacancy-details {
+    color: #e0e6ef;
+}
+
+body[data-theme="dark"] .job-application-form .select-job,
+body[data-theme="dark"] .resume-drop-area {
+    background: #23272f;
+    color: #f3f3f3;
+    border-color: #333a4d;
+}
+
+body[data-theme="dark"] .resume-drop-area.dragover {
+    border-color: #7bb0ff;
+    background: #1a1d22;
+}
+
+body[data-theme="dark"] .resume-drop-area .drop-text,
+body[data-theme="dark"] .file-hint {
+    color: #b3b3b3;
+}
+
+body[data-theme="dark"] .file-error {
+    color: #ff6b6b;
+}
+
+body[data-theme="dark"] .job-application-form .btn {
+    background: #23272f;
+    color: #ffffff;
+    border-color: #ffffff;
+}
+
+body[data-theme="dark"] .job-application-form .btn:hover {
+    background: #1a1d22;
+    color: #ffffff;
+}
+
+body[data-theme="dark"] .job-details-block.vacancy-details .vacancy-description {
+    color: #ffffff;
+}
+
+@media only screen and (min-width: 1200px) {
+    .mxd-pinned-projects__static-inner {
+        position: sticky;
+        top: 0;
+        padding-top: 8rem;
+        text-align: left;
+    }
+
+    .hero-09-headline__caption {
+        max-width: 550px;
+    }
+
+    .hero-09-headline__title h1 {
+        font-size: 15vh;
+        text-align: center;
+    }
+
+    .mxd-hero-09__wrap {
+        padding-top: 0;
+        height: 90vh;
+    }
+}
+
+@media only screen and (max-width: 1200px) {
+    .mxd-page-content {
+        padding: 0;
+    }
+}
+
+@media only screen and (max-width: 1080px) {
+    .mxd-pinned-projects__static-inner #job-application-form {
+        margin-top: 5rem !important;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .mxd-project-item__promo {
+        padding: 0.5em 0em;
+    }
+
+    .mxd-project-item__name {
+        font-size: 1.3em;
+    }
+
+    .mxd-project-item__promo {
+        font-size: 0.95em;
+    }
+
+    .vacancy-toggle-btn {
+        font-size: 0.95em;
+        padding: 0.3em 1em;
+    }
+
+    .job-application-form .form-label.label-job {
+        font-size: 1em;
+    }
+
+    .job-application-form .btn {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .hero-09-headline__title h1 {
+        font-size: 8vh;
+    }
+
+    .mxd-hero-09__wrap {
+        height: 80vh;
+    }
+}

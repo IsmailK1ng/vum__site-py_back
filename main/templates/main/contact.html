@@ -1,0 +1,379 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8" />
+
+    <!-- Page Title -->
+    <title>VUM Kontaktlar</title>
+
+    <!-- Meta Tags -->
+    <meta name="description" content="Faw Trucks в Узбекистане" />
+    <meta name="keywords" content="Faw Trucks в Узбекистане" />
+    <meta name="author" content="mix_design" />
+
+    <!-- Viewport Meta-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <!-- Template Favicon & Icons Start -->
+    <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="{% static 'images/icon/_iiiiapple.png' %}" />
+    <link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/icon/_iiii176.png' %}" />
+    <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/icon/_iiii1156.png' %}" />
+    <link rel="apple-touch-startup-image" href="{% static 'images/icon/_iiii1.png' %}" />
+    <!-- Template Favicon & Icons End -->
+
+    <!-- Facebook Metadata Start -->
+    <meta property="og:image:height" content="1200" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:title" content="Faw Trucks в Узбекистане" />
+    <meta property="og:description" content="Faw Trucks в Узбекистане" />
+    <meta property="og:url" content="https://mixdesign.dev/themeforest/rayo" />
+    <meta property="og:image" content="https://mixdesign.dev/themeforest/rayo/img/og-image.jpg" />
+    <!-- Facebook Metadata End -->
+
+    <!-- Template Styles Start -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/breadcrumbs.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/site_contact.css' %}" />
+
+    <!-- Template Styles End -->
+
+    <!-- Custom Browser Color Start -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616" />
+    <meta name="msapplication-navbutton-color" content="#161616" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- Custom Browser Color End -->
+</head>
+
+<body>
+    <!-- Loader Start -->
+    <div id="loader" style="display: none" class="loader">
+        <div class="loader__wrapper">
+            <div class="loader__content">
+                <div class="loader__count">
+                    <span class="count__text">0</span>
+                    <!-- <span class="count__percent">%</span> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Loader End -->
+
+    <!-- Меню и шапка (начало) -->
+    {% include 'main/includes/header.html' %}
+    <!-- Меню и шапка (конец) -->
+
+    <div class="mxd-block loading-wrap">
+    </div>
+    <!-- Хлебные крошки -->
+    <div class="mxd-section-filter pre-grid">
+        <div class="mxd-section-filter__inner animate-card-3">
+            <div class="mxd-grid-item-1">
+                <div class="section-filter">
+                    <div aria-label="breadcrumb">
+                        <ol class="breadcrumb-ol">
+                            <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
+                            <li class="active">
+                                <a href="{% url 'about' %}">Kontaktlar </a>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section - Text Block Start -->
+    <div class="mxd-section padding-default">
+        <div class="mxd-container grid-container">
+            <!-- Block - Text Block with H2 Title, Paragraph and Contact Lists Start -->
+            <div class="mxd-block">
+                <div class="container-fluid px-0">
+                    <div class="col contact-col">
+                        <div class="col-12 col-xl-5 mxd-grid-item no-margin">
+                            <div class="mxd-block__name">
+                                <div class="faw-history-title fade-in">
+                                    <h2>Bizning ofisimizga xush kelibsiz
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-6 mxd-grid-item no-margin">
+                            <div class="mxd-block__content">
+                                <div class="mxd-block__paragraph">
+
+                                    <div class="mxd-paragraph__lists">
+                                        <div class="container-fluid p-0">
+                                            <div class="row g-0 contact-info__container">
+                                                <div
+                                                    class="col-12 col-md-6 col-xl-5 mxd-paragraph__lists-item card_border">
+                                                    <div class="mxd-paragraph__lists-title">
+                                                        <p
+                                                            class="t-large t-bright t-caption anim-uni-in-up contact-fluid__txt">
+                                                            Toshkent
+                                                        </p>
+                                                    </div>
+                                                    <div class="contact-info__details">
+                                                        <div class="contact-detail anim-uni-in-up">
+                                                            <div class="contact-detail__icon">
+                                                                <i class="ph-fill ph-phone"></i>
+                                                            </div>
+                                                            <div class="contact-detail__content">
+                                                                <h4 class="contact-detail__title">Telefon</h4>
+                                                                <a href="tel:+998712345678"
+                                                                    class="contact-detail__value">+998 71
+                                                                    234-56-78</a>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="contact-detail anim-uni-in-up">
+                                                            <div class="contact-detail__icon">
+                                                                <i class="ph-fill ph-envelope"></i>
+                                                            </div>
+                                                            <div class="contact-detail__content">
+                                                                <h4 class="contact-detail__title">Email</h4>
+                                                                <a href="mailto:info@fawtrucks.uz"
+                                                                    class="contact-detail__value">info@fawtrucks.uz</a>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="contact-detail anim-uni-in-up">
+                                                            <div class="contact-detail__icon">
+                                                                <i class="ph-fill ph-map-pin"></i>
+                                                            </div>
+                                                            <div class="contact-detail__content">
+                                                                <h4 class="contact-detail__title">Manzil</h4>
+                                                                <p class="contact-detail__value">Toshkent shahar,
+                                                                    Yunusobod tumani</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    class="col-12 col-md-6 col-xl-5 mxd-paragraph__lists-item  card_border">
+                                                    <div class="mxd-paragraph__lists-title">
+                                                        <p
+                                                            class="t-large t-bright t-caption anim-uni-in-up contact-fluid__txt">
+                                                            Andijon
+                                                        </p>
+                                                    </div>
+                                                    <div class="contact-info__details">
+                                                        <div class="contact-detail anim-uni-in-up">
+                                                            <div class="contact-detail__icon">
+                                                                <i class="ph-fill ph-phone"></i>
+                                                            </div>
+                                                            <div class="contact-detail__content">
+                                                                <h4 class="contact-detail__title">Telefon</h4>
+                                                                <a href="tel:+998712345678"
+                                                                    class="contact-detail__value">+998 71
+                                                                    234-56-78</a>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="contact-detail anim-uni-in-up">
+                                                            <div class="contact-detail__icon">
+                                                                <i class="ph-fill ph-envelope"></i>
+                                                            </div>
+                                                            <div class="contact-detail__content">
+                                                                <h4 class="contact-detail__title">Email</h4>
+                                                                <a href="mailto:info@fawtrucks.uz"
+                                                                    class="contact-detail__value">info@fawtrucks.uz</a>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="contact-detail anim-uni-in-up">
+                                                            <div class="contact-detail__icon">
+                                                                <i class="ph-fill ph-map-pin"></i>
+                                                            </div>
+                                                            <div class="contact-detail__content">
+                                                                <h4 class="contact-detail__title">Manzil</h4>
+                                                                <p class="contact-detail__value">Toshkent shahar,
+                                                                    Yunusobod tumani</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Block - Text Block with H2 Title, Paragraph and Contact Lists End -->
+        </div>
+    </div>
+    <!-- Section - Text Block End -->
+    <div class="faw-history-title fade-in">
+        <h3>Biz bilan boglaning
+        </h3>
+    </div>
+    <!-- Page Content Start -->
+    <main id="mxd-page-content" class="mxd-page-content inner-page-content">
+        <!-- Section - Inner Page Headline Start -->
+        <div class="mxd-section mxd-section-inner-headline padding-s-text-pre-form overflow-hidden">
+            <div class="mxd-container grid-container">
+
+            </div>
+        </div>
+        <!-- Section - Inner Page Headline End -->
+
+        <!-- Section - Inner Page Form Start -->
+        <div class="mxd-section mxd-section-inner-form padding-default">
+            <div class="mxd-container grid-container">
+                <!-- Block - Inner Page Headline Start -->
+                <div class="mxd-block">
+                    <div class="container-fluid px-0">
+                        <div class="row gx-0">
+                            <!-- Inner Headline Name Start -->
+                            <div class="col-12 col-xl-2 mxd-grid-item no-margin"></div>
+                            <!-- Inner Headline Name Start -->
+
+                            <!-- Inner Headline Content Start -->
+                            <div class="col-12 col-xl-8">
+                                <div class="mxd-block__content contact">
+                                    <div class="mxd-block__inner-form loading__fade">
+                                        <div class="form-container">
+                                            <!-- Reply Messages Start -->
+                                            <div class="form__reply centered text-center">
+                                                <i class="ph-fill ph-smiley-wink reply__icon"></i>
+                                                <!-- <i class="ph-fill ph-smiley reply__icon"></i> -->
+                                                <p class="reply__title">Bajarildi!</p>
+                                                <span class="reply__text">Xabaringiz uchun rahmat. Biz tez orada javob
+                                                    beramiz.</span>
+                                            </div>
+                                            <!-- Reply Messages End -->
+
+                                            <!-- Contact Form Start -->
+                                            <form class="form contact-form" id="contact-form">
+                                                <!-- Hidden Required Fields -->
+                                                <input type="hidden" name="project_name" value="FAW Trucks" />
+                                                <input type="hidden" name="admin_email" value="info@fawtrucks.uz" />
+                                                <input type="hidden" name="form_subject"
+                                                    value="FAW Contact Form Message" />
+                                                <!-- END Hidden Required Fields-->
+                                                <div class="container-fluid p-0">
+                                                    <div class="row gx-0">
+                                                        <div
+                                                            class="col-12 col-md-6 mxd-grid-item anim-uni-in-up contact-grid-item">
+                                                            <input type="text" name="Name" placeholder="F.I.Sh*"
+                                                                required />
+                                                        </div>
+                                                        <div
+                                                            class="col-12 col-md-6 mxd-grid-item anim-uni-in-up contact-grid-item">
+                                                            <input type="text" name="Company"
+                                                                placeholder="Kompaniya nomi" />
+                                                        </div>
+                                                        <div
+                                                            class="col-12 col-md-6 mxd-grid-item anim-uni-in-up contact-grid-item">
+                                                            <input type="email" name="E-mail" placeholder="Email*"
+                                                                required />
+                                                        </div>
+                                                        <div
+                                                            class="col-12 col-md-6 mxd-grid-item anim-uni-in-up contact-grid-item">
+                                                            <input type="tel" name="Phone" placeholder="Telefon*" />
+                                                        </div>
+                                                        <div
+                                                            class="col-12 mxd-grid-item anim-uni-in-up contact-grid-item">
+                                                            <textarea name="Message"
+                                                                placeholder="Savolingiz bo‘yicha bir necha so‘z"
+                                                                required></textarea>
+                                                        </div>
+                                                        <div class="col-12 mxd-grid-item anim-uni-in-up">
+                                                            <button
+                                                                class="btn btn-anim btn-default btn-large btn-opposite slide-right-up"
+                                                                type="submit">
+                                                                <span class="btn-caption">Jo‘natish</span>
+                                                                <i class="ph-bold ph-arrow-up-right"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            <!-- Contact Form End -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Inner Headline Content End -->
+                        </div>
+                    </div>
+                </div>
+                <!-- Block - Inner Page Headline End -->
+            </div>
+        </div>
+        <!-- Section - Inner Page Form End -->
+
+
+
+
+        <!-- Секция — CTA (начало) -->
+        <div class="mxd-section overflow-hidden">
+            <div class="mxd-container">
+
+                <!-- Блок — CTA (начало) -->
+                <div class="mxd-block">
+                    <div class="mxd-promo">
+                        <div class="mxd-promo__inner anim-zoom-out-container">
+                            <!-- background -->
+                            <div class="mxd-promo__bg"></div>
+                            <!-- caption -->
+                            <div class="mxd-promo__content">
+                                <div class="mxd-promo__layout">
+                                    <div class="mxd-promo__icon-section">
+                                        <span class="mxd-promo__icon">
+                                            <img src="{% static 'images/faw-logo.svg' %}" alt="FAW Icon">
+                                            <span class="mxd-promo__icon-tx reveal-type">FAW TRUCKS</span>
+                                        </span>
+                                    </div>
+                                    <div class="mxd-promo__text-section">
+                                        <span class="mxd-promo__caption reveal-type">
+                                            FAW bu – ishonchli texnika. Har qanday iqlimda, har qanday yo'lda FAW o'zini
+                                            ko'rsatadi.
+                                            Buning ortida esa o'z ishini sidqidildan bajarayotgan kuchli va jips
+                                            jamoamiz turibdi.
+                                            Har bir mijoz biz uchun muhim, har bir yuk – mas'uliyat.
+                                            FAW jamoasi – bu tajriba, halollik va xizmatga sadoqat!
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Блок — CTA (конец) -->
+
+            </div>
+        </div>
+        <!-- Секция — CTA (конец) -->
+
+    </main>
+    <!-- Page Content End -->
+
+    <!-- Футер (начало) -->
+    {% include 'main/includes/footer.html' %}
+    <!-- Футер (конец) -->
+    <!-- To Top Button Start -->
+    <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
+        <i class="ph ph-arrow-up"></i>
+    </a>
+    <!-- To Top Button End -->
+
+    <!-- Load Scripts Start -->
+    <script src="{% static 'js/libs.min.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/faw.js' %}"></script>
+
+</body>
+
+</html>

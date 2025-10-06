@@ -1,0 +1,1611 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+
+  <!-- Page Title -->
+  <title>VUMFAW tarixi</title>
+
+  <!-- Meta Tags -->
+  <meta name="description" content="Faw Trucks в Узбекистане">
+  <meta name="keywords" content="Faw Trucks в Узбекистане">
+  <meta name="author" content="mix_design">
+
+  <!-- Viewport Meta-->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Template Favicon & Icons Start -->
+    <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="{% static 'images/icon/_iiiiapple.png' %}" />
+    <link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/icon/_iiii176.png' %}" />
+    <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/icon/_iiii1156.png' %}" />
+    <link rel="apple-touch-startup-image" href="{% static 'images/icon/_iiii1.png' %}" />
+  <!-- Template Favicon & Icons End -->
+
+  <!-- Facebook Metadata Start -->
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:title" content="Faw Trucks в Узбекистане">
+  <meta property="og:description" content="Faw Trucks в Узбекистане">
+  <meta property="og:url" content="https://mixdesign.dev/themeforest/rayo">
+  <meta property="og:image" content="https://mixdesign.dev/themeforest/rayo/img/og-image.jpg">
+  <!-- Facebook Metadata End -->
+
+  <!-- Template Styles Start -->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/breadcrumbs.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/site_about.css' %}">
+
+
+  <!-- Template Styles End -->
+
+  <!-- Custom Browser Color Start -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
+  <meta name="msapplication-navbutton-color" content="#161616">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- Custom Browser Color End -->
+
+</head>
+
+<body>
+
+  <!-- Loader Start -->
+  <div id="loader" style="display: none;" class="loader">
+    <div class="loader__wrapper">
+      <div class="loader__content">
+        <div class="loader__count">
+          <span class="count__text">0</span>
+          <!-- <span class="count__percent">%</span> -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Loader End -->
+  <!-- Меню и шапка (начало) -->
+  {% include 'main/includes/header.html' %}
+  <!-- Меню и шапка (конец) -->
+  <!-- Page Content Start -->
+  <div class="mxd-block loading-wrap">
+  </div>
+  <!-- Хлебные крошки -->
+  <div class="mxd-section-filter pre-grid">
+    <div class="mxd-section-filter__inner animate-card-3">
+      <div class="mxd-grid-item-1">
+        <div class="section-filter">
+          <div aria-label="breadcrumb">
+            <ol class="breadcrumb-ol">
+              <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
+              <li class="active"><a href="{% url 'about' %}">VUM FAW tarixi </a></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Parallax video banner start -->
+  <div class="mxd-section padding-grid-pre-pinned">
+    <div class="mxd-container">
+      <div class="mxd-divider" id="parallax-divider">
+        <div class="mxd-divider__video">
+          <video class="video parallax-video" preload="auto" autoplay="autoplay" loop="loop" muted="muted"
+            data-parallax="true">
+            <source type="video/mp4" src="{% static 'videos/banner.mp4' %}">
+          </video>
+          <div class="text-overlay">
+            <div class="pw-text-style-overline">Innovatsiyalar 2025</div>
+            <h1 class="pw-text-style-hl--xl">VUM <strong>FAW</strong></h1>
+            <p class="pw-text-style-intro">
+              Jahon darajasidagi texnologiyalar – O‘zbekistonning yuragida.<br>
+              Yuk transportining kelajagini bugunoq yaratamiz.
+            </p>
+            <div class="stats-bar">
+              <div class="stat-item">
+                <span class="stat-value">70+</span>
+                <span class="stat-label">Yillik tajriba</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">180</span>
+                <span class="stat-label">Mamlakatlar</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">6M+</span>
+                <span class="stat-label">Yuk mashinalari</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- Parallax video banner end -->
+
+  <!-- Title after video start -->
+  <div class="title-after-video">
+    <div class="faw-history-title fade-in">
+      <h2 class="reveal-type anim-uni-in-up">FAW TRUCKS Tarixi</h2>
+    </div>
+
+    <div class="mxd-hero-00__bottom">
+      <div class="hero-00-manifest loading__fade">
+        <p class="mxd-manifest reveal-type anim-uni-in-up">
+          FAW — dunyoda eng ko‘p sotuvga ega og‘ir yuk mashinalari brendi! Xitoyda avtomobilsozlikning birinchi qadami
+          sifatida 1956-yilda tashkil etilgan FAW o‘zining 60 yillik tarixida 8 zavod qurgan, 57 global hamkorlik
+          o‘rnatgan va 80 dan ortiq davlatda mahsulotlarini sotmoqda. 2019-yilda 3,5 million avtomobil ishlab chiqarib,
+          88,6 milliard dollar daromad va 6,3 milliard dollar foyda olgan FAW dunyoda 87-o‘rinni egalladi. Brend qiymati
+          10,8 milliard dollarni oshdi!
+          2001-yilda dunyodagi eng yaxshi tijorat avtomobillari brendi unvoni bilan taqdirlangan FAW,
+          2017-2019-yillarda Xitoyda va dunyoda og‘ir yuk mashinalari bo‘yicha birinchi o‘rinni qo‘lga kiritdi.
+          Bugun FAW — Xitoyning birinchi va dunyodagi yetakchi avtomobilsozlik kompaniyasi sifatida namoyon bo‘lmoqda!
+        </p>
+      </div>
+    </div>
+  </div>
+  <!-- Title after video end -->
+  <!-- Block - Marquee Images Two Lines Start -->
+  <div class="mxd-block">
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <img id="modal-image" alt="Modal Image">
+        <div class="modal-text">
+          <div id="modal-title" class="history-section-elemet_title"></div>
+          <span id="modal-description" class="mxd-section text"></span>
+        </div>
+      </div>
+    </div>
+    <div class="marquee marquee--gsap">
+      <!-- top line -->
+      <div class="marquee__top">
+        <!-- 1 item -->
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>15 iyul 1953 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW tarixida ulkan bosqich — birinchi avtomobil zavodi poydevoriga asosiy tamal toshi qo‘yildi. Bu
+                  voqea yangi davrning boshlanishi bo‘ldi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/1.webp' %}" alt="Image">
+          </a>
+        </div>
+        <!-- 2 item -->
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>13 iyul 1956 yil</strong></div>
+                <span class="mxd-section text">
+                  Yig‘uv liniyasidan FAW CA10 to‘rt tonnalik tijorat yuk mashinasining birinchi modeli chiqdi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/2.webp' %}" alt="Image">
+          </a>
+        </div>
+        <!-- 3 item -->
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>12 may 1958 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW birinchi yengil avtomobil modelini ishlab chiqardi, u afsonaviy Hongqi’ning ajdodiga aylandi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/3.webp' %}" alt="Image">
+          </a>
+        </div>
+        <!-- 3.1 item -->
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>1 avgust 1958 yil</strong></div>
+                <span class="mxd-section text">
+                  Birinchi “Hongqi” lyuks klassidagi sedan taqdim etildi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/3.1.webp' %}" alt="Image">
+          </a>
+        </div>
+        <!-- 4 item -->
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>21 fevral 1972 yil</strong></div>
+                <span class="mxd-section text">
+                  1972 yilda AQSH prezidenti Richard Niksonning Xitoyga tarixiy tashrifi chog‘ida prezident limuzini
+                  Hongqi uning safarlari uchun tanlandi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/4.webp' %}" alt="Image">
+          </a>
+        </div>
+        <!-- item -->
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>15 iyul 1986 yil</strong></div>
+                <span class="mxd-section text">
+                  Standart kabinali ikkinchi avlod tijorat yuk mashinalari ishlab chiqarilishi boshlandi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/5.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>17 may 1988 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW Group va Volkswagen AG AUDI 100 sedanlarini import qilish va qo‘shma yig‘ish bo‘yicha kelishuvni
+                  imzoladi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/6.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>8 fevral 1991 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW-Volkswagen Automobile Co. Ltd. kompaniyasi tashkil etildi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/7.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>15 iyul 1996 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW o‘zining yangi o‘rta yuk ko‘taruvchi tijorat yuk mashinalarini taqdim etdi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/8.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>9 mart 2002 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW Group va Mazda Motor Corporation Mazda 6 sedanini ishlab chiqarish bo‘yicha texnik hamkorlik
+                  to‘g‘risida kelishuv imzoladi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/9.1.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>29 avgust 2002 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW Group va Toyota Motor Corporation strategik va uzoq muddatli hamkorlikni yo‘lga qo‘yish bo‘yicha
+                  kelishuv imzoladi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/9.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>18 yanvar 2003 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW Wuxi Engine bo‘linmasi og‘ir yuk mashinalari uchun elektron boshqaruvga ega CA6DL turkumidagi 4
+                  klapanli dvigatelni taqdim etdi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/10.2.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>18 yanvar 2003 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW Group’ning yuk mashinalari ishlab chiqarish bo‘linmasi FAW Jiefang Truck Co. Ltd nomi bilan qayta
+                  tashkil etildi. Bu orqali kompaniyaning barcha tijorat yuk mashinalari bo‘linmalari yagona, yanada
+                  barqaror va foydaga yo‘naltirilgan, zamonaviy korporativ boshqaruv tizimiga ega tashkilotga
+                  birlashtirildi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/10.1.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>9 aprel 2003 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW Group va Toyota Motor Corporation Xitoyda to‘rtta Toyota modeli — Corolla, Crown, Land Cruiser
+                  Prado va gibrid Prius’ni qo‘shma ishlab chiqarish bo‘yicha kelishuv imzoladi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/10.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>7 dekabr 2004 yil</strong></div>
+                <span class="mxd-section text">
+                  Germaniya kansleri Gerxard Shreder $1,1 milliardlik qiymatga ega bo‘lgan FAW-Volkswagen’ning ikkinchi
+                  zavodining tantanali ochilish marosimida ishtirok etdi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/11.1.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>15 iyul 2004 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW o‘zining yangi ilg‘or J5P og‘ir yuk mashinalari seriyasini taqdim etdi, u tortuvchi mashinalar,
+                  bortsiz yuk mashinalari va maxsus texnikalarni o‘z ichiga oladi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/11.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>15 yanvar 2005 yil</strong></div>
+                <span class="mxd-section text">
+                  Changchun zavodidagi konveyerdan FAW ning birinchi J5M og‘ir yuk mashinasi chiqarildi va u FAW tijorat
+                  yuk mashinalarining beshinchi avlodi bo‘ldi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/12.1.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>26 may 2005 yil</strong></div>
+                <span class="mxd-section text">
+                  Yangi zavod – Volkswagen FAW Engine (Dalian) Co. Ltd. qurilishi boshlandi. Loyihaning qiymati 194 mln
+                  dollar bo‘lib, yiliga 300 000 dona dvigatel ishlab chiqarish rejalashtirilgan.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/12.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>16 oktaybr 2006 yil</strong></div>
+                <span class="mxd-section text">
+                  Dalian Diesel Engine – FAW Jiefang Truck Co. Ltd.ning bo‘limi, quvvati 160 dan 300 ot kuchigacha
+                  bo‘lgan Deutz Euro 3 1013 va 2012 dizel dvigatellarini ishlab chiqara boshladi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/13.2.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>18 avgust 2006 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW Group o‘zining yangi jozibador va qudratli «lyuks» toifasidagi Besturn sedanini taqdim etdi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/13.1.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>15 dekabr 2006 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW Wuxi Diesel Engine bo‘limi yuqori quvvatli 4 klapanli CA6DN seriyali dvigatelni taqdim etdi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/13.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title">
+                  <strong>15 iyul 2007 yil</strong>
+                </div>
+                <span class="mxd-section text">
+                  FAW uzoq masofali yuk tashishlar uchun mo‘ljallangan yangi ilg‘or Yevropa sinfidagi J6P og‘ir
+                  tortuvchi yuk mashinasini ishlab chiqarishni boshladi. Bu to‘liq Xitoyda loyihalashtirilgan birinchi
+                  og‘ir tortuvchi mashina hisoblanadi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/14.1.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>12 iyul 2007 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW uzoq masofali yuk tashishlar uchun mo‘ljallangan yangi ilg‘or Yevropa sinfidagi J6P og‘ir
+                  tortuvchi yuk mashinasini ishlab chiqarishni boshladi. Bu to‘liq Xitoyda loyihalashtirilgan birinchi
+                  og‘ir tortuvchi mashina hisoblanadi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/14.webp' %}" alt="Image">
+          </a>
+        </div>
+      </div>
+      <!-- bottom line -->
+      <div class="marquee__bottom">
+        <!-- item -->
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>22 aprel 2008 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW o‘zining tijorat yuk mashinalari uchun mo‘ljallangan, elektron boshqaruvga ega va katta silindr
+                  diametriga ega 11 litrli CA6DM seriyali tejamkor dvigatelini taqdim etdi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/15.webp' %}" alt="Image">
+          </a>
+        </div>
+        <!-- item -->
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>14 yanvar 2011 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW guruhiga 2010 yilda noyob «J6» seriyasi va yangi dizel dvigatellar oilasini ishlab chiqgani uchun
+                  davlat texnik taraqqiyot mukofoti – «Mashinasozlik sohasidagi yuqori texnologik ishlanmalar» taqdim
+                  etildi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/16.webp' %}" alt="Image">
+          </a>
+        </div>
+        <!-- item -->
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>21 mart 2016 yil</strong></div>
+                <span class="mxd-section text">
+                  Xitoyning Qingdao shahrida “Kuchlarni birlashtirib, kelajakni yaratamiz” mavzusida birinchi yillik
+                  xalqaro dilerlar konferensiyasi o‘tkazildi. Konferensiyada 70 dan ortiq dilerlar va 30 ta turli
+                  mamlakat vakillari ishtirok etdi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/17.webp' %}" alt="Image">
+          </a>
+        </div>
+        <!-- item -->
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong>16 dekabr 2017 yil</strong></div>
+                <span class="mxd-section text">
+                  2017 yil noyabr oyida FAW guruhi yillik rejalashtirilgan ko‘rsatkichlarni oshirib, yangi rekordlar
+                  o‘rnatdi. Changchun zavodida oylik ishlab chiqarish 13 500 donadan oshdi, Qingdao zavodi esa yillik
+                  quvvatini 124 476 dona bilan oshib chiqdi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/18.webp' %}" alt="Image">
+          </a>
+        </div>
+        <!-- item -->
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong> 2018 yil</strong></div>
+                <span class="mxd-section text">
+                  Og‘ir texnika ichki bozorda va dunyo bo‘yicha bir marka mahsuloti sotuv hajmi bo‘yicha birinchi
+                  o‘rinni egalladi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/19.webp' %}" alt="Image">
+          </a>
+        </div>
+        <!-- item -->
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong> 2018 yil</strong></div>
+                <span class="mxd-section text">
+                  7 millioninchi yuk mashinasi yig‘ish liniyasidan tushdi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/19.1.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong> 2018 yil</strong></div>
+                <span class="mxd-section text">
+                  Daromad oldingi davrga nisbatan 26,4% ga oshdi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/19.2.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong> 2019 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW J6 seriyasidan 1 million dona avtomobil sotildi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/20.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong> 2019 yil</strong></div>
+                <span class="mxd-section text">
+                  3,46 million dona avtomobil sotildi, daromad 600 milliard RMB ga yetdi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/20.1.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong> 2020 yil</strong></div>
+                <span class="mxd-section text">
+                  Qayta tashkil etish va fond birjalariga chiqish.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/21.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong> 2020 yil</strong></div>
+                <span class="mxd-section text">
+                  Xitoyning eng muhim kompaniyalari reytingida 9-o‘rinni egallaydi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/21.1.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong> 2020 yil</strong></div>
+                <span class="mxd-section text">
+                  Xitoy Xalq Respublikasi raisi Si Tszinpin FAW korporatsiyasiga tashrif buyurdi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/21.2.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong> 2021 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW TRUCKS yuqori intellektli zavodi ishga tushirildi: maydoni 55 ming kv.m, yillik quvvati 50 000
+                  avtomobil.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/22.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong> 2021 yil</strong></div>
+                <span class="mxd-section text">
+                  Fortune Global 500 reytingida 66-o‘rinda, jami daromadi $101 mlrd.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/22.1.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong> 2022 yil</strong></div>
+                <span class="mxd-section text">
+                  Fortune Global 500 reytingida 79-o‘rinda, daromadi 109,4 mlrd $.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/23.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong> 2022 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW Trucks tortuvchi yuk mashinalari Xitoyda 17 yil ketma-ket sotuv bo‘yicha yetakchi hisoblanadi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/23.1.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong> 2023 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW Group tijorat avtomobillari bo‘limi yangi va noyob mahsulotlar ishlab chiqaruvchi, jahon
+                  darajasidagi ixtisoslashgan namoyishkor korxona sifatida tanlandi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/24.webp' %}" alt="Image">
+          </a>
+        </div>
+        <div class="marquee__item image">
+          <a class="marquee__link" href="#">
+            <div class="marquee__overlay">
+              <div class="marquee__text">
+                <div class="history-section-elemet_title"><strong> 2023 yil</strong></div>
+                <span class="mxd-section text">
+                  FAW Jiefang brendi qiymati 107,8 mlrd yuanga yetib, Xitoy tijorat avtomobillari bozorida 11 yil
+                  ketma-ket birinchi o‘rinda turadi.
+                </span>
+              </div>
+            </div>
+            <img src="{% static 'images/history/24.1.webp' %}" alt="Image">
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Block - Marquee Images Two Lines End -->
+
+  <!-- Section - Statistics Simple Start -->
+  <div class="mxd-section padding-default">
+    <div class="mxd-container grid-container">
+      <!-- Block - Statistics Cards Start -->
+      <div class="mxd-block">
+        <div class="mxd-stats-simple">
+          <div class="container-fluid p-0">
+            <div class="faw-quantity-title">
+              <h2 class="reveal-type anim-uni-in-up">Bizning natijalar</h2>
+            </div>
+            <div class="row g-0 mxd-stats-simple">
+              <!-- item -->
+              <div class="col-12 col-lg-3 mxd-stats-simple__item mxd-grid-item">
+                <div class="mxd-stats-simple__inner animate-card-4">
+                  <!-- counter -->
+                  <div class="mxd-counter">
+                    <p id="stats-counter-1" class="mxd-stats-number mxd-stats-simple__counter">0</p>
+                  </div>
+                  <!-- image -->
+                  <img class="mxd-stats-simple__image" src="{% static 'images/icon/globus_metal.png' %}" alt="Icon">
+
+                  <!-- description -->
+                  <p class="mxd-stats-simple__descr t-140 t-bright">Dunyo bo‘ylab<br>mamnun mijozlar</p>
+                </div>
+              </div>
+              <!-- item -->
+              <div class="col-12 col-lg-3 mxd-stats-simple__item mxd-grid-item">
+                <div class="mxd-stats-simple__inner animate-card-4">
+                  <!-- counter -->
+                  <div class="mxd-counter">
+                    <p id="stats-counter-2" class="mxd-stats-number mxd-stats-simple__counter">0</p>
+                  </div>
+                  <!-- image -->
+                  <img class="mxd-stats-simple__image" src="{% static 'images/icon/inovation_meta.png' %}" alt="Icon">
+                  <!-- description -->
+                  <p class="mxd-stats-simple__descr t-140 t-bright"><br>Yangi innovatsion loyihalar</p>
+                </div>
+              </div>
+              <!-- item -->
+              <div class="col-12 col-lg-3 mxd-stats-simple__item mxd-grid-item">
+                <div class="mxd-stats-simple__inner animate-card-4">
+                  <!-- counter -->
+                  <div class="mxd-counter">
+                    <p id="stats-counter-3" class="mxd-stats-number mxd-stats-simple__counter">0</p>
+                  </div>
+                  <!-- image -->
+                  <img class="mxd-stats-simple__image"
+                    src="{% static 'images/icon/8cf13721-5670-42e3-9cb7-db36b5402d48.png' %}" alt="Icon">
+                  <!-- description -->
+                  <p class="mxd-stats-simple__descr t-140 t-bright">Yillik professional tajriba</p>
+                </div>
+              </div>
+              <!-- item -->
+              <div class="col-12 col-lg-3 mxd-stats-simple__item mxd-grid-item">
+                <div class="mxd-stats-simple__inner animate-card-4">
+                  <!-- counter -->
+                  <div class="mxd-counter">
+                    <p id="stats-counter-4" class="mxd-stats-number mxd-stats-simple__counter">0</p>
+                  </div>
+                  <!-- image -->
+                  <img class="mxd-stats-simple__image" src="{% static 'images/icon/cup.png' %}" alt="Icon">
+                  <!-- description -->
+                  <p class="mxd-stats-simple__descr t-140 t-bright">Muvaffaqiyatli yakunlangan loyihalar</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Block - Statistics Cards End -->
+    </div>
+  </div>
+  <!-- Section - Statistics Simple End -->
+
+  <div class="mxd-section padding-pre-title">
+    <div class="mxd-container grid-container">
+      <div class="faw-safe-title">
+        <h2 class="reveal-type anim-uni-in-up">Bizga ishonishadi</h2>
+      </div>
+      <!-- Block - Partners Cards Start -->
+      <div class="mxd-block">
+        <div class="mxd-partners-cards">
+          <div class="container-fluid p-0">
+            <div class="row g-0">
+              <!-- item -->
+              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
+                <a class="mxd-partners-cards__inner" href="#0">
+                  <div class="mxd-partners-cards__logo">
+                    <img src="{% static 'images/logo-brends/safia.png' %}" alt="Partner Logo">
+                  </div>
+                </a>
+              </div>
+              <!-- item -->
+              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
+                <a class="mxd-partners-cards__inner" href="#0">
+                  <div class="mxd-partners-cards__logo">
+                    <img src="{% static 'images/logo-brends/audi.png' %}" alt="Partner Logo">
+                  </div>
+                </a>
+              </div>
+              <!-- item -->
+              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
+                <a class="mxd-partners-cards__inner" href="#0">
+                  <div class="mxd-partners-cards__logo">
+                    <img src="{% static 'images/logo-brends/transport-vazirligi.png' %}" alt="Partner Logo">
+                  </div>
+                </a>
+              </div>
+              <!-- item -->
+              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
+                <a class="mxd-partners-cards__inner" href="#0">
+                  <div class="mxd-partners-cards__logo">
+                    <img src="{% static 'images/logo-brends/silkroad.png' %}" alt="Partner Logo">
+                  </div>
+                </a>
+              </div>
+              <!-- item -->
+              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
+                <a class="mxd-partners-cards__inner" href="#0">
+                  <div class="mxd-partners-cards__logo">
+                    <img src="{% static 'images/logo-brends/mazda.png' %}" alt="Partner Logo">
+                  </div>
+                </a>
+              </div>
+              <!-- item -->
+              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
+                <a class="mxd-partners-cards__inner" href="#0">
+                  <div class="mxd-partners-cards__logo">
+                    <img src="{% static 'images/logo-brends/korzinka.png' %}" alt="Partner Logo">
+                  </div>
+                </a>
+              </div>
+              <!-- item -->
+              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
+                <a class="mxd-partners-cards__inner" href="#0">
+                  <div class="mxd-partners-cards__logo">
+                    <img src="{% static 'images/logo-brends/Coca-Cola.png' %}" alt="Partner Logo">
+                  </div>
+                </a>
+              </div>
+              <!-- item -->
+              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
+                <a class="mxd-partners-cards__inner" href="#0">
+                  <div class="mxd-partners-cards__logo">
+                    <img src="{% static 'images/logo-brends/volkswagen.png' %}" alt="Partner Logo">
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Block - Partners Cards End -->
+
+    </div>
+  </div>
+  <div class="mxd-section padding-grid-pre-mtext">
+    <div class="mxd-container no-padding-container">
+      <div class="faw-commet-title">
+        <h2 class="reveal-type anim-uni-in-up">Mijozlarimiz fikrlari</h2>
+      </div>
+      <!-- Block - Testimonials Slider #01 with Section Title Start -->
+      <div class="mxd-block">
+        <div class="container-fluid px-0">
+          <div class="row gx-0">
+            <div class="col-12 col-xl-5">
+              <!-- Additional Container Start -->
+              <div class="mxd-container grid-container">
+                <div class="mxd-block">
+                  <!-- Section Title Start -->
+                  <div class="mxd-section-title no-margin-desktop">
+                    <div class="container-fluid p-0">
+                      <div class="row g-0">
+                        <div class="col-12 mxd-grid-item no-margin">
+                          <div class="mxd-section-title__title anim-uni-in-up">
+                            <h2 class="reveal-type">Vum Faw </h2>
+                          </div>
+                        </div>
+                        <div class="col-12 mxd-grid-item no-margin">
+                          <div class="mxd-section-title__descr">
+                            <p class="anim-uni-in-up">Biz faqat avtomobil ishlab chiqaruvchilar emasmiz — biz sizning
+                              ishonchli hamkorlaringizmiz. Gapimizga ishonibgina qolmang, FAW mijozlarining biz bilan
+                              ishlash haqidagi fikrlarini ko‘ring.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Section Title Start -->
+                </div>
+              </div>
+              <!-- Additional Container End -->
+            </div>
+            <div class="col-12 col-xl-7">
+
+              <!-- Testimonials Slider Start -->
+              <div class="testimonials-slider overflow-hidden anim-uni-in-up">
+                <!-- slider main container -->
+                <div class="swiper-testimonials">
+                  <!-- additional required wrapper -->
+                  <div class="swiper-wrapper">
+                    <!-- single slide -->
+                    <div class="swiper-slide">
+                      <div class="mxd-testimonials-card bg-base-tint radius-m">
+                        <div class="mxd-testimonials-card__content">
+                          <div class="mxd-testimonials-card__media anim-uni-in-up">
+                            <div class="mxd-testimonials-card__photo">
+                              <img src="{% static 'images/logo/faw-logo.png' %}" alt="Author Photo">
+                            </div>
+                            <div class="mxd-testimonials-card__author">
+                              <h5 class="mxd-testimonials-card__name anim-uni-in-up">Karimjonov Avazjon</h5>
+                              <p class="mxd-testimonials-card__position t-small anim-uni-in-up">Tadbirkor
+                              </p>
+                            </div>
+                          </div>
+                          <div class="mxd-testimonials-card__text">
+                            <p class="anim-uni-in-up">Avval Xitoy mashinasidan biroz cho‘chib olgandim, lekin olish
+                              nasib qildi va oldim.
+                              Mashina kutilganidan ham yaxshi chiqdi — juda chaqqon, mustahkam va haydashda juda qulay.
+                              Ramalari og‘ir yuklarni ko‘tarishga mo‘ljallangani ham ko‘nglimni to‘liq joyiga qo‘ydi.
+                              Tanlovimdan juda mamnunman!</p>
+                          </div>
+                          <div class="mxd-testimonials-card__video anim-uni-in-up">
+                            <div class="video-container">
+                              <iframe src="https://www.youtube.com/embed/07MbTXqsAn0?feature=oembed" frameborder="0"
+                                allow="picture-in-picture; fullscreen; accelerometer; autoplay; encrypted-media"
+                                allowfullscreen>
+                              </iframe>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- single slide -->
+
+                    <!-- single slide -->
+                    <div class="swiper-slide">
+                      <div class="mxd-testimonials-card bg-base-tint radius-m">
+                        <div class="mxd-testimonials-card__content">
+                          <div class="mxd-testimonials-card__media anim-uni-in-up">
+                            <div class="mxd-testimonials-card__photo">
+                              <img src="{% static 'images/client.png' %}" alt="Author Photo">
+                            </div>
+                            <div class="mxd-testimonials-card__author">
+                              <h5 class="mxd-testimonials-card__name anim-uni-in-up">Karimjonov Avazjon</h5>
+                              <p class="mxd-testimonials-card__position t-small anim-uni-in-up">Fura haydovchisi
+                              </p>
+                            </div>
+                          </div>
+                          <div class="mxd-testimonials-card__text">
+                            <p class="anim-uni-in-up">Men, Karimjonov Avazjon, to'rt yildan beri Sofiyada haydovchilik
+                              bilan shug'ullanaman va hozirda Faw Tiger V sovutgichli avtomobilini boshqaraman.
+                              Ushbu avtomobilni bir yil avval Sofiyada xarid qildi.</p>
+                          </div>
+                          <div class="mxd-testimonials-card__video anim-uni-in-up">
+                            <div class="video-container">
+                              <iframe src="https://youtube.com/embed/I7SrlcMwwLA?si=9aEhOFqBJ5xF5WSu" frameborder="0"
+                                allow="picture-in-picture; fullscreen; accelerometer; autoplay; encrypted-media"
+                                allowfullscreen>
+                              </iframe>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- single slide -->
+                    <div class="swiper-slide">
+                      <div class="mxd-testimonials-card bg-base-tint radius-m">
+                        <div class="mxd-testimonials-card__content">
+                          <div class="mxd-testimonials-card__media anim-uni-in-up">
+                            <div class="mxd-testimonials-card__photo">
+                              <img src="{% static 'images/logo/safia.png' %}" alt="Author Photo">
+                            </div>
+                            <div class="mxd-testimonials-card__author">
+                              <h5 class="mxd-testimonials-card__name anim-uni-in-up">Karimjonov Avazjon</h5>
+                              <p class="mxd-testimonials-card__position t-small anim-uni-in-up">Sofia haydovchisi
+                              </p>
+                            </div>
+                          </div>
+                          <div class="mxd-testimonials-card__text">
+                            <p class="anim-uni-in-up">Men, Karimjonov Avazjon, to'rt yildan beri Sofiyada haydovchilik
+                              bilan shug'ullanaman va hozirda Faw Tiger V sovutgichli avtomobilini boshqaraman.
+                              Ushbu avtomobilni bir yil avval Sofiyada xarid qildi.</p>
+                          </div>
+                          <div class="mxd-testimonials-card__video anim-uni-in-up">
+                            <div class="video-container">
+                              <iframe src="https://youtube.com/embed/bjAEel6Hw5o?si=Qv-vzzTyhATFqw_v" frameborder="0"
+                                allow="picture-in-picture; fullscreen; accelerometer; autoplay; encrypted-media"
+                                allowfullscreen>
+                              </iframe>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- navigation buttons -->
+                  <div class="swiper-button-prev mxd-slider-btn mxd-slider-btn-round-prev animate-card-2">
+                    <a class="btn btn-round btn-round-small btn-outline slide-left anim-no-delay" href="#0">
+                      <i class="ph ph-arrow-left"></i>
+                    </a>
+                  </div>
+                  <div class="swiper-button-next mxd-slider-btn mxd-slider-btn-round-next animate-card-2">
+                    <a class="btn btn-round btn-round-small btn-outline slide-right anim-no-delay" href="#0">
+                      <i class="ph ph-arrow-right"></i>
+                    </a>
+                  </div>
+                </div>
+                <div class="testimonials-slider__shadow"></div>
+              </div>
+              <!-- Testimonials Slider End -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Block - Testimonials Slider #01 with Section Title Start -->
+    </div>
+  </div>
+
+  <!-- Section - Experience Start -->
+  <div class="mxd-section padding-grid-pre-pinned">
+    <div class="mxd-container grid-container">
+
+      <!-- Block - Stack Universal Pinned Block with Section Title Start -->
+      <div class="mxd-block">
+        <div class="mxd-pinned-universal">
+          <div class="container-fluid px-0">
+            <div class="row gx-0">
+              <div class="col-12 col-xl-5 mxd-pinned-universal__static">
+                <div class="mxd-pinned-universal__static-inner no-margin">
+
+                  <!-- Section Title Start -->
+                  <div class="mxd-section-title h2-only no-margin-desktop">
+                    <div class="container-fluid p-0">
+                      <div class="row g-0">
+                        <div class="col-12 mxd-grid-item no-margin">
+                          <div class="mxd-section-title__title anim-uni-in-up">
+                            <h2 class="reveal-type">VUM tarixi </h2>
+                          </div>
+                        </div>
+                        <div class="col-12 mxd-grid-item no-margin">
+                          <div class="mxd-section-title__descr">
+                            <p class="anim-uni-in-up">Van Universal Motors (VUM) — O‘zbekistonda yuk avtomobillari
+                              savdosi, servis xizmatlari va dilerlik tarmog‘ida faoliyat yuritayotgan kompaniya. Bugungi
+                              kunda VUM 20 dan ortiq dilerlik markazlari bilan hamkorlik qilib, FAW yuk avtomobillarini
+                              ishlab chiqarish va servis xizmatini yo‘lga qo‘ygan.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Section Title Start -->
+
+                </div>
+              </div>
+              <div class="col-12 col-xl-7 mxd-pinned-universal__scroll">
+                <div class="mxd-pinned-universal__scroll-inner mxd-grid-item no-margin">
+                  <div class="mxd-res-list">
+                    <!-- item -->
+                    <div class="mxd-res-list__item">
+                      <div class="mxd-res-list__divider anim-uni-in-up"></div>
+                      <div class="mxd-res-list__content">
+                        <div class="mxd-res-list__data">
+                          <div class="mxd-res-list__title">
+                            <h4 class="anim-uni-in-up">VUM Tashkil topgan</h4>
+                          </div>
+                          <div class="mxd-res-list__descr">
+                            <p class="anim-uni-in-up">Vum kompaniyasi 1 fevral 2018 yilda asos solingan.</p>
+                          </div>
+                        </div>
+                        <div class="mxd-res-list__year">
+                          <p class="anim-uni-in-up">1 fevral 2018</p>
+                        </div>
+                      </div>
+                      <div class="mxd-res-list__divider anim-uni-in-up"></div>
+                    </div>
+                    <!-- item -->
+                    <div class="mxd-res-list__item">
+                      <div class="mxd-res-list__divider anim-uni-in-up"></div>
+                      <div class="mxd-res-list__content">
+                        <div class="mxd-res-list__data">
+                          <div class="mxd-res-list__title">
+                            <h4 class="anim-uni-in-up">VUM Tashkil topgan</h4>
+                          </div>
+                          <div class="mxd-res-list__descr">
+                            <p class="anim-uni-in-up">Vum kompaniyasi 1 fevral 2018 yilda asos solingan.</p>
+                          </div>
+                        </div>
+                        <div class="mxd-res-list__year">
+                          <p class="anim-uni-in-up">1 fevral 2018</p>
+                        </div>
+                      </div>
+                      <div class="mxd-res-list__divider anim-uni-in-up"></div>
+                    </div>
+                    <!-- item -->
+                    <div class="mxd-res-list__item">
+                      <div class="mxd-res-list__divider anim-uni-in-up"></div>
+                      <div class="mxd-res-list__content">
+                        <div class="mxd-res-list__data">
+                          <div class="mxd-res-list__title">
+                            <h4 class="anim-uni-in-up">VUM Tashkil topgan</h4>
+                          </div>
+                          <div class="mxd-res-list__descr">
+                            <p class="anim-uni-in-up">Vum kompaniyasi 1 fevral 2018 yilda asos solingan.</p>
+                          </div>
+                        </div>
+                        <div class="mxd-res-list__year">
+                          <p class="anim-uni-in-up">1 fevral 2018</p>
+                        </div>
+                      </div>
+                      <div class="mxd-res-list__divider anim-uni-in-up"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Block - Stack Universal Pinned Block with Section Title Start -->
+
+    </div>
+  </div>
+  <!-- Section - Experience End -->
+  <!-- Футер (начало) -->
+  {% include 'main/includes/footer.html' %}
+  <!-- Футер (конец) -->
+
+  <!-- Кнопка «вверх» (начало) -->
+  <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
+    <i class="ph ph-arrow-up"></i>
+  </a>
+  <!-- Кнопка «вверх» (конец) -->
+
+  <!-- Load Scripts Start -->
+  <script src="{% static 'js/libs.min.js' %}"></script>
+  <!-- <script src="template/js/app.js"></script> -->
+  <script src="{% static 'js/faw.js' %}"></script>
+  <script src="{% static 'js/about.js' %}"></script>
+  <script>
+    // ОБЪЕДИНЕННЫЙ И ИСПРАВЛЕННЫЙ СКРИПТ - добавить в <head> первым скриптом
+
+    (function () {
+      'use strict';
+
+      // БЛОКИРОВЩИК ОШИБОК И YOUTUBE API
+      const originalConsole = {
+        log: console.log.bind(console),
+        warn: console.warn.bind(console),
+        error: console.error.bind(console),
+        info: console.info.bind(console)
+      };
+
+      const BLOCKED_DOMAINS = [
+        'play.google.com',
+        'youtube.com/iframe_api',
+        'youtube.com/player_api',
+        'googlevideo.com'
+      ];
+
+      const BLOCKED_MESSAGES = [
+        'Failed to load resource',
+        '401 ()',
+        'Unauthorized',
+        'picture-in-picture is not allowed',
+        'Permissions policy violation',
+        'SAPISIDHASH',
+        'SAPISID3PHASH',
+        'hasfast=true',
+        'ERR_CONNECTION_TIMED_OUT',
+        'net::ERR_'
+      ];
+
+      function shouldBlock(message) {
+        if (typeof message !== 'string') {
+          message = String(message);
+        }
+
+        for (const domain of BLOCKED_DOMAINS) {
+          if (message.includes(domain)) return true;
+        }
+
+        for (const blockedMsg of BLOCKED_MESSAGES) {
+          if (message.includes(blockedMsg)) return true;
+        }
+
+        return false;
+      }
+
+      // Переопределяем методы консоли
+      console.error = function (...args) {
+        const message = args.join(' ');
+        if (!shouldBlock(message)) {
+          originalConsole.error.apply(console, args);
+        }
+      };
+
+      console.warn = function (...args) {
+        const message = args.join(' ');
+        if (!shouldBlock(message)) {
+          originalConsole.warn.apply(console, args);
+        }
+      };
+
+      console.log = function (...args) {
+        const message = args.join(' ');
+        if (!shouldBlock(message)) {
+          originalConsole.log.apply(console, args);
+        }
+      };
+
+      // Блокируем window.onerror
+      const originalOnError = window.onerror;
+      window.onerror = function (message, source, lineno, colno, error) {
+        if (shouldBlock(message) || shouldBlock(source || '')) {
+          return true;
+        }
+        if (originalOnError) {
+          return originalOnError.call(window, message, source, lineno, colno, error);
+        }
+      };
+
+      // Блокируем unhandledrejection
+      window.addEventListener('unhandledrejection', function (event) {
+        const message = event.reason ? String(event.reason) : '';
+        if (shouldBlock(message)) {
+          event.preventDefault();
+        }
+      });
+
+      // БЛОКИРОВКА YOUTUBE API
+      const originalCreateElement = document.createElement;
+      document.createElement = function (tagName) {
+        const element = originalCreateElement.call(document, tagName);
+
+        if (tagName.toLowerCase() === 'script') {
+          const originalSrcSetter = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, 'src').set;
+          Object.defineProperty(element, 'src', {
+            set: function (value) {
+              if (typeof value === 'string' &&
+                (value.includes('youtube.com/iframe_api') ||
+                  value.includes('youtube.com/player_api'))) {
+                originalConsole.log('YouTube API заблокирован:', value);
+                return;
+              }
+              originalSrcSetter.call(this, value);
+            },
+            get: function () {
+              return this.getAttribute('src');
+            },
+            configurable: true
+          });
+        }
+
+        return element;
+      };
+
+      // Блокируем appendChild для YouTube API
+      const originalAppendChild = Node.prototype.appendChild;
+      Node.prototype.appendChild = function (child) {
+        if (child.tagName === 'SCRIPT' && child.src &&
+          (child.src.includes('youtube.com/iframe_api') ||
+            child.src.includes('youtube.com/player_api'))) {
+          originalConsole.log('YouTube API скрипт заблокирован');
+          return child;
+        }
+        return originalAppendChild.call(this, child);
+      };
+
+      // Мокаем YouTube API
+      window.YT = {
+        Player: function (elementId, config) {
+          return {
+            playVideo: function () { },
+            pauseVideo: function () { },
+            stopVideo: function () { },
+            destroy: function () { },
+            getPlayerState: function () { return -1; },
+            addEventListener: function () { }
+          };
+        },
+        ready: function (callback) {
+          if (typeof callback === 'function') {
+            setTimeout(callback, 100);
+          }
+        }
+      };
+
+      window.onYouTubeIframeAPIReady = function () { };
+
+      originalConsole.log('Блокировщик ошибок активирован');
+    })();
+
+    // ИНИЦИАЛИЗАЦИЯ СТРАНИЦЫ И СЧЕТЧИКОВ
+    document.addEventListener("DOMContentLoaded", function () {
+      'use strict';
+
+      // ПРАВИЛЬНЫЕ ЗНАЧЕНИЯ СЧЕТЧИКОВ - ИСПРАВЛЕНО!
+      const COUNTER_VALUES = {
+        'stats-counter-1': { value: 15, suffix: ' млн+' },  // ИСПРАВЛЕНО: было 18
+        'stats-counter-2': { value: 800, suffix: '+' },
+        'stats-counter-3': { value: 75, suffix: '+' },
+        'stats-counter-4': { value: 200, suffix: '+' }
+      };
+
+      // 1. Auto-play videos with error handling
+      function initVideoAutoplay() {
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => {
+          video.play().catch(e => {
+            console.log('Autoplay prevented:', e);
+          });
+        });
+      }
+
+      // 2. Prevent default behavior for empty links
+      function preventEmptyLinks() {
+        document.querySelectorAll('a[href="#"]').forEach(link => {
+          link.addEventListener('click', e => e.preventDefault());
+        });
+      }
+
+      // 3. Modal functionality for history images
+      function initHistoryModal() {
+        const items = document.querySelectorAll(".marquee__item.image");
+        const modal = document.getElementById("modal");
+
+        if (!modal || items.length === 0) return;
+
+        const modalImage = document.getElementById("modal-image");
+        const modalTitle = document.getElementById("modal-title");
+        const modalDescription = document.getElementById("modal-description");
+        const closeBtn = document.querySelector(".close");
+
+        items.forEach(item => {
+          const link = item.querySelector(".marquee__link");
+          const img = item.querySelector("img");
+          const titleElement = item.querySelector(".history-section-elemet_title");
+          const descriptionElement = item.querySelector(".mxd-section.text");
+
+          if (!link || !img || !titleElement || !descriptionElement) return;
+
+          const title = titleElement.textContent;
+          const description = descriptionElement.textContent;
+
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+            modal.style.display = "flex";
+            modalImage.src = img.src;
+            modalImage.alt = title;
+            modalTitle.textContent = title;
+            modalDescription.textContent = description;
+          });
+        });
+
+        // Close modal handlers
+        if (closeBtn) {
+          closeBtn.addEventListener("click", function () {
+            modal.style.display = "none";
+          });
+        }
+
+        window.addEventListener("click", function (e) {
+          if (e.target === modal) {
+            modal.style.display = "none";
+          }
+        });
+
+        // ESC key to close modal
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && modal.style.display === "flex") {
+            modal.style.display = "none";
+          }
+        });
+      }
+
+      // 4. Counter animations - ИСПРАВЛЕННАЯ ВЕРСИЯ
+      function initFAWCounters() {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const counterId = entry.target.id;
+              const config = COUNTER_VALUES[counterId];
+
+              if (config) {
+                try {
+                  if (typeof countUp !== 'undefined' && countUp.CountUp) {
+                    const counter = new countUp.CountUp(counterId, config.value, {
+                      suffix: config.suffix,
+                      duration: 2.5,
+                      useEasing: true,
+                      useGrouping: true
+                    });
+
+                    if (!counter.error) {
+                      counter.start();
+                      console.log(`✓ ${counterId}: ${config.value}${config.suffix}`);
+                    } else {
+                      entry.target.textContent = config.value + config.suffix;
+                      console.log(`⚠ ${counterId}: fallback used`);
+                    }
+                  } else {
+                    entry.target.textContent = config.value + config.suffix;
+                    console.log(`📝 ${counterId}: direct set`);
+                  }
+                } catch (error) {
+                  entry.target.textContent = config.value + config.suffix;
+                  console.log(`❌ ${counterId}: error handled`);
+                }
+
+                observer.unobserve(entry.target);
+              }
+            }
+          });
+        }, {
+          threshold: 0.3,
+          rootMargin: '0px 0px -100px 0px'
+        });
+
+        // Observe all counter elements
+        Object.keys(COUNTER_VALUES).forEach(counterId => {
+          const element = document.getElementById(counterId);
+          if (element) {
+            observer.observe(element);
+          }
+        });
+      }
+
+      // 5. Fallback for counters if CountUp not available
+      function initCountersFallback() {
+        Object.keys(COUNTER_VALUES).forEach(counterId => {
+          const element = document.getElementById(counterId);
+          if (element) {
+            const config = COUNTER_VALUES[counterId];
+            element.textContent = config.value + config.suffix;
+            console.log(`${counterId}: ${config.value}${config.suffix} (fallback)`);
+          }
+        });
+      }
+
+      // 6. Fix GSAP warnings by checking if elements exist
+      function handleGSAPWarnings() {
+        const gsapTargets = document.querySelectorAll('[data-speed]');
+        if (gsapTargets.length === 0) {
+          console.log('GSAP targets with [data-speed] not found - this is expected for this page');
+        }
+      }
+
+      // 7. Initialize page components
+      function initializePage() {
+        try {
+          initVideoAutoplay();
+          preventEmptyLinks();
+          initHistoryModal();
+
+          // Инициализируем счетчики с проверкой библиотеки
+          if (typeof countUp === 'undefined') {
+            console.warn('CountUp library not available, using fallback');
+            setTimeout(initCountersFallback, 500);
+          } else {
+            initFAWCounters();
+          }
+
+          handleGSAPWarnings();
+          console.log('About page initialized successfully');
+        } catch (error) {
+          console.error('Error initializing about page:', error);
+        }
+      }
+
+      // Start initialization
+      initializePage();
+
+      // Проверка и исправление через 3 секунды
+      setTimeout(() => {
+        Object.keys(COUNTER_VALUES).forEach(counterId => {
+          const element = document.getElementById(counterId);
+          if (element) {
+            const current = element.textContent.trim();
+            const expected = COUNTER_VALUES[counterId].value + COUNTER_VALUES[counterId].suffix;
+
+            if (current !== expected && current !== '0') {
+              console.log(`Исправление ${counterId}: "${current}" → "${expected}"`);
+              element.textContent = expected;
+            }
+          }
+        });
+      }, 3000);
+    });
+
+    // ПУБЛИЧНЫЕ МЕТОДЫ
+    window.FAWAbout = {
+      // Переинициализация счетчиков
+      reinitCounters: function () {
+        const counters = document.querySelectorAll('[id^="stats-counter-"]');
+        counters.forEach(counter => {
+          counter.textContent = '0';
+        });
+
+        setTimeout(() => {
+          const COUNTER_VALUES = {
+            'stats-counter-1': { value: 15, suffix: ' млн+' },
+            'stats-counter-2': { value: 800, suffix: '+' },
+            'stats-counter-3': { value: 75, suffix: '+' },
+            'stats-counter-4': { value: 200, suffix: '+' }
+          };
+
+          Object.keys(COUNTER_VALUES).forEach(counterId => {
+            const element = document.getElementById(counterId);
+            if (element) {
+              const config = COUNTER_VALUES[counterId];
+              element.textContent = config.value + config.suffix;
+            }
+          });
+        }, 100);
+      },
+
+      // Открыть модальное окно истории
+      openHistoryModal: function (imageSrc, title, description) {
+        const modal = document.getElementById("modal");
+        if (!modal) return;
+
+        const modalImage = document.getElementById("modal-image");
+        const modalTitle = document.getElementById("modal-title");
+        const modalDescription = document.getElementById("modal-description");
+
+        if (modalImage && modalTitle && modalDescription) {
+          modal.style.display = "flex";
+          modalImage.src = imageSrc;
+          modalImage.alt = title;
+          modalTitle.textContent = title;
+          modalDescription.textContent = description;
+        }
+      }
+    };
+
+    // Принудительное исправление счетчиков (для консоли)
+    window.fixCounters = function () {
+      const COUNTER_VALUES = {
+        'stats-counter-1': { value: 15, suffix: ' млн+' },
+        'stats-counter-2': { value: 800, suffix: '+' },
+        'stats-counter-3': { value: 75, suffix: '+' },
+        'stats-counter-4': { value: 200, suffix: '+' }
+      };
+
+      Object.keys(COUNTER_VALUES).forEach(counterId => {
+        const element = document.getElementById(counterId);
+        if (element) {
+          const config = COUNTER_VALUES[counterId];
+          element.textContent = config.value + config.suffix;
+          console.log(`Исправлен ${counterId}: ${config.value}${config.suffix}`);
+        }
+      });
+    };
+  </script>
+
+</body>
+
+</html>
