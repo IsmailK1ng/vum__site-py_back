@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from .models import News, NewsBlock
+from .models import News, NewsBlock, ContactForm
 
 
 class NewsBlockSerializer(serializers.ModelSerializer):
     class Meta:
         model = NewsBlock
-        fields = ('id', 'block_type', 'text', 'image', 'youtube_url', 'video_file', 'order')
+        fields = '__all__'
 
 
 class NewsSerializer(serializers.ModelSerializer):
@@ -13,13 +13,10 @@ class NewsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = News
-        fields = (
-            'id',
-            'title',
-            'desc',
-            'author',
-            'author_photo',
-            'preview_image',
-            'created_at',
-            'blocks',  # ← вот это добавили
-        )
+        fields = '__all__'
+
+class ContactFormSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactForm
+        fields = ['id', 'name', 'region', 'phone', 'message', 'created_at']
+        read_only_fields = ['id', 'created_at']

@@ -33,7 +33,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(','
 
 INSTALLED_APPS = [
     'jazzmin',
-    'main',
+    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,20 +42,33 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_spectacular',
+    'main',
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-LANGUAGE_CODE = config('LANGUAGE_CODE', default='ru') # язык по умолчанию, русский
+# В settings.py замените эти строки:
+
+LANGUAGE_CODE = 'ru'
 USE_I18N = True
-USE_L10N = True  # если есть
+USE_L10N = True
+
 LANGUAGES = [
-    ('en', 'English'),
     ('ru', 'Русский'),
-    ('uz', "O‘zbek"),
+    ('en', 'English'),
+    ('uz', "O'zbek"),
 ]
+
+# ВАЖНО: Добавьте эти настройки
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'ru'  # Это обязательно!
+MODELTRANSLATION_LANGUAGES = ('ru', 'en', 'uz')  # Все языки для перевода
+MODELTRANSLATION_FALLBACK_LANGUAGES = ('ru',)  # Язык по умолчанию
+
+# Удалите дублирующиеся строки (они у вас повторяются):
+# from pathlib import Path  # <- это уже есть в начале файла
+# BASE_DIR = Path(__file__).resolve().parent.parent  # <- это тоже
 
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent

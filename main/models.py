@@ -46,4 +46,37 @@ class NewsBlock(models.Model):
 
     def __str__(self):
         return f"{self.news.title} — {self.block_type}"
+
+
+class ContactForm(models.Model):
+    REGION_CHOICES = [
+        ('Toshkent shahri', 'Toshkent shahri'),
+        ('Andijon viloyati', 'Andijon viloyati'),
+        ('Buxoro viloyati', 'Buxoro viloyati'),
+        ('Fargʻona viloyati', 'Fargʻona viloyati'),
+        ('Jizzax viloyati', 'Jizzax viloyati'),
+        ('Xorazm viloyati', 'Xorazm viloyati'),
+        ('Namangan viloyati', 'Namangan viloyati'),
+        ('Navoiy viloyati', 'Navoiy viloyati'),
+        ('Qashqadaryo viloyati', 'Qashqadaryo viloyati'),
+        ('Samarqand viloyati', 'Samarqand viloyati'),
+        ('Sirdaryo viloyati', 'Sirdaryo viloyati'),
+        ('Surxondaryo viloyati', 'Surxondaryo viloyati'),
+        ('Toshkent viloyati', 'Toshkent viloyati'),
+        ('Qoraqalpogʻiston Respublikasi', 'Qoraqalpogʻiston Respublikasi'),
+    ]
     
+    name = models.CharField(max_length=255, verbose_name='Ism')
+    region = models.CharField(max_length=100, choices=REGION_CHOICES, verbose_name='Viloyat')
+    phone = models.CharField(max_length=50, verbose_name='Telefon')
+    message = models.TextField(verbose_name='Xabar')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Yuborilgan vaqt')
+    is_processed = models.BooleanField(default=False, verbose_name='Ko\'rib chiqilgan')
+    
+    class Meta:
+        verbose_name = 'Kontakt forma'
+        verbose_name_plural = 'Kontakt formalar'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.name} - {self.phone} ({self.created_at.strftime('%d.%m.%Y')})"

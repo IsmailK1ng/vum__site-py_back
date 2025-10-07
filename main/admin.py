@@ -1,15 +1,22 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import News, NewsBlock
+from modeltranslation.admin import TabbedTranslationAdmin, TranslationTabularInline
+from .models import News, NewsBlock, ContactForm
 
-class NewsBlockInline(admin.TabularInline):  # Можно StackedInline для вертикального вида
+
+class NewsBlockInline(TranslationTabularInline):
     model = NewsBlock
-    extra = 1  # показывать один пустой блок для добавления
+    extra = 1
+    # Не указывайте явно поля переводов - modeltranslation добавит их автоматически
     fields = ('block_type', 'text', 'image', 'youtube_url', 'video_file', 'order', 'image_tag')
     readonly_fields = ('image_tag',)
 
     class Media:
-        js = ('main/admin.js',)  # путь относительно static/
+        js = ('main/admin.js',)
+        # Добавляем CSS для вкладок
+        css = {
+            'screen': ('modeltranslation/css/tabbed_translation_fields.css',),
+        }
 
     def image_tag(self, obj):
         if obj.image and obj.image.name:
@@ -22,14 +29,14 @@ class NewsBlockInline(admin.TabularInline):  # Можно StackedInline для �
 
 
 @admin.register(News)
-class NewsAdmin(admin.ModelAdmin):
+class NewsAdmin(TabbedTranslationAdmin):  # Вкладки для переводов
     list_display = ('title', 'author', 'preview_image_tag', 'created_at')
     readonly_fields = ('preview_image_tag', 'author_photo_tag')
     search_fields = ('title', 'author__username')
     list_filter = ('created_at',)
     ordering = ('-created_at',)
-    inlines = [NewsBlockInline]  # <-- добавили инлайн
-
+    inlines = [NewsBlockInline]
+    
     def preview_image_tag(self, obj):
         if obj.preview_image and obj.preview_image.name:
             return format_html(
@@ -48,6 +55,20 @@ class NewsAdmin(admin.ModelAdmin):
         return "—"
     author_photo_tag.short_description = "Фото автора"
 
+
+@admin.register(ContactForm)
+class ContactFormAdmin(admin.ModelAdmin):
+    list_display = ['name', 'phone', 'region', 'created_at', 'is_processed']
+    list_filter = ['is_processed', 'region', 'created_at']
+    search_fields = ['name', 'phone', 'message']
+    readonly_fields = ['created_at']
+    
+    actions = ['mark_as_processed']
+    
+    def mark_as_processed(self, request, queryset):
+        updated = queryset.update(is_processed=True)
+        self.message_user(request, f'{updated} ta ariza ko\'rib chiqilgan deb belgilandi.')
+    mark_as_processed.short_description = 'Ko\'rib chiqilgan deb belgilash'
 
 # @admin.register(NewsBlock)
 # class NewsBlockAdmin(admin.ModelAdmin):

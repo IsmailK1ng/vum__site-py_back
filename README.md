@@ -54,6 +54,7 @@
 ##  tzdata                    2025.2
 ##  uritemplate               4.2.0
 ##  Werkzeug                  3.1.3
+##  django-modeltranslation   0.19.17
 
 
 ## ⚙️ Установка и запуск проекта
