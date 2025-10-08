@@ -55,13 +55,22 @@ class NewsAdmin(TabbedTranslationAdmin):  # Вкладки для перевод
         return "—"
     author_photo_tag.short_description = "Фото автора"
 
-
 @admin.register(ContactForm)
 class ContactFormAdmin(admin.ModelAdmin):
     list_display = ['name', 'phone', 'region', 'created_at', 'is_processed']
     list_filter = ['is_processed', 'region', 'created_at']
-    search_fields = ['name', 'phone', 'message']
+    search_fields = ['name', 'phone', 'message', 'admin_comment']
     readonly_fields = ['created_at']
+    
+    fieldsets = (
+        ('Информация о заявке', {
+            'fields': ('name', 'phone', 'region', 'message', 'created_at')
+        }),
+        ('Обработка', {
+            'fields': ('is_processed', 'admin_comment'),
+            'classes': ('wide',)
+        }),
+    )
     
     actions = ['mark_as_processed']
     

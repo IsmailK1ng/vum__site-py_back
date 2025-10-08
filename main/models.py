@@ -66,16 +66,17 @@ class ContactForm(models.Model):
         ('Qoraqalpogʻiston Respublikasi', 'Qoraqalpogʻiston Respublikasi'),
     ]
     
-    name = models.CharField(max_length=255, verbose_name='Ism')
-    region = models.CharField(max_length=100, choices=REGION_CHOICES, verbose_name='Viloyat')
-    phone = models.CharField(max_length=50, verbose_name='Telefon')
-    message = models.TextField(verbose_name='Xabar')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Yuborilgan vaqt')
-    is_processed = models.BooleanField(default=False, verbose_name='Ko\'rib chiqilgan')
-    
+    name = models.CharField(max_length=255, verbose_name='Имя')
+    region = models.CharField(max_length=100, choices=REGION_CHOICES, verbose_name='Регион')
+    phone = models.CharField(max_length=50, verbose_name='Телефон')
+    message = models.TextField(verbose_name='Сообщение')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Время отправки')
+    is_processed = models.BooleanField(default=False, verbose_name='Просмотрено')
+    admin_comment = models.TextField(blank=True, null=True, verbose_name='Комментарий администратора')
+
     class Meta:
-        verbose_name = 'Kontakt forma'
-        verbose_name_plural = 'Kontakt formalar'
+        verbose_name = 'Поступившие заявки'
+        verbose_name_plural = 'Поступившие заявки'
         ordering = ['-created_at']
     
     def __str__(self):

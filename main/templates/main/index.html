@@ -18,11 +18,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   <!-- Фавикон и иконки (начало) -->
-    <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
-    <link rel="apple-touch-icon" href="{% static 'images/icon/_iiiiapple.png' %}" />
-    <link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/icon/_iiii176.png' %}" />
-    <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/icon/_iiii1156.png' %}" />
-    <link rel="apple-touch-startup-image" href="{% static 'images/icon/_iiii1.png' %}" />
+  <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="{% static 'images/icon/_iiiiapple.png' %}" />
+  <link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/icon/_iiii176.png' %}" />
+  <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/icon/_iiii1156.png' %}" />
+  <link rel="apple-touch-startup-image" href="{% static 'images/icon/_iiii1.png' %}" />
   <!-- Фавикон и иконки (конец) -->
 
   <!-- Мета для Facebook (начало) -->
@@ -318,7 +318,6 @@
                   </div>
                 </div>
               </div>
-
               <!-- Right Column - Form with Template Design -->
               <div class="col-12 col-md-6 mxd-grid-item">
                 <div class="mxd-block__content contact">
@@ -326,27 +325,24 @@
                     <div class="form-container">
 
                       <!-- Сообщения-ответы (начало) -->
-                      <div class="form__reply centered text-center">
+                      <div class="form__reply centered text-center" style="display: none;">
                         <i class="ph-fill ph-smiley-wink reply__icon"></i>
                         <p class="reply__title">Bajarildi!</p>
-                        <span class="reply__text">Xabaringiz uchun rahmat. Biz tez orada javob beramiz.</span>
+                        <span class="reply__text">Xabaringiz uchun rahmat. Biz tez orada siz bilan bog'lanamiz.</span>
                       </div>
                       <!-- Сообщения-ответы (конец) -->
 
                       <!-- Форма контакта (начало) -->
-                      <form class="form contact-form">
-                        <!-- Hidden Required Fields -->
-                        <input type="hidden" name="project_name" value="FAW Trucks">
-                        <input type="hidden" name="admin_email" value="info@fawtrucks.uz">
-                        <input type="hidden" name="form_subject" value="FAW Contact Form Message">
-                        <!-- END Hidden Required Fields-->
+                      <form class="form contact-form" id="contactForm">
+                        {% csrf_token %}
+
                         <div class="container-fluid p-0">
                           <div class="row gx-0">
                             <div class="col-12 mxd-grid-item anim-uni-in-up">
-                              <input type="text" name="Name" placeholder="Ismingiz*" required>
+                              <input type="text" name="name" placeholder="Ismingiz*" required>
                             </div>
                             <div class="col-12 mxd-grid-item anim-uni-in-up">
-                              <select name="Region" required>
+                              <select name="region" required>
                                 <option value="" disabled selected>Viloyatni tanlang*</option>
                                 <option value="Toshkent shahri">Toshkent shahri</option>
                                 <option value="Andijon viloyati">Andijon viloyati</option>
@@ -365,11 +361,11 @@
                               </select>
                             </div>
                             <div class="col-12 mxd-grid-item anim-uni-in-up">
-                              <input type="tel" name="Phone" placeholder="Telefon raqami*" pattern="[+]*[0-9\s\-\(\)]*"
+                              <input type="tel" name="phone" placeholder="Telefon raqami*" pattern="[+]*[0-9\s\-\(\)]*"
                                 required>
                             </div>
                             <div class="col-12 mxd-grid-item anim-uni-in-up">
-                              <textarea name="Message"
+                              <textarea name="message"
                                 placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*"
                                 required></textarea>
                             </div>
@@ -390,7 +386,7 @@
                   </div>
                 </div>
               </div>
-
+              <!-- Right Column - Form with Template Design end-->
             </div>
           </div>
         </div>
@@ -830,6 +826,66 @@
       // запускаем несколько раз, чтобы поймать поздно инициализирующиеся скрипты
       var runs = 0; var interval = setInterval(function () { disableParallaxInline(); startObserver(); runs++; if (runs > 12) { clearInterval(interval); } }, 500);
     })();
+
+    let isSubmitting = false;
+
+    document.getElementById('contactForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      if (isSubmitting) return;
+
+      const form = this;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const btnCaption = submitBtn.querySelector('.btn-caption');
+      const replyBlock = form.closest('.form-container').querySelector('.form__reply');
+
+      isSubmitting = true;
+
+      // Сохраняем оригинальный HTML кнопки
+      const originalHTML = btnCaption.innerHTML;
+
+      // Меняем текст (он автоматически дублируется в анимации)
+      btnCaption.innerHTML = 'Yuborilmoqda...';
+
+      const formData = {
+        name: form.name.value,
+        region: form.region.value,
+        phone: form.phone.value,
+        message: form.message.value
+      };
+
+      try {
+        const response = await fetch('/api/contact/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          replyBlock.style.display = 'block';
+          form.reset();
+
+          setTimeout(() => {
+            replyBlock.style.display = 'none';
+          }, 5000);
+
+        } else {
+          throw new Error(data.message || 'Xatolik yuz berdi');
+        }
+
+      } catch (error) {
+        alert('Xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.');
+      } finally {
+        // Восстанавливаем оригинальный HTML
+        btnCaption.innerHTML = originalHTML;
+        isSubmitting = false;
+      }
+    });
   </script>
 
   <!-- Load Scripts End -->
