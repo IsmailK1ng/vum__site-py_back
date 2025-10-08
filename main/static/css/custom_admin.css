@@ -19,7 +19,7 @@
 }
 
 /* Общий фон всей админки */
-body, .content-wrapper {
+.content-wrapper {
     background: url("/static/images/logo-vum.png") no-repeat center center fixed !important;
 }
 
