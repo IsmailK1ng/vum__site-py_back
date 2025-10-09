@@ -1,8 +1,17 @@
+# main/api_urls.py
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import NewsViewSet, ContactFormViewSet
 
-router = DefaultRouter()
-router.register(r'news', NewsViewSet, basename='news')
-router.register(r'contact', ContactFormViewSet, basename='contact')
+# Роутер для UZ
+uz_router = DefaultRouter()
+uz_router.register(r'news', NewsViewSet, basename='news')
+uz_router.register(r'contact', ContactFormViewSet, basename='contact')
 
-urlpatterns = router.urls
+urlpatterns = [
+    # API для faw.uz
+    path('uz/', include(uz_router.urls)),
+    
+    # API для faw.kg
+    path('kg/', include('main.kg_api_urls')),
+]
