@@ -76,8 +76,8 @@ class ContactFormAdmin(admin.ModelAdmin):
     
     def mark_as_processed(self, request, queryset):
         updated = queryset.update(is_processed=True)
-        self.message_user(request, f'{updated} ta ariza ko\'rib chiqilgan deb belgilandi.')
-    mark_as_processed.short_description = 'Ko\'rib chiqilgan deb belgilash'
+        self.message_user(request, f'{updated} - помечены как просмотренные.')
+    mark_as_processed.short_description = 'Пометить как просмотренные'
 
 # @admin.register(NewsBlock)
 # class NewsBlockAdmin(admin.ModelAdmin):
