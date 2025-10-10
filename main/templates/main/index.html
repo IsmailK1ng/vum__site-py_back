@@ -49,7 +49,6 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <!-- Цвет браузера (конец) -->
-
 </head>
 
 <body>
@@ -324,13 +323,10 @@
                   <div class="mxd-block__inner-form loading__fade">
                     <div class="form-container">
 
-                      <!-- Сообщения-ответы (начало) -->
-                      <div class="form__reply centered text-center" style="display: none;">
-                        <i class="ph-fill ph-smiley-wink reply__icon"></i>
-                        <p class="reply__title">Bajarildi!</p>
-                        <span class="reply__text">Xabaringiz uchun rahmat. Biz tez orada siz bilan bog'lanamiz.</span>
+                      <!-- Сообщение о статусе (встроенное уведомление) -->
+                      <div class="form-status hidden">
+                        <p class="form-status__text"></p>
                       </div>
-                      <!-- Сообщения-ответы (конец) -->
 
                       <!-- Форма контакта (начало) -->
                       <form class="form contact-form" id="contactForm">
@@ -361,8 +357,8 @@
                               </select>
                             </div>
                             <div class="col-12 mxd-grid-item anim-uni-in-up">
-                              <input type="tel" name="phone" placeholder="Telefon raqami*" pattern="[+]*[0-9\s\-\(\)]*"
-                                required>
+                              <input type="tel" name="phone" placeholder="+998 (__) ___-__-__" id="phoneInput"
+                                pattern="[+]*[0-9\s\-\(\)]*" data-default="+998" required>
                             </div>
                             <div class="col-12 mxd-grid-item anim-uni-in-up">
                               <textarea name="message"
@@ -828,64 +824,86 @@
     })();
 
     let isSubmitting = false;
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("contactForm");
+      const phoneInput = document.getElementById("phoneInput");
+      const statusBlock = document.querySelector(".form-status");
+      const statusText = statusBlock.querySelector(".form-status__text");
 
-    document.getElementById('contactForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
+      // === Маска телефона ===
+      phoneInput.addEventListener("input", (e) => {
+        let value = e.target.value.replace(/\D/g, ""); // убираем все нецифры
+        if (!value.startsWith("998")) value = "998" + value; // авто добавляем код страны
+        if (value.length > 12) value = value.slice(0, 12);
 
-      if (isSubmitting) return;
+        // форматируем +998 (__) ___-__-__
+        let formatted = "+998 ";
+        if (value.length > 3) formatted += "(" + value.slice(3, 5);
+        if (value.length >= 5) formatted += ") " + value.slice(5, 8);
+        if (value.length >= 8) formatted += "-" + value.slice(8, 10);
+        if (value.length >= 10) formatted += "-" + value.slice(10, 12);
 
-      const form = this;
-      const submitBtn = form.querySelector('button[type="submit"]');
-      const btnCaption = submitBtn.querySelector('.btn-caption');
-      const replyBlock = form.closest('.form-container').querySelector('.form__reply');
+        e.target.value = formatted;
+      });
 
-      isSubmitting = true;
+      // === Отправка формы ===
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (isSubmitting) return;
+        isSubmitting = true;
 
-      // Сохраняем оригинальный HTML кнопки
-      const originalHTML = btnCaption.innerHTML;
-
-      // Меняем текст (он автоматически дублируется в анимации)
-      btnCaption.innerHTML = 'Yuborilmoqda...';
-
-      const formData = {
-        name: form.name.value,
-        region: form.region.value,
-        phone: form.phone.value,
-        message: form.message.value
-      };
-
-      try {
-        const response = await fetch('/api/contact/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
-          },
-          body: JSON.stringify(formData)
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          replyBlock.style.display = 'block';
-          form.reset();
-
-          setTimeout(() => {
-            replyBlock.style.display = 'none';
-          }, 5000);
-
-        } else {
-          throw new Error(data.message || 'Xatolik yuz berdi');
+        const phone = phoneInput.value.replace(/\D/g, "");
+        if (phone.length !== 12) {
+          showStatus("❌ Iltimos, telefon raqamingizni to‘liq kiriting.", "error");
+          isSubmitting = false;
+          return;
         }
 
-      } catch (error) {
-        alert('Xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.');
-      } finally {
-        // Восстанавливаем оригинальный HTML
-        btnCaption.innerHTML = originalHTML;
-        isSubmitting = false;
+        const formData = {
+          name: form.name.value,
+          region: form.region.value,
+          phone: phoneInput.value,
+          message: form.message.value,
+        };
+
+        try {
+          const response = await fetch("/api/contact/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value,
+            },
+            body: JSON.stringify(formData),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog‘lanamiz.", "success");
+            form.reset();
+          } else {
+            throw new Error(data.message || "Xatolik yuz berdi.");
+          }
+        } catch (error) {
+          showStatus("❌ Xatolik yuz berdi. Qayta urinib ko‘ring.", "error");
+        } finally {
+          isSubmitting = false;
+        }
+      });
+
+      // === Функция показа статуса ===
+      function showStatus(message, type = "success") {
+        statusText.textContent = message;
+        statusBlock.className = `form-status ${type} show`;
+        statusBlock.classList.remove("hidden");
+
+        setTimeout(() => {
+          statusBlock.classList.remove("show");
+          setTimeout(() => statusBlock.classList.add("hidden"), 400);
+        }, 4000);
       }
     });
+
   </script>
 
   <!-- Load Scripts End -->

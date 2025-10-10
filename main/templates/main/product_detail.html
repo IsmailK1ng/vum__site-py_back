@@ -77,7 +77,7 @@
                                                     <h2 class="models_title">FAW Tiger V 4x2 samosvali</h2>
                                                     <ul class="more_info-link">
                                                         <li><a href="#parametrs">Parametrlar</a></li>
-                                                        <li><a href="#">Galereya</a></li>
+                                                        <li><a href="#gallery">Galereya</a></li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -210,7 +210,8 @@
                                             <li><a href="{% static 'home' %}">Bosh sahifa</a></li>
                                             <li><a href="javascript:void(0)">Modellar</a></li>
                                             <li class="active"><a
-                                                    href="{% static 'products/<int:product_id>/' %}">Shatakchi mashinalar</a></li>
+                                                    href="{% static 'products/<int:product_id>/' %}">Shatakchi
+                                                    mashinalar</a></li>
                                         </ol>
                                     </div>
                                 </div>
@@ -335,7 +336,7 @@
             </div>
             <!-- Секция — превью блога (конец) -->
             <!-- Section - Inner Pages Slider Start -->
-            <div class="mxd-section padding-pre-grid section-galery">
+            <div class="mxd-section padding-pre-grid section-galery" id="gallery">
                 <div class="grid-container">
 
                     <!-- Block - Inner Pages Slider Start -->
@@ -433,6 +434,7 @@
             </div>
 
             <form class="faw-modal__form" id="faw-contact-form">
+                {% csrf_token %}
                 <!-- Hidden Required Fields -->
                 <input type="hidden" name="project_name" value="FAW Trucks">
                 <input type="hidden" name="admin_email" value="info@fawtrucks.uz">
@@ -463,8 +465,8 @@
                 </div>
 
                 <div class="faw-form__group">
-                    <input type="tel" name="Phone" class="faw-form__input" placeholder="Telefon raqami*"
-                        pattern="[+]*[0-9\s\-\(\)]*" required>
+                    <input type="tel" name="phone" class="faw-form__input" placeholder="+998 (__) ___-__-__"
+                        id="phoneInput" pattern="[+]*[0-9\s\-\(\)]*" data-default="+998" required>
                 </div>
 
                 <div class="faw-form__group">
@@ -501,12 +503,13 @@
         </div>
     </div>
     <!-- Подключение скриптов (начало) -->
+    <!-- Подключение скриптов (начало) -->
     <script src="{% static 'js/libs.min.js' %}"></script>
     <script src="{% static 'js/app.js' %}"></script>
-    <!-- Счётчики FAW (инициализация) -->
     <script src="{% static 'js/faw.js' %}"></script>
+
     <script>
-        // Универсальный плавный скролл, сразу учитывающий высоту фиксированного хедера
+        // Универсальный плавный скролл
         (function () {
             function getHeaderHeight() {
                 try { var h = document.getElementById('header'); return h ? h.offsetHeight || 0 : 0; } catch (e) { return 0; }
@@ -516,14 +519,13 @@
                 var el = document.getElementById(id);
                 if (!el) return;
                 var headerH = getHeaderHeight();
-                var offset = 25; // отступ под хедером
+                var offset = 25;
                 var rect = el.getBoundingClientRect();
                 var targetY = Math.max(0, Math.round(window.pageYOffset + rect.top - headerH - offset));
                 try { window.scrollTo({ top: targetY, behavior: 'smooth' }); }
                 catch (e) { window.scrollTo(0, targetY); }
             }
 
-            // Делегирование: клики по ссылкам вида href="#id"
             document.addEventListener('click', function (e) {
                 var a = e.target.closest && e.target.closest('a[href^="#"]');
                 if (!a) return;
@@ -537,26 +539,41 @@
                 }
             }, false);
         })();
+
+        // ========== ОСНОВНОЙ КОД ФОРМЫ ==========
+        let isSubmitting = false;
+
         document.addEventListener('DOMContentLoaded', function () {
-            // Получаем элементы
             const modal = document.getElementById('faw-modal');
             const modalOverlay = document.querySelector('.faw-modal__overlay');
             const modalClose = document.querySelector('.faw-modal__close');
             const contactForm = document.getElementById('faw-contact-form');
+            const phoneInput = contactForm.querySelector('input[name="phone"]');
 
-            // Функция открытия модального окна
+            // Создаем блок для статусов
+            let statusBlock = contactForm.querySelector('.faw-form__status');
+            if (!statusBlock) {
+                statusBlock = document.createElement('div');
+                statusBlock.className = 'faw-form__status hidden';
+                const statusText = document.createElement('p');
+                statusText.className = 'faw-form__status-text';
+                statusBlock.appendChild(statusText);
+                contactForm.prepend(statusBlock);
+            }
+            const statusText = statusBlock.querySelector('.faw-form__status-text') || statusBlock;
+
+            // Функции открытия/закрытия
             function openModal() {
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
             }
 
-            // Функция закрытия модального окна
             function closeModal() {
                 modal.classList.remove('active');
                 document.body.style.overflow = '';
             }
 
-            // Обработчики для всех кнопок, которые должны открывать модальное окно
+            // Открытие модалки
             const modalTriggers = document.querySelectorAll('a[href="#faw-main-contact-modal"]');
             modalTriggers.forEach(trigger => {
                 trigger.addEventListener('click', function (e) {
@@ -565,46 +582,97 @@
                 });
             });
 
-            // Закрытие модального окна при клике на крестик
+            // Закрытие модалки
             modalClose.addEventListener('click', closeModal);
-
-            // Закрытие модального окна при клике на оверлей
             modalOverlay.addEventListener('click', closeModal);
-
-            // Закрытие модального окна при нажатии Escape
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape' && modal.classList.contains('active')) {
                     closeModal();
                 }
             });
 
-            // Обработка отправки формы
-            contactForm.addEventListener('submit', function (e) {
-                e.preventDefault();
+            // Маска телефона
+            phoneInput.addEventListener("input", (e) => {
+                let value = e.target.value.replace(/\D/g, "");
+                if (!value.startsWith("998")) value = "998" + value;
+                if (value.length > 12) value = value.slice(0, 12);
 
-                // Получаем данные формы
-                const formData = new FormData(contactForm);
+                let formatted = "+998 ";
+                if (value.length > 3) formatted += "(" + value.slice(3, 5);
+                if (value.length >= 5) formatted += ") " + value.slice(5, 8);
+                if (value.length >= 8) formatted += "-" + value.slice(8, 10);
+                if (value.length >= 10) formatted += "-" + value.slice(10, 12);
 
-                // Здесь вы можете добавить отправку данных на сервер
-                // Например, через fetch или XMLHttpRequest
-
-                // Показываем сообщение об успешной отправке
-                alert("Ma'lumotlaringiz muvaffaqiyatli yuborildi! Tez orada siz bilan bog'lanamiz.");
-
-                // Сбрасываем форму
-                contactForm.reset();
-
-                // Закрываем модальное окно
-                closeModal();
+                e.target.value = formatted;
             });
 
-            // Галерея: открытие картинки в модальном окне
+            // Отправка формы
+            contactForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                if (isSubmitting) return;
+                isSubmitting = true;
+
+                const phone = phoneInput.value.replace(/\D/g, "");
+                if (phone.length !== 12) {
+                    showStatus("❌ Iltimos, telefon raqamingizni to'liq kiriting.", "error");
+                    isSubmitting = false;
+                    return;
+                }
+
+                const formData = {
+                    name: contactForm.Name.value,
+                    region: contactForm.Region.value,
+                    phone: phoneInput.value,
+                    message: contactForm.Message.value,
+                };
+
+                try {
+                    const response = await fetch("/api/contact/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": contactForm.querySelector("[name=csrfmiddlewaretoken]").value,
+                        },
+                        body: JSON.stringify(formData),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
+                        contactForm.reset();
+
+                        setTimeout(() => {
+                            closeModal();
+                            statusBlock.classList.add("hidden");
+                        }, 2000);
+                    } else {
+                        throw new Error(data.message || "Xatolik yuz berdi.");
+                    }
+                } catch (error) {
+                    showStatus("❌ Xatolik yuz berdi. Qayta urinib ko'ring.", "error");
+                } finally {
+                    isSubmitting = false;
+                }
+            });
+
+            function showStatus(message, type = "success") {
+                statusText.textContent = message;
+                statusBlock.className = `faw-form__status ${type} show`;
+                statusBlock.classList.remove("hidden");
+
+                setTimeout(() => {
+                    statusBlock.classList.remove("show");
+                    setTimeout(() => statusBlock.classList.add("hidden"), 400);
+                }, 4000);
+            }
+
+            // Галерея
             const galleryModal = document.getElementById('gallery-modal');
             const galleryModalImg = document.getElementById('gallery-modal-img');
             const galleryModalClose = document.querySelector('.gallery-modal__close');
             const galleryModalOverlay = document.querySelector('.gallery-modal__overlay');
 
-            // Находим все картинки галереи (swiper)
             document.querySelectorAll('.swiper-wrapper img').forEach(img => {
                 img.style.cursor = 'pointer';
                 img.addEventListener('click', function () {
@@ -620,6 +688,7 @@
                 galleryModalImg.src = '';
                 document.body.style.overflow = '';
             }
+
             galleryModalClose.addEventListener('click', closeGalleryModal);
             galleryModalOverlay.addEventListener('click', closeGalleryModal);
             document.addEventListener('keydown', function (e) {

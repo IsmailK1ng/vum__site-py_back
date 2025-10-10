@@ -256,6 +256,7 @@
 
                                             <!-- Contact Form Start -->
                                             <form class="form contact-form" id="contact-form">
+                                                {% csrf_token %}
                                                 <!-- Hidden Required Fields -->
                                                 <input type="hidden" name="project_name" value="FAW Trucks" />
                                                 <input type="hidden" name="admin_email" value="info@fawtrucks.uz" />
@@ -373,7 +374,110 @@
     <script src="{% static 'js/libs.min.js' %}"></script>
     <script src="{% static 'js/app.js' %}"></script>
     <script src="{% static 'js/faw.js' %}"></script>
+    <script>
+        let isSubmitting = false;
 
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("contact-form");
+            const phoneInput = form.querySelector('input[name="Phone"]');
+            const replyBlock = document.querySelector(".form__reply");
+
+            // ✅ Создаем блок для статусов
+            let statusBlock = document.createElement('div');
+            statusBlock.className = 'form-status hidden';
+            const statusText = document.createElement('p');
+            statusText.className = 'form-status__text';
+            statusBlock.appendChild(statusText);
+            form.parentElement.insertBefore(statusBlock, form);
+
+            // ========== МАСКА ТЕЛЕФОНА ==========
+            phoneInput.addEventListener("input", (e) => {
+                let value = e.target.value.replace(/\D/g, "");
+                if (!value.startsWith("998")) value = "998" + value;
+                if (value.length > 12) value = value.slice(0, 12);
+
+                let formatted = "+998 ";
+                if (value.length > 3) formatted += "(" + value.slice(3, 5);
+                if (value.length >= 5) formatted += ") " + value.slice(5, 8);
+                if (value.length >= 8) formatted += "-" + value.slice(8, 10);
+                if (value.length >= 10) formatted += "-" + value.slice(10, 12);
+
+                e.target.value = formatted;
+            });
+
+            // ========== ОТПРАВКА ФОРМЫ ==========
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                if (isSubmitting) return;
+                isSubmitting = true;
+
+                // Валидация телефона
+                const phone = phoneInput.value.replace(/\D/g, "");
+                if (phone.length !== 12) {
+                    showStatus("❌ Iltimos, telefon raqamingizni to'liq kiriting.", "error");
+                    isSubmitting = false;
+                    return;
+                }
+
+                // Собираем данные формы
+                const formData = {
+                    name: form.Name.value,
+                    // company: form.Company.value || "",
+                    // email: form["E-mail"].value,
+                    phone: phoneInput.value,
+                    message: form.Message.value,
+                };
+
+                try {
+                    const response = await fetch("/api/contact/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": getCookie("csrftoken"),
+                        },
+                        body: JSON.stringify(formData),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // Показываем встроенный reply блок
+                        replyBlock.style.display = "block";
+                        form.style.display = "none";
+
+                        // Также показываем статус
+                        showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
+
+                        // Сбрасываем форму и возвращаем её через 5 секунд
+                        setTimeout(() => {
+                            form.reset();
+                            form.style.display = "block";
+                            replyBlock.style.display = "none";
+                            statusBlock.classList.add("hidden");
+                        }, 5000);
+                    } else {
+                        throw new Error(data.message || "Xatolik yuz berdi.");
+                    }
+                } catch (error) {
+                    showStatus("❌ Xatolik yuz berdi. Qayta urinib ko'ring.", "error");
+                } finally {
+                    isSubmitting = false;
+                }
+            });
+
+            // ========== ФУНКЦИЯ ПОКАЗА СТАТУСА ==========
+            function showStatus(message, type = "success") {
+                statusText.textContent = message;
+                statusBlock.className = `form-status ${type} show`;
+                statusBlock.classList.remove("hidden");
+
+                setTimeout(() => {
+                    statusBlock.classList.remove("show");
+                    setTimeout(() => statusBlock.classList.add("hidden"), 400);
+                }, 4000);
+            }
+        });
+    </script>
 </body>
 
 </html>
