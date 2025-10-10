@@ -1,3 +1,4 @@
+
 """
 Django settings for myproject project.
 
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_spectacular',
     'main',
+    'corsheaders',
 ]
 
 REST_FRAMEWORK = {
@@ -59,16 +61,17 @@ LANGUAGES = [
     ('ru', 'Русский'),
     ('en', 'English'),
     ('uz', "O'zbek"),
+    ('ky', 'Кыргызский'),
 ]
 
 # ВАЖНО: Добавьте эти настройки
-MODELTRANSLATION_DEFAULT_LANGUAGE = 'ru'  # Это обязательно!
-MODELTRANSLATION_LANGUAGES = ('ru', 'en', 'uz')  # Все языки для перевода
-MODELTRANSLATION_FALLBACK_LANGUAGES = ('ru',)  # Язык по умолчанию
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'ru'
+MODELTRANSLATION_LANGUAGES = ('ru', 'en', 'uz')  # БЕЗ 'ky'!
+MODELTRANSLATION_FALLBACK_LANGUAGES = ('ru',)
 
 # Удалите дублирующиеся строки (они у вас повторяются):
 # from pathlib import Path  # <- это уже есть в начале файла
-# BASE_DIR = Path(__file__).resolve().parent.parent  # <- это тоже
+# BASE_DIR = Path(file).resolve().parent.parent  # <- это тоже
 
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -108,6 +111,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'myproject.urls'
@@ -191,3 +195,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOWED_ORIGINS = [
+    'https://faw.kg',
+    'https://faw.uz',
+    'http://localhost:3000',
+    'http://localhost:5173',  # Vite
+    'http://127.0.0.1:5173',
+    'http://localhost:8080',  # Другие dev серверы
+]
+
+CORS_ALLOW_ALL_ORIGINS = True  # ТОЛЬКО ДЛЯ РАЗРАБОТКИ! В продакшене удалить!
