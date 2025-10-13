@@ -190,33 +190,6 @@ class KGVehicle(models.Model):
             return self.specs_ru or self.specs or {}
 
 
-class FeatureIcon(models.Model):
-    """Иконки особенностей машин"""
-    name = models.CharField(max_length=100, verbose_name='Название иконки')
-    image = models.ImageField(upload_to='kg_vehicles/features/', verbose_name='Изображение иконки')
-
-    class Meta:
-        verbose_name = 'Иконка особенности'
-        verbose_name_plural = 'Иконки особенностей'
-
-    def __str__(self):
-        return self.name
-
-
-class KGVehicleFeature(models.Model):
-    """Связь машины с её особенностями"""
-    vehicle = models.ForeignKey(KGVehicle, related_name='vehicle_features', on_delete=models.CASCADE, verbose_name='Машина')
-    feature = models.ForeignKey(FeatureIcon, on_delete=models.CASCADE, verbose_name='Особенность')
-
-    class Meta:
-        verbose_name = 'Особенность машины (KG)'
-        verbose_name_plural = 'Особенности машин (KG)'
-        unique_together = ('vehicle', 'feature')
-
-    def __str__(self):
-        return f"{self.vehicle.title} - {self.feature.name}"
-
-
 class KGVehicleImage(models.Model):
     """Дополнительные изображения машины"""
     vehicle = models.ForeignKey(KGVehicle, related_name='mini_images', on_delete=models.CASCADE, verbose_name='Машина')
@@ -246,6 +219,18 @@ class KGFeedback(models.Model):
         ('Issyk-Kul', 'Иссык-Кульская область'),
     ]
     
+    STATUS_CHOICES = [
+        ('new', 'Новая'),
+        ('in_process', 'В процессе'),
+        ('done', 'Обработана'),
+    ]
+    
+    PRIORITY_CHOICES = [
+        ('high', 'Высокий'),
+        ('medium', 'Средний'),
+        ('low', 'Низкий'),
+    ]
+    
     name = models.CharField(max_length=255, verbose_name='ФИО')
     phone = models.CharField(
         max_length=50, 
@@ -267,13 +252,35 @@ class KGFeedback(models.Model):
         related_name='feedbacks'
     )
     message = models.TextField(verbose_name='Сообщение', blank=True, null=True)
+    
+    # Новые поля
+    status = models.CharField(
+        max_length=20, 
+        choices=STATUS_CHOICES, 
+        default='new', 
+        verbose_name='Статус'
+    )
+    priority = models.CharField(
+        max_length=10, 
+        choices=PRIORITY_CHOICES, 
+        default='medium', 
+        verbose_name='Приоритет'
+    )
+    manager = models.ForeignKey(
+        User, 
+        null=True, 
+        blank=True, 
+        on_delete=models.SET_NULL, 
+        verbose_name='Ответственный',
+        related_name='kg_feedbacks'
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Время отправки')
-    is_processed = models.BooleanField(default=False, verbose_name='Обработано')
     admin_comment = models.TextField(blank=True, null=True, verbose_name='Комментарий администратора')
 
     class Meta:
-        verbose_name = 'Заявка (KG)'
-        verbose_name_plural = 'Заявки (KG)'
+        verbose_name = 'Заявка'
+        verbose_name_plural = 'Заявки'
         ordering = ['-created_at']
 
     def __str__(self):

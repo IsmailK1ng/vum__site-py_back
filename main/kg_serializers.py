@@ -1,16 +1,9 @@
 # main/kg_serializers.py
 from rest_framework import serializers
 from .models import (
-    KGVehicle, KGVehicleImage, KGVehicleFeature, FeatureIcon, 
+    KGVehicle, KGVehicleImage,
     KGFeedback, VehicleCardSpec, KGHeroSlide
 )
-
-
-class FeatureIconSerializer(serializers.ModelSerializer):
-    """Сериализатор для иконок особенностей"""
-    class Meta:
-        model = FeatureIcon
-        fields = ['id', 'name', 'image']
 
 
 class VehicleCardSpecSerializer(serializers.ModelSerializer):
@@ -33,15 +26,6 @@ class KGVehicleImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = KGVehicleImage
         fields = ['id', 'image', 'alt', 'order']
-
-
-class KGVehicleFeatureSerializer(serializers.ModelSerializer):
-    """Сериализатор для особенностей машины"""
-    feature = FeatureIconSerializer(read_only=True)
-    
-    class Meta:
-        model = KGVehicleFeature
-        fields = ['id', 'feature']
 
 
 class KGVehicleListSerializer(serializers.ModelSerializer):
@@ -67,7 +51,6 @@ class KGVehicleListSerializer(serializers.ModelSerializer):
 
 class KGVehicleDetailSerializer(serializers.ModelSerializer):
     """Детальный сериализатор машины (для страницы vehicle-details)"""
-    vehicle_features = KGVehicleFeatureSerializer(many=True, read_only=True)
     mini_images = KGVehicleImageSerializer(many=True, read_only=True)
     card_specs = VehicleCardSpecSerializer(many=True, read_only=True)
     
@@ -75,7 +58,7 @@ class KGVehicleDetailSerializer(serializers.ModelSerializer):
         model = KGVehicle
         fields = [
             'id', 'slug', 'title', 'preview_image', 'main_image', 
-            'specs', 'vehicle_features', 'mini_images', 'card_specs', 'is_active'
+            'specs', 'mini_images', 'card_specs', 'is_active'
         ]
     
     def to_representation(self, instance):
@@ -90,6 +73,17 @@ class KGVehicleDetailSerializer(serializers.ModelSerializer):
         data['specs'] = instance.get_specs(lang)
         
         return data
+
+
+# Добавляем этот сериализатор (он нужен для kg_views.py)
+class KGVehicleSerializer(serializers.ModelSerializer):
+    """Базовый сериализатор машины"""
+    card_specs = VehicleCardSpecSerializer(many=True, read_only=True)
+    mini_images = KGVehicleImageSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = KGVehicle
+        fields = '__all__'
 
 
 class KGHeroSlideSerializer(serializers.ModelSerializer):
@@ -109,9 +103,9 @@ class KGFeedbackSerializer(serializers.ModelSerializer):
         model = KGFeedback
         fields = [
             'id', 'name', 'phone', 'region', 'vehicle', 'vehicle_title',
-            'message', 'created_at', 'is_processed'
+            'message', 'status', 'priority', 'manager', 'created_at', 'admin_comment'
         ]
-        read_only_fields = ['id', 'created_at', 'is_processed']
+        read_only_fields = ['id', 'created_at']
     
     def get_vehicle_title(self, obj):
         """Получить название машины на языке запроса"""
