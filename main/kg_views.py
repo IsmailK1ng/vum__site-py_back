@@ -6,14 +6,14 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from django.db.models import Count
 from datetime import datetime, timedelta
 from django.http import HttpResponse
-
-from .models import KGVehicle, KGFeedback, FeatureIcon
+from .models import KGVehicle, KGFeedback, FeatureIcon, KGHeroSlide  # добавьте KGHeroSlide
 from .kg_serializers import (
     KGVehicleListSerializer, 
     KGVehicleDetailSerializer,
     KGFeedbackSerializer,
     KGFeedbackCreateSerializer,
-    FeatureIconSerializer
+    FeatureIconSerializer,
+    KGHeroSlideSerializer  # добавьте
 )
 
 
@@ -207,4 +207,10 @@ class FeatureIconViewSet(viewsets.ReadOnlyModelViewSet):
     """API для иконок особенностей (для справки)"""
     queryset = FeatureIcon.objects.all()
     serializer_class = FeatureIconSerializer
+    permission_classes = [AllowAny]
+
+class KGHeroSlideViewSet(viewsets.ReadOnlyModelViewSet):
+    """API для Hero-слайдов на главной странице"""
+    queryset = KGHeroSlide.objects.filter(is_active=True).select_related('vehicle')
+    serializer_class = KGHeroSlideSerializer
     permission_classes = [AllowAny]
