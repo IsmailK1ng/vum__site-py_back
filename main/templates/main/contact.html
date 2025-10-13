@@ -60,7 +60,6 @@
             <div class="loader__content">
                 <div class="loader__count">
                     <span class="count__text">0</span>
-                    <!-- <span class="count__percent">%</span> -->
                 </div>
             </div>
         </div>
@@ -244,57 +243,50 @@
                                 <div class="mxd-block__content contact">
                                     <div class="mxd-block__inner-form loading__fade">
                                         <div class="form-container">
-                                            <!-- Reply Messages Start -->
-                                            <div class="form__reply centered text-center">
-                                                <i class="ph-fill ph-smiley-wink reply__icon"></i>
-                                                <!-- <i class="ph-fill ph-smiley reply__icon"></i> -->
-                                                <p class="reply__title">Bajarildi!</p>
-                                                <span class="reply__text">Xabaringiz uchun rahmat. Biz tez orada javob
-                                                    beramiz.</span>
+                                            
+                                            <!-- Сообщение о статусе (встроенное уведомление) -->
+                                            <div class="form-status hidden">
+                                                <p class="form-status__text"></p>
                                             </div>
-                                            <!-- Reply Messages End -->
 
                                             <!-- Contact Form Start -->
-                                            <form class="form contact-form" id="contact-form">
+                                            <form class="form contact-form" id="contactForm">
                                                 {% csrf_token %}
-                                                <!-- Hidden Required Fields -->
-                                                <input type="hidden" name="project_name" value="FAW Trucks" />
-                                                <input type="hidden" name="admin_email" value="info@fawtrucks.uz" />
-                                                <input type="hidden" name="form_subject"
-                                                    value="FAW Contact Form Message" />
-                                                <!-- END Hidden Required Fields-->
+                                                
                                                 <div class="container-fluid p-0">
                                                     <div class="row gx-0">
-                                                        <div
-                                                            class="col-12 col-md-6 mxd-grid-item anim-uni-in-up contact-grid-item">
-                                                            <input type="text" name="Name" placeholder="F.I.Sh*"
-                                                                required />
+                                                        <div class="col-12 mxd-grid-item anim-uni-in-up contact-grid-item">
+                                                            <input type="text" name="name" placeholder="F.I.Sh*" required />
                                                         </div>
-                                                        <div
-                                                            class="col-12 col-md-6 mxd-grid-item anim-uni-in-up contact-grid-item">
-                                                            <input type="text" name="Company"
-                                                                placeholder="Kompaniya nomi" />
+                                                        <div class="col-12 mxd-grid-item anim-uni-in-up contact-grid-item">
+                                                            <select name="region" required>
+                                                                <option value="" disabled selected>Viloyatni tanlang*</option>
+                                                                <option value="Toshkent shahri">Toshkent shahri</option>
+                                                                <option value="Andijon viloyati">Andijon viloyati</option>
+                                                                <option value="Buxoro viloyati">Buxoro viloyati</option>
+                                                                <option value="Fargʻona viloyati">Fargʻona viloyati</option>
+                                                                <option value="Jizzax viloyati">Jizzax viloyati</option>
+                                                                <option value="Xorazm viloyati">Xorazm viloyati</option>
+                                                                <option value="Namangan viloyati">Namangan viloyati</option>
+                                                                <option value="Navoiy viloyati">Navoiy viloyati</option>
+                                                                <option value="Qashqadaryo viloyati">Qashqadaryo viloyati</option>
+                                                                <option value="Samarqand viloyati">Samarqand viloyati</option>
+                                                                <option value="Sirdaryo viloyati">Sirdaryo viloyati</option>
+                                                                <option value="Surxondaryo viloyati">Surxondaryo viloyati</option>
+                                                                <option value="Toshkent viloyati">Toshkent viloyati</option>
+                                                                <option value="Qoraqalpogʻiston Respublikasi">Qoraqalpogʻiston Respublikasi</option>
+                                                            </select>
                                                         </div>
-                                                        <div
-                                                            class="col-12 col-md-6 mxd-grid-item anim-uni-in-up contact-grid-item">
-                                                            <input type="email" name="E-mail" placeholder="Email*"
-                                                                required />
+                                                        <div class="col-12 mxd-grid-item anim-uni-in-up contact-grid-item">
+                                                            <input type="tel" name="phone" placeholder="+998 (__) ___-__-__" id="phoneInput" pattern="[+]*[0-9\s\-\(\)]*" data-default="+998" required />
                                                         </div>
-                                                        <div
-                                                            class="col-12 col-md-6 mxd-grid-item anim-uni-in-up contact-grid-item">
-                                                            <input type="tel" name="Phone" placeholder="Telefon*" />
-                                                        </div>
-                                                        <div
-                                                            class="col-12 mxd-grid-item anim-uni-in-up contact-grid-item">
-                                                            <textarea name="Message"
-                                                                placeholder="Savolingiz bo‘yicha bir necha so‘z"
-                                                                required></textarea>
+                                                        <div class="col-12 mxd-grid-item anim-uni-in-up contact-grid-item">
+                                                            <textarea name="message" placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*" required></textarea>
                                                         </div>
                                                         <div class="col-12 mxd-grid-item anim-uni-in-up">
-                                                            <button
-                                                                class="btn btn-anim btn-default btn-large btn-opposite slide-right-up"
-                                                                type="submit">
-                                                                <span class="btn-caption">Jo‘natish</span>
+                                                            <button class="btn btn-anim btn-default btn-large btn-opposite slide-right-up shimmer-btn" type="submit">
+                                                                <span class="btn-caption">Qongʻiroq kutaman</span>
+                                                                <span class="shimmer"></span>
                                                                 <i class="ph-bold ph-arrow-up-right"></i>
                                                             </button>
                                                         </div>
@@ -378,24 +370,18 @@
         let isSubmitting = false;
 
         document.addEventListener("DOMContentLoaded", () => {
-            const form = document.getElementById("contact-form");
-            const phoneInput = form.querySelector('input[name="Phone"]');
-            const replyBlock = document.querySelector(".form__reply");
+            const form = document.getElementById("contactForm");
+            const phoneInput = document.getElementById("phoneInput");
+            const statusBlock = document.querySelector(".form-status");
+            const statusText = statusBlock.querySelector(".form-status__text");
 
-            // ✅ Создаем блок для статусов
-            let statusBlock = document.createElement('div');
-            statusBlock.className = 'form-status hidden';
-            const statusText = document.createElement('p');
-            statusText.className = 'form-status__text';
-            statusBlock.appendChild(statusText);
-            form.parentElement.insertBefore(statusBlock, form);
-
-            // ========== МАСКА ТЕЛЕФОНА ==========
+            // === Маска телефона ===
             phoneInput.addEventListener("input", (e) => {
-                let value = e.target.value.replace(/\D/g, "");
-                if (!value.startsWith("998")) value = "998" + value;
+                let value = e.target.value.replace(/\D/g, ""); // убираем все нецифры
+                if (!value.startsWith("998")) value = "998" + value; // авто добавляем код страны
                 if (value.length > 12) value = value.slice(0, 12);
 
+                // форматируем +998 (__) ___-__-__
                 let formatted = "+998 ";
                 if (value.length > 3) formatted += "(" + value.slice(3, 5);
                 if (value.length >= 5) formatted += ") " + value.slice(5, 8);
@@ -405,13 +391,12 @@
                 e.target.value = formatted;
             });
 
-            // ========== ОТПРАВКА ФОРМЫ ==========
+            // === Отправка формы ===
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
                 if (isSubmitting) return;
                 isSubmitting = true;
 
-                // Валидация телефона
                 const phone = phoneInput.value.replace(/\D/g, "");
                 if (phone.length !== 12) {
                     showStatus("❌ Iltimos, telefon raqamingizni to'liq kiriting.", "error");
@@ -419,21 +404,19 @@
                     return;
                 }
 
-                // Собираем данные формы
                 const formData = {
-                    name: form.Name.value,
-                    // company: form.Company.value || "",
-                    // email: form["E-mail"].value,
+                    name: form.name.value,
+                    region: form.region.value,
                     phone: phoneInput.value,
-                    message: form.Message.value,
+                    message: form.message.value,
                 };
 
                 try {
-                    const response = await fetch("/api/contact/", {
+                    const response = await fetch("/api/uz/contact/", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            "X-CSRFToken": getCookie("csrftoken"),
+                            "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value,
                         },
                         body: JSON.stringify(formData),
                     });
@@ -441,20 +424,8 @@
                     const data = await response.json();
 
                     if (response.ok) {
-                        // Показываем встроенный reply блок
-                        replyBlock.style.display = "block";
-                        form.style.display = "none";
-
-                        // Также показываем статус
                         showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
-
-                        // Сбрасываем форму и возвращаем её через 5 секунд
-                        setTimeout(() => {
-                            form.reset();
-                            form.style.display = "block";
-                            replyBlock.style.display = "none";
-                            statusBlock.classList.add("hidden");
-                        }, 5000);
+                        form.reset();
                     } else {
                         throw new Error(data.message || "Xatolik yuz berdi.");
                     }
@@ -465,7 +436,7 @@
                 }
             });
 
-            // ========== ФУНКЦИЯ ПОКАЗА СТАТУСА ==========
+            // === Функция показа статуса ===
             function showStatus(message, type = "success") {
                 statusText.textContent = message;
                 statusBlock.className = `form-status ${type} show`;
@@ -475,6 +446,22 @@
                     statusBlock.classList.remove("show");
                     setTimeout(() => statusBlock.classList.add("hidden"), 400);
                 }, 4000);
+            }
+
+            // === Функция для получения CSRF токена из cookie ===
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
             }
         });
     </script>
