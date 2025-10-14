@@ -1,5 +1,5 @@
 from rest_framework.routers import DefaultRouter
-from .kg_views import KGVehicleViewSet, KGFeedbackViewSet, KGHeroSlideViewSet
+from .views import KGVehicleViewSet, KGFeedbackViewSet, KGHeroSlideViewSet
 
 router = DefaultRouter()
 router.register(r'vehicles', KGVehicleViewSet, basename='kg-vehicles')

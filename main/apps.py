@@ -1,10 +1,9 @@
-# main/apps.py
 from django.apps import AppConfig
+
 
 class MainConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'main'
     
     def ready(self):
-        import main.translation  # только для UZ (News, NewsBlock)
-        # import main.kg_translation  # ЗАКОММЕНТИРОВАЛИ
+        import main.admin

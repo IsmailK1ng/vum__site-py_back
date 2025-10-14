@@ -1,4 +1,3 @@
-# main/api_urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import NewsViewSet, ContactFormViewSet
@@ -13,5 +12,5 @@ urlpatterns = [
     path('uz/', include(uz_router.urls)),
     
     # API для faw.kg
-    path('kg/', include('main.kg_api_urls')),
+    path('kg/', include('kg.urls')),  # ← ИСПРАВЛЕНО
 ]

@@ -1,15 +1,15 @@
-# main/kg_views.py
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
-from django.db.models import Count
-from datetime import datetime, timedelta
 from django.http import HttpResponse
+from datetime import datetime
 from .models import KGVehicle, KGFeedback, KGHeroSlide
-from .kg_serializers import (
-    KGVehicleSerializer, 
+from .serializers import (
+    KGVehicleListSerializer,
+    KGVehicleDetailSerializer,
     KGFeedbackSerializer,
+    KGFeedbackCreateSerializer,
     KGHeroSlideSerializer
 )
 

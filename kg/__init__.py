@@ -1,0 +1,1 @@
+default_app_config = 'kg.apps.KgConfig'

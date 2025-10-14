@@ -1,9 +1,5 @@
-# main/kg_serializers.py
 from rest_framework import serializers
-from .models import (
-    KGVehicle, KGVehicleImage,
-    KGFeedback, VehicleCardSpec, KGHeroSlide
-)
+from .models import KGVehicle, KGVehicleImage, KGFeedback, VehicleCardSpec, KGHeroSlide
 
 
 class VehicleCardSpecSerializer(serializers.ModelSerializer):
@@ -53,6 +49,7 @@ class KGVehicleDetailSerializer(serializers.ModelSerializer):
     """Детальный сериализатор машины (для страницы vehicle-details)"""
     mini_images = KGVehicleImageSerializer(many=True, read_only=True)
     card_specs = VehicleCardSpecSerializer(many=True, read_only=True)
+    specs = serializers.SerializerMethodField()  # ← ДОБАВЬ ЭТО
     
     class Meta:
         model = KGVehicle
@@ -61,18 +58,11 @@ class KGVehicleDetailSerializer(serializers.ModelSerializer):
             'specs', 'mini_images', 'card_specs', 'is_active'
         ]
     
-    def to_representation(self, instance):
-        """Возвращаем данные на нужном языке"""
-        data = super().to_representation(instance)
-        
+    def get_specs(self, obj):  # ← ДОБАВЬ ЭТОТ МЕТОД
+        """Получить specs на нужном языке"""
         request = self.context.get('request')
         lang = request.query_params.get('lang', 'ru') if request else 'ru'
-        
-        data['title'] = instance.get_title(lang)
-        data['slug'] = instance.get_slug(lang)
-        data['specs'] = instance.get_specs(lang)
-        
-        return data
+        return obj.get_specs(lang)
 
 
 # Добавляем этот сериализатор (он нужен для kg_views.py)
