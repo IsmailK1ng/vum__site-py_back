@@ -49,7 +49,7 @@ class KGVehicleDetailSerializer(serializers.ModelSerializer):
     """Детальный сериализатор машины (для страницы vehicle-details)"""
     mini_images = KGVehicleImageSerializer(many=True, read_only=True)
     card_specs = VehicleCardSpecSerializer(many=True, read_only=True)
-    specs = serializers.SerializerMethodField()  # ← ДОБАВЬ ЭТО
+    specs = serializers.SerializerMethodField()
     
     class Meta:
         model = KGVehicle
@@ -58,31 +58,42 @@ class KGVehicleDetailSerializer(serializers.ModelSerializer):
             'specs', 'mini_images', 'card_specs', 'is_active'
         ]
     
-    def get_specs(self, obj):  # ← ДОБАВЬ ЭТОТ МЕТОД
+    def get_specs(self, obj):
         """Получить specs на нужном языке"""
         request = self.context.get('request')
         lang = request.query_params.get('lang', 'ru') if request else 'ru'
         return obj.get_specs(lang)
 
 
-# Добавляем этот сериализатор (он нужен для kg_views.py)
 class KGVehicleSerializer(serializers.ModelSerializer):
     """Базовый сериализатор машины"""
+    title = serializers.SerializerMethodField()
+    slug = serializers.SerializerMethodField()
+    specs = serializers.SerializerMethodField()
     card_specs = VehicleCardSpecSerializer(many=True, read_only=True)
     mini_images = KGVehicleImageSerializer(many=True, read_only=True)
-    
+
     class Meta:
         model = KGVehicle
-        fields = '__all__'
+        fields = [
+            'id', 'slug', 'title', 'preview_image', 'main_image',
+            'specs', 'card_specs', 'mini_images', 'is_active'
+        ]
 
+    def get_title(self, obj):
+        request = self.context.get('request')
+        lang = request.GET.get('lang', 'ru') if request else 'ru'
+        return obj.get_title(lang)
 
-class KGHeroSlideSerializer(serializers.ModelSerializer):
-    """Сериализатор для Hero-слайдов"""
-    vehicle = KGVehicleListSerializer(read_only=True)
-    
-    class Meta:
-        model = KGHeroSlide
-        fields = ['id', 'vehicle', 'order']
+    def get_slug(self, obj):
+        request = self.context.get('request')
+        lang = request.GET.get('lang', 'ru') if request else 'ru'
+        return obj.get_slug(lang)
+
+    def get_specs(self, obj):
+        request = self.context.get('request')
+        lang = request.GET.get('lang', 'ru') if request else 'ru'
+        return obj.get_specs(lang) or {}
 
 
 class KGFeedbackSerializer(serializers.ModelSerializer):
@@ -129,3 +140,20 @@ class KGFeedbackCreateSerializer(serializers.ModelSerializer):
         if len(value) != 13:
             raise serializers.ValidationError('Неверный формат номера телефона')
         return value
+
+
+# ← ДОБАВЬТЕ ЭТО:
+class KGHeroSlideSerializer(serializers.ModelSerializer):
+    """Сериализатор для Hero-слайдов"""
+    vehicle = KGVehicleSerializer(read_only=True)
+    description = serializers.SerializerMethodField()
+
+    class Meta:
+        model = KGHeroSlide
+        fields = ['id', 'vehicle', 'description', 'order']
+
+    def get_description(self, obj):
+        """Получить описание на нужном языке"""
+        request = self.context.get('request')
+        lang = request.GET.get('lang', 'ru') if request else 'ru'
+        return obj.get_description(lang)

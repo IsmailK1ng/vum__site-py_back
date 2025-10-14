@@ -163,11 +163,34 @@ class KGFeedback(models.Model):
 
 
 class KGHeroSlide(models.Model):
-    """Hero-слайды"""
-    vehicle = models.ForeignKey(KGVehicle, on_delete=models.CASCADE)
-    order = models.PositiveIntegerField(default=0)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    """Hero-слайды для главной страницы"""
+    vehicle = models.ForeignKey(KGVehicle, on_delete=models.CASCADE, verbose_name='Машина')
+    
+    # Описания на 3 языках
+    description_ru = models.TextField(
+        max_length=500, 
+        verbose_name='Описание (RU)',
+        help_text='Краткое описание для Hero-слайда на русском',
+        default=''
+    )
+    description_ky = models.TextField(
+        max_length=500, 
+        verbose_name='Описание (KY)',
+        blank=True,
+        default='',
+        help_text='Краткое описание для Hero-слайда на кыргызском'
+    )
+    description_en = models.TextField(
+        max_length=500, 
+        verbose_name='Описание (EN)',
+        blank=True,
+        default='',
+        help_text='Краткое описание для Hero-слайда на английском'
+    )
+    
+    order = models.PositiveIntegerField(default=0, verbose_name='Порядок')
+    is_active = models.BooleanField(default=True, verbose_name='Активно')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создано')
 
     class Meta:
         ordering = ['order']
@@ -176,3 +199,11 @@ class KGHeroSlide(models.Model):
 
     def __str__(self):
         return f"Hero #{self.order} - {self.vehicle.title}"
+    
+    def get_description(self, lang='ru'):
+        """Получить описание на нужном языке"""
+        if lang == 'en':
+            return self.description_en or self.description_ru
+        elif lang == 'ky':
+            return self.description_ky or self.description_ru
+        return self.description_ru

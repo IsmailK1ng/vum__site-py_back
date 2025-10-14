@@ -21,7 +21,8 @@ class KGVehicleViewSet(viewsets.ReadOnlyModelViewSet):
     - retrieve: детальная информация для vehicle-details.ts
     """
     queryset = KGVehicle.objects.filter(is_active=True).prefetch_related(
-        'vehicle_features__feature', 'mini_images'
+        'mini_images',  # ← ОСТАВЛЯЕМ ТОЛЬКО ЭТО
+        'card_specs'    # ← И ЭТО
     )
     permission_classes = [AllowAny]
     lookup_field = 'slug'

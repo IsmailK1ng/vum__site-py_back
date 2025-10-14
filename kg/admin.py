@@ -132,18 +132,21 @@ class KGVehicleAdmin(admin.ModelAdmin):
     category_badge.short_description = "Серия"
 
     def action_buttons(self, obj):
+        title = obj.title_ru or obj.title or obj.slug
+    
         return format_html('''
-            <div style="display: flex; gap: 10px;">
-                <a href="{}" title="Просмотр" style="background: #007AFF; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">👁</a>
-                <a href="{}" title="Редактировать" style="background: #FF9500; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">✏️</a>
-                <a href="{}" title="Удалить" onclick="return confirm('Удалить {}?')" style="background: #FF3B30; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">🗑</a>
-            </div>
-        ''',
-                f'/admin/kg/kgvehicle/{obj.id}/change/',
-                f'/admin/kg/kgvehicle/{obj.id}/change/',
-                f'/admin/kg/kgvehicle/{obj.id}/delete/',
-            obj.title_display()
-        )
+        <div style="display: flex; gap: 10px;">
+            <a href="{}" title="Просмотр" style="background: #007AFF; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">👁</a>
+            <a href="{}" title="Редактировать" style="background: #FF9500; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">✏️</a>
+            <a href="{}" title="Удалить" onclick="return confirm('Удалить {}?')" style="background: #FF3B30; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">🗑</a>
+        </div>
+    ''',
+        f'/admin/kg/kgvehicle/{obj.id}/change/',
+        f'/admin/kg/kgvehicle/{obj.id}/change/',
+        f'/admin/kg/kgvehicle/{obj.id}/delete/',
+        title
+    )
+
     action_buttons.short_description = "Действия"
 
     def activate_vehicles(self, request, queryset):
@@ -159,16 +162,28 @@ class KGVehicleAdmin(admin.ModelAdmin):
 
 @admin.register(KGHeroSlide)
 class KGHeroSlideAdmin(admin.ModelAdmin):
-    list_display = ('order', 'vehicle', 'vehicle_preview', 'is_active', 'created_at')
-    list_display_links = ('order', 'vehicle')
-    list_editable = ('is_active',)
+    list_display = ('order', 'vehicle_info', 'vehicle_preview', 'is_active', 'created_at')
+    list_display_links = ('vehicle_info',)  # ← УБРАЛИ 'order' ОТСЮДА
+    list_editable = ('is_active', 'order')  # ← order остается здесь для быстрого редактирования
     list_filter = ('is_active', 'created_at')
-    autocomplete_fields = ['vehicle']
+    search_fields = ('vehicle__title', 'vehicle__title_ru', 'description_ru')
     readonly_fields = ('created_at', 'vehicle_preview')
 
     fieldsets = (
         ('Основная информация', {
             'fields': ('vehicle', 'vehicle_preview', 'order', 'is_active')
+        }),
+        ('🇷🇺 Описание (Русский)', {
+            'fields': ('description_ru',),
+            'classes': ('wide',)
+        }),
+        ('🇰🇬 Описание (Кыргызский)', {
+            'fields': ('description_ky',),
+            'classes': ('wide',)
+        }),
+        ('🇬🇧 Описание (Английский)', {
+            'fields': ('description_en',),
+            'classes': ('wide',)
         }),
         ('Дополнительно', {
             'fields': ('created_at',),
@@ -176,14 +191,28 @@ class KGHeroSlideAdmin(admin.ModelAdmin):
         }),
     )
 
+    def vehicle_info(self, obj):
+        return obj.vehicle.title_ru or obj.vehicle.title
+    vehicle_info.short_description = "Машина"
+
     def vehicle_preview(self, obj):
-        if obj.vehicle and obj.vehicle.preview_image:
+        if obj.vehicle and obj.vehicle.main_image:
             return format_html(
-                '<img src="{}" width="150" style="border-radius:8px;"><br><b>{}</b>',
+                '<img src="{}" width="200" style="border-radius:8px;"><br><b>{}</b>',
+                obj.vehicle.main_image.url, obj.vehicle.title
+            )
+        elif obj.vehicle and obj.vehicle.preview_image:
+            return format_html(
+                '<img src="{}" width="200" style="border-radius:8px;"><br><b>{}</b>',
                 obj.vehicle.preview_image.url, obj.vehicle.title
             )
         return "—"
     vehicle_preview.short_description = "Превью"
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['title'] = 'Hero-слайды FAW.KG'
+        return super().changelist_view(request, extra_context)
 
 
 @admin.register(KGFeedback)
@@ -270,9 +299,9 @@ class KGFeedbackAdmin(admin.ModelAdmin):
     def action_buttons(self, obj):
         return format_html('''
             <div style="display: flex; gap: 10px;">
-                <a href="{}" title="Просмотр" style="background: #007AFF; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">👁</a>
-                <a href="{}" title="Редактировать" style="background: #FF9500; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">✏️</a>
-                <a href="{}" title="Удалить" onclick="return confirm('Удалить заявку от {}?')" style="background: #FF3B30; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">🗑</a>
+                <a href="{}" title="Просмотр" style="color: white; width: 35px; height: 35px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">👁</a>
+                <a href="{}" title="Редактировать" style="color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">✏️</a>
+                <a href="{}" title="Удалить" onclick="return confirm('Удалить заявку от {}?')" style="color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">🗑</a>
             </div>
         ''',
                 f'/admin/kg/kgfeedback/{obj.id}/change/',

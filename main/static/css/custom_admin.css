@@ -27,8 +27,10 @@
 .content-wrapper::before {
     content: "";
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.10);
     z-index: -1;
 }
@@ -37,4 +39,14 @@
 .card {
     background-color: rgba(255, 255, 255, 0.85) !important;
     border-radius: 10px !important;
+}
+
+.select2-container--admin-autocomplete .select2-selection--single .select2-selection__rendered {
+    border-radius: 2rem;
+    background: #ffffff;
+    line-height: normal !important;
+    padding: 2px 15px 5px 10px;
+}
+.select2-container--admin-autocomplete .select2-selection--single .select2-selection__clear {
+    left: 10px;
 }
