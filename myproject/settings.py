@@ -81,20 +81,51 @@ LOCALE_PATHS = [
 ]
 
 JAZZMIN_SETTINGS = {
-    # "site_title": "Админка VUM",
     "site_header": "FAW Admin",
     "site_brand": "VUM",
-    "site_logo": "images/logo-vum.png",  # Путь к логотипу
+    "site_logo": "images/logo-vum.png",
     "welcome_sign": "Добро пожаловать в админку VUM",
-    "search_model": "auth.User",  # Модель для поиска
+    "search_model": "auth.User",
     "copyright": "VUM",
     "show_sidebar": True,
     "navigation_expanded": True,
     "show_ui_builder": False,
-    # "theme": "default",
-    "custom_css": "css/custom_admin.css",  # Путь к вашему кастомному CSS файлу
+    "custom_css": "css/custom_admin.css",
+    
     "topmenu_links": [
-        {"name": "Сайт", "url": "home"},
+        {"name": "🌐 Сайт", "url": "home", "new_window": True},
+    ],
+    
+    # ИКОНКИ ДЛЯ МОДЕЛЕЙ
+    "icons": {
+        # Auth
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        
+        # FAW.UZ (main)
+        "main.News": "fas fa-newspaper",
+        "main.NewsBlock": "fas fa-paragraph",
+        "main.ContactForm": "fas fa-envelope",
+        "main.Vacancy": "fas fa-briefcase",
+        "main.JobApplication": "fas fa-file-alt",
+        "main.VacancyResponsibility": "fas fa-tasks",
+        "main.VacancyRequirement": "fas fa-check-circle",
+        "main.VacancyCondition": "fas fa-handshake",
+        "main.IdealCandidate": "fas fa-star",
+        
+        # FAW.KG (kg)
+        "kg.KGVehicle": "fas fa-truck",
+        "kg.KGVehicleImage": "fas fa-images",
+        "kg.VehicleCardSpec": "fas fa-list",
+        "kg.KGFeedback": "fas fa-comment-dots",
+        "kg.KGHeroSlide": "fas fa-sliders-h",
+    },
+    
+    # ПОРЯДОК ПРИЛОЖЕНИЙ
+    "order_with_respect_to": [
+        "main",
+        "kg", 
+        "auth",
     ],
 }
 

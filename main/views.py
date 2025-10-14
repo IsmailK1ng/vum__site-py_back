@@ -5,13 +5,11 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
-from django.core.mail import send_mail
-from .models import News, ContactForm  # Добавили ContactForm
-from .serializers import NewsSerializer, ContactFormSerializer  # Добавили ContactFormSerializer
+from .models import News, ContactForm, JobApplication, Vacancy
+from .serializers import NewsSerializer, ContactFormSerializer, JobApplicationSerializer
 
 
 # === FRONTEND views === 
-# (ваши существующие view функции остаются без изменений)
 def index(request):
     return render(request, 'main/index.html')
 
@@ -43,7 +41,15 @@ def dealers(request):
     return render(request, 'main/dealers.html')
 
 def jobs(request):
-    return render(request, 'main/jobs.html')
+    """Страница с вакансиями"""
+    vacancies = Vacancy.objects.filter(is_active=True).prefetch_related(
+        'responsibilities', 
+        'requirements', 
+        'ideal_candidates',
+        'conditions'
+    ).order_by('order', '-created_at')
+    
+    return render(request, 'main/jobs.html', {'vacancies': vacancies})
 
 def new_detail(request, new_id):
     return render(request, 'main/news_detail.html', {'new_id': new_id})
@@ -58,12 +64,12 @@ def set_language_get(request):
     return redirect(request.META.get("HTTP_REFERER", "/"))
 
 
-# === API views ===
+# === API ViewSets ===
 class NewsViewSet(viewsets.ModelViewSet):
     """API endpoint для CRUD операций с новостями"""
     queryset = News.objects.all().order_by('-created_at')
     serializer_class = NewsSerializer
-    permission_classes = [AllowAny]  # Новости доступны всем
+    permission_classes = [AllowAny]
 
 
 class ContactFormViewSet(viewsets.ModelViewSet):
@@ -73,10 +79,8 @@ class ContactFormViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         if self.action == 'create':
-            # Любой может отправить форму
             return [AllowAny()]
         else:
-            # Только админы могут просматривать/изменять
             return [IsAdminUser()]
     
     def create(self, request):
@@ -85,12 +89,6 @@ class ContactFormViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         contact_form = serializer.save()
         
-        # Опционально: отправка email уведомления
-        # try:
-        #     self.send_notification_email(contact_form)
-        # except Exception as e:
-        #     print(f"Email sending failed: {e}")
-        
         return Response(
             {
                 'success': True,
@@ -98,30 +96,6 @@ class ContactFormViewSet(viewsets.ModelViewSet):
                 'data': serializer.data
             },
             status=status.HTTP_201_CREATED
-        )
-    
-    def send_notification_email(self, contact_form):
-        """Отправка email уведомления администратору (опционально)"""
-        subject = f'Yangi kontakt forma - {contact_form.name}'
-        message = f"""
-        Yangi kontakt forma yuborildi:
-        
-        Ism: {contact_form.name}
-        Viloyat: {contact_form.region}
-        Telefon: {contact_form.phone}
-        Xabar: {contact_form.message}
-        
-        Yuborilgan vaqt: {contact_form.created_at.strftime('%d.%m.%Y %H:%M')}
-        
-        Admin panelda ko'rish: http://yourdomain.com/admin/main/contactform/{contact_form.id}/
-        """
-        
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            ['info@fawtrucks.uz'],  # или получить из settings
-            fail_silently=False,
         )
     
     @action(detail=False, methods=['get'], permission_classes=[IsAdminUser])
@@ -172,4 +146,52 @@ class ContactFormViewSet(viewsets.ModelViewSet):
             'today': today,
             'this_week': this_week,
             'by_region': by_region
+        })
+
+
+class JobApplicationViewSet(viewsets.ModelViewSet):
+    """API endpoint для приема заявок на вакансии"""
+    queryset = JobApplication.objects.all().order_by('-created_at')
+    serializer_class = JobApplicationSerializer
+    
+    def get_permissions(self):
+        if self.action == 'create':
+            return [AllowAny()]
+        else:
+            return [IsAdminUser()]
+    
+    def create(self, request, *args, **kwargs):
+        """Создание новой заявки с резюме"""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        
+        return Response(
+            {
+                'success': True,
+                'message': 'Rezyume muvaffaqiyatli yuborildi! Tez orada siz bilan bog\'lanamiz.',
+                'data': serializer.data
+            },
+            status=status.HTTP_201_CREATED
+        )
+    
+    @action(detail=False, methods=['get'], permission_classes=[IsAdminUser])
+    def unprocessed(self, request):
+        """Получить необработанные заявки"""
+        unprocessed = self.queryset.filter(is_processed=False)
+        serializer = self.get_serializer(unprocessed, many=True)
+        return Response({
+            'count': unprocessed.count(),
+            'results': serializer.data
+        })
+    
+    @action(detail=True, methods=['post'], permission_classes=[IsAdminUser])
+    def mark_processed(self, request, pk=None):
+        """Отметить заявку как обработанную"""
+        application = self.get_object()
+        application.is_processed = True
+        application.save()
+        return Response({
+            'status': 'processed',
+            'message': f'Ariza #{application.id} ko\'rib chiqilgan deb belgilandi'
         })

@@ -342,3 +342,8 @@ body[data-theme="dark"] .job-details-block.vacancy-details .vacancy-description 
         height: 80vh;
     }
 }
+
+li b {
+    font-weight: bold;
+    font-size: 2.1rem;
+}
