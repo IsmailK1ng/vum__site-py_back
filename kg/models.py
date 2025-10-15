@@ -41,7 +41,7 @@ class KGVehicle(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
 
     class Meta:
-        verbose_name = '[KG] Машина'
+        verbose_name = 'Машина'
         verbose_name_plural = '[KG] Каталог машин'
         ordering = ['-created_at']
 
@@ -88,8 +88,8 @@ class KGVehicleImage(models.Model):
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
-        verbose_name = '[KG] Доп. изображение'
-        verbose_name_plural = '[KG] Доп. изображения'
+        verbose_name = ' Доп. изображение'
+        verbose_name_plural = 'Доп. изображения'
         ordering = ['order']
 
 
@@ -104,8 +104,8 @@ class VehicleCardSpec(models.Model):
 
     class Meta:
         ordering = ['order']
-        verbose_name = '[KG] Характеристика'
-        verbose_name_plural = '[KG] Характеристики'
+        verbose_name = ' Характеристика'
+        verbose_name_plural = 'Характеристики'
 
     def get_value(self, lang='ru'):
         if lang == 'en':
@@ -154,7 +154,7 @@ class KGFeedback(models.Model):
     admin_comment = models.TextField(blank=True, null=True)
 
     class Meta:
-        verbose_name = '[KG] Заявка'
+        verbose_name = 'Заявка'
         verbose_name_plural = '[KG] Заявки'
         ordering = ['-created_at']
 
@@ -194,7 +194,7 @@ class KGHeroSlide(models.Model):
 
     class Meta:
         ordering = ['order']
-        verbose_name = '[KG] Hero-слайд'
+        verbose_name = ' Hero-слайд'
         verbose_name_plural = '[KG] Hero-слайды'
 
     def __str__(self):

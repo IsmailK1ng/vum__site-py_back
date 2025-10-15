@@ -70,3 +70,4 @@ uuid==1.30
 wrapt==1.16.0
 x25519==0.0.2
 yarl==1.13.1
+django-filter>=23.0

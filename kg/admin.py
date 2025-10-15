@@ -37,74 +37,156 @@ class KGVehicleImageInline(admin.TabularInline):
 
 @admin.register(KGVehicle)
 class KGVehicleAdmin(admin.ModelAdmin):
-    list_display = ('preview_thumb', 'title_display', 'category_badge', 'is_active', 'created_at', 'action_buttons')
+    list_display = ('preview_thumb', 'title_display', 'category_badge', 'translation_status', 'is_active', 'created_at', 'action_buttons')
     list_editable = ('is_active',)
-    list_filter = ('category', 'created_at')
-    search_fields = ('title', 'title_ru', 'title_ky', 'title_en', 'slug')
-    prepopulated_fields = {'slug': ('title',)}
-    readonly_fields = ('preview_thumb', 'main_thumb', 'created_at', 'updated_at', 'category')
+    list_filter = ('category', 'is_active', 'created_at')
+    search_fields = ('title_ru', 'title_ky', 'title_en', 'slug')
+    prepopulated_fields = {
+        'slug': ('title',),
+        'slug_ru': ('title_ru',),
+        'slug_ky': ('title_ky',),
+        'slug_en': ('title_en',)
+    }
+    readonly_fields = ('preview_thumb', 'main_thumb', 'created_at', 'updated_at', 'category', 'translation_helper', 'specs_helper')
     inlines = [VehicleCardSpecInline, KGVehicleImageInline]
     list_per_page = 20
-    actions = ['activate_vehicles', 'deactivate_vehicles']
+    actions = ['activate_vehicles', 'deactivate_vehicles', 'copy_ru_to_all']
 
     fieldsets = (
-        ('Основная информация', {
+        ('🚨 ВАЖНО: Заполните хотя бы русский язык!', {
+            'fields': ('translation_helper',),
+            'classes': ('wide',),
+            'description': '''
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107;">
+                    <strong>📋 Инструкция:</strong><br>
+                    1️⃣ <strong>ОБЯЗАТЕЛЬНО</strong> заполните русский язык<br>
+                    2️⃣ Кыргызский и английский — по желанию<br>
+                    3️⃣ Если не заполните перевод — покажется русский<br>
+                    4️⃣ Slug заполнится автоматически
+                </div>
+            '''
+        }),
+        ('⚙️ Настройки', {
             'fields': ('is_active', 'category'),
-            'description': 'Категория определяется автоматически'
+            'description': '<em>Категория определяется автоматически по названию (V, VR, VH)</em>'
         }),
-        ('Переводы названия', {
-            'fields': (
-                ('title', 'slug'),
-                ('title_ru', 'slug_ru'),
-                ('title_ky', 'slug_ky'),
-                ('title_en', 'slug_en'),
-            )
+        ('🇷🇺 РУССКИЙ ЯЗЫК (обязательно)', {
+            'fields': (('title', 'slug'), ('title_ru', 'slug_ru')),
+            'classes': ('wide',),
+            'description': '<strong style="color: red;">⚠️ Заполните обязательно!</strong>'
         }),
-        ('Изображения', {
+        ('🇰🇬 КЫРГЫЗСКИЙ ЯЗЫК (опционально)', {
+            'fields': (('title_ky', 'slug_ky'),),
+            'classes': ('wide', 'collapse'),
+            'description': '<em>Если не заполните — покажется русский</em>'
+        }),
+        ('🇬🇧 АНГЛИЙСКИЙ ЯЗЫК (опционально)', {
+            'fields': (('title_en', 'slug_en'),),
+            'classes': ('wide', 'collapse'),
+            'description': '<em>Если не заполните — покажется русский</em>'
+        }),
+        ('📸 Изображения', {
             'fields': ('preview_image', 'preview_thumb', 'main_image', 'main_thumb')
         }),
-        ('Характеристики', {
-            'fields': ('specs_ru', 'specs_ky', 'specs_en'),
-            'classes': ('collapse',)
+        ('📊 Характеристики', {
+            'fields': ('specs_helper', 'specs_ru', 'specs_ky', 'specs_en'),
+            'classes': ('collapse',),
+            'description': '''
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                    <strong>📝 Формат JSON:</strong><br>
+                    <pre style="background: white; padding: 10px; border-radius: 4px;">{
+  "wheelFormula": "4x2",
+  "fuelType": "Дизель",
+  "enginePower": "130",
+  "payload": "6920",
+  "transmission": "Механика"
+}</pre>
+                    <strong>⚠️ Важно:</strong> Используйте точно такие же ключи!
+                </div>
+            '''
         }),
-        ('Служебная информация', {
+        ('🕐 Служебная информация', {
             'fields': ('created_at', 'updated_at'),
             'classes': ('collapse',)
         }),
     )
 
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        if 'is_active' in request.GET:
-            qs = qs.filter(is_active=request.GET['is_active'] == '1')
-        return qs
-
-    def changelist_view(self, request, extra_context=None):
-        extra_context = extra_context or {}
-        extra_context['title'] = 'Каталог машин FAW.KG'
-
-        extra_context['custom_filters'] = format_html('''
-            <div style="margin: 15px 0; display: flex; gap: 10px;">
-                <a href="?" style="background: {}; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
-                    Все ({})
-                </a>
-                <a href="?is_active=1" style="background: {}; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
-                    ✓ Активные ({})
-                </a>
-                <a href="?is_active=0" style="background: {}; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
-                    ✗ Неактивные ({})
-                </a>
+    def translation_helper(self, obj):
+        if not obj.pk:
+            return format_html('''
+                <div style="background: #d1ecf1; padding: 15px; border-radius: 8px; border: 1px solid #bee5eb;">
+                    <h3 style="margin-top: 0;">🎯 Как добавить машину:</h3>
+                    <ol style="line-height: 1.8;">
+                        <li>Заполните <strong>"Название (RU)"</strong> — например: "FAW Tiger V Бортовой"</li>
+                        <li>Slug заполнится автоматически</li>
+                        <li>Загрузите фотографии (Preview и Main)</li>
+                        <li>Заполните характеристики в формате JSON</li>
+                        <li>Если хотите — добавьте переводы на кыргызский/английский</li>
+                    </ol>
+                </div>
+            ''')
+        
+        ru = '✅' if obj.title_ru else '❌'
+        ky = '✅' if obj.title_ky else '⚠️'
+        en = '✅' if obj.title_en else '⚠️'
+        
+        return format_html('''
+            <div style="background: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                <strong>Статус переводов:</strong><br>
+                🇷🇺 Русский: {} {}<br>
+                🇰🇬 Кыргызский: {} {}<br>
+                🇬🇧 Английский: {} {}
             </div>
-        ''',
-            '#607D8B' if not request.GET.get('is_active') else '#9E9E9E',
-            KGVehicle.objects.count(),
-            '#4CAF50' if request.GET.get('is_active') == '1' else '#9E9E9E',
-            KGVehicle.objects.filter(is_active=True).count(),
-            '#F44336' if request.GET.get('is_active') == '0' else '#9E9E9E',
-            KGVehicle.objects.filter(is_active=False).count()
+        ''', 
+            ru, 'Заполнен' if obj.title_ru else 'НЕ ЗАПОЛНЕН',
+            ky, 'Заполнен' if obj.title_ky else 'Не заполнен (показывается русский)',
+            en, 'Заполнен' if obj.title_en else 'Не заполнен (показывается русский)'
         )
+    translation_helper.short_description = "📊 Статус"
 
-        return super().changelist_view(request, extra_context)
+    def specs_helper(self, obj):
+        return format_html('''
+            <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                <button type="button" onclick="copySpecsTemplate()" style="background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                    📋 Скопировать шаблон
+                </button>
+                <textarea id="specsTemplate" readonly style="width: 100%; height: 150px; margin-top: 10px; font-family: monospace; padding: 10px;">{{
+  "wheelFormula": "4x2",
+  "fuelType": "Дизель",
+  "enginePower": "130",
+  "payload": "6920",
+  "transmission": "Механика",
+  "dimensions": "7330×2350×2560",
+  "wheelbase": "3900",
+  "curbWeight": "4380",
+  "tankVolume": "100"
+}}</textarea>
+            </div>
+            <script>
+            function copySpecsTemplate() {{
+                const template = document.getElementById('specsTemplate');
+                template.select();
+                document.execCommand('copy');
+                alert('✅ Шаблон скопирован! Вставьте в поле "Характеристики (RU)"');
+            }}
+            </script>
+        ''')
+    specs_helper.short_description = "📝 Шаблон"
+
+    def translation_status(self, obj):
+        statuses = []
+        if obj.title_ru:
+            statuses.append('🇷🇺')
+        if obj.title_ky:
+            statuses.append('🇰🇬')
+        if obj.title_en:
+            statuses.append('🇬🇧')
+        
+        if not statuses:
+            return format_html('<span style="color: red;">❌ Не заполнено</span>')
+        
+        return format_html(' '.join(statuses))
+    translation_status.short_description = "Языки"
 
     def title_display(self, obj):
         return obj.title_ru or obj.title or '—'
@@ -132,64 +214,133 @@ class KGVehicleAdmin(admin.ModelAdmin):
     category_badge.short_description = "Серия"
 
     def action_buttons(self, obj):
-        title = obj.title_ru or obj.title or obj.slug
-    
+        title = obj.title_ru or obj.title or 'машину'
         return format_html('''
-        <div style="display: flex; gap: 10px;">
-            <a href="{}" title="Просмотр" style="background: #007AFF; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">👁</a>
-            <a href="{}" title="Редактировать" style="background: #FF9500; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">✏️</a>
-            <a href="{}" title="Удалить" onclick="return confirm('Удалить {}?')" style="background: #FF3B30; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">🗑</a>
-        </div>
-    ''',
-        f'/admin/kg/kgvehicle/{obj.id}/change/',
-        f'/admin/kg/kgvehicle/{obj.id}/change/',
-        f'/admin/kg/kgvehicle/{obj.id}/delete/',
-        title
-    )
-
+            <div style="display: flex; gap: 10px;">
+                <a href="{}" title="Редактировать" style="background: #FF9500; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">✏️</a>
+                <a href="{}" title="Удалить" onclick="return confirm('Удалить {}?')" style="background: #FF3B30; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">🗑</a>
+            </div>
+        ''',
+            f'/admin/kg/kgvehicle/{obj.id}/change/',
+            f'/admin/kg/kgvehicle/{obj.id}/delete/',
+            title
+        )
     action_buttons.short_description = "Действия"
 
     def activate_vehicles(self, request, queryset):
         queryset.update(is_active=True)
         self.message_user(request, f'✅ Активировано: {queryset.count()}')
-    activate_vehicles.short_description = 'Активировать'
+    activate_vehicles.short_description = '✅ Активировать'
 
     def deactivate_vehicles(self, request, queryset):
         queryset.update(is_active=False)
         self.message_user(request, f'❌ Деактивировано: {queryset.count()}')
-    deactivate_vehicles.short_description = 'Деактивировать'
+    deactivate_vehicles.short_description = '❌ Деактивировать'
+
+    def copy_ru_to_all(self, request, queryset):
+        count = 0
+        for obj in queryset:
+            if obj.title_ru:
+                if not obj.title_ky:
+                    obj.title_ky = obj.title_ru
+                    obj.slug_ky = obj.slug_ru
+                if not obj.title_en:
+                    obj.title_en = obj.title_ru
+                    obj.slug_en = obj.slug_ru
+                if not obj.specs_ky:
+                    obj.specs_ky = obj.specs_ru
+                if not obj.specs_en:
+                    obj.specs_en = obj.specs_ru
+                obj.save()
+                count += 1
+        self.message_user(request, f'📋 Скопировано переводов для {count} машин')
+    copy_ru_to_all.short_description = '📋 Копировать RU → KY/EN'
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['title'] = 'Каталог машин FAW.KG'
+        return super().changelist_view(request, extra_context)
 
 
 @admin.register(KGHeroSlide)
 class KGHeroSlideAdmin(admin.ModelAdmin):
-    list_display = ('order', 'vehicle_info', 'vehicle_preview', 'is_active', 'created_at')
-    list_display_links = ('vehicle_info',)  # ← УБРАЛИ 'order' ОТСЮДА
-    list_editable = ('is_active', 'order')  # ← order остается здесь для быстрого редактирования
+    list_display = ('order', 'vehicle_info', 'translation_status', 'vehicle_preview', 'is_active', 'created_at')
+    list_display_links = ('vehicle_info',)
+    list_editable = ('is_active', 'order')
     list_filter = ('is_active', 'created_at')
-    search_fields = ('vehicle__title', 'vehicle__title_ru', 'description_ru')
-    readonly_fields = ('created_at', 'vehicle_preview')
+    search_fields = ('vehicle__title_ru', 'description_ru')
+    readonly_fields = ('created_at', 'vehicle_preview', 'translation_status_display')
 
     fieldsets = (
+        ('📋 Инструкция', {
+            'fields': ('translation_status_display',),
+            'description': '''
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px;">
+                    <strong>Как добавить Hero-слайд:</strong><br>
+                    1️⃣ Выберите машину из списка<br>
+                    2️⃣ Заполните описание на русском (обязательно)<br>
+                    3️⃣ При желании — добавьте переводы<br>
+                    4️⃣ Укажите порядок (0 = первый слайд)
+                </div>
+            '''
+        }),
         ('Основная информация', {
             'fields': ('vehicle', 'vehicle_preview', 'order', 'is_active')
         }),
         ('🇷🇺 Описание (Русский)', {
             'fields': ('description_ru',),
-            'classes': ('wide',)
+            'classes': ('wide',),
+            'description': '<strong style="color: red;">⚠️ Заполните обязательно!</strong>'
         }),
         ('🇰🇬 Описание (Кыргызский)', {
             'fields': ('description_ky',),
-            'classes': ('wide',)
+            'classes': ('wide',),
+            'description': '<em>Если не заполните — покажется русский</em>'
         }),
         ('🇬🇧 Описание (Английский)', {
             'fields': ('description_en',),
-            'classes': ('wide',)
+            'classes': ('wide',),
+            'description': '<em>Если не заполните — покажется русский</em>'
         }),
         ('Дополнительно', {
             'fields': ('created_at',),
             'classes': ('collapse',)
         }),
     )
+
+    def translation_status_display(self, obj):
+        if not obj.pk:
+            return "Сначала сохраните слайд"
+        
+        ru = '✅' if obj.description_ru else '❌'
+        ky = '✅' if obj.description_ky else '⚠️'
+        en = '✅' if obj.description_en else '⚠️'
+        
+        return format_html('''
+            <div style="background: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                <strong>Статус переводов:</strong><br>
+                🇷🇺 Русский: {} {}<br>
+                🇰🇬 Кыргызский: {} {}<br>
+                🇬🇧 Английский: {} {}
+            </div>
+        ''',
+            ru, 'Заполнен' if obj.description_ru else 'НЕ ЗАПОЛНЕН',
+            ky, 'Заполнен' if obj.description_ky else 'Показывается русский',
+            en, 'Заполнен' if obj.description_en else 'Показывается русский'
+        )
+    translation_status_display.short_description = "Статус"
+
+    def translation_status(self, obj):
+        statuses = []
+        if obj.description_ru:
+            statuses.append('🇷🇺')
+        if obj.description_ky:
+            statuses.append('🇰🇬')
+        if obj.description_en:
+            statuses.append('🇬🇧')
+        
+        return format_html(' '.join(statuses)) if statuses else '❌'
+    translation_status.short_description = "Языки"
 
     def vehicle_info(self, obj):
         return obj.vehicle.title_ru or obj.vehicle.title
@@ -234,6 +385,7 @@ class KGFeedbackAdmin(admin.ModelAdmin):
             'fields': ('status', 'priority', 'manager', 'admin_comment')
         }),
     )
+    
     class Media:
         js = ('admin/js/auto_save_feedback.js',)
         
@@ -304,9 +456,9 @@ class KGFeedbackAdmin(admin.ModelAdmin):
                 <a href="{}" title="Удалить" onclick="return confirm('Удалить заявку от {}?')" style="color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">🗑</a>
             </div>
         ''',
-                f'/admin/kg/kgfeedback/{obj.id}/change/',
-                f'/admin/kg/kgfeedback/{obj.id}/change/',
-                f'/admin/kg/kgfeedback/{obj.id}/delete/',
+            f'/admin/kg/kgfeedback/{obj.id}/change/',
+            f'/admin/kg/kgfeedback/{obj.id}/change/',
+            f'/admin/kg/kgfeedback/{obj.id}/delete/',
             obj.name
         )
     action_buttons.short_description = "Действия"
