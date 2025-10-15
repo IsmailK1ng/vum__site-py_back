@@ -57,19 +57,17 @@ class KGVehicleDetailSerializer(serializers.ModelSerializer):
             'id', 'slug', 'title', 'preview_image', 'main_image', 
             'specs', 'mini_images', 'card_specs', 'is_active'
         ]
+    def get_specs(self, obj):
+        """Получить характеристики на нужном языке"""
+        request = self.context.get('request')
+        lang = request.GET.get('lang', 'ru') if request else 'ru'
         
-def get_specs(self, obj):
-    """Получить характеристики на нужном языке"""
-    request = self.context.get('request')
-    lang = request.GET.get('lang', 'ru') if request else 'ru'
-    
-    # Получаем спеки на нужном языке
-    if lang == 'en':
-        return obj.specs_en or obj.specs_ru or {}
-    elif lang == 'ky':
-        return obj.specs_ky or obj.specs_ru or {}
-    
-    return obj.specs_ru or {}
+        # Получаем спеки на нужном языке
+        if lang == 'en':
+            return obj.specs_en or obj.specs_ru or {}
+        elif lang == 'ky':
+            return obj.specs_ky or obj.specs_ru or {}
+        return obj.specs_ru or {}
 
 
 class KGVehicleSerializer(serializers.ModelSerializer):
@@ -160,5 +158,5 @@ class KGHeroSlideSerializer(serializers.ModelSerializer):
     def get_description(self, obj):
         """Получить описание на нужном языке"""
         request = self.context.get('request')
-        lang = request.GET.get('lang', 'ru') if request else 'ru'
+        lang = request.query_params.get('lang', 'ru') if request else 'ru'
         return obj.get_description(lang)

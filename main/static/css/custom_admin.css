@@ -150,7 +150,7 @@ input[type="submit"]:disabled {
 a[title="Просмотр"],
 a[title="Редактировать"],
 a[title="Удалить"] {
-
+    border-radius: var(--radius) !important;
     width: 38px !important;
     height: 38px !important;
     display: flex !important;
