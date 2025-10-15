@@ -47,7 +47,7 @@ class NewsBlock(models.Model):
 
 
 class ContactForm(models.Model):
-    """Заявки с сайта faw.uz"""
+    """Заявки с сайта faw.uz (обновленная версия с функционалом из KG)"""
     REGION_CHOICES = [
         ('Toshkent shahri', 'Toshkent shahri'),
         ('Andijon viloyati', 'Andijon viloyati'),
@@ -64,13 +64,40 @@ class ContactForm(models.Model):
         ('Toshkent viloyati', 'Toshkent viloyati'),
         ('Qoraqalpogʻiston Respublikasi', 'Qoraqalpogʻiston Respublikasi'),
     ]
+    
+    STATUS_CHOICES = [
+        ('new', 'Новая'),
+        ('in_process', 'В процессе'),
+        ('done', 'Обработана'),
+    ]
+    
+    PRIORITY_CHOICES = [
+        ('high', 'Высокий'),
+        ('medium', 'Средний'),
+        ('low', 'Низкий'),
+    ]
 
+    # Основные поля
     name = models.CharField(max_length=255, verbose_name='Имя')
     region = models.CharField(max_length=100, choices=REGION_CHOICES, verbose_name='Регион')
     phone = models.CharField(max_length=50, verbose_name='Телефон')
     message = models.TextField(verbose_name='Сообщение')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Время отправки')
-    is_processed = models.BooleanField(default=False, verbose_name='Просмотрено')
+    
+    # Новые поля для управления (как в KG)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new', verbose_name='Статус')
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium', verbose_name='Приоритет')
+    manager = models.ForeignKey(
+        User, 
+        null=True, 
+        blank=True, 
+        on_delete=models.SET_NULL, 
+        related_name='uz_contacts',
+        verbose_name='Менеджер'
+    )
+    
+    # Старые поля (оставляем для обратной совместимости)
+    is_processed = models.BooleanField(default=False, verbose_name='Просмотрено (устарело)')
     admin_comment = models.TextField(blank=True, null=True, verbose_name='Комментарий администратора')
 
     class Meta:
@@ -80,7 +107,7 @@ class ContactForm(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.phone} ({self.created_at.strftime('%d.%m.%Y')})"
-    
+
 
 class JobApplication(models.Model):
     """Заявки на вакансии с резюме"""

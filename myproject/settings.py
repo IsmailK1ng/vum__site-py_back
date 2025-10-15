@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_spectacular',
+    'django_filters',
     'main',          # ← FAW.UZ
     'kg',            # ← FAW.KG
     'corsheaders',
@@ -50,9 +51,14 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',  # ← ДОБАВЬТЕ
+    'PAGE_SIZE': 20,
 }
-
-# В settings.py замените эти строки:
 
 LANGUAGE_CODE = 'ru'
 USE_I18N = True

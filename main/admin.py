@@ -51,26 +51,141 @@ class NewsAdmin(TabbedTranslationAdmin):
 
 @admin.register(ContactForm)
 class ContactFormAdmin(admin.ModelAdmin):
-    list_display = ['name', 'phone', 'region', 'created_at', 'is_processed']
-    list_filter = ['is_processed', 'region', 'created_at']
+    list_display = ['name', 'phone', 'region', 'priority', 'status', 'manager', 'created_at', 'action_buttons']
+    list_editable = ['priority', 'status', 'manager']
+    list_filter = ['status', 'priority', 'region', 'created_at']
     search_fields = ['name', 'phone']
     readonly_fields = ['created_at']
-    actions = ['mark_as_processed']
+    autocomplete_fields = ['manager']
+    date_hierarchy = 'created_at'
+    actions = ['export_to_excel']
 
     fieldsets = (
-        ('Информация о заявке', {
+        ('Информация о клиенте', {
             'fields': ('name', 'phone', 'region', 'message', 'created_at')
         }),
-        ('Обработка', {
-            'fields': ('is_processed', 'admin_comment')
+        ('Управление', {
+            'fields': ('status', 'priority', 'manager', 'admin_comment')
         }),
     )
+    
+    class Media:
+        js = ('admin/js/auto_save_feedback.js',)
+        
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
-    def mark_as_processed(self, request, queryset):
-        queryset.update(is_processed=True)
-        self.message_user(request, f'Обработано: {queryset.count()}')
-    mark_as_processed.short_description = 'Пометить как обработанные'
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['title'] = 'Заявки FAW.UZ'
 
+        extra_context['status_filters'] = format_html('''
+            <div style="margin: 20px 0; display: flex; gap: 12px;">
+                <a href="?" style="{}">
+                    📊 Все <span style="background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 10px; margin-left: 5px;">{}</span>
+                </a>
+                <a href="?status=new" style="{}">
+                    ● Новые <span style="background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 10px; margin-left: 5px;">{}</span>
+                </a>
+                <a href="?status=in_process" style="{}">
+                    ◐ В работе <span style="background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 10px; margin-left: 5px;">{}</span>
+                </a>
+                <a href="?status=done" style="{}">
+                    ✓ Завершено <span style="background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 10px; margin-left: 5px;">{}</span>
+                </a>
+            </div>
+            <style>
+                a[href*="status"] {{
+                    background: #E5E5EA;
+                    color: #1C1C1E;
+                    padding: 12px 20px;
+                    border-radius: 12px;
+                    text-decoration: none;
+                    font-weight: 600;
+                    transition: all 0.2s;
+                }}
+                a[href*="status"]:hover {{ 
+                    transform: translateY(-2px); 
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+                }}
+            </style>
+        ''',
+            'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;' if not request.GET.get('status') else '',
+            ContactForm.objects.count(),
+            'background: #34C759; color: white;' if request.GET.get('status') == 'new' else '',
+            ContactForm.objects.filter(status='new').count(),
+            'background: #FF9500; color: white;' if request.GET.get('status') == 'in_process' else '',
+            ContactForm.objects.filter(status='in_process').count(),
+            'background: #007AFF; color: white;' if request.GET.get('status') == 'done' else '',
+            ContactForm.objects.filter(status='done').count()
+        )
+
+        return super().changelist_view(request, extra_context)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if 'status' in request.GET:
+            qs = qs.filter(status=request.GET['status'])
+        return qs
+
+    def action_buttons(self, obj):
+        return format_html('''
+            <div style="display: flex; gap: 10px;">
+                <a href="{}" title="Просмотр" style="color: white; width: 35px; height: 35px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">👁</a>
+                <a href="{}" title="Редактировать" style="color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">✏️</a>
+                <a href="{}" title="Удалить" onclick="return confirm('Удалить заявку от {}?')" style="color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">🗑</a>
+            </div>
+        ''',
+            f'/admin/main/contactform/{obj.id}/change/',
+            f'/admin/main/contactform/{obj.id}/change/',
+            f'/admin/main/contactform/{obj.id}/delete/',
+            obj.name
+        )
+    action_buttons.short_description = "Действия"
+
+    def export_to_excel(self, request, queryset):
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Заявки FAW UZ"
+
+        headers = ['№', 'ФИО', 'Телефон', 'Регион', 'Сообщение', 'Статус', 'Приоритет', 'Менеджер', 'Дата']
+        ws.append(headers)
+
+        from openpyxl.styles import Font, PatternFill, Alignment
+        header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
+        header_font = Font(bold=True, color='FFFFFF')
+
+        for cell in ws[1]:
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+
+        for idx, contact in enumerate(queryset, start=1):
+            ws.append([
+                idx, 
+                contact.name, 
+                contact.phone,
+                contact.get_region_display(),
+                contact.message[:100] if contact.message else '-',
+                contact.get_status_display(),
+                contact.get_priority_display(),
+                contact.manager.username if contact.manager else '-',
+                contact.created_at.strftime('%d.%m.%Y %H:%M')
+            ])
+
+        for column in ws.columns:
+            max_length = max(len(str(cell.value)) for cell in column)
+            ws.column_dimensions[column[0].column_letter].width = min(max_length + 2, 50)
+
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = f'attachment; filename="faw_uz_contacts_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+        wb.save(response)
+        return response
+
+    export_to_excel.short_description = '📥 Экспорт в Excel'
 
 
 # Инлайны для вакансий

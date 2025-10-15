@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.utils import translation
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -73,81 +75,55 @@ class NewsViewSet(viewsets.ModelViewSet):
 
 
 class ContactFormViewSet(viewsets.ModelViewSet):
-    """API endpoint для приема контактных форм"""
-    queryset = ContactForm.objects.all().order_by('-created_at')
+    """
+    API для контактных форм FAW.UZ (обновленная версия)
+    GET /uz/contact/ - список заявок (с фильтрацией)
+    POST /uz/contact/ - создание заявки
+    GET /uz/contact/{id}/ - детальная заявка
+    GET /uz/contact/stats/ - статистика по заявкам
+    """
     serializer_class = ContactFormSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['status', 'priority', 'region']
+    search_fields = ['name', 'phone']
+    ordering_fields = ['created_at', 'priority']
     
-    def get_permissions(self):
-        if self.action == 'create':
-            return [AllowAny()]
-        else:
-            return [IsAdminUser()]
+    def get_queryset(self):
+        queryset = ContactForm.objects.all().order_by('-created_at')
+        
+        # Фильтр по статусу из query params
+        status_filter = self.request.query_params.get('status', None)
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+        
+        return queryset
     
-    def create(self, request):
-        """Создание новой заявки с контактной формы"""
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        contact_form = serializer.save()
+        self.perform_create(serializer)
         
-        return Response(
-            {
-                'success': True,
-                'message': 'Xabaringiz qabul qilindi. Tez orada siz bilan bog\'lanamiz.',
-                'data': serializer.data
-            },
-            status=status.HTTP_201_CREATED
-        )
-    
-    @action(detail=False, methods=['get'], permission_classes=[IsAdminUser])
-    def unprocessed(self, request):
-        """Получить необработанные заявки"""
-        unprocessed = self.queryset.filter(is_processed=False)
-        serializer = self.get_serializer(unprocessed, many=True)
         return Response({
-            'count': unprocessed.count(),
-            'results': serializer.data
-        })
+            'success': True,
+            'message': 'Ваша заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.',
+            'data': serializer.data
+        }, status=status.HTTP_201_CREATED)
     
-    @action(detail=True, methods=['post'], permission_classes=[IsAdminUser])
-    def mark_processed(self, request, pk=None):
-        """Отметить заявку как обработанную"""
-        contact_form = self.get_object()
-        contact_form.is_processed = True
-        contact_form.save()
-        return Response({
-            'status': 'processed',
-            'message': f'Ariza #{contact_form.id} ko\'rib chiqilgan deb belgilandi'
-        })
-    
-    @action(detail=False, methods=['get'], permission_classes=[IsAdminUser])
-    def statistics(self, request):
-        """Получить статистику по заявкам"""
-        from django.db.models import Count
-        from datetime import datetime, timedelta
-        
-        total = self.queryset.count()
-        processed = self.queryset.filter(is_processed=True).count()
-        unprocessed = self.queryset.filter(is_processed=False).count()
-        today = self.queryset.filter(
-            created_at__date=datetime.now().date()
-        ).count()
-        this_week = self.queryset.filter(
-            created_at__gte=datetime.now() - timedelta(days=7)
-        ).count()
-        
-        by_region = self.queryset.values('region').annotate(
-            count=Count('id')
-        ).order_by('-count')
+    @action(detail=False, methods=['get'])
+    def stats(self, request):
+        """Статистика по заявкам"""
+        total = ContactForm.objects.count()
+        new = ContactForm.objects.filter(status='new').count()
+        in_process = ContactForm.objects.filter(status='in_process').count()
+        done = ContactForm.objects.filter(status='done').count()
         
         return Response({
             'total': total,
-            'processed': processed,
-            'unprocessed': unprocessed,
-            'today': today,
-            'this_week': this_week,
-            'by_region': by_region
+            'new': new,
+            'in_process': in_process,
+            'done': done
         })
-
 
 class JobApplicationViewSet(viewsets.ModelViewSet):
     """API endpoint для приема заявок на вакансии"""
