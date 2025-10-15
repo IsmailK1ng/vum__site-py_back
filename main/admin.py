@@ -4,6 +4,7 @@ from modeltranslation.admin import TabbedTranslationAdmin, TranslationTabularInl
 from .models import News, NewsBlock, ContactForm, Vacancy, JobApplication, VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate
 import openpyxl
 from datetime import datetime
+from django.http import HttpResponse
 
 # Настройка админки
 admin.site.site_header = "VUM Admin Panel"
