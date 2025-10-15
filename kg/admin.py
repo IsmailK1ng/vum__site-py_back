@@ -151,16 +151,16 @@ class KGVehicleAdmin(admin.ModelAdmin):
                     📋 Скопировать шаблон
                 </button>
                 <textarea id="specsTemplate" readonly style="width: 100%; height: 150px; margin-top: 10px; font-family: monospace; padding: 10px;">{{
-  "wheelFormula": "4x2",
-  "fuelType": "Дизель",
-  "enginePower": "130",
-  "payload": "6920",
-  "transmission": "Механика",
-  "dimensions": "7330×2350×2560",
-  "wheelbase": "3900",
-  "curbWeight": "4380",
-  "tankVolume": "100"
-}}</textarea>
+                "wheelFormula": "4x2",
+                "fuelType": "Дизель",
+                "enginePower": "130",
+                "payload": "6920",
+                "transmission": "Механика",
+                "dimensions": "7330×2350×2560",
+                "wheelbase": "3900",
+                "curbWeight": "4380",
+                "tankVolume": "100"
+                }}</textarea>
             </div>
             <script>
             function copySpecsTemplate() {{
