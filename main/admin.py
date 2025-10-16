@@ -144,9 +144,9 @@ class ContactFormAdmin(admin.ModelAdmin):
     def action_buttons(self, obj):
         return format_html('''
             <div style="display: flex; gap: 10px;">
-                <a href="{}" title="Просмотр" style="color: white; width: 35px; height: 35px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">👁</a>
-                <a href="{}" title="Редактировать" style="color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">✏️</a>
-                <a href="{}" title="Удалить" onclick="return confirm('Удалить заявку от {}?')" style="color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">🗑</a>
+                <a href="{}" title="Просмотр" style="color: white; width: 35px; height: 35px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none; background: #a5a5a5;">👁</a>
+                <a href="{}" title="Редактировать" style="color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none; background: orange;">✏️</a>
+                <a href="{}" title="Удалить" onclick="return confirm('Удалить заявку от {}?')" style="color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none; background: red;">🗑</a>
             </div>
         ''',
             f'/admin/main/contactform/{obj.id}/change/',
