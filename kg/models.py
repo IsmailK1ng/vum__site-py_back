@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
+from django.utils.text import slugify
+from unidecode import unidecode
+import uuid
 
 # ============ ТОЛЬКО FAW.KG ============
 
@@ -46,6 +49,29 @@ class KGVehicle(models.Model):
         ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
+        # Генерация slug
+        if self.title_ru:
+            if not self.slug_ru:
+                base_slug = slugify(unidecode(self.title_ru))
+                counter = 1
+                unique_slug = base_slug
+                while KGVehicle.objects.filter(slug_ru=unique_slug).exclude(pk=self.pk).exists():
+                    unique_slug = f"{base_slug}-{counter}"
+                    counter += 1
+                self.slug_ru = unique_slug
+            
+            self.slug = self.slug_ru or f"vehicle-{uuid.uuid4().hex[:12]}"
+            
+        
+        if not self.slug or self.slug == '':
+            self.slug = f"vehicle-{uuid.uuid4().hex[:12]}"
+        
+          # Slug для KY и EN создаются только если есть переводы
+        if self.title_ky and not self.slug_ky:
+         self.slug_ky = slugify(unidecode(self.title_ky))
+        if self.title_en and not self.slug_en:
+         self.slug_en = slugify(self.title_en)
+        
         title_lower = (self.title or self.title_ru or '').lower()
         if 'vr' in title_lower:
             self.category = 'vr'
@@ -53,6 +79,7 @@ class KGVehicle(models.Model):
             self.category = 'vh'
         else:
             self.category = 'v'
+        
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -96,15 +123,15 @@ class KGVehicleImage(models.Model):
 class VehicleCardSpec(models.Model):
     """Характеристики для карточки"""
     vehicle = models.ForeignKey(KGVehicle, related_name='card_specs', on_delete=models.CASCADE)
-    icon = models.ImageField(upload_to='kg_vehicles/card_icons/')
-    value_ru = models.CharField(max_length=100)
-    value_ky = models.CharField(max_length=100, blank=True)
-    value_en = models.CharField(max_length=100, blank=True)
-    order = models.PositiveIntegerField(default=0)
+    icon = models.ImageField(upload_to='kg_vehicles/card_icons/', verbose_name='Иконка', blank=True, null=True)  # ← ДОБАВЛЕНО blank=True, null=True
+    value_ru = models.CharField(max_length=100, verbose_name='Значение (RU)')
+    value_ky = models.CharField(max_length=100, blank=True, verbose_name='Значение (KY)')
+    value_en = models.CharField(max_length=100, blank=True, verbose_name='Значение (EN)')
+    order = models.PositiveIntegerField(default=0, verbose_name='Порядок')
 
     class Meta:
         ordering = ['order']
-        verbose_name = ' Характеристика'
+        verbose_name = 'Характеристика'
         verbose_name_plural = 'Характеристики'
 
     def get_value(self, lang='ru'):
@@ -113,8 +140,56 @@ class VehicleCardSpec(models.Model):
         elif lang == 'ky':
             return self.value_ky or self.value_ru
         return self.value_ru
+    
+    def save(self, *args, **kwargs):
+        if self.value_ru and not self.value_ky:
+            self.value_ky = self.auto_translate(self.value_ru, 'ky')
+        if self.value_ru and not self.value_en:
+            self.value_en = self.auto_translate(self.value_ru, 'en')
+        super().save(*args, **kwargs)
+    
+    def auto_translate(self, text, lang):
+        """Расширенный автоперевод для терминов"""
+        translations = {
+            'Дизель': {'ky': 'Дизель', 'en': 'Diesel'},
+            'Бензин': {'ky': 'Бензин', 'en': 'Gasoline'},
+            'кг': {'ky': 'кг', 'en': 'kg'},
+            'л.с.': {'ky': 'а.к.', 'en': 'hp'},
+            'м³': {'ky': 'м³', 'en': 'm³'},
+            'л': {'ky': 'л', 'en': 'L'},
+            'Климат-контроль': {'ky': 'Климат-контроль', 'en': 'Climate control'},
+            'Кондиционер': {'ky': 'Кондиционер', 'en': 'Air conditioning'},
+            '4x2': {'ky': '4x2', 'en': '4x2'},
+            '4x4': {'ky': '4x4', 'en': '4x4'},
+            'Передний': {'ky': 'Алдыңкы', 'en': 'Front'},
+            'Задний': {'ky': 'Арткы', 'en': 'Rear'},
+            'Полный': {'ky': 'Толук', 'en': 'Full'},
+            'Механика': {'ky': 'Механикалык', 'en': 'Manual'},
+            'Автомат': {'ky': 'Автоматтык', 'en': 'Automatic'},
+            'Робот': {'ky': 'Робот', 'en': 'Robot'},
+        }
+        
+        result = text
+        for ru_term, trans in translations.items():
+            if ru_term in text:
+                result = result.replace(ru_term, trans.get(lang, ru_term))
+        
+        return result
 
-
+class IconTemplate(models.Model):
+    """Шаблонные иконки для выбора"""
+    name = models.CharField(max_length=50, verbose_name='Название', unique=True)
+    icon = models.ImageField(upload_to='kg_vehicles/card_icons/', verbose_name='Иконка')
+    order = models.PositiveIntegerField(default=0, verbose_name='Порядок')
+    
+    class Meta:
+        ordering = ['order']
+        verbose_name = 'Шаблон иконки'
+        verbose_name_plural = 'Шаблоны иконок'
+    
+    def __str__(self):
+        return self.name
+    
 class KGFeedback(models.Model):
     """Заявки с faw.kg"""
     REGION_CHOICES = [
