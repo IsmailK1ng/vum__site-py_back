@@ -60,6 +60,16 @@ class ContactFormAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     actions = ['export_to_excel']
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        formfield = super().formfield_for_foreignkey(db_field, request, **kwargs)
+        if db_field.name == "manager":
+            # Убираем все “related links”
+            formfield.widget.can_add_related = False
+            formfield.widget.can_change_related = False
+            formfield.widget.can_delete_related = False
+            formfield.widget.can_view_related = False
+        return formfield
+
     fieldsets = (
         ('Информация о клиенте', {
             'fields': ('name', 'phone', 'region', 'message', 'created_at')
@@ -117,9 +127,9 @@ class ContactFormAdmin(admin.ModelAdmin):
             ContactForm.objects.count(),
             'background: #34C759; color: white;' if request.GET.get('status') == 'new' else '',
             ContactForm.objects.filter(status='new').count(),
-            'background: #FF9500; color: white;' if request.GET.get('status') == 'in_process' else '',
+            'background: #FF9500; color: yellow;' if request.GET.get('status') == 'in_process' else '',
             ContactForm.objects.filter(status='in_process').count(),
-            'background: #007AFF; color: white;' if request.GET.get('status') == 'done' else '',
+            'background: #007AFF; color: green;' if request.GET.get('status') == 'done' else '',
             ContactForm.objects.filter(status='done').count()
         )
 

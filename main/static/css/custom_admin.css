@@ -5,7 +5,33 @@
 }
 
 .navbar {
-    background-color: #343a40;
+    background: linear-gradient(306deg, #000000, #002b9b, #1e57eb);
+}
+
+[class*=sidebar-dark-] {
+    background: linear-gradient(64deg, #000000, #01164d, #225fff);
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgb(255 255 255);
+}
+
+.navbar-dark .form-control-navbar+.input-group-append>.btn-navbar,
+.navbar-dark .form-control-navbar+.input-group-prepend>.btn-navbar {
+    background-color: transparent;
+    color: #fff;
+    /* border: 1; */
+    border-left: none;
+    border-color: #6c757d;
+}
+
+.navbar-dark .btn-navbar,
+.navbar-dark .form-control-navbar {
+    background-color: transparent;
+    /* border: 1px solid #6c757d; */
+    color: #fff;
+    border-color: #6c757d;
+    border-right: none;
 }
 
 .navbar-light .navbar-nav .nav-link {
@@ -47,10 +73,28 @@
     line-height: normal !important;
     padding: 2px 15px 5px 10px;
 }
+
 .select2-container--admin-autocomplete .select2-selection--single .select2-selection__clear {
     left: 10px;
 }
 
 .navbar-dark .navbar-nav .nav-link {
     filter: brightness(0) invert(1);
+}
+
+.accent-primary [class*=sidebar-dark-] .sidebar a:not(.dropdown-item):not(.btn-app):not(.nav-link):not(.brand-link) {
+    color: #ffffff;
+}
+
+[class*=sidebar-dark] .user-panel {
+    border-bottom: 1px solid #ffffff;
+}
+
+[class*=sidebar-dark-] .nav-header {
+    color: rgb(255 255 255);
+    margin-top: 1rem;
+}
+
+[class*=sidebar-dark-] .sidebar a {
+    color: #ffffff;
 }
