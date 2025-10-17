@@ -60,7 +60,7 @@ class KGVehicleDetailSerializer(serializers.ModelSerializer):
     def get_specs(self, obj):
         """Получить характеристики на нужном языке"""
         request = self.context.get('request')
-        lang = request.GET.get('lang', 'ru') if request else 'ru'
+        lang = request.query_params.get('lang', 'ru') if request else 'ru'
         
         # Получаем спеки на нужном языке
         if lang == 'en':
@@ -87,17 +87,17 @@ class KGVehicleSerializer(serializers.ModelSerializer):
 
     def get_title(self, obj):
         request = self.context.get('request')
-        lang = request.GET.get('lang', 'ru') if request else 'ru'
+        lang = request.query_params.get('lang', 'ru') if request else 'ru'
         return obj.get_title(lang)
 
     def get_slug(self, obj):
         request = self.context.get('request')
-        lang = request.GET.get('lang', 'ru') if request else 'ru'
+        lang = request.query_params.get('lang', 'ru') if request else 'ru'
         return obj.get_slug(lang)
 
     def get_specs(self, obj):
         request = self.context.get('request')
-        lang = request.GET.get('lang', 'ru') if request else 'ru'
+        lang = request.query_params.get('lang', 'ru') if request else 'ru'
         return obj.get_specs(lang) or {}
 
 
