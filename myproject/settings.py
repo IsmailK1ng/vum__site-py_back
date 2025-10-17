@@ -221,11 +221,13 @@ USE_TZ = True
 import os
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # import os
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, "static"),
-# ]
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'main/static'),
+    os.path.join(BASE_DIR, 'kg/static'),    # ← ДОБАВЬТЕ ЭТО!
+]
 
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'

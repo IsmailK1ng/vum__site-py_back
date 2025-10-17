@@ -49,7 +49,11 @@ class KGVehicle(models.Model):
         ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
-        # Генерация slug
+        print(f"\n=== СОХРАНЕНИЕ KGVehicle ===")
+        print(f"ID: {self.pk}")
+        print(f"title_ru: {self.title_ru}")
+        
+        # 1. ГЕНЕРАЦИЯ SLUG
         if self.title_ru:
             if not self.slug_ru:
                 base_slug = slugify(unidecode(self.title_ru))
@@ -59,26 +63,39 @@ class KGVehicle(models.Model):
                     unique_slug = f"{base_slug}-{counter}"
                     counter += 1
                 self.slug_ru = unique_slug
+                print(f"✓ Создан slug_ru: {self.slug_ru}")
             
             self.slug = self.slug_ru or f"vehicle-{uuid.uuid4().hex[:12]}"
-            
         
         if not self.slug or self.slug == '':
             self.slug = f"vehicle-{uuid.uuid4().hex[:12]}"
+            print(f"✓ Создан дефолтный slug: {self.slug}")
         
-          # Slug для KY и EN создаются только если есть переводы
+        # Slug для KY и EN
         if self.title_ky and not self.slug_ky:
-         self.slug_ky = slugify(unidecode(self.title_ky))
-        if self.title_en and not self.slug_en:
-         self.slug_en = slugify(self.title_en)
+            self.slug_ky = slugify(unidecode(self.title_ky))
+            print(f"✓ Создан slug_ky: {self.slug_ky}")
         
-        title_lower = (self.title or self.title_ru or '').lower()
+        if self.title_en and not self.slug_en:
+            self.slug_en = slugify(self.title_en)
+            print(f"✓ Создан slug_en: {self.slug_en}")
+        
+        # 2. ОПРЕДЕЛЕНИЕ КАТЕГОРИИ
+        title_lower = (self.title_ru or self.title or '').lower()
+        print(f"Анализ названия для категории: '{title_lower}'")
+        
         if 'vr' in title_lower:
             self.category = 'vr'
+            print(f"✓ Категория: VR Series")
         elif 'vh' in title_lower:
             self.category = 'vh'
+            print(f"✓ Категория: VH Series")
         else:
             self.category = 'v'
+            print(f"✓ Категория: V Series")
+        
+        print(f"Финальная категория: {self.category}")
+        print("=== КОНЕЦ СОХРАНЕНИЯ ===\n")
         
         super().save(*args, **kwargs)
 
@@ -123,7 +140,7 @@ class KGVehicleImage(models.Model):
 class VehicleCardSpec(models.Model):
     """Характеристики для карточки"""
     vehicle = models.ForeignKey(KGVehicle, related_name='card_specs', on_delete=models.CASCADE)
-    icon = models.ImageField(upload_to='kg_vehicles/card_icons/', verbose_name='Иконка', blank=True, null=True)  # ← ДОБАВЛЕНО blank=True, null=True
+    icon = models.ImageField(upload_to='kg_vehicles/card_icons/', verbose_name='Иконка', blank=True, null=True)
     value_ru = models.CharField(max_length=100, verbose_name='Значение (RU)')
     value_ky = models.CharField(max_length=100, blank=True, verbose_name='Значение (KY)')
     value_en = models.CharField(max_length=100, blank=True, verbose_name='Значение (EN)')
@@ -142,25 +159,46 @@ class VehicleCardSpec(models.Model):
         return self.value_ru
     
     def save(self, *args, **kwargs):
-        if self.value_ru and not self.value_ky:
-            self.value_ky = self.auto_translate(self.value_ru, 'ky')
-        if self.value_ru and not self.value_en:
-            self.value_en = self.auto_translate(self.value_ru, 'en')
+        print(f"\n=== СОХРАНЕНИЕ VehicleCardSpec ===")
+        print(f"value_ru: {self.value_ru}")
+        print(f"value_ky (до): {self.value_ky}")
+        print(f"value_en (до): {self.value_en}")
+        
+        if self.value_ru:
+            if not self.value_ky or self.value_ky.strip() == '':
+                self.value_ky = self.auto_translate(self.value_ru, 'ky')
+                print(f"✓ Автоперевод KY: {self.value_ky}")
+            else:
+                print(f"⊘ KY уже заполнено")
+            
+            if not self.value_en or self.value_en.strip() == '':
+                self.value_en = self.auto_translate(self.value_ru, 'en')
+                print(f"✓ Автоперевод EN: {self.value_en}")
+            else:
+                print(f"⊘ EN уже заполнено")
+        
+        print(f"value_ky (после): {self.value_ky}")
+        print(f"value_en (после): {self.value_en}")
+        print("=== КОНЕЦ СОХРАНЕНИЯ ===\n")
+        
         super().save(*args, **kwargs)
     
     def auto_translate(self, text, lang):
-        """Расширенный автоперевод для терминов"""
+       
         translations = {
             'Дизель': {'ky': 'Дизель', 'en': 'Diesel'},
             'Бензин': {'ky': 'Бензин', 'en': 'Gasoline'},
             'кг': {'ky': 'кг', 'en': 'kg'},
             'л.с.': {'ky': 'а.к.', 'en': 'hp'},
+            'м²': {'ky': 'м²', 'en': 'm²'},
             'м³': {'ky': 'м³', 'en': 'm³'},
             'л': {'ky': 'л', 'en': 'L'},
-            'Климат-контроль': {'ky': 'Климат-контроль', 'en': 'Climate control'},
+            'Климат-контроль': {'ky': 'Климат-контроль', 'en': 'Climate control'},  # ← КРИТИЧНО!
             'Кондиционер': {'ky': 'Кондиционер', 'en': 'Air conditioning'},
             '4x2': {'ky': '4x2', 'en': '4x2'},
-            '4x4': {'ky': '4x4', 'en': '4x4'},
+            '4×2': {'ky': '4×2', 'en': '4×2'},
+            '4х2': {'ky': '4х2', 'en': '4х2'},
+            '4 х 2': {'ky': '4 х 2', 'en': '4 х 2'},
             'Передний': {'ky': 'Алдыңкы', 'en': 'Front'},
             'Задний': {'ky': 'Арткы', 'en': 'Rear'},
             'Полный': {'ky': 'Толук', 'en': 'Full'},
@@ -169,12 +207,16 @@ class VehicleCardSpec(models.Model):
             'Робот': {'ky': 'Робот', 'en': 'Robot'},
         }
         
+        if text in translations:
+            return translations[text].get(lang, text)
+        
         result = text
         for ru_term, trans in translations.items():
             if ru_term in text:
                 result = result.replace(ru_term, trans.get(lang, ru_term))
         
         return result
+
 
 class IconTemplate(models.Model):
     """Шаблонные иконки для выбора"""
@@ -189,7 +231,8 @@ class IconTemplate(models.Model):
     
     def __str__(self):
         return self.name
-    
+
+
 class KGFeedback(models.Model):
     """Заявки с faw.kg"""
     REGION_CHOICES = [
@@ -241,27 +284,9 @@ class KGHeroSlide(models.Model):
     """Hero-слайды для главной страницы"""
     vehicle = models.ForeignKey(KGVehicle, on_delete=models.CASCADE, verbose_name='Машина')
     
-    # Описания на 3 языках
-    description_ru = models.TextField(
-        max_length=500, 
-        verbose_name='Описание (RU)',
-        help_text='Краткое описание для Hero-слайда на русском',
-        default=''
-    )
-    description_ky = models.TextField(
-        max_length=500, 
-        verbose_name='Описание (KY)',
-        blank=True,
-        default='',
-        help_text='Краткое описание для Hero-слайда на кыргызском'
-    )
-    description_en = models.TextField(
-        max_length=500, 
-        verbose_name='Описание (EN)',
-        blank=True,
-        default='',
-        help_text='Краткое описание для Hero-слайда на английском'
-    )
+    description_ru = models.TextField(max_length=500, verbose_name='Описание (RU)', default='')
+    description_ky = models.TextField(max_length=500, verbose_name='Описание (KY)', blank=True, default='')
+    description_en = models.TextField(max_length=500, verbose_name='Описание (EN)', blank=True, default='')
     
     order = models.PositiveIntegerField(default=0, verbose_name='Порядок')
     is_active = models.BooleanField(default=True, verbose_name='Активно')
@@ -276,7 +301,6 @@ class KGHeroSlide(models.Model):
         return f"Hero #{self.order} - {self.vehicle.title}"
     
     def get_description(self, lang='ru'):
-        """Получить описание на нужном языке"""
         if lang == 'en':
             return self.description_en or self.description_ru
         elif lang == 'ky':

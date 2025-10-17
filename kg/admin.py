@@ -6,6 +6,9 @@ from .forms import VehicleCardSpecForm
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
 from datetime import datetime
+from .models import IconTemplate
+from django.utils.safestring import mark_safe
+import random
 
 
 # ============================================
@@ -21,6 +24,9 @@ class VehicleCardSpecInline(admin.TabularInline):
     verbose_name = "Характеристика"
     verbose_name_plural = "Характеристики для каталога"
 
+    class Media:
+        js = ('admin/js/icon_selector.js',)
+
     def icon_preview(self, obj):
         if obj.icon:
             return format_html('<img src="{}" width="50" style="border-radius:8px;">', obj.icon.url)
@@ -35,30 +41,29 @@ class VehicleCardSpecInline(admin.TabularInline):
         templates = IconTemplate.objects.all().order_by('order')
         
         if not templates.exists():
-            return mark_safe('<p style="color:red;">Нет иконок!</p>')
+            return mark_safe('<p style="color:red;">⚠️ Нет иконок! Добавьте в разделе "Шаблоны иконок"</p>')
         
-        unique_id = f"icon_{random.randint(10000, 99999)}"
+        # Уникальный ID для этого виджета
+        widget_id = f"icon_widget_{random.randint(100000, 999999)}"
         
         html = f'''
-        <div id="{unique_id}" style="margin:10px 0;">
-            <details style="border:1px solid #ddd; border-radius:5px; padding:5px;">
-                <summary style="cursor:pointer; padding:8px; background:#f5f5f5; border-radius:4px; font-weight:600;">
-                    Выбрать иконку ({templates.count()})
+        <div class="icon-selector-widget" data-widget-id="{widget_id}">
+            <details style="border:1px solid #ddd; border-radius:8px; padding:8px; background:#f9f9f9;">
+                <summary style="cursor:pointer; padding:10px; background:#e3f2fd; border-radius:6px; font-weight:600; color:#1976d2;">
+                    📦 Выбрать иконку ({templates.count()})
                 </summary>
-                <div style="padding:10px; margin-top:10px;">
-                    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; max-width:350px;">
+                <div style="padding:15px; margin-top:10px;">
+                    <div class="icon-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(80px, 1fr)); gap:10px; max-width:100%;">
         '''
         
         for t in templates:
             html += f'''
-            <div class="icon-pick" 
+            <div class="icon-card" 
                 data-template-id="{t.id}"
                 data-icon-url="{t.icon.url}"
-                style="text-align:center; padding:8px; border:2px solid #ccc; border-radius:5px; cursor:pointer; background:#fff; transition:all 0.2s;"
-                onmouseover="this.style.borderColor='#667eea';"
-                onmouseout="this.style.borderColor='#ccc';">
-                <img src="{t.icon.url}" width="40" height="40" style="display:block; margin:0 auto 5px;">
-                <small style="font-size:9px;">{t.name}</small>
+                style="text-align:center; padding:10px; border:2px solid #ddd; border-radius:8px; cursor:pointer; background:#fff; transition:all 0.2s; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+                <img src="{t.icon.url}" width="50" height="50" style="display:block; margin:0 auto 8px; object-fit:contain;">
+                <small style="font-size:10px; color:#666; display:block; font-weight:500;">{t.name}</small>
             </div>
             '''
         
@@ -66,56 +71,117 @@ class VehicleCardSpecInline(admin.TabularInline):
                     </div>
                 </div>
             </details>
-            <input type="hidden" name="temp_icon" value="" class="selected-icon-input">
+            <input type="hidden" class="selected-icon-field" name="temp_icon" value="">
+            <div class="selected-icon-display" style="margin-top:10px; padding:8px; background:#fff; border:1px solid #ddd; border-radius:6px; display:none;">
+                <strong style="color:#2e7d32;">✓ Выбрана:</strong> <span class="icon-name"></span>
+            </div>
         </div>
         
         <script>
         (function() {{
-            const container = document.getElementById('{unique_id}');
-            const hiddenInput = container.querySelector('.selected-icon-input');
-            const iconCards = container.querySelectorAll('.icon-pick');
+            const widget = document.querySelector('[data-widget-id="{widget_id}"]');
+            if (!widget) return;
             
-            iconCards.forEach(card => {{
-                card.addEventListener('click', function() {{
-                    const templateId = this.dataset.templateId;
-                    const iconUrl = this.dataset.iconUrl;
-                    
-                    iconCards.forEach(c => {{
-                        c.style.border = '2px solid #ccc';
-                        c.style.background = '#fff';
-                    }});
-                    
-                    this.style.border = '3px solid #28a745';
-                    this.style.background = '#e8f5e9';
-                    
-                    const row = container.closest('tr.form-row');
-                    const preview = row.querySelector('td:nth-child(2) img');
-                    if (preview) {{
-                        preview.src = iconUrl;
-                        preview.style.display = 'block';
-                    }}
-                    
-                    const inlineGroup = row.closest('.tabular.inline-related');
-                    const allRows = inlineGroup.querySelectorAll('tr.form-row');
-                    
-                    let rowIndex = -1;
-                    allRows.forEach((r, index) => {{
-                        if (r === row) rowIndex = index;
-                    }});
-                    
-                    if (rowIndex >= 0) {{
-                        hiddenInput.name = 'card_specs-' + rowIndex + '-selected_template';
-                        hiddenInput.id = 'id_card_specs-' + rowIndex + '-selected_template';
-                        hiddenInput.value = templateId;
-                    }}
+            const hiddenInput = widget.querySelector('.selected-icon-field');
+            const display = widget.querySelector('.selected-icon-display');
+            const iconName = widget.querySelector('.icon-name');
+            
+            // КРИТИЧЕСКАЯ ФУНКЦИЯ: Получаем индекс строки только когда нужно
+            function getRowIndex() {{
+                const row = widget.closest('tr.form-row');
+                if (!row) {{
+                    console.error('❌ Строка не найдена для виджета {widget_id}');
+                    return -1;
+                }}
+                
+                const table = row.closest('table');
+                if (!table) {{
+                    console.error('❌ Таблица не найдена');
+                    return -1;
+                }}
+                
+                // Получаем ВСЕ строки с формами (включая пустые)
+                const allRows = Array.from(table.querySelectorAll('tbody tr.form-row'));
+                const index = allRows.indexOf(row);
+                
+                console.log('🔍 Виджет {widget_id} находится в строке:', index, 'из', allRows.length);
+                return index;
+            }}
+            
+            // ЕДИНСТВЕННОЕ место где обновляем name - при клике на иконку
+            function updateInputName() {{
+                const rowIndex = getRowIndex();
+                if (rowIndex >= 0) {{
+                    hiddenInput.name = `card_specs-${{rowIndex}}-selected_template`;
+                    hiddenInput.id = `id_card_specs-${{rowIndex}}-selected_template`;
+                    console.log('✅ Обновлен name для строки', rowIndex, '→', hiddenInput.name);
+                }} else {{
+                    console.error('❌ Не удалось обновить name, индекс:', rowIndex);
+                }}
+            }}
+            
+            // Обработчик выбора иконки
+            widget.addEventListener('click', function(e) {{
+                const card = e.target.closest('.icon-card');
+                if (!card) return;
+                
+                const templateId = card.dataset.templateId;
+                const iconUrl = card.dataset.iconUrl;
+                const iconText = card.querySelector('small').textContent;
+                
+                console.log('🖱️ Клик по иконке:', iconText, 'ID:', templateId);
+                
+                // СНАЧАЛА обновляем name (КРИТИЧНО!)
+                updateInputName();
+                
+                // ПОТОМ устанавливаем значение
+                hiddenInput.value = templateId;
+                
+                console.log('💾 Установлено значение:', hiddenInput.name, '=', templateId);
+                
+                // Снимаем выделение со всех карточек
+                widget.querySelectorAll('.icon-card').forEach(c => {{
+                    c.style.border = '2px solid #ddd';
+                    c.style.background = '#fff';
+                    c.style.transform = 'scale(1)';
                 }});
+                
+                // Выделяем выбранную
+                card.style.border = '3px solid #2e7d32';
+                card.style.background = '#e8f5e9';
+                card.style.transform = 'scale(1.05)';
+                
+                // Показываем уведомление
+                display.style.display = 'block';
+                iconName.textContent = iconText;
+                
+                // Обновляем превью в таблице
+                const row = widget.closest('tr.form-row');
+                const previewCell = row.querySelector('td:nth-child(2) img');
+                if (previewCell) {{
+                    previewCell.src = iconUrl;
+                    previewCell.style.border = '2px solid #2e7d32';
+                    previewCell.style.borderRadius = '8px';
+                }}
+                
+                console.log('✅ Иконка выбрана успешно');
             }});
+            
+            console.log('🚀 Виджет {widget_id} инициализирован');
         }})();
         </script>
+        
+        <style>
+        .icon-card:hover {{
+            border-color: #64b5f6 !important;
+            transform: scale(1.08) !important;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+        }}
+        </style>
         '''
         
         return mark_safe(html)
-    
+
     icon_selector.short_description = "Выбор иконки"
 
 
@@ -186,26 +252,24 @@ class KGVehicleAdmin(admin.ModelAdmin):
     category_badge.short_description = "Серия"
 
     def action_buttons(self, obj):
+        # ВРЕМЕННО: Используем slug_ru
+        frontend_url = f"http://localhost:3000/vehicle-details.html?id={obj.slug_ru or obj.slug}&lang=ru"
+        
         return format_html(
             '<div style="display:flex; gap:8px;">'
-            '<a href="{}" title="Редактировать" style="display:inline-block; width:28px; height:28px;">'
+            '<a href="{}" title="Редактировать">'
             '<img src="/static/media/icon-adminpanel/pencil.png" width="28" height="28"></a>'
-            '<a href="{}" title="Удалить" onclick="return confirm(\'Удалить {}?\')" style="display:inline-block; width:28px; height:28px;">'
+            '<a href="{}" title="Удалить" onclick="return confirm(\'Удалить {}?\')">'
             '<img src="/static/media/icon-adminpanel/recycle-bin.png" width="28" height="28"></a>'
-            '<a href="https://faw.kg/vehicle/{}/" target="_blank" title="Посмотреть на сайте" style="display:inline-block; width:28px; height:28px;">'
+            '<a href="{}" target="_blank" title="Посмотреть на сайте">'
             '<img src="/static/media/icon-adminpanel/eyes.png" width="28" height="28"></a>'
             '</div>',
             f'/admin/kg/kgvehicle/{obj.id}/change/',
             f'/admin/kg/kgvehicle/{obj.id}/delete/',
             obj.title_ru or 'машину',
-            obj.slug
+            frontend_url
         )
     action_buttons.short_description = "Действия"
-
-
-# ============================================
-# ADMIN: HERO-СЛАЙДЫ
-# ============================================
 
 @admin.register(KGHeroSlide)
 class KGHeroSlideAdmin(admin.ModelAdmin):
