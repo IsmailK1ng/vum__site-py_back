@@ -267,3 +267,148 @@ class VacancyIdealCandidate(models.Model):
     def __str__(self):
         return self.text[:50]
     
+
+    # ========== МОДЕЛИ ДЛЯ ПРОДУКТОВ FAW.UZ ==========
+
+class FeatureTemplate(models.Model):
+    """Шаблоны характеристик с иконками (как в KG)"""
+    name = models.CharField("Название", max_length=100, unique=True)
+    icon = models.FileField("Иконка SVG", upload_to="features/icons/")
+    category = models.CharField("Категория", max_length=50, blank=True, 
+                               help_text="Для группировки (Комфорт, Безопасность и т.д.)")
+    order = models.PositiveIntegerField("Порядок", default=0)
+    
+    class Meta:
+        verbose_name = "Шаблон характеристики"
+        verbose_name_plural = "Шаблоны характеристик"
+        ordering = ['category', 'order', 'name']
+    
+    def __str__(self):
+        return f"{self.category} - {self.name}" if self.category else self.name
+
+
+class Product(models.Model):
+    """Модель грузовика FAW"""
+    CATEGORY_CHOICES = [
+        ('dump_truck', 'Самосвал'),
+        ('tractor', 'Тягач'),
+        ('chassis', 'Шасси'),
+        ('van', 'Фургон'),
+        ('special', 'Спецтехника'),
+    ]
+    
+    # Основная информация
+    title = models.CharField("Название модели", max_length=255)
+    slug = models.SlugField("URL", max_length=255, unique=True)
+    category = models.CharField("Категория", max_length=50, choices=CATEGORY_CHOICES)
+    
+    # Описания
+    short_description = models.TextField("Краткое описание", max_length=500, blank=True)
+    main_description = models.TextField("Основное описание", blank=True)
+    slogan = models.CharField("Слоган", max_length=255, blank=True)
+    
+    # Изображения (без переводов)
+    main_image = models.ImageField("Главное изображение", upload_to="products/main/")
+    card_image = models.ImageField("Изображение для карточки", upload_to="products/cards/", 
+                                   blank=True, null=True)
+    
+    # Базовые характеристики
+    wheel_formula = models.CharField("Колесная формула", max_length=20, default="4x2")
+    fuel_type = models.CharField("Тип топлива", max_length=50, default="Dizel")
+    load_capacity = models.CharField("Грузоподъемность", max_length=50)
+    
+    # Мета
+    is_active = models.BooleanField("Активен", default=True)
+    is_featured = models.BooleanField("Показывать на главной", default=False)
+    order = models.PositiveIntegerField("Порядок", default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Грузовик FAW"
+        verbose_name_plural = "Грузовики FAW"
+        ordering = ['order', 'title']
+    
+    def __str__(self):
+        return self.title
+
+
+class ProductFeature(models.Model):
+    """Характеристики продукта (климат контроль, круиз контроль и т.д.)"""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='features')
+    icon = models.FileField("Иконка", upload_to="products/feature_icons/", blank=True, null=True)
+    name = models.CharField("Название", max_length=100)
+    value = models.CharField("Значение", max_length=100, default="Mavjud")
+    order = models.PositiveIntegerField("Порядок", default=0)
+    
+    class Meta:
+        verbose_name = "Характеристика"
+        verbose_name_plural = "Характеристики"
+        ordering = ['order']
+    
+    def __str__(self):
+        return f"{self.name}: {self.value}"
+
+
+class ProductCardSpec(models.Model):
+    """Характеристики для карточки товара (4 основные)"""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='card_specs')
+    icon = models.FileField("Иконка", upload_to="products/card_icons/", blank=True, null=True)
+    value = models.CharField("Значение", max_length=100)
+    order = models.PositiveIntegerField("Порядок", default=0)
+    
+    class Meta:
+        verbose_name = "Характеристика карточки"
+        verbose_name_plural = "Характеристики карточки"
+        ordering = ['order']
+    
+    def __str__(self):
+        return self.value
+
+
+class ProductParameterCategory(models.Model):
+    """Категории параметров (Asosiy xususiyatlar, Dvigatel и т.д.)"""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='parameter_categories')
+    title = models.CharField("Название категории", max_length=200)
+    is_expanded = models.BooleanField("Развернута по умолчанию", default=False)
+    order = models.PositiveIntegerField("Порядок", default=0)
+    
+    class Meta:
+        verbose_name = "Категория параметров"
+        verbose_name_plural = "Категории параметров"
+        ordering = ['order']
+    
+    def __str__(self):
+        return self.title
+
+
+class ProductParameter(models.Model):
+    """Технические параметры продукта"""
+    category = models.ForeignKey(ProductParameterCategory, on_delete=models.CASCADE, 
+                                 related_name='parameters')
+    name = models.CharField("Параметр", max_length=200)
+    value = models.CharField("Значение", max_length=500)
+    order = models.PositiveIntegerField("Порядок", default=0)
+    
+    class Meta:
+        verbose_name = "Параметр"
+        verbose_name_plural = "Параметры"
+        ordering = ['order']
+    
+    def __str__(self):
+        return f"{self.name}: {self.value}"
+
+
+class ProductGallery(models.Model):
+    """Галерея продукта"""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery')
+    image = models.ImageField("Изображение", upload_to="products/gallery/")
+    order = models.PositiveIntegerField("Порядок", default=0)
+    
+    class Meta:
+        verbose_name = "Фото галереи"
+        verbose_name_plural = "Галерея"
+        ordering = ['order']
+    
+    def __str__(self):
+        return f"Фото {self.order + 1}"
