@@ -1,109 +1,317 @@
 from rest_framework import serializers
-from .models import KGVehicle, KGVehicleImage, KGFeedback, VehicleCardSpec, KGHeroSlide
+from .models import KGVehicle, KGVehicleImage, VehicleCardSpec, KGFeedback, KGHeroSlide
 
-
-class VehicleCardSpecSerializer(serializers.ModelSerializer):
-    """Сериализатор для характеристик карточки"""
-    value = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = VehicleCardSpec
-        fields = ['id', 'icon', 'value', 'order']
-    
-    def get_value(self, obj):
-        """Получить значение на языке запроса"""
-        request = self.context.get('request')
-        lang = request.query_params.get('lang', 'ru') if request else 'ru'
-        return obj.get_value(lang)
-
+# ============================================
+# СЕРИАЛИЗАТОР: ДОПОЛНИТЕЛЬНЫЕ ФОТО
+# ============================================
 
 class KGVehicleImageSerializer(serializers.ModelSerializer):
-    """Сериализатор для дополнительных изображений"""
+    """Сериализатор для дополнительных фото"""
     class Meta:
         model = KGVehicleImage
         fields = ['id', 'image', 'alt', 'order']
 
 
-class KGVehicleListSerializer(serializers.ModelSerializer):
-    card_specs = VehicleCardSpecSerializer(many=True, read_only=True)
-    category_display = serializers.SerializerMethodField()  # ← ДОБАВИТЬ
+# ============================================
+# СЕРИАЛИЗАТОР: ХАРАКТЕРИСТИКИ ДЛЯ КАТАЛОГА
+# ============================================
+
+class VehicleCardSpecSerializer(serializers.ModelSerializer):
+    """Сериализатор для характеристик карточки"""
+    icon = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
+    
+    def get_icon(self, obj):
+        if obj.icon:
+            return obj.icon.url
+        return None
+    
+    def get_value(self, obj):
+        lang = self.context.get('lang', 'ru')
+        return obj.get_value(lang)
     
     class Meta:
-        model = KGVehicle
-        fields = ['id', 'slug', 'title', 'preview_image', 'card_specs', 'is_active', 'category', 'category_display']  # ← ДОБАВИТЬ category
-    
-    def get_category_display(self, obj):  # ← ДОБАВИТЬ
-        return obj.get_category_display()
-    
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        request = self.context.get('request')
-        lang = request.query_params.get('lang', 'ru') if request else 'ru'
-        
-        data['title'] = instance.get_title(lang)
-        data['slug'] = instance.get_slug(lang)
-        
-        return data
+        model = VehicleCardSpec
+        fields = ['id', 'icon', 'value', 'order']
 
 
-class KGVehicleDetailSerializer(serializers.ModelSerializer):
-    """Детальный сериализатор машины (для страницы vehicle-details)"""
-    mini_images = KGVehicleImageSerializer(many=True, read_only=True)
+# ============================================
+# СЕРИАЛИЗАТОР: ДЕТАЛЬНЫЕ ХАРАКТЕРИСТИКИ
+# ============================================
+
+class DetailedSpecsSerializer(serializers.Serializer):
+    """Детальные характеристики для страницы детализации"""
+    
+    # Основные
+    general = serializers.SerializerMethodField()
+    # Весовые
+    weight = serializers.SerializerMethodField()
+    # Кузов
+    body = serializers.SerializerMethodField()
+    # Двигатель
+    engine = serializers.SerializerMethodField()
+    # Трансмиссия
+    transmission = serializers.SerializerMethodField()
+    # Шины
+    tires = serializers.SerializerMethodField()
+    # Кабина
+    cabin = serializers.SerializerMethodField()
+    
+    def get_general(self, obj):
+        lang = self.context.get('lang', 'ru')
+        data = {}
+        
+        if obj.wheel_formula:
+            data['wheelFormula'] = obj.wheel_formula
+        
+        if lang == 'en' and obj.dimensions_en:
+            data['dimensions'] = obj.dimensions_en
+        elif lang == 'ky' and obj.dimensions_ky:
+            data['dimensions'] = obj.dimensions_ky
+        elif obj.dimensions_ru:
+            data['dimensions'] = obj.dimensions_ru
+        
+        if obj.wheelbase:
+            data['wheelbase'] = obj.wheelbase
+        
+        if lang == 'en' and obj.fuel_type_en:
+            data['fuelType'] = obj.fuel_type_en
+        elif lang == 'ky' and obj.fuel_type_ky:
+            data['fuelType'] = obj.fuel_type_ky
+        elif obj.fuel_type_ru:
+            data['fuelType'] = obj.fuel_type_ru
+        
+        if obj.tank_volume:
+            data['tankVolume'] = obj.tank_volume
+        
+        return data if data else None
+    
+    def get_weight(self, obj):
+        data = {}
+        
+        if obj.curb_weight:
+            data['curbWeight'] = obj.curb_weight
+        if obj.payload:
+            data['payload'] = obj.payload
+        if obj.gross_weight:
+            data['grossWeight'] = obj.gross_weight
+        
+        return data if data else None
+    
+    def get_body(self, obj):
+        lang = self.context.get('lang', 'ru')
+        data = {}
+        
+        if lang == 'en' and obj.body_type_en:
+            data['type'] = obj.body_type_en
+        elif lang == 'ky' and obj.body_type_ky:
+            data['type'] = obj.body_type_ky
+        elif obj.body_type_ru:
+            data['type'] = obj.body_type_ru
+        
+        if lang == 'en' and obj.body_dimensions_en:
+            data['dimensions'] = obj.body_dimensions_en
+        elif lang == 'ky' and obj.body_dimensions_ky:
+            data['dimensions'] = obj.body_dimensions_ky
+        elif obj.body_dimensions_ru:
+            data['dimensions'] = obj.body_dimensions_ru
+        
+        if obj.body_volume:
+            data['volume'] = obj.body_volume
+        
+        if lang == 'en' and obj.body_material_en:
+            data['material'] = obj.body_material_en
+        elif lang == 'ky' and obj.body_material_ky:
+            data['material'] = obj.body_material_ky
+        elif obj.body_material_ru:
+            data['material'] = obj.body_material_ru
+        
+        if lang == 'en' and obj.loading_type_en:
+            data['loadingType'] = obj.loading_type_en
+        elif lang == 'ky' and obj.loading_type_ky:
+            data['loadingType'] = obj.loading_type_ky
+        elif obj.loading_type_ru:
+            data['loadingType'] = obj.loading_type_ru
+        
+        return data if data else None
+    
+    def get_engine(self, obj):
+        data = {}
+        
+        if obj.engine_model:
+            data['model'] = obj.engine_model
+        if obj.engine_volume:
+            data['volume'] = obj.engine_volume
+        if obj.engine_power:
+            data['power'] = obj.engine_power
+        
+        return data if data else None
+    
+    def get_transmission(self, obj):
+        lang = self.context.get('lang', 'ru')
+        data = {}
+        
+        if obj.transmission_model:
+            data['model'] = obj.transmission_model
+        
+        if lang == 'en' and obj.transmission_type_en:
+            data['type'] = obj.transmission_type_en
+        elif lang == 'ky' and obj.transmission_type_ky:
+            data['type'] = obj.transmission_type_ky
+        elif obj.transmission_type_ru:
+            data['type'] = obj.transmission_type_ru
+        
+        if obj.gears:
+            data['gears'] = obj.gears
+        
+        return data if data else None
+    
+    def get_tires(self, obj):
+        lang = self.context.get('lang', 'ru')
+        data = {}
+        
+        if obj.tire_type:
+            data['type'] = obj.tire_type
+        
+        if lang == 'en' and obj.suspension_en:
+            data['suspension'] = obj.suspension_en
+        elif lang == 'ky' and obj.suspension_ky:
+            data['suspension'] = obj.suspension_ky
+        elif obj.suspension_ru:
+            data['suspension'] = obj.suspension_ru
+        
+        if lang == 'en' and obj.brakes_en:
+            data['brakes'] = obj.brakes_en
+        elif lang == 'ky' and obj.brakes_ky:
+            data['brakes'] = obj.brakes_ky
+        elif obj.brakes_ru:
+            data['brakes'] = obj.brakes_ru
+        
+        return data if data else None
+    
+    def get_cabin(self, obj):
+        lang = self.context.get('lang', 'ru')
+        data = {}
+        
+        if lang == 'en' and obj.cabin_category_en:
+            data['category'] = obj.cabin_category_en
+        elif lang == 'ky' and obj.cabin_category_ky:
+            data['category'] = obj.cabin_category_ky
+        elif obj.cabin_category_ru:
+            data['category'] = obj.cabin_category_ru
+        
+        if lang == 'en' and obj.cabin_equipment_en:
+            data['equipment'] = obj.cabin_equipment_en
+        elif lang == 'ky' and obj.cabin_equipment_ky:
+            data['equipment'] = obj.cabin_equipment_ky
+        elif obj.cabin_equipment_ru:
+            data['equipment'] = obj.cabin_equipment_ru
+        
+        return data if data else None
+
+
+# ============================================
+# СЕРИАЛИЗАТОР: СПИСОК МАШИН (КАТАЛОГ)
+# ============================================
+
+class KGVehicleListSerializer(serializers.ModelSerializer):
+    """Сериализатор для списка машин (каталог)"""
+    title = serializers.SerializerMethodField()
+    slug = serializers.SerializerMethodField()
     card_specs = VehicleCardSpecSerializer(many=True, read_only=True)
-    specs = serializers.SerializerMethodField()
+    category_display = serializers.SerializerMethodField()
+    
+    def get_title(self, obj):
+        lang = self.context.get('lang', 'ru')
+        return obj.get_title(lang)
+    
+    def get_slug(self, obj):
+        lang = self.context.get('lang', 'ru')
+        return obj.get_slug(lang)
+    
+    def get_category_display(self, obj):
+        return obj.get_category_display()
     
     class Meta:
         model = KGVehicle
         fields = [
-            'id', 'slug', 'title', 'preview_image', 'main_image', 
-            'specs', 'mini_images', 'card_specs', 'is_active'
+            'id', 'slug', 'title', 'category', 'category_display',
+            'preview_image', 'card_specs', 'is_active'
         ]
-    def get_specs(self, obj):
-        """Получить характеристики на нужном языке"""
-        request = self.context.get('request')
-        lang = request.query_params.get('lang', 'ru') if request else 'ru'
-        
-        # Получаем спеки на нужном языке
-        if lang == 'en':
-            return obj.specs_en or obj.specs_ru or {}
-        elif lang == 'ky':
-            return obj.specs_ky or obj.specs_ru or {}
-        return obj.specs_ru or {}
 
 
-class KGVehicleSerializer(serializers.ModelSerializer):
-    """Базовый сериализатор машины"""
+# ============================================
+# СЕРИАЛИЗАТОР: ДЕТАЛИЗАЦИЯ МАШИНЫ
+# ============================================
+
+class KGVehicleDetailSerializer(serializers.ModelSerializer):
+    """Сериализатор для детальной страницы машины"""
     title = serializers.SerializerMethodField()
     slug = serializers.SerializerMethodField()
     specs = serializers.SerializerMethodField()
     card_specs = VehicleCardSpecSerializer(many=True, read_only=True)
-    mini_images = KGVehicleImageSerializer(many=True, read_only=True)
-
+    gallery_images = KGVehicleImageSerializer(many=True, source='mini_images', read_only=True)
+    features = serializers.SerializerMethodField()
+    detailed_specs = serializers.SerializerMethodField()
+    
+    def get_title(self, obj):
+        lang = self.context.get('lang', 'ru')
+        return obj.get_title(lang)
+    
+    def get_slug(self, obj):
+        lang = self.context.get('lang', 'ru')
+        return obj.get_slug(lang)
+    
+    def get_specs(self, obj):
+        """Для Hero (обратная совместимость)"""
+        lang = self.context.get('lang', 'ru')
+        return obj.get_specs(lang)
+    
+    def get_features(self, obj):
+        """Возвращает список активных features"""
+        return obj.get_features()
+    
+    def get_detailed_specs(self, obj):
+        """Детальные характеристики для страницы детализации"""
+        lang = self.context.get('lang', 'ru')
+        serializer = DetailedSpecsSerializer(obj, context={'lang': lang})
+        return serializer.data
+    
     class Meta:
         model = KGVehicle
         fields = [
-            'id', 'slug', 'title', 'preview_image', 'main_image',
-            'specs', 'card_specs', 'mini_images', 'is_active'
+            'id', 'slug', 'title', 'category',
+            'preview_image', 'main_image',
+            'specs', 'card_specs', 'gallery_images',
+            'features', 'detailed_specs',
+            'is_active'
         ]
 
-    def get_title(self, obj):
-        request = self.context.get('request')
-        lang = request.query_params.get('lang', 'ru') if request else 'ru'
-        return obj.get_title(lang)
 
-    def get_slug(self, obj):
-        request = self.context.get('request')
-        lang = request.query_params.get('lang', 'ru') if request else 'ru'
-        return obj.get_slug(lang)
+# ============================================
+# СЕРИАЛИЗАТОР: HERO-СЛАЙДЫ
+# ============================================
 
-    def get_specs(self, obj):
-        request = self.context.get('request')
-        lang = request.query_params.get('lang', 'ru') if request else 'ru'
-        return obj.get_specs(lang) or {}
+class KGHeroSlideSerializer(serializers.ModelSerializer):
+    """Сериализатор для Hero-слайдов"""
+    vehicle = KGVehicleDetailSerializer(read_only=True)
+    description = serializers.SerializerMethodField()
+    
+    def get_description(self, obj):
+        lang = self.context.get('lang', 'ru')
+        return obj.get_description(lang)
+    
+    class Meta:
+        model = KGHeroSlide
+        fields = ['id', 'vehicle', 'description', 'order']
 
+
+# ============================================
+# СЕРИАЛИЗАТОР: ЗАЯВКИ (полный)
+# ============================================
 
 class KGFeedbackSerializer(serializers.ModelSerializer):
-    """Сериализатор для заявок с сайта"""
+    """Полный сериализатор для админки"""
     vehicle_title = serializers.SerializerMethodField()
     
     class Meta:
@@ -115,49 +323,38 @@ class KGFeedbackSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at']
     
     def get_vehicle_title(self, obj):
-        """Получить название машины на языке запроса"""
-        if not obj.vehicle:
-            return None
-        
-        request = self.context.get('request')
-        lang = request.query_params.get('lang', 'ru') if request else 'ru'
-        
-        return obj.vehicle.get_title(lang)
-    
-    def validate_phone(self, value):
-        """Валидация номера телефона"""
-        if not value.startswith('+996'):
-            raise serializers.ValidationError('Номер должен начинаться с +996')
-        if len(value) != 13:
-            raise serializers.ValidationError('Неверный формат номера телефона')
-        return value
+        if obj.vehicle:
+            return obj.vehicle.title_ru
+        return None
 
+
+# ============================================
+# СЕРИАЛИЗАТОР: СОЗДАНИЕ ЗАЯВКИ (frontend)
+# ============================================
 
 class KGFeedbackCreateSerializer(serializers.ModelSerializer):
-    """Упрощенный сериализатор для создания заявки с фронтенда"""
+    """Упрощенный сериализатор для создания заявки с frontend"""
+    
     class Meta:
         model = KGFeedback
         fields = ['name', 'phone', 'region', 'vehicle', 'message']
     
     def validate_phone(self, value):
-        """Валидация номера телефона"""
+        """Валидация номера телефона Кыргызстана"""
         if not value.startswith('+996'):
             raise serializers.ValidationError('Номер должен начинаться с +996')
-        if len(value) != 13:
+        
+        # Убираем пробелы и проверяем длину
+        clean_phone = value.replace(' ', '')
+        if len(clean_phone) != 13:  # +996 (3 цифры) + 9 цифр = 13
             raise serializers.ValidationError('Неверный формат номера телефона')
+        
         return value
-
-
-class KGHeroSlideSerializer(serializers.ModelSerializer):
-    vehicle = KGVehicleSerializer(read_only=True)  # ← Использует тот же сериализатор!
-    description = serializers.SerializerMethodField()
-
-    class Meta:
-        model = KGHeroSlide
-        fields = ['id', 'vehicle', 'description', 'order']
-
-    def get_description(self, obj):
-        """Получить описание на нужном языке"""
-        request = self.context.get('request')
-        lang = request.query_params.get('lang', 'ru') if request else 'ru'
-        return obj.get_description(lang)
+    
+    def create(self, validated_data):
+        """Создание заявки с дефолтными значениями"""
+        return KGFeedback.objects.create(
+            **validated_data,
+            status='new',  # По умолчанию новая
+            priority='medium'  # По умолчанию средний приоритет
+        )

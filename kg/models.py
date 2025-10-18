@@ -20,7 +20,7 @@ class KGVehicle(models.Model):
     ]
     category = models.CharField(max_length=10, choices=CATEGORY_CHOICES, default='v', verbose_name='Серия')
     
-    # Переводы
+    # Переводы названия
     title_ru = models.CharField(max_length=255, verbose_name='Название (RU)', blank=True, null=True)
     title_ky = models.CharField(max_length=255, verbose_name='Название (KY)', blank=True, null=True)
     title_en = models.CharField(max_length=255, verbose_name='Название (EN)', blank=True, null=True)
@@ -33,7 +33,95 @@ class KGVehicle(models.Model):
     preview_image = models.ImageField(upload_to='kg_vehicles/previews/', blank=True, null=True, verbose_name='Превью')
     main_image = models.ImageField(upload_to='kg_vehicles/main/', blank=True, null=True, verbose_name='Главное фото')
     
-    # Характеристики
+    # ============================================
+    # ДЕТАЛЬНЫЕ ХАРАКТЕРИСТИКИ
+    # ============================================
+    
+    # === ОСНОВНЫЕ ХАРАКТЕРИСТИКИ ===
+    wheel_formula = models.CharField(max_length=50, blank=True, verbose_name='Колесная формула')
+    
+    dimensions_ru = models.CharField(max_length=100, blank=True, verbose_name='Габариты (RU)')
+    dimensions_en = models.CharField(max_length=100, blank=True, verbose_name='Габариты (EN)')
+    dimensions_ky = models.CharField(max_length=100, blank=True, verbose_name='Габариты (KY)')
+    
+    wheelbase = models.CharField(max_length=50, blank=True, verbose_name='Колесная база, мм')
+    
+    fuel_type_ru = models.CharField(max_length=50, blank=True, verbose_name='Вид топлива (RU)')
+    fuel_type_en = models.CharField(max_length=50, blank=True, verbose_name='Вид топлива (EN)')
+    fuel_type_ky = models.CharField(max_length=50, blank=True, verbose_name='Вид топлива (KY)')
+    
+    tank_volume = models.CharField(max_length=50, blank=True, verbose_name='Объем топливного бака, л')
+    
+    # === ВЕСОВЫЕ ХАРАКТЕРИСТИКИ ===
+    curb_weight = models.CharField(max_length=50, blank=True, verbose_name='Снаряженная масса, кг')
+    payload = models.CharField(max_length=50, blank=True, verbose_name='Грузоподъемность, кг')
+    gross_weight = models.CharField(max_length=50, blank=True, verbose_name='Полная масса, кг')
+    
+    # === КУЗОВ ===
+    body_type_ru = models.CharField(max_length=100, blank=True, verbose_name='Тип кузова (RU)')
+    body_type_en = models.CharField(max_length=100, blank=True, verbose_name='Тип кузова (EN)')
+    body_type_ky = models.CharField(max_length=100, blank=True, verbose_name='Тип кузова (KY)')
+    
+    body_dimensions_ru = models.CharField(max_length=100, blank=True, verbose_name='Размеры кузова (RU)')
+    body_dimensions_en = models.CharField(max_length=100, blank=True, verbose_name='Размеры кузова (EN)')
+    body_dimensions_ky = models.CharField(max_length=100, blank=True, verbose_name='Размеры кузова (KY)')
+    
+    body_volume = models.CharField(max_length=50, blank=True, verbose_name='Объем кузова, м³')
+    
+    body_material_ru = models.TextField(blank=True, verbose_name='Материал кузова (RU)')
+    body_material_en = models.TextField(blank=True, verbose_name='Материал кузова (EN)')
+    body_material_ky = models.TextField(blank=True, verbose_name='Материал кузова (KY)')
+    
+    loading_type_ru = models.TextField(blank=True, verbose_name='Вид загрузки (RU)')
+    loading_type_en = models.TextField(blank=True, verbose_name='Вид загрузки (EN)')
+    loading_type_ky = models.TextField(blank=True, verbose_name='Вид загрузки (KY)')
+    
+    # === ДВИГАТЕЛЬ ===
+    engine_model = models.CharField(max_length=100, blank=True, verbose_name='Модель двигателя')
+    engine_volume = models.CharField(max_length=50, blank=True, verbose_name='Объем двигателя, л')
+    engine_power = models.CharField(max_length=50, blank=True, verbose_name='Мощность, л.с.')
+    
+    # === ТРАНСМИССИЯ ===
+    transmission_model = models.CharField(max_length=100, blank=True, verbose_name='Модель трансмиссии')
+    
+    transmission_type_ru = models.CharField(max_length=100, blank=True, verbose_name='Тип трансмиссии (RU)')
+    transmission_type_en = models.CharField(max_length=100, blank=True, verbose_name='Тип трансмиссии (EN)')
+    transmission_type_ky = models.CharField(max_length=100, blank=True, verbose_name='Тип трансмиссии (KY)')
+    
+    gears = models.CharField(max_length=50, blank=True, verbose_name='Число передач')
+    
+    # === ШИНЫ И ТОРМОЗНАЯ СИСТЕМА ===
+    tire_type = models.CharField(max_length=100, blank=True, verbose_name='Шины')
+    
+    suspension_ru = models.TextField(blank=True, verbose_name='Подвеска (RU)')
+    suspension_en = models.TextField(blank=True, verbose_name='Подвеска (EN)')
+    suspension_ky = models.TextField(blank=True, verbose_name='Подвеска (KY)')
+    
+    brakes_ru = models.TextField(blank=True, verbose_name='Тормоза (RU)')
+    brakes_en = models.TextField(blank=True, verbose_name='Тормоза (EN)')
+    brakes_ky = models.TextField(blank=True, verbose_name='Тормоза (KY)')
+    
+    # === КАБИНА ===
+    cabin_category_ru = models.TextField(blank=True, verbose_name='Модель кабины (RU)')
+    cabin_category_en = models.TextField(blank=True, verbose_name='Модель кабины (EN)')
+    cabin_category_ky = models.TextField(blank=True, verbose_name='Модель кабины (KY)')
+    
+    cabin_equipment_ru = models.TextField(blank=True, verbose_name='Комплектация (RU)')
+    cabin_equipment_en = models.TextField(blank=True, verbose_name='Комплектация (EN)')
+    cabin_equipment_ky = models.TextField(blank=True, verbose_name='Комплектация (KY)')
+    
+    # ============================================
+    # FEATURES (Детальные иконки)
+    # ============================================
+    feature_aircondi = models.BooleanField(default=False, verbose_name='Кондиционер')
+    feature_power_windows = models.BooleanField(default=False, verbose_name='Электро-стеклоподъемники')
+    feature_sleeping_area = models.BooleanField(default=False, verbose_name='Спальное место')
+    feature_radio = models.BooleanField(default=False, verbose_name='Магнитофон')
+    feature_remote_control = models.BooleanField(default=False, verbose_name='Пульт ДУ')
+    feature_bluetooth = models.BooleanField(default=False, verbose_name='Bluetooth + USB')
+    feature_multifunction_steering = models.BooleanField(default=False, verbose_name='Мультируль')
+    
+    # Старые поля (для совместимости с API)
     specs_ru = models.JSONField(blank=True, null=True, default=dict, verbose_name='Характеристики (RU)')
     specs_ky = models.JSONField(blank=True, null=True, default=dict, verbose_name='Характеристики (KY)')
     specs_en = models.JSONField(blank=True, null=True, default=dict, verbose_name='Характеристики (EN)')
@@ -49,10 +137,6 @@ class KGVehicle(models.Model):
         ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
-        print(f"\n=== СОХРАНЕНИЕ KGVehicle ===")
-        print(f"ID: {self.pk}")
-        print(f"title_ru: {self.title_ru}")
-        
         # 1. ГЕНЕРАЦИЯ SLUG
         if self.title_ru:
             if not self.slug_ru:
@@ -63,39 +147,55 @@ class KGVehicle(models.Model):
                     unique_slug = f"{base_slug}-{counter}"
                     counter += 1
                 self.slug_ru = unique_slug
-                print(f"✓ Создан slug_ru: {self.slug_ru}")
             
             self.slug = self.slug_ru or f"vehicle-{uuid.uuid4().hex[:12]}"
         
         if not self.slug or self.slug == '':
             self.slug = f"vehicle-{uuid.uuid4().hex[:12]}"
-            print(f"✓ Создан дефолтный slug: {self.slug}")
         
-        # Slug для KY и EN
         if self.title_ky and not self.slug_ky:
             self.slug_ky = slugify(unidecode(self.title_ky))
-            print(f"✓ Создан slug_ky: {self.slug_ky}")
         
         if self.title_en and not self.slug_en:
             self.slug_en = slugify(self.title_en)
-            print(f"✓ Создан slug_en: {self.slug_en}")
         
         # 2. ОПРЕДЕЛЕНИЕ КАТЕГОРИИ
         title_lower = (self.title_ru or self.title or '').lower()
-        print(f"Анализ названия для категории: '{title_lower}'")
         
         if 'vr' in title_lower:
             self.category = 'vr'
-            print(f"✓ Категория: VR Series")
         elif 'vh' in title_lower:
             self.category = 'vh'
-            print(f"✓ Категория: VH Series")
         else:
             self.category = 'v'
-            print(f"✓ Категория: V Series")
         
-        print(f"Финальная категория: {self.category}")
-        print("=== КОНЕЦ СОХРАНЕНИЯ ===\n")
+        # 3. АВТОМАТИЧЕСКАЯ СБОРКА specs (для Hero и обратной совместимости)
+        self.specs_ru = {
+            'wheelFormula': self.wheel_formula,
+            'fuelType': self.fuel_type_ru,
+            'payload': self.payload,
+            'enginePower': self.engine_power,
+            'transmission': self.transmission_type_ru,
+            'bodyType': self.body_type_ru,
+        }
+        
+        self.specs_ky = {
+            'wheelFormula': self.wheel_formula,
+            'fuelType': self.fuel_type_ky,
+            'payload': self.payload,
+            'enginePower': self.engine_power,
+            'transmission': self.transmission_type_ky,
+            'bodyType': self.body_type_ky,
+        }
+        
+        self.specs_en = {
+            'wheelFormula': self.wheel_formula,
+            'fuelType': self.fuel_type_en,
+            'payload': self.payload,
+            'enginePower': self.engine_power,
+            'transmission': self.transmission_type_en,
+            'bodyType': self.body_type_en,
+        }
         
         super().save(*args, **kwargs)
 
@@ -122,6 +222,25 @@ class KGVehicle(models.Model):
         elif lang == 'ky':
             return self.specs_ky or self.specs_ru or {}
         return self.specs_ru or {}
+    
+    def get_features(self):
+        """Возвращает список активных features"""
+        features = []
+        if self.feature_aircondi:
+            features.append('aircondi')
+        if self.feature_power_windows:
+            features.append('mirror-up')
+        if self.feature_sleeping_area:
+            features.append('bed')
+        if self.feature_radio:
+            features.append('recorder')
+        if self.feature_remote_control:
+            features.append('remote')
+        if self.feature_bluetooth:
+            features.append('bluetooth')
+        if self.feature_multifunction_steering:
+            features.append('wheel')
+        return features
 
 
 class KGVehicleImage(models.Model):
@@ -132,7 +251,7 @@ class KGVehicleImage(models.Model):
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
-        verbose_name = ' Доп. изображение'
+        verbose_name = 'Доп. изображение'
         verbose_name_plural = 'Доп. изображения'
         ordering = ['order']
 
@@ -159,32 +278,16 @@ class VehicleCardSpec(models.Model):
         return self.value_ru
     
     def save(self, *args, **kwargs):
-        print(f"\n=== СОХРАНЕНИЕ VehicleCardSpec ===")
-        print(f"value_ru: {self.value_ru}")
-        print(f"value_ky (до): {self.value_ky}")
-        print(f"value_en (до): {self.value_en}")
-        
         if self.value_ru:
             if not self.value_ky or self.value_ky.strip() == '':
                 self.value_ky = self.auto_translate(self.value_ru, 'ky')
-                print(f"✓ Автоперевод KY: {self.value_ky}")
-            else:
-                print(f"⊘ KY уже заполнено")
             
             if not self.value_en or self.value_en.strip() == '':
                 self.value_en = self.auto_translate(self.value_ru, 'en')
-                print(f"✓ Автоперевод EN: {self.value_en}")
-            else:
-                print(f"⊘ EN уже заполнено")
-        
-        print(f"value_ky (после): {self.value_ky}")
-        print(f"value_en (после): {self.value_en}")
-        print("=== КОНЕЦ СОХРАНЕНИЯ ===\n")
         
         super().save(*args, **kwargs)
     
     def auto_translate(self, text, lang):
-       
         translations = {
             'Дизель': {'ky': 'Дизель', 'en': 'Diesel'},
             'Бензин': {'ky': 'Бензин', 'en': 'Gasoline'},
@@ -193,18 +296,10 @@ class VehicleCardSpec(models.Model):
             'м²': {'ky': 'м²', 'en': 'm²'},
             'м³': {'ky': 'м³', 'en': 'm³'},
             'л': {'ky': 'л', 'en': 'L'},
-            'Климат-контроль': {'ky': 'Климат-контроль', 'en': 'Climate control'},  # ← КРИТИЧНО!
+            'Климат-контроль': {'ky': 'Климат-контроль', 'en': 'Climate control'},
             'Кондиционер': {'ky': 'Кондиционер', 'en': 'Air conditioning'},
             '4x2': {'ky': '4x2', 'en': '4x2'},
             '4×2': {'ky': '4×2', 'en': '4×2'},
-            '4х2': {'ky': '4х2', 'en': '4х2'},
-            '4 х 2': {'ky': '4 х 2', 'en': '4 х 2'},
-            'Передний': {'ky': 'Алдыңкы', 'en': 'Front'},
-            'Задний': {'ky': 'Арткы', 'en': 'Rear'},
-            'Полный': {'ky': 'Толук', 'en': 'Full'},
-            'Механика': {'ky': 'Механикалык', 'en': 'Manual'},
-            'Автомат': {'ky': 'Автоматтык', 'en': 'Automatic'},
-            'Робот': {'ky': 'Робот', 'en': 'Robot'},
         }
         
         if text in translations:
@@ -294,7 +389,7 @@ class KGHeroSlide(models.Model):
 
     class Meta:
         ordering = ['order']
-        verbose_name = ' Hero-слайд'
+        verbose_name = 'Hero-слайд'
         verbose_name_plural = '[KG] Hero-слайды'
 
     def __str__(self):
