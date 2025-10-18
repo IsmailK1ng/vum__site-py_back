@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_spectacular',
+    'nested_admin',
     'django_filters',
     'main',          # ← FAW.UZ
     'kg',            # ← FAW.KG

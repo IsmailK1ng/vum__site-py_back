@@ -47,7 +47,7 @@ class NewsBlock(models.Model):
 
 
 class ContactForm(models.Model):
-    """Заявки с сайта faw.uz (обновленная версия с функционалом из KG)"""
+    """Заявки с сайта faw.uz"""
     REGION_CHOICES = [
         ('Toshkent shahri', 'Toshkent shahri'),
         ('Andijon viloyati', 'Andijon viloyati'),
@@ -77,26 +77,14 @@ class ContactForm(models.Model):
         ('low', 'Низкий'),
     ]
 
-    # Основные поля
     name = models.CharField(max_length=255, verbose_name='Имя')
     region = models.CharField(max_length=100, choices=REGION_CHOICES, verbose_name='Регион')
     phone = models.CharField(max_length=50, verbose_name='Телефон')
     message = models.TextField(verbose_name='Сообщение')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Время отправки')
-    
-    # Новые поля для управления (как в KG)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new', verbose_name='Статус')
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium', verbose_name='Приоритет')
-    manager = models.ForeignKey(
-        User, 
-        null=True, 
-        blank=True, 
-        on_delete=models.SET_NULL, 
-        related_name='uz_contacts',
-        verbose_name='Менеджер'
-    )
-    
-    # Старые поля (оставляем для обратной совместимости)
+    manager = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='uz_contacts', verbose_name='Менеджер')
     is_processed = models.BooleanField(default=False, verbose_name='Просмотрено (устарело)')
     admin_comment = models.TextField(blank=True, null=True, verbose_name='Комментарий администратора')
 
@@ -107,6 +95,89 @@ class ContactForm(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.phone} ({self.created_at.strftime('%d.%m.%Y')})"
+
+
+class Vacancy(models.Model):
+    """Вакансии компании"""
+    title = models.CharField(max_length=255, verbose_name='Название вакансии')
+    slug = models.SlugField(max_length=255, unique=True, verbose_name='URL-имя')
+    short_description = models.TextField(max_length=500, blank=True, verbose_name='Краткое описание')
+    contact_info = models.TextField(
+        verbose_name='Контактная информация',
+        default='Присылайте своё резюме на <a href="https://hh.uz" target="_blank">hh.uz</a> или на корпоративную почту <a href="mailto:info@faw.uz">info@faw.uz</a>'
+    )
+    is_active = models.BooleanField(default=True, verbose_name='Активна')
+    order = models.PositiveIntegerField(default=0, verbose_name='Порядок отображения')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
+
+    class Meta:
+        verbose_name = 'Вакансия (UZ)'
+        verbose_name_plural = 'Вакансии (UZ)'
+        ordering = ['order', '-created_at']
+
+    def __str__(self):
+        return self.title
+    
+    def get_applications_count(self):
+        return self.applications.count()
+
+
+class VacancyResponsibility(models.Model):
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='responsibilities', verbose_name='Вакансия')
+    title = models.CharField(max_length=255, verbose_name='Заголовок', blank=True)
+    text = models.TextField(verbose_name='Описание')
+    order = models.PositiveIntegerField(default=0, verbose_name='Порядок')
+
+    class Meta:
+        verbose_name = 'Обязанность'
+        verbose_name_plural = 'Обязанности'
+        ordering = ['order']
+
+    def __str__(self):
+        return self.title or self.text[:50]
+
+
+class VacancyRequirement(models.Model):
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='requirements', verbose_name='Вакансия')
+    text = models.CharField(max_length=500, verbose_name='Требование')
+    order = models.PositiveIntegerField(default=0, verbose_name='Порядок')
+
+    class Meta:
+        verbose_name = 'Требование'
+        verbose_name_plural = 'Требования'
+        ordering = ['order']
+
+    def __str__(self):
+        return self.text[:50]
+
+
+class VacancyCondition(models.Model):
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='conditions', verbose_name='Вакансия')
+    text = models.CharField(max_length=500, verbose_name='Условие')
+    order = models.PositiveIntegerField(default=0, verbose_name='Порядок')
+
+    class Meta:
+        verbose_name = 'Условие работы'
+        verbose_name_plural = 'Условия работы'
+        ordering = ['order']
+
+    def __str__(self):
+        return self.text[:50]
+
+
+class VacancyIdealCandidate(models.Model):
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='ideal_candidates', verbose_name='Вакансия')
+    text = models.CharField(max_length=500, verbose_name='Качество/Требование')
+    order = models.PositiveIntegerField(default=0, verbose_name='Порядок')
+
+    class Meta:
+        verbose_name = 'Портрет кандидата'
+        verbose_name_plural = 'Портрет идеального кандидата'
+        ordering = ['order']
+
+    def __str__(self):
+        return self.text[:50]
 
 
 class JobApplication(models.Model):
@@ -128,23 +199,12 @@ class JobApplication(models.Model):
         ('Qoraqalpogʻiston Respublikasi', 'Qoraqalpogʻiston Respublikasi'),
     ]
     
-    vacancy = models.ForeignKey(
-        'Vacancy',
-        on_delete=models.CASCADE,
-        related_name='applications',
-        verbose_name='Вакансия'
-    )
+    vacancy = models.ForeignKey('Vacancy', on_delete=models.CASCADE, related_name='applications', verbose_name='Вакансия')
     region = models.CharField(max_length=100, choices=REGION_CHOICES, verbose_name='Регион')
-    resume = models.FileField(
-        upload_to='resumes/%Y/%m/',
-        verbose_name='Резюме',
-        help_text='Форматы: PDF, DOC, DOCX, JPG, PNG. Максимум 10 MB'
-    )
+    resume = models.FileField(upload_to='resumes/%Y/%m/', verbose_name='Резюме')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата подачи')
     is_processed = models.BooleanField(default=False, verbose_name='Рассмотрено')
     admin_comment = models.TextField(blank=True, null=True, verbose_name='Комментарий HR')
-    
-    # Дополнительные поля
     applicant_name = models.CharField(max_length=255, blank=True, verbose_name='ФИО кандидата')
     applicant_phone = models.CharField(max_length=50, blank=True, verbose_name='Телефон')
     applicant_email = models.EmailField(blank=True, verbose_name='Email')
@@ -160,115 +220,9 @@ class JobApplication(models.Model):
     def get_file_size(self):
         if self.resume:
             return round(self.resume.size / (1024 * 1024), 2)
-        return 0    
-
-class Vacancy(models.Model):
-    """Вакансии компании"""
-    title = models.CharField(max_length=255, verbose_name='Название вакансии')
-    slug = models.SlugField(max_length=255, unique=True, verbose_name='URL-имя')
-    short_description = models.TextField(
-        max_length=500, 
-        blank=True, 
-        verbose_name='Краткое описание',
-        help_text='Отображается под заголовком'
-    )
-    
-    # Контактная информация с дефолтным значением
-    contact_info = models.TextField(
-        verbose_name='Контактная информация',
-        default='Присылайте своё резюме на <a href="https://hh.uz" target="_blank">hh.uz</a> или на корпоративную почту <a href="mailto:info@faw.uz">info@faw.uz</a> или <a href="tel:+998555086060">+998(55)508-60-60</a>, отражая опыт: конкретных достижений в продажах, развитии дилерской сети, маркетинге; опыта стратегического планирования и управления командой; успешно реализованных проектов (желательно с цифрами).',
-        help_text='Можно использовать HTML'
-    )
-    
-    # Служебные поля
-    is_active = models.BooleanField(default=True, verbose_name='Активна')
-    order = models.PositiveIntegerField(default=0, verbose_name='Порядок отображения')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
-    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
-
-    class Meta:
-        verbose_name = 'Вакансия (UZ)'
-        verbose_name_plural = 'Вакансии (UZ)'
-        ordering = ['order', '-created_at']
-
-    def __str__(self):
-        return self.title
-    
-    def get_applications_count(self):
-        """Количество заявок на эту вакансию"""
-        return self.applications.count()
-
-class VacancyResponsibility(models.Model):
-    """Обязанности для вакансии"""
-    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='responsibilities', verbose_name='Вакансия')
-    title = models.CharField(max_length=255, verbose_name='Заголовок', blank=True, help_text='Например: Разработка стратегии')
-    text = models.TextField(verbose_name='Описание', help_text='Подробное описание обязанности')
-    order = models.PositiveIntegerField(default=0, verbose_name='Порядок')
-
-    class Meta:
-        verbose_name = 'Обязанность'
-        verbose_name_plural = 'Обязанности'
-        ordering = ['order']
-
-    def __str__(self):
-        return self.title or self.text[:50]
+        return 0
 
 
-class VacancyRequirement(models.Model):
-    """Требования к кандидату"""
-    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='requirements', verbose_name='Вакансия')
-    text = models.CharField(max_length=500, verbose_name='Требование', help_text='Например: Высшее образование (экономика)')
-    order = models.PositiveIntegerField(default=0, verbose_name='Порядок')
-
-    class Meta:
-        verbose_name = 'Требование'
-        verbose_name_plural = 'Требования'
-        ordering = ['order']
-
-    def __str__(self):
-        return self.text[:50]
-
-
-class VacancyCondition(models.Model):
-    """Условия работы"""
-    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='conditions', verbose_name='Вакансия')
-    text = models.CharField(max_length=500, verbose_name='Условие', help_text='Например: Конкурентная зарплата + бонусы')
-    order = models.PositiveIntegerField(default=0, verbose_name='Порядок')
-
-    class Meta:
-        verbose_name = 'Условие работы'
-        verbose_name_plural = 'Условия работы'
-        ordering = ['order']
-
-    def __str__(self):
-        return self.text[:50]
-        return f"{self.vehicle.title} - {self.value_ru}"
-    
-    def get_value(self, lang='ru'):
-        """Получить значение на нужном языке"""
-        if lang == 'en':
-            return self.value_en or self.value_ru
-        elif lang == 'ky':
-            return self.value_ky or self.value_ru
-        return self.value_ru
-
-
-class VacancyIdealCandidate(models.Model):
-    """Портрет идеального кандидата"""
-    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='ideal_candidates', verbose_name='Вакансия')
-    text = models.CharField(max_length=500, verbose_name='Качество/Требование', help_text='Например: Высшее образование')
-    order = models.PositiveIntegerField(default=0, verbose_name='Порядок')
-
-    class Meta:
-        verbose_name = 'Портрет кандидата'
-        verbose_name_plural = 'Портрет идеального кандидата'
-        ordering = ['order']
-
-    def __str__(self):
-        return self.text[:50]
-    
-
- 
 # ========== МОДЕЛИ ДЛЯ ПРОДУКТОВ FAW.UZ ==========
 
 class FeatureIcon(models.Model):
@@ -298,7 +252,7 @@ class SpecificationCategory(models.Model):
         ordering = ['order', 'name']
     
     def __str__(self):
-        return f"{self.icon} {self.name}"
+        return getattr(self, 'name', 'Без названия') or 'Без названия'
 
 
 class Product(models.Model):
@@ -311,17 +265,18 @@ class Product(models.Model):
         ('special', 'Спецтехника'),
     ]
     
-    # Основная информация
     title = models.CharField("Название модели", max_length=255)
     slug = models.SlugField("URL", max_length=255, unique=True)
     category = models.CharField("Категория", max_length=50, choices=CATEGORY_CHOICES)
-    short_description = models.TextField("Краткое описание", max_length=500, blank=True)
-    main_description = models.TextField("Основное описание", blank=True)
-    slogan = models.CharField("Слоган", max_length=255, blank=True)
+    
+    # ========== ЗАКОММЕНТИРОВАНО (можно раскомментировать при необходимости) ==========
+    # short_description = models.TextField("Краткое описание", max_length=500, blank=True)
+    # main_description = models.TextField("Основное описание", blank=True)
+    # slogan = models.CharField("Слоган", max_length=255, blank=True)
+    
     main_image = models.ImageField("Главное изображение", upload_to="products/main/")
     card_image = models.ImageField("Изображение для карточки", upload_to="products/cards/", blank=True, null=True)
     
-    # Метаданные
     is_active = models.BooleanField("Активен", default=True)
     is_featured = models.BooleanField("Показывать на главной", default=False)
     order = models.PositiveIntegerField("Порядок", default=0)
@@ -337,21 +292,35 @@ class Product(models.Model):
         return self.title
 
 
-class ProductSpecification(models.Model):
-    """Параметры продукта (привязаны к категории)"""
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='specifications', verbose_name='Продукт')
+class ProductSpecificationGroup(models.Model):
+    """Группа параметров для продукта (привязка категории к продукту)"""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='spec_groups', verbose_name='Продукт')
     category = models.ForeignKey(SpecificationCategory, on_delete=models.CASCADE, verbose_name='Категория')
-    name = models.CharField("Название параметра", max_length=255, help_text='Например: Мощность двигателя')
-    value = models.CharField("Значение", max_length=255, help_text='Например: 300 л.с.')
     order = models.PositiveIntegerField("Порядок", default=0)
     
     class Meta:
-        verbose_name = "Параметр продукта"
-        verbose_name_plural = "Параметры продукта"
-        ordering = ['category__order', 'order']
+        verbose_name = "Группа параметров"
+        verbose_name_plural = "Группы параметров"
+        ordering = ['order', 'category__order']
+        unique_together = ['product', 'category']
     
     def __str__(self):
-        return f"{self.name}: {self.value}"
+        return f"{self.category.name}"
+
+
+class ProductParameter(models.Model):
+    """Конкретный параметр внутри группы"""
+    group = models.ForeignKey(ProductSpecificationGroup, on_delete=models.CASCADE, related_name='parameters', verbose_name='Группа')
+    text = models.CharField("Параметр", max_length=500, help_text='Например: Мощность двигателя: 300 л.с.')
+    order = models.PositiveIntegerField("Порядок", default=0)
+    
+    class Meta:
+        verbose_name = "Параметр"
+        verbose_name_plural = "Параметры"
+        ordering = ['order']
+    
+    def __str__(self):
+        return self.text[:50]
 
 
 class ProductFeature(models.Model):
@@ -359,7 +328,7 @@ class ProductFeature(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='features')
     icon = models.ForeignKey(FeatureIcon, on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField("Название", max_length=100)
-    value = models.CharField("Значение", max_length=100, default="Mavjud")
+    value = models.CharField("Значение", max_length=100, help_text='RU: Присутствует / EN: Available / UZ: Mavjud')
     order = models.PositiveIntegerField("Порядок", default=0)
     
     class Meta:

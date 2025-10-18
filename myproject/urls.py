@@ -11,6 +11,7 @@ admin.site.index_title = "Админ панель VUM Site"
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('i18n/', include('django.conf.urls.i18n')),
+    path('nested_admin/', include('nested_admin.urls')),
     
     # HTML-страницы
     path('', include('main.urls')),

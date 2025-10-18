@@ -2,7 +2,7 @@ from modeltranslation.translator import register, TranslationOptions
 from .models import (
     News, NewsBlock, ContactForm, Vacancy, 
     VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
-    Product, ProductFeature, ProductSpecification, SpecificationCategory
+    Product, ProductFeature, ProductCardSpec, ProductParameter, SpecificationCategory
 )
 
 
@@ -50,9 +50,9 @@ class SpecificationCategoryTranslationOptions(TranslationOptions):
 class ProductTranslationOptions(TranslationOptions):
     fields = (
         'title',
-        'short_description',
-        'main_description',
-        'slogan',
+        # 'short_description',  # ЗАКОММЕНТИРОВАНО
+        # 'main_description',   # ЗАКОММЕНТИРОВАНО
+        # 'slogan',             # ЗАКОММЕНТИРОВАНО
     )
 
 
@@ -61,6 +61,11 @@ class ProductFeatureTranslationOptions(TranslationOptions):
     fields = ('name', 'value')
 
 
-@register(ProductSpecification)
-class ProductSpecificationTranslationOptions(TranslationOptions):
-    fields = ('name', 'value')
+@register(ProductCardSpec)
+class ProductCardSpecTranslationOptions(TranslationOptions):
+    fields = ('value',)
+
+
+@register(ProductParameter)
+class ProductParameterTranslationOptions(TranslationOptions):
+    fields = ('text',)
