@@ -25,17 +25,18 @@ class KGVehicleImageSerializer(serializers.ModelSerializer):
 
 
 class KGVehicleListSerializer(serializers.ModelSerializer):
-    """Сериализатор для списка машин (каталог)"""
     card_specs = VehicleCardSpecSerializer(many=True, read_only=True)
+    category_display = serializers.SerializerMethodField()  # ← ДОБАВИТЬ
     
     class Meta:
         model = KGVehicle
-        fields = ['id', 'slug', 'title', 'preview_image', 'card_specs', 'is_active']
+        fields = ['id', 'slug', 'title', 'preview_image', 'card_specs', 'is_active', 'category', 'category_display']  # ← ДОБАВИТЬ category
+    
+    def get_category_display(self, obj):  # ← ДОБАВИТЬ
+        return obj.get_category_display()
     
     def to_representation(self, instance):
-        """Автоматически возвращаем контент на нужном языке"""
         data = super().to_representation(instance)
-        
         request = self.context.get('request')
         lang = request.query_params.get('lang', 'ru') if request else 'ru'
         
