@@ -2,6 +2,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
+from datetime import datetime, timedelta  
+from django.db.models import Count  
 from django.http import HttpResponse
 from datetime import datetime
 from .models import KGVehicle, KGFeedback, KGHeroSlide
@@ -15,11 +17,6 @@ from .serializers import (
 
 
 class KGVehicleViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    API для каталога машин faw.kg
-    - list: каталог для главной страницы
-    - retrieve: детальная информация для vehicle-details.ts
-    """
     queryset = KGVehicle.objects.filter(is_active=True).prefetch_related(
         'mini_images',  # ← ОСТАВЛЯЕМ ТОЛЬКО ЭТО
         'card_specs'    # ← И ЭТО
@@ -31,6 +28,11 @@ class KGVehicleViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return KGVehicleDetailSerializer
         return KGVehicleListSerializer
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['lang'] = self.request.query_params.get('lang', 'ru')
+        return context
 
 
 class KGFeedbackViewSet(viewsets.ModelViewSet):
@@ -96,8 +98,10 @@ class KGFeedbackViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(region=region)
         if vehicle_id:
             queryset = queryset.filter(vehicle_id=vehicle_id)
-        if is_processed is not None:
-            queryset = queryset.filter(is_processed=is_processed.lower() == 'true')
+  
+        status_filter = request.query_params.get('status')
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
         
         # Создание Excel файла
         wb = openpyxl.Workbook()
@@ -127,7 +131,7 @@ class KGFeedbackViewSet(viewsets.ModelViewSet):
                 feedback.vehicle.title if feedback.vehicle else '-',
                 feedback.message or '-',
                 feedback.created_at.strftime('%d.%m.%Y %H:%M'),
-                'Да' if feedback.is_processed else 'Нет',
+                feedback.get_status_display(),
                 feedback.admin_comment or '-'
             ])
         
@@ -204,7 +208,11 @@ class KGFeedbackViewSet(viewsets.ModelViewSet):
 
 
 class KGHeroSlideViewSet(viewsets.ReadOnlyModelViewSet):
-    """API для Hero-слайдов на главной странице"""
     queryset = KGHeroSlide.objects.filter(is_active=True).select_related('vehicle')
     serializer_class = KGHeroSlideSerializer
     permission_classes = [AllowAny]
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['lang'] = self.request.query_params.get('lang', 'ru')
+        return context

@@ -272,7 +272,6 @@ class KGVehicleDetailSerializer(serializers.ModelSerializer):
         return obj.get_features()
     
     def get_detailed_specs(self, obj):
-        """Детальные характеристики для страницы детализации"""
         lang = self.context.get('lang', 'ru')
         serializer = DetailedSpecsSerializer(obj, context={'lang': lang})
         return serializer.data

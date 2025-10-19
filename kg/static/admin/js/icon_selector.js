@@ -2,13 +2,10 @@
     'use strict';
     
     if (typeof $ === 'undefined') {
-        console.error('❌ jQuery не загружен! Проверьте подключение.');
         return;
     }
     
-    $(document).ready(function() {
-        console.log('🚀 Icon Selector загружен (jQuery работает)');
-        
+    $(document).ready(function() {        
         // ============================================
         // АВТОПЕРЕВОД ХАРАКТЕРИСТИК
         // ============================================
@@ -49,8 +46,6 @@
                 
                 if (!$kyInput.val()) $kyInput.val(kyValue);
                 if (!$enInput.val()) $enInput.val(enValue);
-                
-                console.log('✅ Автоперевод:', ruValue, '→', kyValue, '/', enValue);
             }
         });
 
@@ -63,14 +58,11 @@
         // Следим за добавлением новых строк
         $(document).on('click', '.add-row a', function() {
             setTimeout(function() {
-                console.log('➕ Добавлена новая строка');
                 initIconSelectors();
             }, 500);
         });
         
         function initIconSelectors() {
-            console.log('🔧 Инициализация селекторов иконок...');
-            
             // Используем делегирование событий через document
             $(document).off('click', '.icon-card').on('click', '.icon-card', function(e) {
                 e.preventDefault();
@@ -81,11 +73,10 @@
                 const iconUrl = $card.data('icon-url');
                 const iconName = $card.find('small').text();
                 
-                console.log('🖱️ Клик по иконке:', iconName, 'ID:', templateId);
+
                 
                 const $row = $card.closest('tr.form-row');
                 if (!$row.length) {
-                    console.error('❌ Строка не найдена');
                     return;
                 }
                 
@@ -93,8 +84,6 @@
                 const $table = $row.closest('table');
                 const $allRows = $table.find('tbody tr.form-row');
                 const rowIndex = $allRows.index($row);
-                
-                console.log('📍 Индекс строки:', rowIndex);
                 
                 // Создаём или обновляем скрытое поле
                 const fieldName = 'card_specs-' + rowIndex + '-selected_template';
@@ -111,14 +100,16 @@
                     
                     // Добавляем в конец строки
                     $row.find('td').last().append($hiddenInput);
-                    console.log('✅ Создано поле:', fieldName);
-                } else {
-                    console.log('🔄 Поле уже существует:', fieldName);
-                }
+                } 
                 
                 // Устанавливаем значение
                 $hiddenInput.val(templateId);
-                console.log('💾 Значение установлено:', fieldName, '=', templateId);
+
+                // КРИТИЧНО: Обновляем поле icon (для сохранения в базу)
+                const $iconField = $row.find('input[name*="-icon"]');
+                if ($iconField.length) {
+                    $iconField.val(iconUrl);  // ← Устанавливаем URL иконки
+                }
                 
                 // Визуальная обратная связь
                 $row.find('.icon-card').css({
@@ -140,17 +131,9 @@
                         'border': '2px solid #2e7d32',
                         'border-radius': '8px'
                     });
-                    console.log('🖼️ Превью обновлено');
                 }
-                
-                console.log('✅ Иконка выбрана успешно');
             });
-            
-            console.log('✅ Селекторы инициализированы');
         }
-        
-        console.log('✅ Icon Selector готов к работе');
     });
-    
 })(django.jQuery || jQuery || window.jQuery || $);
 

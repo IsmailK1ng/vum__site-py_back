@@ -18,7 +18,8 @@ urlpatterns = [
 
     # API эндпоинты
     path('api/', include('main.api_urls')),
-
+    path('api/kg/', include('kg.api_urls')),  # ← FAW.KG API
+    
     # Swagger
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
@@ -26,4 +27,4 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root='')  # ← Убираем STATIC_ROOT

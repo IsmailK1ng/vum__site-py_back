@@ -39,76 +39,76 @@ class KGVehicle(models.Model):
     
     # === ОСНОВНЫЕ ХАРАКТЕРИСТИКИ ===
     wheel_formula = models.CharField(max_length=50, blank=True, verbose_name='Колесная формула')
-    
-    dimensions_ru = models.CharField(max_length=100, blank=True, verbose_name='Габариты (RU)')
-    dimensions_en = models.CharField(max_length=100, blank=True, verbose_name='Габариты (EN)')
-    dimensions_ky = models.CharField(max_length=100, blank=True, verbose_name='Габариты (KY)')
-    
+
+    dimensions_ru = models.CharField(max_length=100, blank=True, verbose_name='Габаритные размеры, мм (RU)')
+    dimensions_ky = models.CharField(max_length=100, blank=True, verbose_name='Габаритные размеры, мм (KY)')
+    dimensions_en = models.CharField(max_length=100, blank=True, verbose_name='Габаритные размеры, мм (EN)')
+
     wheelbase = models.CharField(max_length=50, blank=True, verbose_name='Колесная база, мм')
-    
+
     fuel_type_ru = models.CharField(max_length=50, blank=True, verbose_name='Вид топлива (RU)')
-    fuel_type_en = models.CharField(max_length=50, blank=True, verbose_name='Вид топлива (EN)')
     fuel_type_ky = models.CharField(max_length=50, blank=True, verbose_name='Вид топлива (KY)')
-    
+    fuel_type_en = models.CharField(max_length=50, blank=True, verbose_name='Вид топлива (EN)')
+
     tank_volume = models.CharField(max_length=50, blank=True, verbose_name='Объем топливного бака, л')
-    
+
     # === ВЕСОВЫЕ ХАРАКТЕРИСТИКИ ===
     curb_weight = models.CharField(max_length=50, blank=True, verbose_name='Снаряженная масса, кг')
     payload = models.CharField(max_length=50, blank=True, verbose_name='Грузоподъемность, кг')
     gross_weight = models.CharField(max_length=50, blank=True, verbose_name='Полная масса, кг')
-    
+
     # === КУЗОВ ===
-    body_type_ru = models.CharField(max_length=100, blank=True, verbose_name='Тип кузова (RU)')
-    body_type_en = models.CharField(max_length=100, blank=True, verbose_name='Тип кузова (EN)')
-    body_type_ky = models.CharField(max_length=100, blank=True, verbose_name='Тип кузова (KY)')
-    
-    body_dimensions_ru = models.CharField(max_length=100, blank=True, verbose_name='Размеры кузова (RU)')
-    body_dimensions_en = models.CharField(max_length=100, blank=True, verbose_name='Размеры кузова (EN)')
-    body_dimensions_ky = models.CharField(max_length=100, blank=True, verbose_name='Размеры кузова (KY)')
-    
-    body_volume = models.CharField(max_length=50, blank=True, verbose_name='Объем кузова, м³')
-    
-    body_material_ru = models.TextField(blank=True, verbose_name='Материал кузова (RU)')
-    body_material_en = models.TextField(blank=True, verbose_name='Материал кузова (EN)')
-    body_material_ky = models.TextField(blank=True, verbose_name='Материал кузова (KY)')
-    
+    body_type_ru = models.CharField(max_length=100, blank=True, verbose_name='Тип (RU)')
+    body_type_ky = models.CharField(max_length=100, blank=True, verbose_name='Тип (KY)')
+    body_type_en = models.CharField(max_length=100, blank=True, verbose_name='Тип (EN)')
+
+    body_dimensions_ru = models.CharField(max_length=100, blank=True, verbose_name='Габариты, мм (RU)')
+    body_dimensions_ky = models.CharField(max_length=100, blank=True, verbose_name='Габариты, мм (KY)')
+    body_dimensions_en = models.CharField(max_length=100, blank=True, verbose_name='Габариты, мм (EN)')
+
+    body_volume = models.CharField(max_length=50, blank=True, verbose_name='Объем надстройки, куб.м')
+
+    body_material_ru = models.TextField(blank=True, verbose_name='Материал надстройки (RU)')
+    body_material_ky = models.TextField(blank=True, verbose_name='Материал надстройки (KY)')
+    body_material_en = models.TextField(blank=True, verbose_name='Материал надстройки (EN)')
+
     loading_type_ru = models.TextField(blank=True, verbose_name='Вид загрузки (RU)')
-    loading_type_en = models.TextField(blank=True, verbose_name='Вид загрузки (EN)')
     loading_type_ky = models.TextField(blank=True, verbose_name='Вид загрузки (KY)')
-    
+    loading_type_en = models.TextField(blank=True, verbose_name='Вид загрузки (EN)')
+
     # === ДВИГАТЕЛЬ ===
-    engine_model = models.CharField(max_length=100, blank=True, verbose_name='Модель двигателя')
-    engine_volume = models.CharField(max_length=50, blank=True, verbose_name='Объем двигателя, л')
+    engine_model = models.CharField(max_length=100, blank=True, verbose_name='Модель')
+    engine_volume = models.CharField(max_length=50, blank=True, verbose_name='Объем, л')
     engine_power = models.CharField(max_length=50, blank=True, verbose_name='Мощность, л.с.')
-    
+
     # === ТРАНСМИССИЯ ===
-    transmission_model = models.CharField(max_length=100, blank=True, verbose_name='Модель трансмиссии')
-    
-    transmission_type_ru = models.CharField(max_length=100, blank=True, verbose_name='Тип трансмиссии (RU)')
-    transmission_type_en = models.CharField(max_length=100, blank=True, verbose_name='Тип трансмиссии (EN)')
-    transmission_type_ky = models.CharField(max_length=100, blank=True, verbose_name='Тип трансмиссии (KY)')
-    
+    transmission_model = models.CharField(max_length=100, blank=True, verbose_name='Модель')
+
+    transmission_type_ru = models.CharField(max_length=100, blank=True, verbose_name='Тип (RU)')
+    transmission_type_ky = models.CharField(max_length=100, blank=True, verbose_name='Тип (KY)')
+    transmission_type_en = models.CharField(max_length=100, blank=True, verbose_name='Тип (EN)')
+
     gears = models.CharField(max_length=50, blank=True, verbose_name='Число передач')
-    
+
     # === ШИНЫ И ТОРМОЗНАЯ СИСТЕМА ===
     tire_type = models.CharField(max_length=100, blank=True, verbose_name='Шины')
-    
+
     suspension_ru = models.TextField(blank=True, verbose_name='Подвеска (RU)')
-    suspension_en = models.TextField(blank=True, verbose_name='Подвеска (EN)')
     suspension_ky = models.TextField(blank=True, verbose_name='Подвеска (KY)')
-    
+    suspension_en = models.TextField(blank=True, verbose_name='Подвеска (EN)')
+
     brakes_ru = models.TextField(blank=True, verbose_name='Тормоза (RU)')
-    brakes_en = models.TextField(blank=True, verbose_name='Тормоза (EN)')
     brakes_ky = models.TextField(blank=True, verbose_name='Тормоза (KY)')
-    
+    brakes_en = models.TextField(blank=True, verbose_name='Тормоза (EN)')
+
     # === КАБИНА ===
     cabin_category_ru = models.TextField(blank=True, verbose_name='Модель кабины (RU)')
-    cabin_category_en = models.TextField(blank=True, verbose_name='Модель кабины (EN)')
     cabin_category_ky = models.TextField(blank=True, verbose_name='Модель кабины (KY)')
-    
+    cabin_category_en = models.TextField(blank=True, verbose_name='Модель кабины (EN)')
+
     cabin_equipment_ru = models.TextField(blank=True, verbose_name='Комплектация (RU)')
-    cabin_equipment_en = models.TextField(blank=True, verbose_name='Комплектация (EN)')
     cabin_equipment_ky = models.TextField(blank=True, verbose_name='Комплектация (KY)')
+    cabin_equipment_en = models.TextField(blank=True, verbose_name='Комплектация (EN)')
     
     # ============================================
     # FEATURES (Детальные иконки)
