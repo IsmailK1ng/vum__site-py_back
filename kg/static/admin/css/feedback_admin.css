@@ -1,25 +1,20 @@
-/* Улучшенный вид списка заявок */
-#result_list tbody tr {
-    transition: background 0.2s;
+/* Удаление иконки редактирования, удаления и просмотра рядом с полями ForeignKey */
+.related-lookup,
+.add-related,
+.delete-related,
+.change-related {
+    display: none !important;
 }
 
-#result_list tbody tr:hover {
-    background: #f5f5f5 !important;
+/* Удаление иконок из формы добавления для всех полей */
+.form-row .field-vehicle img,
+.form-row .field-manager img,
+.form-row .field-status img,
+.form-row .field-priority img {
+    display: none !important;
 }
 
-/* Селекты автосохранения */
-#result_list select {
-    transition: all 0.3s;
-    border-radius: 4px;
-    padding: 4px 8px;
-}
-
-#result_list select:focus {
-    outline: 2px solid #417690;
-    outline-offset: 2px;
-}
-
-/* Кнопки действий */
+/* Сохранение стилей для кнопок действий в списке */
 .action-buttons {
     display: flex;
     gap: 8px;
@@ -33,31 +28,4 @@
 
 .action-buttons img:hover {
     transform: scale(1.1);
-}
-
-/* Статусы с цветами */
-select[name*="status"] option[value="new"] {
-    color: #e74c3c;
-}
-
-select[name*="status"] option[value="in_process"] {
-    color: #f39c12;
-}
-
-select[name*="status"] option[value="done"] {
-    color: #27ae60;
-}
-
-/* Приоритеты с цветами */
-select[name*="priority"] option[value="high"] {
-    color: #e74c3c;
-    font-weight: 600;
-}
-
-select[name*="priority"] option[value="medium"] {
-    color: #f39c12;
-}
-
-select[name*="priority"] option[value="low"] {
-    color: #95a5a6;
 }

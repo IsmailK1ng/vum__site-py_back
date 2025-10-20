@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.db import models
 from django.http import Http404
 from .models import KGVehicle, KGFeedback, KGHeroSlide
+from django.shortcuts import get_object_or_404
 from .serializers import (
     KGVehicleListSerializer,
     KGVehicleDetailSerializer,
@@ -15,6 +16,10 @@ from .serializers import (
     KGFeedbackCreateSerializer,
     KGHeroSlideSerializer
 )
+
+
+
+
 
 
 class KGVehicleViewSet(viewsets.ReadOnlyModelViewSet):
@@ -238,3 +243,53 @@ class KGHeroSlideViewSet(viewsets.ReadOnlyModelViewSet):
         context = super().get_serializer_context()
         context['lang'] = self.request.query_params.get('lang', 'ru')
         return context
+# ============================================
+# VIEWSET: БЫСТРОЕ ОБНОВЛЕНИЕ ЗАЯВОК (для автосохранения в админке)
+# ============================================
+
+class KGFeedbackQuickUpdateViewSet(viewsets.ViewSet):
+    """
+    Быстрое обновление полей заявки (для автосохранения в админке)
+    Endpoint: PATCH /api/kg/feedback-update/{id}/quick-update/
+    """
+    permission_classes = [IsAdminUser]
+    
+    @action(detail=True, methods=['patch'], url_path='quick-update')
+    def quick_update(self, request, pk=None):
+        feedback = get_object_or_404(KGFeedback, pk=pk)
+        
+        # Разрешённые поля для обновления
+        allowed_fields = ['status', 'priority', 'manager']
+        
+        updated_fields = []
+        for field in allowed_fields:
+            if field in request.data:
+                if field == 'manager':
+                    # Для manager нужно получить объект User
+                    manager_id = request.data[field]
+                    if manager_id and manager_id != '':
+                        feedback.manager_id = manager_id
+                        updated_fields.append('manager')
+                    elif manager_id == '':
+                        feedback.manager = None
+                        updated_fields.append('manager')
+                else:
+                    setattr(feedback, field, request.data[field])
+                    updated_fields.append(field)
+        
+        if updated_fields:
+            feedback.save(update_fields=updated_fields)
+            return Response({
+                'success': True,
+                'message': f'Обновлено: {", ".join(updated_fields)}',
+                'data': {
+                    'status': feedback.status,
+                    'priority': feedback.priority,
+                    'manager': feedback.manager_id if feedback.manager else None
+                }
+            })
+        
+        return Response({
+            'success': False,
+            'message': 'Нет полей для обновления'
+        }, status=status.HTTP_400_BAD_REQUEST)

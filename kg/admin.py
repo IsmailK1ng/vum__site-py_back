@@ -130,7 +130,7 @@ class KGVehicleAdmin(admin.ModelAdmin):
                 'wheel_formula',
                 'dimensions_ru', 
                 'wheelbase',
-                'fuel_type_ru', 
+                'fuel_type_ru','fuel_type_ky','fuel_type_en',
                 'tank_volume',
                 
                 # Весовые характеристики
@@ -287,6 +287,7 @@ class KGFeedbackAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     actions = ['export_to_excel', 'mark_as_done']
     list_select_related = ('vehicle', 'manager')
+    raw_id_fields = ['vehicle', 'manager']  
 
     fieldsets = (
         ('Информация о клиенте', {
@@ -296,12 +297,15 @@ class KGFeedbackAdmin(admin.ModelAdmin):
             'fields': ('status', 'priority', 'manager', 'admin_comment'),
         }),
     )
-    
+
     class Media:
-        css = {
-            'all': ('admin/css/feedback_admin.css',)
-        }
-        js = ('admin/js/auto_save_feedback.js',)
+            css = {
+                'all': ('admin/css/feedback_admin.css',)
+            }
+            js = (
+                'https://code.jquery.com/jquery-3.6.0.min.js',  # Явное подключение jQuery
+                'admin/js/auto_save_feedback.js',
+            )
 
     def vehicle_display(self, obj):
         return obj.vehicle.title_ru if obj.vehicle else '—'
@@ -311,13 +315,13 @@ class KGFeedbackAdmin(admin.ModelAdmin):
     def action_buttons(self, obj):
         frontend_url = f"http://localhost:3000/vehicle-details.html?id={obj.vehicle.slug_ru}&lang=ru" if obj.vehicle else "#"
         return format_html(
-            '<div style="display:flex; gap:8px;">'
+            '<div class="action-buttons">'
             '<a href="{}"><img src="/static/media/icon-adminpanel/pencil.png" width="28" title="Редактировать"></a>'
             '<a href="{}" onclick="return confirm(\'Удалить заявку от {}?\')"><img src="/static/media/icon-adminpanel/recycle-bin.png" width="28" title="Удалить"></a>'
             '<a href="{}" target="_blank"><img src="/static/media/icon-adminpanel/eyes.png" width="28" title="Посмотреть машину"></a>'
             '</div>',
-            f'/admin/main/kgfeedback/{obj.id}/change/',
-            f'/admin/main/kgfeedback/{obj.id}/delete/',
+            f'/admin/kg/kgfeedback/{obj.id}/change/',  # ← БЫЛО /admin/main/
+            f'/admin/kg/kgfeedback/{obj.id}/delete/',  # ← БЫЛО /admin/main/
             obj.name,
             frontend_url
         )
