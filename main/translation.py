@@ -58,7 +58,7 @@ class ProductTranslationOptions(TranslationOptions):
 
 @register(ProductFeature)
 class ProductFeatureTranslationOptions(TranslationOptions):
-    fields = ('name', 'value')
+    fields = ('name',)
 
 
 @register(ProductCardSpec)

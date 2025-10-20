@@ -50,7 +50,29 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <!-- Цвет браузера (конец) -->
+  <style>
+    /* Loader */
+    .loader-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+      width: 100%;
+    }
 
+    .loader {
+      font-size: 18px;
+      color: #666;
+    }
+
+    .error-message,
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-size: 18px;
+    }
+  </style>
 </head>
 
 <body>
@@ -75,7 +97,7 @@
                     <div class="row g-0">
                       <div class="col-12 col-xl-12 mxd-grid-item no-margin">
                         <div class="mxd-section-models__title">
-                          <h2 class="models_title">Shatakchi mashinalar</h2>
+                          <h2 class="models_title">{{ category_info.title }}</h2>
                         </div>
                       </div>
                       <div class="col-12 col-xl-8 mxd-grid-item no-margin">
@@ -89,10 +111,8 @@
                               </svg>
                             </em>
                             <em class="hero-05-title__item" style="font-size: 24px; max-width: 400px;">
-                              Yarim tirkamani tortib olish
-                              uchun egarli-tirkovchi
-                              moslama bilan jihozlangan
-                              g‘ildirakli shatakchi</em>
+                              {{ category_info.slogan }}
+                            </em>
                           </span>
                         </div>
                       </div>
@@ -101,11 +121,10 @@
                 </div>
               </div>
               <div class="mxd-hero-06__img">
-                <img src="{% static 'images/slider-foto_img/3.png' %}" alt="FAW Tiger V 4x2 avtosamosval">
+                <img src="{% static category_info.hero_image %}" alt="{{ category_info.title }}">
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -126,7 +145,7 @@
                     <ol class="breadcrumb-ol">
                       <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
                       <li><a href="javascript:void(0)">Modellar</a></li>
-                      <li class="active"><a href="{% url 'products' %}">Shatakchi mashinalar</a></li>
+                      <li class="active"><a href="javascript:void(0)">{{ category_info.breadcrumb }}</a></li>
                     </ol>
                   </div>
                   <div class="filter-container">
@@ -149,230 +168,17 @@
           <div class="mxd-blog-preview">
             <div class="container-fluid p-0">
               <div class="row g-0 card_block">
-                <!-- item 1 -->
                 <div class="col-12 col-xl-4 mxd-grid-item animate-card-3 faw-truck-card-container">
-                  <div class="faw-truck-card">
-                    <div class="truck-image-container">
-                      <img src="{% static 'images/faw-truck_1.png' %}" alt="FAW Tiger V 4x2 avtosamosval" class="truck-image">
-                    </div>
-                    <div class="truck-info">
-                      <h3 class="truck-title">FAW Tiger V 4x2 avtosamosval</h3>
-                      <div class="truck-specs">
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/4x2-1.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">4x2</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/gas-pump-alt.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">Dizel</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/clipart1018342.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">Iqlim nazorati</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/kisspng-car-computer.png.svg' %}"
-                            viewBox="0 0 24 24">
-                          <span class="spec-value">2.5t</span>
-                        </div>
-                      </div>
-                      <div class="truck-cta">
-                        <a href="#" class="btn-details">Batafsil o'qish</a>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- item 2 -->
-                  <div class="faw-truck-card">
-                    <div class="truck-image-container">
-                      <img src="{% static 'images/faw-truck_2.png' %}" alt="FAW J6L 6x4 Shatakchi" class="truck-image">
-                    </div>
-                    <div class="truck-info">
-                      <h3 class="truck-title">FAW J6L 6x4 Shatakchi</h3>
-                       <div class="truck-specs">
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/4x2-1.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">4x2</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/gas-pump-alt.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">Dizel</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/clipart1018342.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">Iqlim nazorati</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/kisspng-car-computer.png.svg' %}"
-                            viewBox="0 0 24 24">
-                          <span class="spec-value">2.5t</span>
-                        </div>
-                      </div>
-                      <div class="truck-cta">
-                        <a href="#" class="btn-details">Batafsil o'qish</a>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- item 3 -->
-                  <div class="faw-truck-card">
-                    <div class="truck-image-container">
-                      <img src="{% static 'images/faw-truck_3.png' %}" alt="FAW JH6 8x4 Samosval" class="truck-image">
-                    </div>
-                    <div class="truck-info">
-                      <h3 class="truck-title">FAW JH6 8x4 Samosval</h3>
-                       <div class="truck-specs">
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/4x2-1.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">4x2</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/gas-pump-alt.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">Dizel</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/clipart1018342.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">Iqlim nazorati</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/kisspng-car-computer.png.svg' %}"
-                            viewBox="0 0 24 24">
-                          <span class="spec-value">2.5t</span>
-                        </div>
-                      </div>
-                      <div class="truck-cta">
-                        <a href="#" class="btn-details">Batafsil o'qish</a>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- item 4 -->
-                  <div class="faw-truck-card">
-                    <div class="truck-image-container">
-                      <img src="{% static 'images/faw-truck_2.png' %}" alt="FAW TX 4x2 Avtofurgon" class="truck-image">
-                    </div>
-                    <div class="truck-info">
-                      <h3 class="truck-title">FAW TX 4x2 Avtofurgon</h3>
-                       <div class="truck-specs">
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/4x2-1.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">4x2</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/gas-pump-alt.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">Dizel</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/clipart1018342.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">Iqlim nazorati</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/kisspng-car-computer.png.svg' %}"
-                            viewBox="0 0 24 24">
-                          <span class="spec-value">2.5t</span>
-                        </div>
-                      </div>
-                      <div class="truck-cta">
-                        <a href="#" class="btn-details">Batafsil o'qish</a>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- item 5 -->
-                  <div class="faw-truck-card">
-                    <div class="truck-image-container">
-                      <img src="{% static 'images/faw-truck_3.png' %}" alt="FAW J7 6x4 Shassi" class="truck-image">
-                    </div>
-                    <div class="truck-info">
-                      <h3 class="truck-title">FAW J7 6x4 Shassi</h3>
-                       <div class="truck-specs">
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/4x2-1.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">4x2</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/gas-pump-alt.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">Dizel</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/clipart1018342.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">Iqlim nazorati</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/kisspng-car-computer.png.svg' %}"
-                            viewBox="0 0 24 24">
-                          <span class="spec-value">2.5t</span>
-                        </div>
-                      </div>
-                      <div class="truck-cta">
-                        <a href="#" class="btn-details">Batafsil o'qish</a>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- item 6 -->
-                  <div class="faw-truck-card">
-                    <div class="truck-image-container">
-                      <img src="{% static 'images/faw-truck_1.png' %}" alt="FAW T5 4x2 Maxsus texnika" class="truck-image">
-                    </div>
-                    <div class="truck-info">
-                      <h3 class="truck-title">FAW T5 4x2 Maxsus texnika</h3>
-                       <div class="truck-specs">
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/4x2-1.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">4x2</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/gas-pump-alt.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">Dizel</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/clipart1018342.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">Iqlim nazorati</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/kisspng-car-computer.png.svg' %}"
-                            viewBox="0 0 24 24">
-                          <span class="spec-value">2.5t</span>
-                        </div>
-                      </div>
-                      <div class="truck-cta">
-                        <a href="#" class="btn-details">Batafsil o'qish</a>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- item 7 -->
-                  <div class="faw-truck-card">
-                    <div class="truck-image-container">
-                      <img src="{% static 'images/faw-truck_2.png' %}" alt="FAW JH7 8x4 Samosval" class="truck-image">
-                    </div>
-                    <div class="truck-info">
-                      <h3 class="truck-title">FAW JH7 8x4 Samosval</h3>
-                       <div class="truck-specs">
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/4x2-1.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">4x2</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/gas-pump-alt.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">Dizel</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/clipart1018342.svg' %}" viewBox="0 0 24 24">
-                          <span class="spec-value">Iqlim nazorati</span>
-                        </div>
-                        <div class="spec-item">
-                          <img class="spec-icon" src="{% static 'images/icons/kisspng-car-computer.png.svg' %}"
-                            viewBox="0 0 24 24">
-                          <span class="spec-value">2.5t</span>
-                        </div>
-                      </div>
-                      <div class="truck-cta">
-                        <a href="#" class="btn-details">Batafsil o'qish</a>
-                      </div>
-                    </div>
+                  <!-- Loader -->
+                  <div class="loader-container">
+                    <div class="loader">Yuklanmoqda...</div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <!-- Блок — карточки превью (конец) -->
         </div>
+        <!-- Блок — карточки превью (конец) -->>
       </div>
       <!-- Пагинация -->
       <div class="mxd-blog-pagination">
@@ -402,6 +208,7 @@
   <script src="{% static 'js/app.js' %}"></script>
   <!-- Счётчики FAW (инициализация) -->
   <script src="{% static 'js/faw.js' %}"></script>
+  <script src="{% static 'js/production.js' %}"></script>
   <script>
     // Универсальный плавный скролл, сразу учитывающий высоту фиксированного хедера
     (function () {

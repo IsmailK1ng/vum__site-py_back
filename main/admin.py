@@ -295,7 +295,7 @@ class ProductFeatureInline(NestedTranslationTabularInline):
     model = ProductFeature
     extra = 8
     max_num = 8
-    fields = ('icon', 'name', 'value', 'order')
+    fields = ('icon', 'name', 'order')
     verbose_name_plural = "🔧 Характеристики с иконками (макс 8)"
 
 
@@ -310,14 +310,7 @@ class ProductCardSpecInline(NestedTranslationTabularInline):
 class ProductGalleryInline(nested_admin.NestedTabularInline):
     model = ProductGallery
     extra = 3
-    fields = ('image', 'preview', 'order')
-    readonly_fields = ('preview',)
-    
-    def preview(self, obj):
-        if obj.image:
-            return format_html('<img src="{}" height="60"/>', obj.image.url)
-        return "—"
-    preview.short_description = "Превью"
+    verbose_name_plural = "📸 Галерея"
 
 
 # ============ ПРОДУКТЫ ============
