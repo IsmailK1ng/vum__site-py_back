@@ -327,8 +327,7 @@ class ProductFeature(models.Model):
     """8 характеристик с иконками (для главной страницы)"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='features')
     icon = models.ForeignKey(FeatureIcon, on_delete=models.SET_NULL, null=True, blank=True)
-    name = models.CharField("Название", max_length=100)
-    value = models.CharField("Значение", max_length=100, help_text='RU: Присутствует / EN: Available / UZ: Mavjud')
+    name = models.CharField("Название", max_length=100, help_text='Например: Климат контроль, Круиз контроль')
     order = models.PositiveIntegerField("Порядок", default=0)
     
     class Meta:
@@ -337,7 +336,7 @@ class ProductFeature(models.Model):
         ordering = ['order']
     
     def __str__(self):
-        return f"{self.name}: {self.value}"
+        return self.name
 
 
 class ProductCardSpec(models.Model):

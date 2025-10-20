@@ -64,31 +64,31 @@
                     <a href="{% url 'news' %}" class="desktop-menu__link">Kompaniya yangiliklari</a>
                 </li>
                 <li class="desktop-menu__item">
-                    <a href="{% url 'products' %}" class="desktop-menu__link">
+                    <a href="javascript:void(0)" class="desktop-menu__link">
                         Modellar
                         <span class="desktop-menu__arrow">▼</span>
                     </a>
                     <ul class="desktop-submenu">
                         <li class="desktop-submenu__item">
-                            <a href="{% url 'products' %}" class="desktop-submenu__link">Shatakchi mashinalar</a>
+                            <a href="{% url 'products' %}?category=tractor" class="desktop-submenu__link">Shatakchi mashinalar</a>
                         </li>
                         <li class="desktop-submenu__item">
-                            <a href="{% url 'products' %}" class="desktop-submenu__link">Samosvallar</a>
+                            <a href="{% url 'products' %}?category=dump_truck" class="desktop-submenu__link">Samosvallar</a>
                         </li>
                         <li class="desktop-submenu__item">
-                            <a href="{% url 'products' %}" class="desktop-submenu__link">Maxsus texnika</a>
+                            <a href="{% url 'products' %}?category=special" class="desktop-submenu__link">Maxsus texnika</a>
                         </li>
                         <li class="desktop-submenu__item">
-                            <a href="{% url 'products' %}" class="desktop-submenu__link">Avtofurgonlar</a>
+                            <a href="{% url 'products' %}?category=van" class="desktop-submenu__link">Avtofurgonlar</a>
                         </li>
                         <li class="desktop-submenu__item">
-                            <a href="{% url 'products' %}" class="desktop-submenu__link">Shassilar</a>
+                            <a href="{% url 'products' %}?category=chassis" class="desktop-submenu__link">Shassilar</a>
                         </li>
                         <li class="desktop-submenu__item">
-                            <a href="{% url 'products' %}" class="desktop-submenu__link">Tiger V</a>
+                            <a href="{% url 'products' %}?category=faw_tiger_v" class="desktop-submenu__link">Tiger V</a>
                         </li>
                         <li class="desktop-submenu__item">
-                            <a href="{% url 'products' %}" class="desktop-submenu__link">Tiger VR</a>
+                            <a href="{% url 'products' %}?category=faw_tiger_vr" class="desktop-submenu__link">Tiger VR</a>
                         </li>
                     </ul>
                 </li>
@@ -203,26 +203,25 @@
                                         </div>
                                         <ul class="submenu">
                                             <li class="submenu__item">
-                                                <a href="{% url 'products' %}" class="submenu__link">Shatakchi
-                                                    mashinalar</a>
+                                                <a href="{% url 'products' %}?category=tractor" class="submenu__link">Shatakchi mashinalar</a>
                                             </li>
                                             <li class="submenu__item">
-                                                <a href="{% url 'products' %}" class="submenu__link">Samosvallar</a>
+                                                <a href="{% url 'products' %}?category=dump_truck" class="submenu__link">Samosvallar</a>
                                             </li>
                                             <li class="submenu__item">
-                                                <a href="{% url 'products' %}" class="submenu__link">Maxsus texnika</a>
+                                                <a href="{% url 'products' %}?category=special" class="submenu__link">Maxsus texnika</a>
                                             </li>
                                             <li class="submenu__item">
-                                                <a href="{% url 'products' %}" class="submenu__link">Avtofurgonlar</a>
+                                                <a href="{% url 'products' %}?category=van" class="submenu__link">Avtofurgonlar</a>
                                             </li>
                                             <li class="submenu__item">
-                                                <a href="{% url 'products' %}" class="submenu__link">Shassilar</a>
+                                                <a href="{% url 'products' %}?category=chassis" class="submenu__link">Shassilar</a>
                                             </li>
                                             <li class="submenu__item">
-                                                <a href="{% url 'products' %}" class="submenu__link">Tiger V</a>
+                                                <a href="{% url 'products' %}?category=faw_tiger_v" class="submenu__link">Tiger V</a>
                                             </li>
                                             <li class="submenu__item">
-                                                <a href="{% url 'products' %}" class="submenu__link">Tiger VR</a>
+                                                <a href="{% url 'products' %}?category=faw_tiger_vr" class="submenu__link">Tiger VR</a>
                                             </li>
                                         </ul>
                                     </li>
