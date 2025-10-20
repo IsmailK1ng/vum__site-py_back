@@ -128,9 +128,9 @@ class KGVehicleAdmin(admin.ModelAdmin):
                 
                 # Основные характеристики
                 'wheel_formula',
-                'dimensions_ru', 'dimensions_ky', 'dimensions_en',
+                'dimensions_ru', 
                 'wheelbase',
-                'fuel_type_ru', 'fuel_type_ky', 'fuel_type_en',
+                'fuel_type_ru', 
                 'tank_volume',
                 
                 # Весовые характеристики
@@ -140,7 +140,7 @@ class KGVehicleAdmin(admin.ModelAdmin):
                 
                 # Кузов
                 'body_type_ru', 'body_type_ky', 'body_type_en',
-                'body_dimensions_ru', 'body_dimensions_ky', 'body_dimensions_en',
+                'body_dimensions_ru', 
                 'body_volume',
                 'body_material_ru', 'body_material_ky', 'body_material_en',
                 'loading_type_ru', 'loading_type_ky', 'loading_type_en',
@@ -202,7 +202,7 @@ class KGVehicleAdmin(admin.ModelAdmin):
     category_badge.short_description = "Серия"
 
     def action_buttons(self, obj):
-        frontend_url = f"http://localhost:5173/vehicle-details.html?id={obj.slug_ru or obj.slug}&lang=ru"
+        frontend_url = f"http://localhost:3000/vehicle-details.html?id={obj.slug_ru or obj.slug}&lang=ru"
         return format_html(
             '<div style="display:flex; gap:8px;">'
             '<a href="{}"><img src="/static/media/icon-adminpanel/pencil.png" width="28"></a>'
@@ -279,7 +279,7 @@ class KGHeroSlideAdmin(admin.ModelAdmin):
 
 @admin.register(KGFeedback)
 class KGFeedbackAdmin(admin.ModelAdmin):
-    list_display = ['name', 'phone', 'region', 'vehicle_display', 'priority', 'status', 'manager', 'created_at']
+    list_display = ['name', 'phone', 'region', 'vehicle_display', 'priority', 'status', 'manager', 'created_at', 'action_buttons']
     list_editable = ['priority', 'status', 'manager']
     list_filter = ['status', 'priority', 'region', 'created_at']
     search_fields = ['name', 'phone', 'vehicle__title_ru']
@@ -291,15 +291,16 @@ class KGFeedbackAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Информация о клиенте', {
             'fields': ('name', 'phone', 'region', 'vehicle', 'message', 'created_at'),
-            'description': '💡 Данные клиента, оставившего заявку на сайте.'
         }),
         ('Управление', {
             'fields': ('status', 'priority', 'manager', 'admin_comment'),
-            'description': '💡 Настройки обработки заявки. Изменения сохраняются автоматически при редактировании в списке.'
         }),
     )
     
     class Media:
+        css = {
+            'all': ('admin/css/feedback_admin.css',)
+        }
         js = ('admin/js/auto_save_feedback.js',)
 
     def vehicle_display(self, obj):
@@ -307,12 +308,30 @@ class KGFeedbackAdmin(admin.ModelAdmin):
     vehicle_display.short_description = "Машина"
     vehicle_display.admin_order_field = 'vehicle__title_ru'
 
+    def action_buttons(self, obj):
+        frontend_url = f"http://localhost:3000/vehicle-details.html?id={obj.vehicle.slug_ru}&lang=ru" if obj.vehicle else "#"
+        return format_html(
+            '<div style="display:flex; gap:8px;">'
+            '<a href="{}"><img src="/static/media/icon-adminpanel/pencil.png" width="28" title="Редактировать"></a>'
+            '<a href="{}" onclick="return confirm(\'Удалить заявку от {}?\')"><img src="/static/media/icon-adminpanel/recycle-bin.png" width="28" title="Удалить"></a>'
+            '<a href="{}" target="_blank"><img src="/static/media/icon-adminpanel/eyes.png" width="28" title="Посмотреть машину"></a>'
+            '</div>',
+            f'/admin/main/kgfeedback/{obj.id}/change/',
+            f'/admin/main/kgfeedback/{obj.id}/delete/',
+            obj.name,
+            frontend_url
+        )
+    action_buttons.short_description = "Действия"
+
     def mark_as_done(self, request, queryset):
         updated = queryset.update(status='done')
-        self.message_user(request, f'✅ Обработано заявок: {updated}')
+        self.message_user(request, f'Обработано заявок: {updated}')
     mark_as_done.short_description = 'Отметить как обработанные'
-
+    
     def export_to_excel(self, request, queryset):
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment
+
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "Заявки FAW KG"
@@ -353,7 +372,6 @@ class KGFeedbackAdmin(admin.ModelAdmin):
         return response
 
     export_to_excel.short_description = 'Экспорт в Excel'
-
 
 # ============================================
 # ADMIN: ШАБЛОНЫ ИКОНОК

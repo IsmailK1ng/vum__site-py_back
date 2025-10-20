@@ -361,10 +361,25 @@ class KGFeedback(models.Model):
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new', verbose_name='Статус')
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium', verbose_name='Приоритет')
-    manager = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='kg_feedbacks')
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    admin_comment = models.TextField(blank=True, null=True)
+    manager = models.ForeignKey(
+        User, 
+        null=True, 
+        blank=True, 
+        on_delete=models.SET_NULL, 
+        related_name='kg_feedbacks',
+        verbose_name='Менеджер'  # ← Добавьте
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата создания'  # ← Добавьте
+    )
+
+    admin_comment = models.TextField(
+        blank=True, 
+        null=True,
+        verbose_name='Комментарий администратора'  # ← Добавьте
+    )
 
     class Meta:
         verbose_name = 'Заявка'

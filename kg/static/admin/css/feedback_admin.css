@@ -1,0 +1,63 @@
+/* Улучшенный вид списка заявок */
+#result_list tbody tr {
+    transition: background 0.2s;
+}
+
+#result_list tbody tr:hover {
+    background: #f5f5f5 !important;
+}
+
+/* Селекты автосохранения */
+#result_list select {
+    transition: all 0.3s;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+#result_list select:focus {
+    outline: 2px solid #417690;
+    outline-offset: 2px;
+}
+
+/* Кнопки действий */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.action-buttons img {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.action-buttons img:hover {
+    transform: scale(1.1);
+}
+
+/* Статусы с цветами */
+select[name*="status"] option[value="new"] {
+    color: #e74c3c;
+}
+
+select[name*="status"] option[value="in_process"] {
+    color: #f39c12;
+}
+
+select[name*="status"] option[value="done"] {
+    color: #27ae60;
+}
+
+/* Приоритеты с цветами */
+select[name*="priority"] option[value="high"] {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+select[name*="priority"] option[value="medium"] {
+    color: #f39c12;
+}
+
+select[name*="priority"] option[value="low"] {
+    color: #95a5a6;
+}
