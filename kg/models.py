@@ -379,7 +379,7 @@ class KGHeroSlide(models.Model):
     """Hero-слайды для главной страницы"""
     vehicle = models.ForeignKey(KGVehicle, on_delete=models.CASCADE, verbose_name='Машина')
     
-    description_ru = models.TextField(max_length=500, verbose_name='Описание (RU)', default='')
+    description_ru = models.TextField(max_length=500, verbose_name='Описание (RU)', default='', blank=True)
     description_ky = models.TextField(max_length=500, verbose_name='Описание (KY)', blank=True, default='')
     description_en = models.TextField(max_length=500, verbose_name='Описание (EN)', blank=True, default='')
     
