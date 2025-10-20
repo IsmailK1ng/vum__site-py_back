@@ -25,16 +25,6 @@ class VehicleCardSpecForm(forms.ModelForm):
                 template = IconTemplate.objects.get(id=template_id)
                 print(f"✅ Найден шаблон иконки ID={template_id}: {template.name}")
                 
-                # Удаляем старую иконку если есть
-                if instance.icon:
-                    try:
-                        old_path = instance.icon.path
-                        if os.path.exists(old_path):
-                            os.remove(old_path)
-                            print(f"🗑️ Удалена старая иконка: {old_path}")
-                    except Exception as e:
-                        print(f"⚠️ Не удалось удалить старую иконку: {e}")
-                
                 # Копируем новую иконку
                 filename = f"spec_{uuid.uuid4().hex[:8]}_{os.path.basename(template.icon.name)}"
                 
@@ -46,7 +36,7 @@ class VehicleCardSpecForm(forms.ModelForm):
                         save=False
                     )
                     print(f"💾 Сохранена новая иконка: {filename}")
-                    
+                        
             except IconTemplate.DoesNotExist:
                 print(f"❌ Шаблон иконки ID={template_id} не найден")
             except Exception as e:

@@ -5,7 +5,8 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from datetime import datetime, timedelta  
 from django.db.models import Count  
 from django.http import HttpResponse
-from datetime import datetime
+from django.db import models
+from django.http import Http404
 from .models import KGVehicle, KGFeedback, KGHeroSlide
 from .serializers import (
     KGVehicleListSerializer,
@@ -18,11 +19,32 @@ from .serializers import (
 
 class KGVehicleViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = KGVehicle.objects.filter(is_active=True).prefetch_related(
-        'mini_images',  # ← ОСТАВЛЯЕМ ТОЛЬКО ЭТО
-        'card_specs'    # ← И ЭТО
+        'mini_images',
+        'card_specs'
     )
     permission_classes = [AllowAny]
-    lookup_field = 'slug'
+    lookup_field = 'slug'  # ← Ищет только по основному slug
+    
+    # ДОБАВЬТЕ ЭТОТ МЕТОД:
+    def get_object(self):
+        """
+        Ищем машину по любому из slug (ru/ky/en)
+        """
+        lookup_value = self.kwargs.get(self.lookup_field)
+        
+        # Пробуем найти по всем slug
+        queryset = self.get_queryset()
+        obj = queryset.filter(
+            models.Q(slug=lookup_value) |
+            models.Q(slug_ru=lookup_value) |
+            models.Q(slug_ky=lookup_value) |
+            models.Q(slug_en=lookup_value)
+        ).first()
+        
+        if not obj:
+            raise Http404(f"Машина с slug '{lookup_value}' не найдена")
+        
+        return obj
     
     def get_serializer_class(self):
         if self.action == 'retrieve':

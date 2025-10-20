@@ -2,6 +2,7 @@
     'use strict';
     
     if (typeof $ === 'undefined') {
+        console.error('jQuery не найден!');
         return;
     }
     
@@ -9,17 +10,18 @@
         // ============================================
         // АВТОПЕРЕВОД ХАРАКТЕРИСТИК
         // ============================================
-        const translations = {
+        const TRANSLATIONS = {
             'Дизель': { ky: 'Дизель', en: 'Diesel' },
             'Бензин': { ky: 'Бензин', en: 'Gasoline' },
+            'ГАЗ + Бензин': { ky: 'Газ + Бензин', en: 'GAS + Gasoline' },
+            'Климат-контроль': { ky: 'Климат-контроль', en: 'Climate control' },
+            'цистерна, форма круглая': { ky: 'цистерна, формасы тегерек', en: 'tank, round shape' },
             'кг': { ky: 'кг', en: 'kg' },
             'л.с.': { ky: 'а.к.', en: 'hp' },
-            'м³': { ky: 'м³', en: 'm³' },
             'м²': { ky: 'м²', en: 'm²' },
-            'Климат-контроль': { ky: 'Климат-контроль', en: 'Climate control' },
-            '4x2': { ky: '4x2', en: '4x2' },
-            '4×2': { ky: '4×2', en: '4×2' },
-            '4х2': { ky: '4х2', en: '4х2' }
+            'м³': { ky: 'м³', en: 'm³' },
+            'м2': { ky: 'м2', en: 'm2' },
+            'м3': { ky: 'м3', en: 'm3' }
         };
 
         // Автозаполнение при вводе RU
@@ -36,9 +38,9 @@
                 let kyValue = ruValue;
                 let enValue = ruValue;
                 
-                Object.keys(translations).forEach(ruTerm => {
+                Object.keys(TRANSLATIONS).forEach(ruTerm => {
                     if (ruValue.includes(ruTerm)) {
-                        const translated = translations[ruTerm];
+                        const translated = TRANSLATIONS[ruTerm];
                         kyValue = kyValue.replace(ruTerm, translated.ky);
                         enValue = enValue.replace(ruTerm, translated.en);
                     }
@@ -71,12 +73,10 @@
                 const $card = $(this);
                 const templateId = $card.data('template-id');
                 const iconUrl = $card.data('icon-url');
-                const iconName = $card.find('small').text();
-                
-
                 
                 const $row = $card.closest('tr.form-row');
                 if (!$row.length) {
+                    console.warn('Строка не найдена');
                     return;
                 }
                 
@@ -84,6 +84,8 @@
                 const $table = $row.closest('table');
                 const $allRows = $table.find('tbody tr.form-row');
                 const rowIndex = $allRows.index($row);
+                
+                console.log('Выбрана иконка:', templateId, 'для строки:', rowIndex);
                 
                 // Создаём или обновляем скрытое поле
                 const fieldName = 'card_specs-' + rowIndex + '-selected_template';
@@ -108,7 +110,8 @@
                 // КРИТИЧНО: Обновляем поле icon (для сохранения в базу)
                 const $iconField = $row.find('input[name*="-icon"]');
                 if ($iconField.length) {
-                    $iconField.val(iconUrl);  // ← Устанавливаем URL иконки
+                    $iconField.val(iconUrl);
+                    console.log('Иконка установлена в поле:', $iconField.attr('name'));
                 }
                 
                 // Визуальная обратная связь
@@ -136,4 +139,3 @@
         }
     });
 })(django.jQuery || jQuery || window.jQuery || $);
-
