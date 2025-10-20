@@ -17,10 +17,10 @@ class VehicleCardSpecInline(admin.TabularInline):
     model = VehicleCardSpec
     form = VehicleCardSpecForm 
     extra = 1
-    fields = ('icon_selector', 'icon_preview', 'value_ru', 'value_ky', 'value_en', 'order')
+    fields = ('icon_selector', 'icon_preview', 'value_ru', 'order')  # ← УБРАЛИ value_ky и value_en
     readonly_fields = ('icon_selector', 'icon_preview')
     verbose_name = "Характеристика"
-    verbose_name_plural = "Характеристики для каталога"
+    verbose_name_plural = "Характеристики для каталога (отображаются в карточках на главной странице)"
 
     class Media:
         js = ('admin/js/icon_selector.js',)
@@ -83,7 +83,7 @@ class KGVehicleImageInline(admin.TabularInline):
     fields = ('image', 'image_preview', 'alt', 'order')
     readonly_fields = ('image_preview',)
     verbose_name = "Дополнительное фото"
-    verbose_name_plural = "Дополнительные фото"
+    verbose_name_plural = "Дополнительные фото (для галереи на странице детализации)"
 
     def image_preview(self, obj):
         return format_html('<img src="{}" width="80" style="border-radius:8px;">', obj.image.url) if obj.image else "Не загружено"
@@ -108,14 +108,16 @@ class KGVehicleAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Название техники', {
-            'fields': ('title_ru', 'title_ky', 'title_en')
+            'fields': ('title_ru', 'title_ky', 'title_en'),
+            'description': '💡 Это название отображается в каталоге, в Hero-слайдере и на странице детализации машины.'
         }),
         ('Фотографии', {
-            'fields': ('preview_image', 'main_image')
+            'fields': ('preview_image', 'main_image'),
+            'description': '💡 Превью — для каталога (главная страница). Главное фото — для страницы детализации.'
         }),
-        ('📋 Детальные характеристики', {
+        ('Детальные характеристики', {
             'fields': (
-                # Детальные иконки (Grid 2×4)
+                # Детальные иконки (Grid 3×3)
                 'feature_aircondi',
                 'feature_power_windows',
                 'feature_sleeping_area',
@@ -163,10 +165,12 @@ class KGVehicleAdmin(admin.ModelAdmin):
                 'cabin_equipment_ru', 'cabin_equipment_ky', 'cabin_equipment_en',
             ),
             'classes': ('specs-container',),
+            'description': '💡 Эта вкладка содержит подробные технические характеристики машины, которые отображаются на странице детализации. Используйте аккордеоны для удобной навигации.'
         }),
         ('Служебная информация', {
             'fields': ('is_active', 'category', 'created_at', 'updated_at'),
-            'classes': ('collapse',)
+            'classes': ('collapse',),
+            'description': '💡 Служебные поля для управления видимостью и отслеживания изменений.'
         }),
     )
 
@@ -175,133 +179,6 @@ class KGVehicleAdmin(admin.ModelAdmin):
             'all': ('admin/css/vehicle_admin.css',)
         }
         js = ('admin/js/specs_accordion.js',)
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related().prefetch_related('card_specs', 'mini_images')
-
-    def mini_thumb(self, obj):
-        return format_html('<img src="{}" width="60" style="border-radius:6px;">', obj.preview_image.url) if obj.preview_image else "—"
-    mini_thumb.short_description = "Фото"
-
-    def title_display(self, obj):
-        return obj.title_ru or obj.title or '—'
-    title_display.short_description = "Название"
-    title_display.admin_order_field = 'title_ru'
-
-    def category_badge(self, obj):
-        colors = {'v': '#4CAF50', 'vr': '#2196F3', 'vh': '#FF9800'}
-        labels = {'v': 'V Series', 'vr': 'VR Series', 'vh': 'VH Series'}
-        return format_html(
-            '<span style="background:{}; color:white; padding:5px 12px; border-radius:12px; font-weight:600; font-size:11px;">{}</span>',
-            colors.get(obj.category, '#757575'), labels.get(obj.category, obj.category.upper())
-        )
-    category_badge.short_description = "Серия"
-
-    def action_buttons(self, obj):
-        frontend_url = f"http://localhost:5173/vehicle-details.html?id={obj.slug_ru or obj.slug}&lang=ru"
-        return format_html(
-            '<div style="display:flex; gap:8px;">'
-            '<a href="{}"><img src="/static/media/icon-adminpanel/pencil.png" width="28"></a>'
-            '<a href="{}" onclick="return confirm(\'Удалить {}?\')"><img src="/static/media/icon-adminpanel/recycle-bin.png" width="28"></a>'
-            '<a href="{}" target="_blank"><img src="/static/media/icon-adminpanel/eyes.png" width="28"></a>'
-            '</div>',
-            f'/admin/kg/kgvehicle/{obj.id}/change/',
-            f'/admin/kg/kgvehicle/{obj.id}/delete/',
-            obj.title_ru or 'машину',
-            frontend_url
-        )
-    action_buttons.short_description = "Действия"
-
-    actions = ['activate_vehicles', 'deactivate_vehicles']
-
-    def activate_vehicles(self, request, queryset):
-        updated = queryset.update(is_active=True)
-        self.message_user(request, f'✅ Активировано: {updated}')
-    activate_vehicles.short_description = 'Активировать'
-
-    def deactivate_vehicles(self, request, queryset):
-        updated = queryset.update(is_active=False)
-        self.message_user(request, f'❌ Деактивировано: {updated}')
-    deactivate_vehicles.short_description = 'Деактивировать'
-    list_display = ('mini_thumb', 'title_display', 'category_badge', 'is_active', 'created_at', 'action_buttons')
-    list_editable = ('is_active',)
-    list_filter = ('category', 'is_active', 'created_at')
-    list_select_related = True
-    search_fields = ('title_ru', 'title_ky', 'title_en', 'slug')
-    readonly_fields = ('created_at', 'updated_at', 'category')
-    list_per_page = 20
-    date_hierarchy = 'created_at'
-    inlines = [VehicleCardSpecInline, KGVehicleImageInline]
-
-    fieldsets = (
-        ('Название техники', {
-            'fields': ('title_ru', 'title_ky', 'title_en')
-        }),
-        ('Фотографии', {
-            'fields': ('preview_image', 'main_image')
-        }),
-        ('📋 Детальные характеристики', {
-            'fields': (
-                # Детальные иконки (Grid 2×4)
-                'feature_aircondi',
-                'feature_power_windows',
-                'feature_sleeping_area',
-                'feature_radio',
-                'feature_remote_control',
-                'feature_bluetooth',
-                'feature_multifunction_steering',
-                
-                # Основные характеристики
-                'wheel_formula',
-                'dimensions_ru', 'dimensions_ky', 'dimensions_en',
-                'wheelbase',
-                'fuel_type_ru', 'fuel_type_ky', 'fuel_type_en',
-                'tank_volume',
-                
-                # Весовые характеристики
-                'curb_weight',
-                'payload',
-                'gross_weight',
-                
-                # Кузов
-                'body_type_ru', 'body_type_ky', 'body_type_en',
-                'body_dimensions_ru', 'body_dimensions_ky', 'body_dimensions_en',
-                'body_volume',
-                'body_material_ru', 'body_material_ky', 'body_material_en',
-                'loading_type_ru', 'loading_type_ky', 'loading_type_en',
-                
-                # Двигатель
-                'engine_model',
-                'engine_volume',
-                'engine_power',
-                
-                # Трансмиссия
-                'transmission_model',
-                'transmission_type_ru', 'transmission_type_ky', 'transmission_type_en',
-                'gears',
-                
-                # Шины и тормозная система
-                'tire_type',
-                'suspension_ru', 'suspension_ky', 'suspension_en',
-                'brakes_ru', 'brakes_ky', 'brakes_en',
-                
-                # Кабина
-                'cabin_category_ru', 'cabin_category_ky', 'cabin_category_en',
-                'cabin_equipment_ru', 'cabin_equipment_ky', 'cabin_equipment_en',
-            ),
-            'classes': ('specs-container',),
-        }),
-        ('Служебная информация', {
-            'fields': ('is_active', 'category', 'created_at', 'updated_at'),
-            'classes': ('collapse',)
-        }),
-    )
-
-    class Media:
-        css = {
-            'all': ('admin/css/vehicle_admin.css',)
-        }
-        js = ('admin/js/specs_accordion.js',) 
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related().prefetch_related('card_specs', 'mini_images')
@@ -368,10 +245,12 @@ class KGHeroSlideAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Основная информация', {
-            'fields': ('vehicle', 'vehicle_preview', 'order', 'is_active')
+            'fields': ('vehicle', 'vehicle_preview', 'order', 'is_active'),
+            'description': '💡 Hero-слайды отображаются на главной странице сайта. Выберите машину и настройте порядок показа.'
         }),
         ('Описание (Русский)', {
             'fields': ('description_ru',),
+            'description': '💡 Краткое описание машины для главной страницы (например: "Мощный и надежный грузовик").'
         }),
         ('Описание (Кыргызский)', {
             'fields': ('description_ky',),
@@ -411,84 +290,17 @@ class KGFeedbackAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Информация о клиенте', {
-            'fields': ('name', 'phone', 'region', 'vehicle', 'message', 'created_at')
+            'fields': ('name', 'phone', 'region', 'vehicle', 'message', 'created_at'),
+            'description': '💡 Данные клиента, оставившего заявку на сайте.'
         }),
         ('Управление', {
-            'fields': ('status', 'priority', 'manager', 'admin_comment')
+            'fields': ('status', 'priority', 'manager', 'admin_comment'),
+            'description': '💡 Настройки обработки заявки. Изменения сохраняются автоматически при редактировании в списке.'
         }),
     )
     
     class Media:
         js = ('admin/js/auto_save_feedback.js',)
-
-    def vehicle_display(self, obj):
-        return obj.vehicle.title_ru if obj.vehicle else '—'
-    vehicle_display.short_description = "Машина"
-    vehicle_display.admin_order_field = 'vehicle__title_ru'
-
-    def mark_as_done(self, request, queryset):
-        updated = queryset.update(status='done')
-        self.message_user(request, f'✅ Обработано заявок: {updated}')
-    mark_as_done.short_description = 'Отметить как обработанные'
-
-    def export_to_excel(self, request, queryset):
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.title = "Заявки FAW KG"
-
-        headers = ['№', 'ФИО', 'Телефон', 'Регион', 'Машина', 'Статус', 'Приоритет', 'Менеджер', 'Дата']
-        ws.append(headers)
-
-        header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
-        header_font = Font(bold=True, color='FFFFFF')
-
-        for cell in ws[1]:
-            cell.fill = header_fill
-            cell.font = header_font
-            cell.alignment = Alignment(horizontal='center', vertical='center')
-
-        for idx, feedback in enumerate(queryset.select_related('vehicle', 'manager'), start=1):
-            ws.append([
-                idx,
-                feedback.name,
-                feedback.phone,
-                feedback.get_region_display(),
-                feedback.vehicle.title_ru if feedback.vehicle else '-',
-                feedback.get_status_display(),
-                feedback.get_priority_display(),
-                feedback.manager.username if feedback.manager else '-',
-                feedback.created_at.strftime('%d.%m.%Y %H:%M')
-            ])
-
-        for column in ws.columns:
-            max_length = max(len(str(cell.value)) for cell in column)
-            ws.column_dimensions[column[0].column_letter].width = min(max_length + 2, 50)
-
-        response = HttpResponse(
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
-        response['Content-Disposition'] = f'attachment; filename="faw_kg_leads_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
-        wb.save(response)
-        return response
-
-    export_to_excel.short_description = 'Экспорт в Excel'
-    list_display = ['name', 'phone', 'region', 'vehicle_display', 'priority', 'status', 'manager', 'created_at']
-    list_editable = ['priority', 'status', 'manager']
-    list_filter = ['status', 'priority', 'region', 'created_at']
-    search_fields = ['name', 'phone', 'vehicle__title_ru']
-    readonly_fields = ['created_at']
-    date_hierarchy = 'created_at'
-    actions = ['export_to_excel', 'mark_as_done']
-    list_select_related = ('vehicle', 'manager')
-
-    fieldsets = (
-        ('Информация о клиенте', {
-            'fields': ('name', 'phone', 'region', 'vehicle', 'message', 'created_at')
-        }),
-        ('Управление', {
-            'fields': ('status', 'priority', 'manager', 'admin_comment')
-        }),
-    )
 
     def vehicle_display(self, obj):
         return obj.vehicle.title_ru if obj.vehicle else '—'
