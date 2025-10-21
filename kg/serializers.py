@@ -248,7 +248,6 @@ class KGVehicleDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для детальной страницы машины"""
     title = serializers.SerializerMethodField()
     slug = serializers.SerializerMethodField()
-    specs = serializers.SerializerMethodField()
     card_specs = VehicleCardSpecSerializer(many=True, read_only=True)
     gallery_images = KGVehicleImageSerializer(many=True, source='mini_images', read_only=True)
     features = serializers.SerializerMethodField()
@@ -261,11 +260,6 @@ class KGVehicleDetailSerializer(serializers.ModelSerializer):
     def get_slug(self, obj):
         lang = self.context.get('lang', 'ru')
         return obj.get_slug(lang)
-    
-    def get_specs(self, obj):
-        """Для Hero (обратная совместимость)"""
-        lang = self.context.get('lang', 'ru')
-        return obj.get_specs(lang)
     
     def get_features(self, obj):
         """Возвращает список активных features"""
@@ -281,7 +275,7 @@ class KGVehicleDetailSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'slug', 'title', 'category',
             'preview_image', 'main_image',
-            'specs', 'card_specs', 'gallery_images',
+            'card_specs', 'gallery_images',
             'features', 'detailed_specs',
             'is_active'
         ]

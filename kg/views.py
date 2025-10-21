@@ -2,13 +2,12 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
-from datetime import datetime, timedelta  
-from django.db.models import Count  
-from django.http import HttpResponse
+from datetime import datetime
+from django.http import HttpResponse, Http404
 from django.db import models
-from django.http import Http404
+from django.shortcuts import get_object_or_404, render
+from django.contrib.admin.views.decorators import staff_member_required
 from .models import KGVehicle, KGFeedback, KGHeroSlide
-from django.shortcuts import get_object_or_404
 from .serializers import (
     KGVehicleListSerializer,
     KGVehicleDetailSerializer,
@@ -18,26 +17,25 @@ from .serializers import (
 )
 
 
-
-
-
+# ============================================
+# VIEWSET: МАШИНЫ (КАТАЛОГ)
+# ============================================
 
 class KGVehicleViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = KGVehicle.objects.filter(is_active=True).prefetch_related(
+    """API для машин FAW.KG"""
+    queryset = KGVehicle.objects.filter(is_active=True).select_related().prefetch_related(
         'mini_images',
         'card_specs'
     )
     permission_classes = [AllowAny]
-    lookup_field = 'slug'  # ← Ищет только по основному slug
+    lookup_field = 'slug'
     
-    # ДОБАВЬТЕ ЭТОТ МЕТОД:
     def get_object(self):
         """
         Ищем машину по любому из slug (ru/ky/en)
         """
         lookup_value = self.kwargs.get(self.lookup_field)
         
-        # Пробуем найти по всем slug
         queryset = self.get_queryset()
         obj = queryset.filter(
             models.Q(slug=lookup_value) |
@@ -62,10 +60,12 @@ class KGVehicleViewSet(viewsets.ReadOnlyModelViewSet):
         return context
 
 
+# ============================================
+# VIEWSET: ЗАЯВКИ
+# ============================================
+
 class KGFeedbackViewSet(viewsets.ModelViewSet):
-    """
-    API для заявок с сайта faw.kg
-    """
+    """API для заявок с сайта faw.kg"""
     queryset = KGFeedback.objects.all().select_related('vehicle').order_by('-created_at')
     
     def get_serializer_class(self):
@@ -94,147 +94,110 @@ class KGFeedbackViewSet(viewsets.ModelViewSet):
         )
     
     @action(detail=False, methods=['get'], permission_classes=[IsAdminUser])
-    def export_excel(self, request):
-        """
-        Экспорт лидов в Excel
-        Параметры: ?start_date=2025-01-01&end_date=2025-12-31&region=Bishkek&vehicle_id=1
-        """
-        try:
-            import openpyxl
-            from openpyxl.styles import Font, PatternFill, Alignment
-        except ImportError:
-            return Response(
-                {'error': 'openpyxl не установлен. Выполните: pip install openpyxl'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+    def statistics(self, request):
+        """Статистика с фильтрами"""
+        from datetime import timedelta
+        from django.db.models import Count, Q
+        from django.utils import timezone
         
-        # Фильтры
-        queryset = self.get_queryset()
+        # ============ ФИЛЬТРЫ ============
+        queryset = self.queryset
         
+        # Фильтр по датам
         start_date = request.query_params.get('start_date')
         end_date = request.query_params.get('end_date')
-        region = request.query_params.get('region')
-        vehicle_id = request.query_params.get('vehicle_id')
-        is_processed = request.query_params.get('is_processed')
         
         if start_date:
             queryset = queryset.filter(created_at__gte=start_date)
         if end_date:
             queryset = queryset.filter(created_at__lte=end_date)
+        
+        # Фильтр по региону
+        region = request.query_params.get('region')
         if region:
             queryset = queryset.filter(region=region)
+        
+        # Фильтр по машине
+        vehicle_id = request.query_params.get('vehicle_id')
         if vehicle_id:
             queryset = queryset.filter(vehicle_id=vehicle_id)
-  
-        status_filter = request.query_params.get('status')
-        if status_filter:
-            queryset = queryset.filter(status=status_filter)
         
-        # Создание Excel файла
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.title = "Заявки FAW KG"
+        # Фильтр по менеджеру
+        manager_id = request.query_params.get('manager_id')
+        if manager_id:
+            queryset = queryset.filter(manager_id=manager_id)
         
-        # Заголовки
-        headers = ['№', 'ФИО', 'Телефон', 'Регион', 'Машина', 'Сообщение', 'Дата', 'Обработано', 'Комментарий']
-        ws.append(headers)
+        # ============ СТАТИСТИКА ============
+        total = queryset.count()
+        processed = queryset.filter(status='done').count()
+        in_process = queryset.filter(status='in_process').count()
+        new = queryset.filter(status='new').count()
         
-        # Стилизация заголовков
-        header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
-        header_font = Font(bold=True, color='FFFFFF')
-        
-        for cell in ws[1]:
-            cell.fill = header_fill
-            cell.font = header_font
-            cell.alignment = Alignment(horizontal='center', vertical='center')
-        
-        # Данные
-        for idx, feedback in enumerate(queryset, start=1):
-            ws.append([
-                idx,
-                feedback.name,
-                feedback.phone,
-                feedback.get_region_display(),
-                feedback.vehicle.title if feedback.vehicle else '-',
-                feedback.message or '-',
-                feedback.created_at.strftime('%d.%m.%Y %H:%M'),
-                feedback.get_status_display(),
-                feedback.admin_comment or '-'
-            ])
-        
-        # Автоширина колонок
-        for column in ws.columns:
-            max_length = 0
-            column_letter = column[0].column_letter
-            for cell in column:
-                try:
-                    if len(str(cell.value)) > max_length:
-                        max_length = len(cell.value)
-                except:
-                    pass
-            adjusted_width = min(max_length + 2, 50)
-            ws.column_dimensions[column_letter].width = adjusted_width
-        
-        # Отправка файла
-        response = HttpResponse(
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
-        response['Content-Disposition'] = f'attachment; filename="faw_kg_leads_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
-        wb.save(response)
-        
-        return response
-    
-    @action(detail=False, methods=['get'], permission_classes=[IsAdminUser])
-    def statistics(self, request):
-        """Статистика по заявкам"""
-        total = self.queryset.count()
-        processed = self.queryset.filter(is_processed=True).count()
-        unprocessed = self.queryset.filter(is_processed=False).count()
-        today = self.queryset.filter(created_at__date=datetime.now().date()).count()
-        this_week = self.queryset.filter(
-            created_at__gte=datetime.now() - timedelta(days=7)
-        ).count()
-        this_month = self.queryset.filter(
-            created_at__month=datetime.now().month,
-            created_at__year=datetime.now().year
+        # Временные периоды
+        now = timezone.now()
+        today = queryset.filter(created_at__date=now.date()).count()
+        this_week = queryset.filter(created_at__gte=now - timedelta(days=7)).count()
+        this_month = queryset.filter(
+            created_at__month=now.month,
+            created_at__year=now.year
         ).count()
         
-        by_region = self.queryset.values('region').annotate(
+        # По регионам
+        by_region = queryset.values('region').annotate(
             count=Count('id')
         ).order_by('-count')
         
-        by_vehicle = self.queryset.filter(vehicle__isnull=False).values(
-            'vehicle__title'
+        # По машинам
+        by_vehicle = queryset.filter(vehicle__isnull=False).values(
+            'vehicle__id', 'vehicle__title_ru'
         ).annotate(count=Count('id')).order_by('-count')[:10]
+        
+        # По менеджерам
+        by_manager = queryset.filter(manager__isnull=False).values(
+            'manager__id', 'manager__username'
+        ).annotate(count=Count('id')).order_by('-count')
+        
+        # По приоритетам
+        by_priority = queryset.values('priority').annotate(
+            count=Count('id')
+        ).order_by('-count')
+        
+        # График по дням (последние 30 дней)
+        last_30_days = []
+        for i in range(30, -1, -1):
+            day = now - timedelta(days=i)
+            count = queryset.filter(created_at__date=day.date()).count()
+            last_30_days.append({
+                'date': day.strftime('%d.%m'),
+                'count': count
+            })
         
         return Response({
             'total': total,
-            'processed': processed,
-            'unprocessed': unprocessed,
-            'today': today,
-            'this_week': this_week,
-            'this_month': this_month,
+            'by_status': {
+                'new': new,
+                'in_process': in_process,
+                'processed': processed
+            },
+            'time_periods': {
+                'today': today,
+                'this_week': this_week,
+                'this_month': this_month
+            },
             'by_region': list(by_region),
-            'top_vehicles': list(by_vehicle)
-        })
-    
-    @action(detail=True, methods=['post'], permission_classes=[IsAdminUser])
-    def mark_processed(self, request, pk=None):
-        """Отметить заявку как обработанную"""
-        feedback = self.get_object()
-        feedback.is_processed = True
-        feedback.admin_comment = request.data.get('comment', feedback.admin_comment)
-        feedback.save()
-        
-        return Response({
-            'status': 'processed',
-            'message': f'Заявка #{feedback.id} отмечена как обработанная'
+            'by_vehicle': list(by_vehicle),
+            'by_manager': list(by_manager),
+            'by_priority': list(by_priority),
+            'chart_data': last_30_days
         })
 
 
-
+# ============================================
+# VIEWSET: HERO-СЛАЙДЫ
+# ============================================
 
 class KGHeroSlideViewSet(viewsets.ReadOnlyModelViewSet):
+    """API для Hero-слайдов"""
     queryset = KGHeroSlide.objects.filter(is_active=True).select_related('vehicle')
     serializer_class = KGHeroSlideSerializer
     permission_classes = [AllowAny]
@@ -243,8 +206,10 @@ class KGHeroSlideViewSet(viewsets.ReadOnlyModelViewSet):
         context = super().get_serializer_context()
         context['lang'] = self.request.query_params.get('lang', 'ru')
         return context
+
+
 # ============================================
-# VIEWSET: БЫСТРОЕ ОБНОВЛЕНИЕ ЗАЯВОК (для автосохранения в админке)
+# VIEWSET: БЫСТРОЕ ОБНОВЛЕНИЕ ЗАЯВОК
 # ============================================
 
 class KGFeedbackQuickUpdateViewSet(viewsets.ViewSet):
@@ -258,14 +223,12 @@ class KGFeedbackQuickUpdateViewSet(viewsets.ViewSet):
     def quick_update(self, request, pk=None):
         feedback = get_object_or_404(KGFeedback, pk=pk)
         
-        # Разрешённые поля для обновления
         allowed_fields = ['status', 'priority', 'manager']
         
         updated_fields = []
         for field in allowed_fields:
             if field in request.data:
                 if field == 'manager':
-                    # Для manager нужно получить объект User
                     manager_id = request.data[field]
                     if manager_id and manager_id != '':
                         feedback.manager_id = manager_id
@@ -293,3 +256,19 @@ class KGFeedbackQuickUpdateViewSet(viewsets.ViewSet):
             'success': False,
             'message': 'Нет полей для обновления'
         }, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ============================================
+# СТРАНИЦА СТАТИСТИКИ ДЛЯ АДМИНКИ
+# ============================================
+
+@staff_member_required
+def kg_stats_dashboard(request):
+    """
+    Отдельная страница статистики FAW.KG
+    Доступна по адресу: /admin/kg/stats/
+    """
+    return render(request, 'admin/kg_dashboard.html', {
+        'title': 'Статистика FAW.KG',
+        'site_header': 'Статистика заявок',
+    })

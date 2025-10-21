@@ -2,11 +2,9 @@
     'use strict';
     
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('Инициализация аккордеонов...');
         
         const specsContainer = document.querySelector('.specs-container');
         if (!specsContainer) {
-            console.log('Контейнер .specs-container не найден');
             return;
         }
         
@@ -59,7 +57,6 @@
         sections.forEach((section, index) => {
             const startField = specsContainer.querySelector('.field-' + section.start);
             if (!startField) {
-                console.warn('Поле не найдено:', section.start);
                 return;
             }
             
@@ -89,9 +86,7 @@
             // Обработчик клика
             header.addEventListener('click', function() {
                 const isActive = this.classList.contains('active');
-                
-                console.log('Клик по секции:', section.title, 'Активна:', isActive);
-                
+    
                 // Закрываем все секции
                 specsContainer.querySelectorAll('.section-header').forEach(h => h.classList.remove('active'));
                 specsContainer.querySelectorAll('.section-content').forEach(c => c.classList.remove('active'));
@@ -113,7 +108,6 @@
         const firstHeader = specsContainer.querySelector('.section-header');
         if (firstHeader) {
             firstHeader.click();
-            console.log('Первая секция открыта');
         }
     });
 })();

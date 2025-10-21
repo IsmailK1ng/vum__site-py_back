@@ -1,0 +1,11 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+    {% if stats_button_html %}
+        <div style="margin: 15px 0;">
+            {{ stats_button_html|safe }}
+        </div>
+    {% endif %}
+    
+    {{ block.super }}
+{% endblock %}

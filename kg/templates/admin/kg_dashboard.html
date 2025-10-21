@@ -1,0 +1,210 @@
+{% load static %}
+
+<div class="kg-dashboard" style="
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    padding: 30px;
+    margin: 20px 0;
+    color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+">
+    <h2 style="margin-top: 0; font-size: 28px; font-weight: 700;">
+        📊 Статистика заявок FAW.KG
+    </h2>
+    
+    <div id="kg-stats-loading" style="text-align: center; padding: 40px;">
+        <div style="
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        "></div>
+        <p style="margin-top: 15px; font-size: 16px;">Загрузка статистики...</p>
+    </div>
+    
+    <div id="kg-stats-content" style="display: none;"></div>
+</div>
+
+<style>
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 25px 0;
+}
+
+.stat-card {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255,255,255,0.25);
+}
+
+.stat-value {
+    font-size: 36px;
+    font-weight: 800;
+    margin: 10px 0;
+}
+
+.stat-label {
+    font-size: 14px;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.top-list {
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.top-list h3 {
+    margin-top: 0;
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.top-item {
+    background: rgba(255,255,255,0.1);
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.top-item:last-child {
+    margin-bottom: 0;
+}
+
+.top-rank {
+    font-weight: 700;
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+.top-count {
+    background: rgba(255,255,255,0.3);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+}
+</style>
+
+<script>
+(function() {
+    fetch('/api/kg/feedback/statistics/')
+        .then(response => response.json())
+        .then(data => {
+            const loading = document.getElementById('kg-stats-loading');
+            const content = document.getElementById('kg-stats-content');
+            
+            loading.style.display = 'none';
+            content.style.display = 'block';
+            
+            const processedPercent = data.total > 0 
+                ? Math.round((data.processed / data.total) * 100) 
+                : 0;
+            
+            content.innerHTML = `
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Всего заявок</div>
+                        <div class="stat-value">${data.total}</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">✅ Обработано</div>
+                        <div class="stat-value">${data.processed}</div>
+                        <div style="font-size: 14px; margin-top: 5px;">${processedPercent}% выполнено</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">⏳ В работе</div>
+                        <div class="stat-value">${data.unprocessed}</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">🆕 Сегодня</div>
+                        <div class="stat-value">${data.today}</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">📅 За неделю</div>
+                        <div class="stat-value">${data.this_week}</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">📆 За месяц</div>
+                        <div class="stat-value">${data.this_month}</div>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                    <div class="top-list">
+                        <h3>🗺️ Топ регионов</h3>
+                        ${data.by_region.slice(0, 5).map((item, index) => `
+                            <div class="top-item">
+                                <div>
+                                    <span class="top-rank">${index + 1}.</span>
+                                    <span>${getRegionName(item.region)}</span>
+                                </div>
+                                <span class="top-count">${item.count}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="top-list">
+                        <h3>🚗 Топ машин</h3>
+                        ${data.top_vehicles.slice(0, 5).map((item, index) => `
+                            <div class="top-item">
+                                <div>
+                                    <span class="top-rank">${index + 1}.</span>
+                                    <span>${item.vehicle__title_ru}</span>
+                                </div>
+                                <span class="top-count">${item.count}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        })
+        .catch(error => {
+            document.getElementById('kg-stats-loading').innerHTML = `
+                <p style="color: #ffcccb;">⚠️ Ошибка загрузки статистики</p>
+            `;
+        });
+    
+    function getRegionName(region) {
+        const names = {
+            'Bishkek': 'Бишкек',
+            'Osh': 'Ош',
+            'Chuy': 'Чуйская область',
+            'Jalal-Abad': 'Джалал-Абадская область',
+            'Naryn': 'Нарынская область',
+            'Batken': 'Баткенская область',
+            'Talas': 'Таласская область',
+            'Issyk-Kul': 'Иссык-Кульская область'
+        };
+        return names[region] || region;
+    }
+})();
+</script>

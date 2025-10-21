@@ -7,6 +7,8 @@ from .forms import VehicleCardSpecForm
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
 from datetime import datetime
+from django.urls import reverse
+
 
 
 # ============================================
@@ -279,6 +281,7 @@ class KGHeroSlideAdmin(admin.ModelAdmin):
 
 @admin.register(KGFeedback)
 class KGFeedbackAdmin(admin.ModelAdmin):
+    """Админка заявок с кнопкой '📊 Статистика заявок' (только для суперпользователей)"""
     list_display = ['name', 'phone', 'region', 'vehicle_display', 'priority', 'status', 'manager', 'created_at', 'action_buttons']
     list_editable = ['priority', 'status', 'manager']
     list_filter = ['status', 'priority', 'region', 'created_at']
@@ -287,7 +290,7 @@ class KGFeedbackAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     actions = ['export_to_excel', 'mark_as_done']
     list_select_related = ('vehicle', 'manager')
-    raw_id_fields = ['vehicle', 'manager']  
+    raw_id_fields = ['vehicle', 'manager']
 
     fieldsets = (
         ('Информация о клиенте', {
@@ -299,13 +302,25 @@ class KGFeedbackAdmin(admin.ModelAdmin):
     )
 
     class Media:
-            css = {
-                'all': ('admin/css/feedback_admin.css',)
-            }
-            js = (
-                'https://code.jquery.com/jquery-3.6.0.min.js',  # Явное подключение jQuery
-                'admin/js/auto_save_feedback.js',
+        css = {'all': ('admin/css/feedback_admin.css',)}
+        js = ('admin/js/auto_save_feedback.js',)
+
+    def changelist_view(self, request, extra_context=None):
+        """
+        Добавляем кнопку статистики только для суперпользователей.
+        """
+        extra_context = extra_context or {}
+        if request.user.is_superuser:  # ✅ только суперпользователи
+            extra_context['stats_button_html'] = format_html(
+                '<div style="margin-bottom:15px;">'
+                '<a href="/admin/kg/stats/" target="_blank" style="'
+                'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); '
+                'color: white; padding: 10px 20px; border-radius: 8px; '
+                'text-decoration: none; font-weight: 600; display: inline-block;">'
+                '📊 Статистика заявок'
+                '</a></div>'
             )
+        return super().changelist_view(request, extra_context)
 
     def vehicle_display(self, obj):
         return obj.vehicle.title_ru if obj.vehicle else '—'
@@ -320,8 +335,8 @@ class KGFeedbackAdmin(admin.ModelAdmin):
             '<a href="{}" onclick="return confirm(\'Удалить заявку от {}?\')"><img src="/static/media/icon-adminpanel/recycle-bin.png" width="28" title="Удалить"></a>'
             '<a href="{}" target="_blank"><img src="/static/media/icon-adminpanel/eyes.png" width="28" title="Посмотреть машину"></a>'
             '</div>',
-            f'/admin/kg/kgfeedback/{obj.id}/change/',  # ← БЫЛО /admin/main/
-            f'/admin/kg/kgfeedback/{obj.id}/delete/',  # ← БЫЛО /admin/main/
+            f'/admin/kg/kgfeedback/{obj.id}/change/',
+            f'/admin/kg/kgfeedback/{obj.id}/delete/',
             obj.name,
             frontend_url
         )
@@ -329,9 +344,9 @@ class KGFeedbackAdmin(admin.ModelAdmin):
 
     def mark_as_done(self, request, queryset):
         updated = queryset.update(status='done')
-        self.message_user(request, f'Обработано заявок: {updated}')
+        self.message_user(request, f'✅ Обработано заявок: {updated}')
     mark_as_done.short_description = 'Отметить как обработанные'
-    
+
     def export_to_excel(self, request, queryset):
         import openpyxl
         from openpyxl.styles import Font, PatternFill, Alignment
@@ -376,7 +391,7 @@ class KGFeedbackAdmin(admin.ModelAdmin):
         return response
 
     export_to_excel.short_description = 'Экспорт в Excel'
-
+    
 # ============================================
 # ADMIN: ШАБЛОНЫ ИКОНОК
 # ============================================
@@ -396,3 +411,4 @@ class IconTemplateAdmin(admin.ModelAdmin):
     def created_display(self, obj):
         return "—"
     created_display.short_description = "Создано"
+

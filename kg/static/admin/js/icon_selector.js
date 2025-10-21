@@ -84,9 +84,7 @@
                 const $table = $row.closest('table');
                 const $allRows = $table.find('tbody tr.form-row');
                 const rowIndex = $allRows.index($row);
-                
-                console.log('Выбрана иконка:', templateId, 'для строки:', rowIndex);
-                
+        
                 // Создаём или обновляем скрытое поле
                 const fieldName = 'card_specs-' + rowIndex + '-selected_template';
                 let $hiddenInput = $row.find('input[name="' + fieldName + '"]');
@@ -111,7 +109,6 @@
                 const $iconField = $row.find('input[name*="-icon"]');
                 if ($iconField.length) {
                     $iconField.val(iconUrl);
-                    console.log('Иконка установлена в поле:', $iconField.attr('name'));
                 }
                 
                 // Визуальная обратная связь
