@@ -310,15 +310,26 @@ class KGFeedbackAdmin(admin.ModelAdmin):
         Добавляем кнопку статистики только для суперпользователей.
         """
         extra_context = extra_context or {}
-        if request.user.is_superuser:  # ✅ только суперпользователи
+        if request.user.is_superuser:
             extra_context['stats_button_html'] = format_html(
-                '<div style="margin-bottom:15px;">'
+                '<div style="margin-bottom: 20px;">'
                 '<a href="/admin/kg/stats/" target="_blank" style="'
-                'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); '
-                'color: white; padding: 10px 20px; border-radius: 8px; '
-                'text-decoration: none; font-weight: 600; display: inline-block;">'
+                'background: linear-gradient(306deg, #000000, #002b9b, #1e57eb); '
+                'color: white; '
+                'padding: 12px 24px; '
+                'border: none; '
+                'border-radius: 8px; '
+                'font-size: 15px; '
+                'font-weight: 600; '
+                'text-decoration: none; '
+                'display: inline-block; '
+                'transition: all 0.3s; '
+                'box-shadow: 0 4px 12px rgba(0, 43, 155, 0.2);"'
+                'onmouseover="this.style.transform=\'translateY(-2px)\'; this.style.boxShadow=\'0 6px 20px rgba(0, 43, 155, 0.3)\';"'
+                'onmouseout="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'0 4px 12px rgba(0, 43, 155, 0.2)\';">'
                 '📊 Статистика заявок'
-                '</a></div>'
+                '</a>'
+                '</div>'
             )
         return super().changelist_view(request, extra_context)
 

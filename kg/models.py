@@ -10,7 +10,6 @@ import uuid
 class KGVehicle(models.Model):
     """Модель машины для Киргизстана"""
     
-    title = models.CharField(max_length=255, verbose_name='Название', default='')
     slug = models.SlugField(max_length=255, unique=True, verbose_name='URL-имя')
     
     CATEGORY_CHOICES = [
@@ -121,10 +120,6 @@ class KGVehicle(models.Model):
     feature_bluetooth = models.BooleanField(default=False, verbose_name='Bluetooth + USB')
     feature_multifunction_steering = models.BooleanField(default=False, verbose_name='Мультируль')
     
-    # Старые поля (для совместимости с API)
-    specs_ru = models.JSONField(blank=True, null=True, default=dict, verbose_name='Характеристики (RU)')
-    specs_ky = models.JSONField(blank=True, null=True, default=dict, verbose_name='Характеристики (KY)')
-    specs_en = models.JSONField(blank=True, null=True, default=dict, verbose_name='Характеристики (EN)')
     
     # Служебные
     is_active = models.BooleanField(default=True, verbose_name='Активно')
@@ -160,7 +155,7 @@ class KGVehicle(models.Model):
                 self.slug_en = slugify(self.title_en)
             
             # 2. ОПРЕДЕЛЕНИЕ КАТЕГОРИИ
-            title_lower = (self.title_ru or self.title or '').lower()
+            title_lower = (self.title_ru or '').lower()
             
             if 'vr' in title_lower:
                 self.category = 'vr'
@@ -172,14 +167,14 @@ class KGVehicle(models.Model):
             super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.title_ru or self.title or self.slug
-    
+        return self.title_ru or self.slug
+        
     def get_title(self, lang='ru'):
         if lang == 'en':
-            return self.title_en or self.title_ru or self.title
+            return self.title_en or self.title_ru
         elif lang == 'ky':
-            return self.title_ky or self.title_ru or self.title
-        return self.title_ru or self.title
+            return self.title_ky or self.title_ru
+        return self.title_ru
     
     def get_slug(self, lang='ru'):
         if lang == 'en':
@@ -187,13 +182,6 @@ class KGVehicle(models.Model):
         elif lang == 'ky':
             return self.slug_ky or self.slug_ru or self.slug
         return self.slug_ru or self.slug
-    
-    def get_specs(self, lang='ru'):
-        if lang == 'en':
-            return self.specs_en or self.specs_ru or {}
-        elif lang == 'ky':
-            return self.specs_ky or self.specs_ru or {}
-        return self.specs_ru or {}
     
     def get_features(self):
         """Возвращает список активных features"""
@@ -380,7 +368,7 @@ class KGHeroSlide(models.Model):
         verbose_name_plural = '[KG] Hero-слайды'
 
     def __str__(self):
-        return f"Hero #{self.order} - {self.vehicle.title}"
+        return f"Hero #{self.order} - {self.vehicle.title_ru}"
     
     def get_description(self, lang='ru'):
         if lang == 'en':

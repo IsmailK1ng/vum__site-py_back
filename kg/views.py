@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAdminUser, BasePermission
 from datetime import datetime
 from django.http import HttpResponse, Http404
 from django.db import models
@@ -16,6 +16,14 @@ from .serializers import (
     KGHeroSlideSerializer
 )
 
+# ============================================
+# CUSTOM PERMISSIONS
+# ============================================
+
+class IsSuperUser(BasePermission):
+    """Доступ только для суперпользователей"""
+    def has_permission(self, request, view):
+        return request.user and request.user.is_superuser
 
 # ============================================
 # VIEWSET: МАШИНЫ (КАТАЛОГ)
@@ -93,11 +101,11 @@ class KGFeedbackViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED
         )
     
-    @action(detail=False, methods=['get'], permission_classes=[IsAdminUser])
+    @action(detail=False, methods=['get'], permission_classes=[IsSuperUser])
     def statistics(self, request):
         """Статистика с фильтрами"""
         from datetime import timedelta
-        from django.db.models import Count, Q
+        from django.db.models import Count
         from django.utils import timezone
         
         # ============ ФИЛЬТРЫ ============
@@ -117,21 +125,11 @@ class KGFeedbackViewSet(viewsets.ModelViewSet):
         if region:
             queryset = queryset.filter(region=region)
         
-        # Фильтр по машине
-        vehicle_id = request.query_params.get('vehicle_id')
-        if vehicle_id:
-            queryset = queryset.filter(vehicle_id=vehicle_id)
-        
-        # Фильтр по менеджеру
-        manager_id = request.query_params.get('manager_id')
-        if manager_id:
-            queryset = queryset.filter(manager_id=manager_id)
-        
         # ============ СТАТИСТИКА ============
-        total = queryset.count()
-        processed = queryset.filter(status='done').count()
-        in_process = queryset.filter(status='in_process').count()
+        # По статусам
         new = queryset.filter(status='new').count()
+        in_process = queryset.filter(status='in_process').count()
+        processed = queryset.filter(status='done').count()
         
         # Временные периоды
         now = timezone.now()
@@ -150,7 +148,7 @@ class KGFeedbackViewSet(viewsets.ModelViewSet):
         # По машинам
         by_vehicle = queryset.filter(vehicle__isnull=False).values(
             'vehicle__id', 'vehicle__title_ru'
-        ).annotate(count=Count('id')).order_by('-count')[:10]
+        ).annotate(count=Count('id')).order_by('-count')[:5]
         
         # По менеджерам
         by_manager = queryset.filter(manager__isnull=False).values(
@@ -162,18 +160,20 @@ class KGFeedbackViewSet(viewsets.ModelViewSet):
             count=Count('id')
         ).order_by('-count')
         
-        # График по дням (последние 30 дней)
-        last_30_days = []
-        for i in range(30, -1, -1):
-            day = now - timedelta(days=i)
-            count = queryset.filter(created_at__date=day.date()).count()
-            last_30_days.append({
-                'date': day.strftime('%d.%m'),
-                'count': count
-            })
+        # Список заявок для таблицы
+        feedbacks_list = queryset.select_related('vehicle', 'manager').values(
+            'id',
+            'name',
+            'phone',
+            'region',
+            'vehicle__title_ru',
+            'status',
+            'priority',
+            'manager__username',
+            'created_at'
+        ).order_by('-created_at')[:100]
         
         return Response({
-            'total': total,
             'by_status': {
                 'new': new,
                 'in_process': in_process,
@@ -188,7 +188,7 @@ class KGFeedbackViewSet(viewsets.ModelViewSet):
             'by_vehicle': list(by_vehicle),
             'by_manager': list(by_manager),
             'by_priority': list(by_priority),
-            'chart_data': last_30_days
+            'feedbacks_list': list(feedbacks_list)
         })
 
 
@@ -264,10 +264,14 @@ class KGFeedbackQuickUpdateViewSet(viewsets.ViewSet):
 
 @staff_member_required
 def kg_stats_dashboard(request):
-    """
-    Отдельная страница статистики FAW.KG
-    Доступна по адресу: /admin/kg/stats/
-    """
+    if not request.user.is_superuser:
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden(
+            '<h1 style="text-align:center; margin-top:100px; color:#dc3545;">'
+            '🚫 Доступ запрещён<br><small>Только для суперпользователей</small>'
+            '</h1>'
+        )
+    
     return render(request, 'admin/kg_dashboard.html', {
         'title': 'Статистика FAW.KG',
         'site_header': 'Статистика заявок',
