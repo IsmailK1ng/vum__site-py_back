@@ -1,68 +1,82 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="uz" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
-
-    <!-- Заголовок страницы -->
-    <title>Faw Trucks в Узбекистане</title>
-
-    <!-- Мета теги -->
-    <meta name="description" content="Faw Trucks в Узбекистане">
-    <meta name="keywords" content="Faw Trucks в Узбекистане">
-    <meta name="author" content="mix_design">
-
-    <!-- Мета viewport -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>FAW Trucks - Mahsulot</title>
+    <meta name="description" content="FAW Trucks в Узбекистане">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-    <!-- Фавикон и иконки (начало) -->
+    <!-- Фавикон -->
     <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
-    <link rel="apple-touch-icon" href="{% static 'images/icon/_iiiiapple.png' %}" />
-    <link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/icon/_iiii176.png' %}" />
-    <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/icon/_iiii1156.png' %}" />
-    <link rel="apple-touch-startup-image" href="{% static 'images/icon/_iiii1.png' %}" />
-    <!-- Фавикон и иконки (конец) -->
 
-    <!-- Мета для Facebook (начало) -->
-    <meta property="og:image:height" content="1200">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:title" content="Faw Trucks в Узбекистане">
-    <meta property="og:description" content="Faw Trucks в Узбекистане">
-    <meta property="og:url" content="https://mixdesign.dev/themeforest/rayo">
-    <meta property="og:image" content="https://mixdesign.dev/themeforest/rayo/img/og-image.jpg">
-    <!-- Мета для Facebook (конец) -->
-
-    <!-- Подключение стилей (начало) -->
+    <!-- Подключение стилей -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/faw_main-models.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/more_info.css' %}">
-    <!-- Стили Leaflet для карты в футере -->
 
-
-    <!-- Цвет браузера (начало) -->
+    <!-- Цвет браузера -->
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
-    <meta name="msapplication-navbutton-color" content="#161616">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Цвет браузера (конец) -->
 
+    <!-- Стили для loader -->
+    <style>
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .page-loader .loader {
+            font-size: 24px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .error-page {
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .error-content {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .error-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .error-content p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            color: #666;
+        }
+    </style>
 </head>
 
 <body>
-    <!-- Меню и шапка (начало) -->
+    <!-- Меню и шапка -->
     {% include 'main/includes/header.html' %}
-    <!-- Меню и шапка (конец) -->
 
-    <!-- Контент страницы (начало) -->
+    <!-- Контент страницы -->
     <main id="mxd-page-content" class="mxd-page-content">
 
-        <!-- Секция героя (начало) -->
+        <!-- Секция героя -->
         <div class="mxd-section">
             <div class="mxd-hero-06">
                 <div class="mxd-hero-06__wrap loading-wrap">
@@ -74,7 +88,8 @@
                                         <div class="row g-0 more_info-block">
                                             <div class="col-12 col-xl-12 mxd-grid-item no-margin">
                                                 <div class="mxd-section-models__title">
-                                                    <h2 class="models_title">FAW Tiger V 4x2 samosvali</h2>
+                                                    <!-- Заголовок загружается через JS -->
+                                                    <h2 class="models_title">Yuklanmoqda...</h2>
                                                     <ul class="more_info-link">
                                                         <li><a href="#parametrs">Parametrlar</a></li>
                                                         <li><a href="#gallery">Galereya</a></li>
@@ -97,92 +112,27 @@
                                                 </svg>
                                             </em>
                                             <em class="hero-05-title__item" style="font-size: 25px; max-width: 400px;">
-                                                Har qanday yomon yo‘l muammosi to‘g‘risida xabar bering
+                                                Har qanday yomon yo'l muammosi to'g'risida xabar bering
                                             </em>
                                         </span>
                                         <a class="btn btn-anim btn-default btn-mobile-icon btn-outline slide-right-up mt-3"
-                                            href="#faw-main-contact-modal" aria-label="Перейти к форме связи">
+                                            href="#faw-main-contact-modal" aria-label="Narxini bilish">
                                             <span class="btn-caption">Narxini bilish</span>
                                             <i class="ph-bold ph-arrow-up-right"></i>
                                         </a>
                                     </div>
                                 </div>
                                 <div class="car-img_block">
+                                    <!-- Главное изображение загружается через JS -->
                                     <img src="{% static 'images/more_info.png' %}" class="mxd-hero-06__car-image"
-                                        alt="Samosval FAW Tiger V 4x2">
+                                        alt="FAW Truck">
                                 </div>
                                 <div class="car-img_block-info">
+                                    <!-- 8 характеристик загружаются через JS -->
                                     <div class="car-specs-grid">
-                                        <div class="car-spec-item">
-                                            <img src="{% static 'images/icons/more-info_icons/004-temperature.svg' %}"
-                                                class="car-spec-icon" alt="icon">
-                                            <div class="car-spec-content">
-                                                <div class="car-spec-label">Iqlim nazorati</div>
-                                                <div class="car-spec-value">Mavjud</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="car-spec-item">
-                                            <img src="{% static 'images/icons/more-info_icons/003-races.svg' %}"
-                                                class="car-spec-icon" alt="icon">
-                                            <div class="car-spec-content">
-                                                <div class="car-spec-label">Kruiz nazorati</div>
-                                                <div class="car-spec-value">Mavjud</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="car-spec-item">
-                                            <img src="{% static 'images/icons/more-info_icons/002-windows.svg' %}"
-                                                class="car-spec-icon" alt="icon">
-                                            <div class="car-spec-content">
-                                                <div class="car-spec-label">Elektr-shisha ko'targichlar</div>
-                                                <div class="car-spec-value">Mavjud</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="car-spec-item">
-                                            <img src="{% static 'images/icons/more-info_icons/005-bluetooth.svg' %}"
-                                                class="car-spec-icon" alt="icon">
-                                            <div class="car-spec-content">
-                                                <div class="car-spec-label">Bluetooth + USB</div>
-                                                <div class="car-spec-value">Mavjud</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="car-spec-item">
-                                            <img src="{% static 'images/icons/more-info_icons/006-radio.svg' %}"
-                                                class="car-spec-icon" alt="icon">
-                                            <div class="car-spec-content">
-                                                <div class="car-spec-label">Radio</div>
-                                                <div class="car-spec-value">Mavjud</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="car-spec-item">
-                                            <img src="{% static 'images/icons/more-info_icons/007-remote-access.svg' %}"
-                                                class="car-spec-icon" alt="icon">
-                                            <div class="car-spec-content">
-                                                <div class="car-spec-label">MB pulti</div>
-                                                <div class="car-spec-value">Mavjud</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="car-spec-item">
-                                            <img src="{% static 'images/icons/more-info_icons/008-car-seat.svg' %}"
-                                                class="car-spec-icon" alt="icon">
-                                            <div class="car-spec-content">
-                                                <div class="car-spec-label">Pnevmo ilgakli o'rindiq</div>
-                                                <div class="car-spec-value">Mavjud</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="car-spec-item">
-                                            <img src="{% static 'images/icons/more-info_icons/001-sleeping.svg' %}"
-                                                class="car-spec-icon" alt="icon">
-                                            <div class="car-spec-content">
-                                                <div class="car-spec-label">Yotog joyi</div>
-                                                <div class="car-spec-value">Mavjud</div>
-                                            </div>
+                                        <!-- Loader для характеристик -->
+                                        <div style="grid-column: 1/-1; text-align: center; padding: 20px; color: #999;">
+                                            Yuklanmoqda...
                                         </div>
                                     </div>
                                 </div>
@@ -192,26 +142,22 @@
                 </div>
             </div>
         </div>
-        <!-- Секция героя (конец) -->
 
-        <!-- Секция — превью блога (начало) -->
+        <!-- Секция параметров -->
         <div class="mxd-section padding-blog">
             <div class="grid-container">
 
-                <!-- Блок — заголовок секции (начало) -->
+                <!-- Хлебные крошки -->
                 <div class="mxd-block">
                     <div class="mxd-section-more_info pre-grid">
                         <div class="mxd-section-more_info__inner animate-card-3">
                             <div class="mxd-grid-item">
                                 <div class="section-more_info">
-                                    <!-- Хлебные крошки -->
                                     <div aria-label="breadcrumb">
                                         <ol class="breadcrumb-ol">
-                                            <li><a href="{% static 'home' %}">Bosh sahifa</a></li>
+                                            <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
                                             <li><a href="javascript:void(0)">Modellar</a></li>
-                                            <li class="active"><a
-                                                    href="{% static 'products/<int:product_id>/' %}">Shatakchi
-                                                    mashinalar</a></li>
+                                            <li class="active"><a href="javascript:void(0)">Yuklanmoqda...</a></li>
                                         </ol>
                                     </div>
                                 </div>
@@ -219,112 +165,18 @@
                         </div>
                     </div>
                 </div>
-                <!-- Блок — заголовок секции (конец) -->
 
-                <!-- Блок — карточки превью (начало) -->
+                <!-- Параметры (accordion) -->
                 <div class="mxd-block" id="parametrs">
                     <div class="mxd-blog-preview">
                         <div class="container-fluid p-0">
                             <div class="g-0 card_block">
                                 <div class="acardeon-cards_container">
                                     <h2 class="acardeon-cards_title">Parametrlar</h2>
+                                    <!-- Accordion загружается через JS -->
                                     <div class="acardeon-cards_block">
-                                        <div class="acardeon-card">
-                                            <input type="checkbox" id="accordion-1" class="accordion-checkbox" checked>
-                                            <label for="accordion-1" class="acardeon-card__header">
-                                                <h3 class="acardeon-card__title">Asosiy xususiyatlar</h3>
-                                                <span class="acardeon-card__icon"></span>
-                                            </label>
-                                            <div class="acardeon-card__content">
-                                                <ul class="specs-list custom-marker">
-                                                    <li class="specs-list__item">Kolesnaya formula: 4x2</li>
-                                                    <li class="specs-list__item">Dlina×shirina×balandlik: 6750×2430×2740
-                                                        mm</li>
-                                                    <li class="specs-list__item">Kolesnaya baza: 4,200 mm</li>
-                                                    <li class="specs-list__item">Yoqilg'i baki hajmi: 200 litr</li>
-                                                    <li class="specs-list__item">Yoqilg'i sarfi: 17 l/100km (70 km/soat)
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="acardeon-card">
-                                            <input type="checkbox" id="accordion-2" class="accordion-checkbox">
-                                            <label for="accordion-2" class="acardeon-card__header">
-                                                <h2 class="acardeon-card__title">Dvigatel</h2>
-                                                <span class="acardeon-card__icon"></span>
-                                            </label>
-                                            <div class="acardeon-card__content">
-                                                <ul class="specs-list custom-marker">
-                                                    <li class="specs-list__item">Maksimal quvvat: 150 ot kuchi</li>
-                                                    <li class="specs-list__item">Maksimal aylanish moment: 350 Nm</li>
-                                                    <li class="specs-list__item">Dvigatel turi: 4 silindrli</li>
-                                                    <li class="specs-list__item">Ekologik sinf: Evro-5</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="acardeon-card">
-                                            <input type="checkbox" id="accordion-3" class="accordion-checkbox">
-                                            <label for="accordion-3" class="acardeon-card__header">
-                                                <h3 class="acardeon-card__title">Vazn parametrlari</h3>
-                                                <span class="acardeon-card__icon"></span>
-                                            </label>
-                                            <div class="acardeon-card__content">
-                                                <ul class="specs-list custom-marker">
-                                                    <li class="specs-list__item">Yuk ko'tarish qobiliyati: 2,500 kg</li>
-                                                    <li class="specs-list__item">Bo'sh vazn: 3,200 kg</li>
-                                                    <li class="specs-list__item">Umumiy vazn: 5,700 kg</li>
-                                                    <li class="specs-list__item">O'qga tushgan vazn (old): 1,800 kg</li>
-                                                    <li class="specs-list__item">O'qga tushgan vazn (orqa): 3,900 kg
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="acardeon-card">
-                                            <input type="checkbox" id="accordion-4" class="accordion-checkbox">
-                                            <label for="accordion-4" class="acardeon-card__header">
-                                                <h3 class="acardeon-card__title">Transmissiya</h3>
-                                                <span class="acardeon-card__icon"></span>
-                                            </label>
-                                            <div class="acardeon-card__content">
-                                                <ul class="specs-list custom-marker">
-                                                    <li class="specs-list__item">Uzatish qutisi: 5-bosqichli mexanik
-                                                    </li>
-                                                    <li class="specs-list__item">Haydovchi o'q: Orqa</li>
-                                                    <li class="specs-list__item">Differensial: Mexanik bloklanish</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="acardeon-card">
-                                            <input type="checkbox" id="accordion-5" class="accordion-checkbox">
-                                            <label for="accordion-5" class="acardeon-card__header">
-                                                <h3 class="acardeon-card__title">Shinalar va tormoz tizimi</h3>
-                                                <span class="acardeon-card__icon"></span>
-                                            </label>
-                                            <div class="acardeon-card__content">
-                                                <ul class="specs-list custom-marker">
-                                                    <li class="specs-list__item">Shina o'lchami: 215/75R17.5</li>
-                                                    <li class="specs-list__item">Tormoz tizimi: Diskli, ABS</li>
-                                                    <li class="specs-list__item">Tormoz kuchaytirgichi: Vakuum</li>
-                                                    <li class="specs-list__item">Qo'l tormozi: Mexanik, orqa
-                                                        g'ildiraklarda</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="acardeon-card">
-                                            <input type="checkbox" id="accordion-6" class="accordion-checkbox">
-                                            <label for="accordion-6" class="acardeon-card__header">
-                                                <h3 class="acardeon-card__title">Ustki tuzilma</h3>
-                                                <span class="acardeon-card__icon"></span>
-                                            </label>
-                                            <div class="acardeon-card__content">
-                                                <ul class="specs-list custom-marker">
-                                                    <li class="specs-list__item">Konditsioner: Mavjud</li>
-                                                    <li class="specs-list__item">Oyna ko'targichlar: Elektr</li>
-                                                    <li class="specs-list__item">Audio tizim: Bluetooth + USB</li>
-                                                    <li class="specs-list__item">Yotoq joyi: Mavjud</li>
-                                                    <li class="specs-list__item">Rulda boshqaruv tugmalari: Mavjud</li>
-                                                </ul>
-                                            </div>
+                                        <div style="text-align: center; padding: 40px; color: #999;">
+                                            Yuklanmoqda...
                                         </div>
                                     </div>
                                 </div>
@@ -332,58 +184,22 @@
                         </div>
                     </div>
                 </div>
-                <!-- Блок — карточки превью (конец) -->
+
             </div>
-            <!-- Секция — превью блога (конец) -->
-            <!-- Section - Inner Pages Slider Start -->
+
+            <!-- Галерея -->
             <div class="mxd-section padding-pre-grid section-galery" id="gallery">
                 <div class="grid-container">
-
-                    <!-- Block - Inner Pages Slider Start -->
                     <div class="mxd-block">
                         <h2 class="reveal-type anim-uni-in-up" style="text-align: center;">Galereya</h2>
-                        <!-- Slider main container -->
                         <div class="mxd-demo-swiper mxd-grid-item anim-uni-in-up" style="min-height: 420px;">
-                            <!-- Additional required wrapper -->
+                            <!-- Галерея загружается через JS -->
                             <div class="swiper-wrapper">
-                                <!-- single slide -->
-                                <div class="swiper-slide mxd-demo-swiper__slide">
-                                    <div class="slide-content">
-                                        <!-- Картинка -->
-                                        <div class="slide-image">
-                                            <img src="{% static 'images/faw-truck_1.png' %}" alt="Services Image">
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- single slide -->
-                                <div class="swiper-slide mxd-demo-swiper__slide">
-                                    <div class="slide-content">
-                                        <!-- Картинка -->
-                                        <div class="slide-image">
-                                            <img src="{% static 'images/faw-truck_2.png' %}" alt="About Us Image">
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- single slide -->
-                                <div class="swiper-slide mxd-demo-swiper__slide">
-                                    <div class="slide-content">
-                                        <!-- Картинка -->
-                                        <div class="slide-image">
-                                            <img src="{% static 'images/faw-truck_3.png' %}" alt="Team Image">
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- single slide -->
-                                <div class="swiper-slide mxd-demo-swiper__slide">
-                                    <div class="slide-content">
-                                        <!-- Картинка -->
-                                        <div class="slide-image">
-                                            <img src="{% static 'images/faw-truck_1.png' %}" alt="Pricing Image">
-                                        </div>
-                                    </div>
+                                <div style="text-align: center; padding: 100px; color: #999;">
+                                    Yuklanmoqda...
                                 </div>
                             </div>
-                            <!-- navigation buttons -->
+                            <!-- Кнопки навигации -->
                             <div class="swiper-button-prev mxd-slider-btn mxd-slider-btn-round-prev v2">
                                 <a class="btn btn-round btn-round-small btn-outline slide-left anim-no-delay" href="#0">
                                     <i class="ph ph-arrow-left"></i>
@@ -397,24 +213,19 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Block - Inner Pages Slider End -->
-
                 </div>
             </div>
-            <!-- Section - Inner Pages Slider End -->
         </div>
     </main>
-    <!-- Контент страницы (конец) -->
 
-    <!-- Футер (начало) -->
+    <!-- Футер -->
     {% include 'main/includes/footer.html' %}
-    <!-- Футер (конец) -->
 
-    <!-- Кнопка «вверх» (начало) -->
+    <!-- Кнопка «вверх» -->
     <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
         <i class="ph ph-arrow-up"></i>
     </a>
-    <!-- Кнопка «вверх» (конец) -->
+
     <!-- Модальное окно с формой контакта -->
     <div id="faw-modal" class="faw-modal">
         <div class="faw-modal__overlay"></div>
@@ -435,7 +246,6 @@
 
             <form class="faw-modal__form" id="faw-contact-form">
                 {% csrf_token %}
-                <!-- Hidden Required Fields -->
                 <input type="hidden" name="project_name" value="FAW Trucks">
                 <input type="hidden" name="admin_email" value="info@fawtrucks.uz">
                 <input type="hidden" name="form_subject" value="FAW Contact Form Message">
@@ -488,6 +298,7 @@
             </form>
         </div>
     </div>
+
     <!-- Модальное окно для галереи -->
     <div id="gallery-modal" class="gallery-modal">
         <div class="gallery-modal__overlay"></div>
@@ -502,205 +313,211 @@
             <img id="gallery-modal-img" alt="Галерея" class="gallery-modal__img" />
         </div>
     </div>
-    <!-- Подключение скриптов (начало) -->
-    <!-- Подключение скриптов (начало) -->
+
+    <!-- Подключение скриптов -->
     <script src="{% static 'js/libs.min.js' %}"></script>
     <script src="{% static 'js/app.js' %}"></script>
     <script src="{% static 'js/faw.js' %}"></script>
+    <!-- Подключение Product Detail JS -->
+    <script src="{% static 'js/product_detail.js' %}"></script>
 
     <script>
-        // Универсальный плавный скролл
-        (function () {
-            function getHeaderHeight() {
-                try { var h = document.getElementById('header'); return h ? h.offsetHeight || 0 : 0; } catch (e) { return 0; }
-            }
+    // Универсальный плавный скролл
+    (function () {
+        function getHeaderHeight() {
+            try { var h = document.getElementById('header'); return h ? h.offsetHeight || 0 : 0; } catch (e) { return 0; }
+        }
 
-            function scrollToElementById(id) {
-                var el = document.getElementById(id);
-                if (!el) return;
-                var headerH = getHeaderHeight();
-                var offset = 25;
-                var rect = el.getBoundingClientRect();
-                var targetY = Math.max(0, Math.round(window.pageYOffset + rect.top - headerH - offset));
-                try { window.scrollTo({ top: targetY, behavior: 'smooth' }); }
-                catch (e) { window.scrollTo(0, targetY); }
-            }
+        function scrollToElementById(id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            var headerH = getHeaderHeight();
+            var offset = 25;
+            var rect = el.getBoundingClientRect();
+            var targetY = Math.max(0, Math.round(window.pageYOffset + rect.top - headerH - offset));
+            try { window.scrollTo({ top: targetY, behavior: 'smooth' }); }
+            catch (e) { window.scrollTo(0, targetY); }
+        }
 
-            document.addEventListener('click', function (e) {
-                var a = e.target.closest && e.target.closest('a[href^="#"]');
-                if (!a) return;
-                var href = a.getAttribute('href');
-                if (!href || href === '#') return;
-                var id = href.slice(1);
-                if (!id) return;
-                if (document.getElementById(id)) {
-                    e.preventDefault();
-                    scrollToElementById(id);
-                }
-            }, false);
-        })();
-
-        // ========== ОСНОВНОЙ КОД ФОРМЫ ==========
-        let isSubmitting = false;
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const modal = document.getElementById('faw-modal');
-            const modalOverlay = document.querySelector('.faw-modal__overlay');
-            const modalClose = document.querySelector('.faw-modal__close');
-            const contactForm = document.getElementById('faw-contact-form');
-            const phoneInput = contactForm.querySelector('input[name="phone"]');
-
-            // Создаем блок для статусов
-            let statusBlock = contactForm.querySelector('.faw-form__status');
-            if (!statusBlock) {
-                statusBlock = document.createElement('div');
-                statusBlock.className = 'faw-form__status hidden';
-                const statusText = document.createElement('p');
-                statusText.className = 'faw-form__status-text';
-                statusBlock.appendChild(statusText);
-                contactForm.prepend(statusBlock);
-            }
-            const statusText = statusBlock.querySelector('.faw-form__status-text') || statusBlock;
-
-            // Функции открытия/закрытия
-            function openModal() {
-                modal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeModal() {
-                modal.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-
-            // Открытие модалки
-            const modalTriggers = document.querySelectorAll('a[href="#faw-main-contact-modal"]');
-            modalTriggers.forEach(trigger => {
-                trigger.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    openModal();
-                });
-            });
-
-            // Закрытие модалки
-            modalClose.addEventListener('click', closeModal);
-            modalOverlay.addEventListener('click', closeModal);
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && modal.classList.contains('active')) {
-                    closeModal();
-                }
-            });
-
-            // Маска телефона
-            phoneInput.addEventListener("input", (e) => {
-                let value = e.target.value.replace(/\D/g, "");
-                if (!value.startsWith("998")) value = "998" + value;
-                if (value.length > 12) value = value.slice(0, 12);
-
-                let formatted = "+998 ";
-                if (value.length > 3) formatted += "(" + value.slice(3, 5);
-                if (value.length >= 5) formatted += ") " + value.slice(5, 8);
-                if (value.length >= 8) formatted += "-" + value.slice(8, 10);
-                if (value.length >= 10) formatted += "-" + value.slice(10, 12);
-
-                e.target.value = formatted;
-            });
-
-            // Отправка формы
-            contactForm.addEventListener("submit", async (e) => {
+        document.addEventListener('click', function (e) {
+            var a = e.target.closest && e.target.closest('a[href^="#"]');
+            if (!a) return;
+            var href = a.getAttribute('href');
+            if (!href || href === '#') return;
+            var id = href.slice(1);
+            if (!id) return;
+            if (document.getElementById(id)) {
                 e.preventDefault();
-                if (isSubmitting) return;
-                isSubmitting = true;
-
-                const phone = phoneInput.value.replace(/\D/g, "");
-                if (phone.length !== 12) {
-                    showStatus("❌ Iltimos, telefon raqamingizni to'liq kiriting.", "error");
-                    isSubmitting = false;
-                    return;
-                }
-
-                const formData = {
-                    name: contactForm.Name.value,
-                    region: contactForm.Region.value,
-                    phone: phoneInput.value,
-                    message: contactForm.Message.value,
-                };
-
-                try {
-                    const response = await fetch("/api/uz/contact/", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRFToken": contactForm.querySelector("[name=csrfmiddlewaretoken]").value,
-                        },
-                        body: JSON.stringify(formData),
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
-                        contactForm.reset();
-
-                        setTimeout(() => {
-                            closeModal();
-                            statusBlock.classList.add("hidden");
-                        }, 2000);
-                    } else {
-                        throw new Error(data.message || "Xatolik yuz berdi.");
-                    }
-                } catch (error) {
-                    showStatus("❌ Xatolik yuz berdi. Qayta urinib ko'ring.", "error");
-                } finally {
-                    isSubmitting = false;
-                }
-            });
-
-            function showStatus(message, type = "success") {
-                statusText.textContent = message;
-                statusBlock.className = `faw-form__status ${type} show`;
-                statusBlock.classList.remove("hidden");
-
-                setTimeout(() => {
-                    statusBlock.classList.remove("show");
-                    setTimeout(() => statusBlock.classList.add("hidden"), 400);
-                }, 4000);
+                scrollToElementById(id);
             }
+        }, false);
+    })();
 
-            // Галерея
-            const galleryModal = document.getElementById('gallery-modal');
-            const galleryModalImg = document.getElementById('gallery-modal-img');
-            const galleryModalClose = document.querySelector('.gallery-modal__close');
-            const galleryModalOverlay = document.querySelector('.gallery-modal__overlay');
+    // Глобальная переменная для хранения названия продукта
+    window.currentProductTitle = '';
 
-            document.querySelectorAll('.swiper-wrapper img').forEach(img => {
-                img.style.cursor = 'pointer';
-                img.addEventListener('click', function () {
-                    galleryModal.classList.add('active');
-                    galleryModalImg.src = img.src;
-                    galleryModalImg.alt = img.alt || '';
-                    document.body.style.overflow = 'hidden';
-                });
-            });
+    // Форма контакта
+    let isSubmitting = false;
 
-            function closeGalleryModal() {
-                galleryModal.classList.remove('active');
-                galleryModalImg.src = '';
-                document.body.style.overflow = '';
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('faw-modal');
+        const modalOverlay = document.querySelector('.faw-modal__overlay');
+        const modalClose = document.querySelector('.faw-modal__close');
+        const contactForm = document.getElementById('faw-contact-form');
+        const phoneInput = contactForm.querySelector('input[name="phone"]');
+        const messageTextarea = contactForm.querySelector('textarea[name="Message"]');
+
+        let statusBlock = contactForm.querySelector('.faw-form__status');
+        if (!statusBlock) {
+            statusBlock = document.createElement('div');
+            statusBlock.className = 'faw-form__status hidden';
+            const statusText = document.createElement('p');
+            statusText.className = 'faw-form__status-text';
+            statusBlock.appendChild(statusText);
+            contactForm.prepend(statusBlock);
+        }
+        const statusText = statusBlock.querySelector('.faw-form__status-text') || statusBlock;
+
+        function openModal() {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // ✅ АВТОМАТИЧЕСКИ ПОДСТАВЛЯЕМ НАЗВАНИЕ МОДЕЛИ
+            if (window.currentProductTitle && messageTextarea) {
+                messageTextarea.value = `Men ${window.currentProductTitle} modeliga qiziqaman.\n\nQo'shimcha savollar: `;
+                // Устанавливаем курсор в конец
+                messageTextarea.focus();
+                messageTextarea.setSelectionRange(messageTextarea.value.length, messageTextarea.value.length);
             }
+        }
 
-            galleryModalClose.addEventListener('click', closeGalleryModal);
-            galleryModalOverlay.addEventListener('click', closeGalleryModal);
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && galleryModal.classList.contains('active')) {
-                    closeGalleryModal();
-                }
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        const modalTriggers = document.querySelectorAll('a[href="#faw-main-contact-modal"]');
+        modalTriggers.forEach(trigger => {
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                openModal();
             });
         });
-    </script>
 
-    <!-- Load Scripts End -->
+        modalClose.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', closeModal);
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
 
+        phoneInput.addEventListener("input", (e) => {
+            let value = e.target.value.replace(/\D/g, "");
+            if (!value.startsWith("998")) value = "998" + value;
+            if (value.length > 12) value = value.slice(0, 12);
+
+            let formatted = "+998 ";
+            if (value.length > 3) formatted += "(" + value.slice(3, 5);
+            if (value.length >= 5) formatted += ") " + value.slice(5, 8);
+            if (value.length >= 8) formatted += "-" + value.slice(8, 10);
+            if (value.length >= 10) formatted += "-" + value.slice(10, 12);
+
+            e.target.value = formatted;
+        });
+
+        contactForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            if (isSubmitting) return;
+            isSubmitting = true;
+
+            const phone = phoneInput.value.replace(/\D/g, "");
+            if (phone.length !== 12) {
+                showStatus("❌ Iltimos, telefon raqamingizni to'liq kiriting.", "error");
+                isSubmitting = false;
+                return;
+            }
+
+            const formData = {
+                name: contactForm.Name.value,
+                region: contactForm.Region.value,
+                phone: phoneInput.value,
+                message: contactForm.Message.value,
+            };
+
+            try {
+                const response = await fetch("/api/uz/contact/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": contactForm.querySelector("[name=csrfmiddlewaretoken]").value,
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
+                    contactForm.reset();
+
+                    setTimeout(() => {
+                        closeModal();
+                        statusBlock.classList.add("hidden");
+                    }, 2000);
+                } else {
+                    throw new Error(data.message || "Xatolik yuz berdi.");
+                }
+            } catch (error) {
+                showStatus("❌ Xatolik yuz berdi. Qayta urinib ko'ring.", "error");
+            } finally {
+                isSubmitting = false;
+            }
+        });
+
+        function showStatus(message, type = "success") {
+            statusText.textContent = message;
+            statusBlock.className = `faw-form__status ${type} show`;
+            statusBlock.classList.remove("hidden");
+
+            setTimeout(() => {
+                statusBlock.classList.remove("show");
+                setTimeout(() => statusBlock.classList.add("hidden"), 400);
+            }, 4000);
+        }
+
+        // Галерея
+        const galleryModal = document.getElementById('gallery-modal');
+        const galleryModalImg = document.getElementById('gallery-modal-img');
+        const galleryModalClose = document.querySelector('.gallery-modal__close');
+        const galleryModalOverlay = document.querySelector('.gallery-modal__overlay');
+
+        // Делегирование событий для галереи
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.swiper-wrapper img')) {
+                const img = e.target.closest('.swiper-wrapper img');
+                galleryModal.classList.add('active');
+                galleryModalImg.src = img.src;
+                galleryModalImg.alt = img.alt || '';
+                document.body.style.overflow = 'hidden';
+            }
+        });
+
+        function closeGalleryModal() {
+            galleryModal.classList.remove('active');
+            galleryModalImg.src = '';
+            document.body.style.overflow = '';
+        }
+
+        galleryModalClose.addEventListener('click', closeGalleryModal);
+        galleryModalOverlay.addEventListener('click', closeGalleryModal);
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && galleryModal.classList.contains('active')) {
+                closeGalleryModal();
+            }
+        });
+    });
+</script>
 </body>
 
 </html>

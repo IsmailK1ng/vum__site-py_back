@@ -296,3 +296,10 @@ def products(request):
         'category': category,
         'category_info': category_info
     })
+
+
+def product_detail(request, product_id):
+    # product_id это на самом деле slug из URL
+    return render(request, 'main/product_detail.html', {
+        'product_slug': product_id
+    })
