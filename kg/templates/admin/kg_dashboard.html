@@ -1,0 +1,481 @@
+{% load static %}
+
+<div class="kg-dashboard-wrapper" style="padding: 20px;">
+    <div class="kg-dashboard">
+        <div class="dashboard-header">
+            <h2>📊 Статистика заявок FAW.KG</h2>
+        </div>
+
+        <div id="kg-stats-loading" class="loading-state">
+            <div class="spinner"></div>
+            <p>Загрузка статистики...</p>
+        </div>
+
+        <div id="kg-stats-content" style="display: none;">
+            <!-- Фильтры -->
+            <div class="filters-container">
+                <h3>🔍 Фильтры</h3>
+                <div class="filters-grid">
+                    <div class="filter-item">
+                        <label>Начальная дата:</label>
+                        <input type="date" id="filter-start-date" class="filter-input">
+                    </div>
+                    <div class="filter-item">
+                        <label>Конечная дата:</label>
+                        <input type="date" id="filter-end-date" class="filter-input">
+                    </div>
+                    <div class="filter-item">
+                        <label>Регион:</label>
+                        <select id="filter-region" class="filter-input">
+                            <option value="">Все регионы</option>
+                            <option value="Bishkek">Бишкек</option>
+                            <option value="Osh">Ош</option>
+                            <option value="Chuy">Чуйская область</option>
+                            <option value="Jalal-Abad">Джалал-Абадская область</option>
+                            <option value="Naryn">Нарынская область</option>
+                            <option value="Batken">Баткенская область</option>
+                            <option value="Talas">Таласская область</option>
+                            <option value="Issyk-Kul">Иссык-Кульская область</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button id="apply-filters" class="btn-primary">✓ Применить</button>
+                    <button id="reset-filters" class="btn-secondary">↻ Сбросить</button>
+                </div>
+            </div>
+
+            <!-- Статистика -->
+            <div id="stats-data"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* ============================================
+       ОСНОВНЫЕ СТИЛИ (Брендбук)
+       ============================================ */
+    
+    .kg-dashboard-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .kg-dashboard {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .dashboard-header {
+        background: linear-gradient(306deg, #000000, #002b9b, #1e57eb);
+        padding: 30px;
+        color: white;
+    }
+
+    .dashboard-header h2 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    /* ============================================
+       ЗАГРУЗКА
+       ============================================ */
+
+    .loading-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .spinner {
+        border: 4px solid rgba(0, 43, 155, 0.1);
+        border-top: 4px solid #002b9b;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .loading-state p {
+        color: #666;
+        font-size: 16px;
+    }
+
+    /* ============================================
+       ФИЛЬТРЫ
+       ============================================ */
+
+    .filters-container {
+        background: #f8f9fa;
+        padding: 25px;
+        margin: 25px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .filters-container h3 {
+        margin: 0 0 20px 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .filter-item label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #555;
+    }
+
+    .filter-input {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        background: white;
+        transition: all 0.2s;
+    }
+
+    .filter-input:focus {
+        outline: none;
+        border-color: #002b9b;
+        box-shadow: 0 0 0 3px rgba(0, 43, 155, 0.1);
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #002b9b, #1e57eb);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 43, 155, 0.3);
+    }
+
+    .btn-secondary {
+        background: white;
+        color: #666;
+        border: 1px solid #ddd;
+        padding: 12px 30px;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+        background: #f5f5f5;
+        border-color: #999;
+    }
+
+    /* ============================================
+       КАРТОЧКИ СТАТИСТИКИ
+       ============================================ */
+
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 25px;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        transition: all 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        border-color: #002b9b;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .stat-value {
+        font-size: 36px;
+        font-weight: 700;
+        color: #002b9b;
+        line-height: 1;
+        margin-bottom: 5px;
+    }
+
+    .stat-card small {
+        font-size: 13px;
+        color: #999;
+    }
+
+    /* ============================================
+       ТОП РЕГИОНОВ И МАШИН
+       ============================================ */
+
+    .top-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        padding: 0 25px 25px 25px;
+    }
+
+    .top-list {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    .top-list h3 {
+        margin: 0 0 15px 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #002b9b;
+        padding-bottom: 10px;
+    }
+
+    .top-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .top-item:last-child {
+        border-bottom: none;
+    }
+
+    .top-rank {
+        font-weight: 700;
+        color: #002b9b;
+        font-size: 16px;
+        margin-right: 10px;
+    }
+
+    .top-count {
+        background: #f0f4ff;
+        color: #002b9b;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .no-data {
+        text-align: center;
+        color: #999;
+        padding: 30px;
+        font-size: 14px;
+    }
+
+    /* ============================================
+       АДАПТИВНОСТЬ
+       ============================================ */
+
+    @media (max-width: 768px) {
+        .filters-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .top-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stat-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .filter-actions {
+            flex-direction: column;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+(function() {
+    let currentFilters = {
+        start_date: '',
+        end_date: '',
+        region: ''
+    };
+
+    function loadStats() {
+        const params = new URLSearchParams();
+
+        if (currentFilters.start_date) params.append('start_date', currentFilters.start_date);
+        if (currentFilters.end_date) params.append('end_date', currentFilters.end_date);
+        if (currentFilters.region) params.append('region', currentFilters.region);
+
+        const loading = document.getElementById('kg-stats-loading');
+        const content = document.getElementById('kg-stats-content');
+        const statsData = document.getElementById('stats-data');
+
+        loading.style.display = 'block';
+        content.style.display = 'none';
+
+        fetch('/api/kg/feedback/statistics/?' + params.toString())
+            .then(response => response.json())
+            .then(data => {
+                loading.style.display = 'none';
+                content.style.display = 'block';
+
+                const total = data.by_status.new + data.by_status.in_process + data.by_status.processed;
+                const processedPercent = total > 0 
+                    ? Math.round((data.by_status.processed / total) * 100) 
+                    : 0;
+
+                statsData.innerHTML = `
+                    <!-- Карточки статистики -->
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Всего заявок</div>
+                            <div class="stat-value">${total}</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-label">🆕 Новые</div>
+                            <div class="stat-value">${data.by_status.new}</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-label">⏳ В работе</div>
+                            <div class="stat-value">${data.by_status.in_process}</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-label">✅ Обработано</div>
+                            <div class="stat-value">${data.by_status.processed}</div>
+                            <small>${processedPercent}% завершено</small>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-label">📅 Сегодня</div>
+                            <div class="stat-value">${data.time_periods.today}</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-label">📆 За неделю</div>
+                            <div class="stat-value">${data.time_periods.this_week}</div>
+                        </div>
+                    </div>
+
+                    <!-- Топ регионов и машин -->
+                    <div class="top-grid">
+                        <div class="top-list">
+                            <h3>🗺️ Топ регионов</h3>
+                            ${data.by_region.length > 0 ? data.by_region.slice(0, 5).map((item, index) => `
+                                <div class="top-item">
+                                    <div>
+                                        <span class="top-rank">${index + 1}.</span>
+                                        <span>${getRegionName(item.region)}</span>
+                                    </div>
+                                    <span class="top-count">${item.count}</span>
+                                </div>
+                            `).join('') : '<div class="no-data">Нет данных</div>'}
+                        </div>
+                        
+                        <div class="top-list">
+                            <h3>🚗 Топ машин</h3>
+                            ${data.by_vehicle.length > 0 ? data.by_vehicle.slice(0, 5).map((item, index) => `
+                                <div class="top-item">
+                                    <div>
+                                        <span class="top-rank">${index + 1}.</span>
+                                        <span>${item.vehicle__title_ru || 'Без машины'}</span>
+                                    </div>
+                                    <span class="top-count">${item.count}</span>
+                                </div>
+                            `).join('') : '<div class="no-data">Нет данных</div>'}
+                        </div>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки:', error);
+                loading.innerHTML = `
+                    <div class="no-data" style="color: #dc3545;">
+                        ⚠️ Ошибка загрузки статистики<br>
+                        <small>${error.message}</small>
+                    </div>
+                `;
+            });
+    }
+
+    function getRegionName(region) {
+        const names = {
+            'Bishkek': 'Бишкек',
+            'Osh': 'Ош',
+            'Chuy': 'Чуйская область',
+            'Jalal-Abad': 'Джалал-Абадская область',
+            'Naryn': 'Нарынская область',
+            'Batken': 'Баткенская область',
+            'Talas': 'Таласская область',
+            'Issyk-Kul': 'Иссык-Кульская область'
+        };
+        return names[region] || region;
+    }
+
+    // Первая загрузка
+    loadStats();
+
+    // Обработчики фильтров
+    document.getElementById('apply-filters').addEventListener('click', () => {
+        currentFilters.start_date = document.getElementById('filter-start-date').value;
+        currentFilters.end_date = document.getElementById('filter-end-date').value;
+        currentFilters.region = document.getElementById('filter-region').value;
+        loadStats();
+    });
+
+    document.getElementById('reset-filters').addEventListener('click', () => {
+        currentFilters = { start_date: '', end_date: '', region: '' };
+        document.getElementById('filter-start-date').value = '';
+        document.getElementById('filter-end-date').value = '';
+        document.getElementById('filter-region').value = '';
+        loadStats();
+    });
+})();
+</script>

@@ -2,6 +2,21 @@ from rest_framework import serializers
 from .models import KGVehicle, KGVehicleImage, VehicleCardSpec, KGFeedback, KGHeroSlide
 
 # ============================================
+# ОБЩИЕ ФУНКЦИИ
+# ============================================
+
+def validate_kg_phone(value):
+    """Общая валидация телефона Кыргызстана"""
+    if not value.startswith('+996'):
+        raise serializers.ValidationError('Номер должен начинаться с +996')
+    
+    clean_phone = value.replace(' ', '')
+    if len(clean_phone) != 13:
+        raise serializers.ValidationError('Неверный формат номера телефона')
+    
+    return value
+
+# ============================================
 # СЕРИАЛИЗАТОР: ДОПОЛНИТЕЛЬНЫЕ ФОТО
 # ============================================
 
@@ -248,7 +263,6 @@ class KGVehicleDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для детальной страницы машины"""
     title = serializers.SerializerMethodField()
     slug = serializers.SerializerMethodField()
-    specs = serializers.SerializerMethodField()
     card_specs = VehicleCardSpecSerializer(many=True, read_only=True)
     gallery_images = KGVehicleImageSerializer(many=True, source='mini_images', read_only=True)
     features = serializers.SerializerMethodField()
@@ -261,11 +275,6 @@ class KGVehicleDetailSerializer(serializers.ModelSerializer):
     def get_slug(self, obj):
         lang = self.context.get('lang', 'ru')
         return obj.get_slug(lang)
-    
-    def get_specs(self, obj):
-        """Для Hero (обратная совместимость)"""
-        lang = self.context.get('lang', 'ru')
-        return obj.get_specs(lang)
     
     def get_features(self, obj):
         """Возвращает список активных features"""
@@ -281,7 +290,7 @@ class KGVehicleDetailSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'slug', 'title', 'category',
             'preview_image', 'main_image',
-            'specs', 'card_specs', 'gallery_images',
+            'card_specs', 'gallery_images',
             'features', 'detailed_specs',
             'is_active'
         ]
@@ -339,16 +348,7 @@ class KGFeedbackCreateSerializer(serializers.ModelSerializer):
         fields = ['name', 'phone', 'region', 'vehicle', 'message']
     
     def validate_phone(self, value):
-        """Валидация номера телефона Кыргызстана"""
-        if not value.startswith('+996'):
-            raise serializers.ValidationError('Номер должен начинаться с +996')
-        
-        # Убираем пробелы и проверяем длину
-        clean_phone = value.replace(' ', '')
-        if len(clean_phone) != 13:  # +996 (3 цифры) + 9 цифр = 13
-            raise serializers.ValidationError('Неверный формат номера телефона')
-        
-        return value
+        return validate_kg_phone(value)
     
     def create(self, validated_data):
         """Создание заявки с дефолтными значениями"""

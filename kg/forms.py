@@ -3,6 +3,8 @@ from django.core.files.base import ContentFile
 from .models import VehicleCardSpec, IconTemplate
 import uuid
 import os
+import logging
+logger = logging.getLogger(__name__)
 
 
 class VehicleCardSpecForm(forms.ModelForm):
@@ -23,8 +25,7 @@ class VehicleCardSpecForm(forms.ModelForm):
         if template_id:
             try:
                 template = IconTemplate.objects.get(id=template_id)
-                print(f"✅ Найден шаблон иконки ID={template_id}: {template.name}")
-                
+            
                 # Копируем новую иконку
                 filename = f"spec_{uuid.uuid4().hex[:8]}_{os.path.basename(template.icon.name)}"
                 
@@ -35,12 +36,12 @@ class VehicleCardSpecForm(forms.ModelForm):
                         ContentFile(file_content),
                         save=False
                     )
-                    print(f"💾 Сохранена новая иконка: {filename}")
+
                         
             except IconTemplate.DoesNotExist:
-                print(f"❌ Шаблон иконки ID={template_id} не найден")
+                logger.error(f"Шаблон иконки ID={template_id} не найден")
             except Exception as e:
-                print(f"❌ Ошибка при копировании иконки: {e}")
+                logger.error(f"Ошибка при копировании иконки: {e}")
         
         if commit:
             instance.save()
