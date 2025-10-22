@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import News, NewsBlock, ContactForm, JobApplication, Product, FeatureIcon, ProductCardSpec, ProductParameter, ProductSpecificationGroup, ProductFeature, ProductGallery
+from .models import News, NewsBlock, ContactForm, JobApplication, Product, FeatureIcon, ProductCardSpec, ProductParameter, ProductFeature, ProductGallery
 
 
 class NewsBlockSerializer(serializers.ModelSerializer):
@@ -61,7 +61,7 @@ class JobApplicationSerializer(serializers.ModelSerializer):
         return value
     
 
-    # ========== СЕРИАЛИЗАТОРЫ ДЛЯ ПРОДУКТОВ ==========
+# ========== СЕРИАЛИЗАТОРЫ ДЛЯ ПРОДУКТОВ ==========
 
 class FeatureIconSerializer(serializers.ModelSerializer):
     """Сериализатор для иконок характеристик"""
@@ -103,7 +103,7 @@ class ProductCardSerializer(serializers.ModelSerializer):
         ]
     
     def get_image_url(self, obj):
-        """Возвращает URL изображения для карточки (card_image или main_image)"""
+        """Возвращает URL изображения для карточки"""
         image = obj.card_image if obj.card_image else obj.main_image
         if image:
             request = self.context.get('request')
@@ -115,19 +115,11 @@ class ProductCardSerializer(serializers.ModelSerializer):
 
 class ProductParameterSerializer(serializers.ModelSerializer):
     """Сериализатор для параметров"""
-    class Meta:
-        model = ProductParameter
-        fields = ['id', 'text', 'order']
-
-
-class ProductSpecificationGroupSerializer(serializers.ModelSerializer):
-    """Сериализатор для группы параметров"""
-    category_name = serializers.CharField(source='category.name', read_only=True)
-    parameters = ProductParameterSerializer(many=True, read_only=True)
+    category_display = serializers.CharField(source='get_category_display', read_only=True)
     
     class Meta:
-        model = ProductSpecificationGroup
-        fields = ['id', 'category_name', 'parameters', 'order']
+        model = ProductParameter
+        fields = ['id', 'category', 'category_display', 'text', 'order']
 
 
 class ProductFeatureSerializer(serializers.ModelSerializer):
@@ -159,7 +151,7 @@ class ProductGallerySerializer(serializers.ModelSerializer):
 class ProductDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для детальной страницы продукта"""
     card_specs = ProductCardSpecSerializer(many=True, read_only=True)
-    spec_groups = ProductSpecificationGroupSerializer(many=True, read_only=True)
+    spec_groups = serializers.SerializerMethodField()  # ← Группируем параметры
     features = ProductFeatureSerializer(many=True, read_only=True)
     gallery = ProductGallerySerializer(many=True, read_only=True)
     main_image_url = serializers.SerializerMethodField()
@@ -174,6 +166,37 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'card_specs', 'spec_groups', 'features', 'gallery',
             'is_active', 'is_featured', 'order'
         ]
+    
+    def get_spec_groups(self, obj):
+        """Группируем параметры по категориям для фронтенда"""
+        parameters = obj.parameters.all().order_by('category', 'order')
+        
+        # Группируем по категориям
+        grouped = {}
+        for param in parameters:
+            category = param.category
+            category_display = param.get_category_display()
+            
+            if category not in grouped:
+                grouped[category] = {
+                    'category_name': category_display,
+                    'parameters': []
+                }
+            
+            grouped[category]['parameters'].append({
+                'id': param.id,
+                'text': param.text,
+                'order': param.order
+            })
+        
+        # Преобразуем в список с правильным порядком категорий
+        category_order = ['main', 'engine', 'weight', 'transmission', 'brakes', 'comfort']
+        result = []
+        for cat in category_order:
+            if cat in grouped:
+                result.append(grouped[cat])
+        
+        return result
     
     def get_main_image_url(self, obj):
         if obj.main_image:

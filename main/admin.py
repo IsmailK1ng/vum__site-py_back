@@ -4,8 +4,8 @@ from modeltranslation.admin import TabbedTranslationAdmin, TranslationTabularInl
 from .models import (
     News, NewsBlock, ContactForm, Vacancy, JobApplication, 
     VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
-    Product, ProductFeature, ProductCardSpec, ProductGallery, ProductSpecificationGroup, ProductParameter,
-    FeatureIcon, SpecificationCategory
+    Product, ProductFeature, ProductCardSpec, ProductGallery, ProductParameter,
+    FeatureIcon,
 )
 import nested_admin
 import openpyxl
@@ -236,23 +236,13 @@ class JobApplicationAdmin(admin.ModelAdmin):
         return format_html('<span style="color:orange;font-weight:bold;">⏳ Новая</span>')
     is_processed_badge.short_description = 'Статус'
 
-
-# ============ КАТЕГОРИИ ПАРАМЕТРОВ ============
-
-@admin.register(SpecificationCategory)
-class SpecificationCategoryAdmin(TabbedTranslationAdmin):
-    list_display = ['name', 'slug', 'order']
-    list_editable = ['order']
-    prepopulated_fields = {'slug': ('name',)}
-    search_fields = ['name']
-
-
 # ============ ИКОНКИ ============
 
 @admin.register(FeatureIcon)
 class FeatureIconAdmin(admin.ModelAdmin):
     list_display = ['icon_preview', 'name', 'order']
     list_editable = ['name', 'order']
+    search_fields = ['name']
     
     def icon_preview(self, obj):
         if obj.icon:
@@ -261,66 +251,49 @@ class FeatureIconAdmin(admin.ModelAdmin):
     icon_preview.short_description = "Иконка"
 
 
-# ============ ПРОДУКТЫ - ИНЛАЙНЫ (ОПРЕДЕЛЯЕМ ДО ProductAdmin!) ============
+# ============ ПРОДУКТЫ - ПРОСТАЯ ВЕРСИЯ БЕЗ ВЛОЖЕННОСТИ ============
 
-# Миксин для совместимости nested_admin и modeltranslation
-class NestedTranslationTabularInline(TranslationTabularInline, nested_admin.NestedTabularInline):
-    """Инлайн поддерживающий и вложенность и переводы"""
-    pass
-
-
-class ProductParameterInline(NestedTranslationTabularInline):
+class ProductParameterInline(TranslationTabularInline):
+    """Параметры машины с предустановленными категориями"""
     model = ProductParameter
     extra = 1
-    fields = ('text', 'order')
+    fields = ('category', 'text', 'order')
     verbose_name = "Параметр"
-    verbose_name_plural = "Параметры"
+    verbose_name_plural = "📋 Параметры машины"
 
 
-class ProductSpecificationGroupInline(nested_admin.NestedStackedInline):
-    model = ProductSpecificationGroup
-    extra = 0
-    fields = ('category', 'order')
-    inlines = [ProductParameterInline]
-    verbose_name = "Категория параметров"
-    verbose_name_plural = "📋 Параметры продукта (сгруппированные)"
-    
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "category":
-            kwargs["queryset"] = SpecificationCategory.objects.all().order_by('order')
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-
-class ProductFeatureInline(NestedTranslationTabularInline):
+class ProductFeatureInline(TranslationTabularInline):
+    """8 характеристик с иконками"""
     model = ProductFeature
-    extra = 8
+    extra = 1
     max_num = 8
     fields = ('icon', 'name', 'order')
     verbose_name_plural = "🔧 Характеристики с иконками (макс 8)"
 
 
-class ProductCardSpecInline(NestedTranslationTabularInline):
+class ProductCardSpecInline(TranslationTabularInline):
+    """4 характеристики для карточки"""
     model = ProductCardSpec
-    extra = 4
+    extra = 1
     max_num = 4
     fields = ('icon', 'value', 'order')
     verbose_name_plural = "📦 Характеристики для карточки (макс 4)"
 
 
-class ProductGalleryInline(nested_admin.NestedTabularInline):
+class ProductGalleryInline(admin.TabularInline):
+    """Галерея продукта"""
     model = ProductGallery
-    extra = 3
+    extra = 1
+    fields = ('image', 'order')
     verbose_name_plural = "📸 Галерея"
 
 
-# ============ ПРОДУКТЫ ============
-
 @admin.register(Product)
-class ProductAdmin(nested_admin.NestedModelAdmin, TabbedTranslationAdmin):
-    list_display = ['thumbnail', 'title', 'category', 'is_active', 'order']
+class ProductAdmin(TabbedTranslationAdmin):
+    list_display = ['thumbnail', 'title', 'category', 'is_active', 'is_featured', 'order']
     list_filter = ['category', 'is_active', 'is_featured']
-    search_fields = ['title']
-    list_editable = ['is_active', 'order']
+    search_fields = ['title', 'slug']
+    list_editable = ['is_active', 'is_featured', 'order']
     prepopulated_fields = {'slug': ('title',)}
     
     fieldsets = (
@@ -329,24 +302,21 @@ class ProductAdmin(nested_admin.NestedModelAdmin, TabbedTranslationAdmin):
                 ('title', 'slug'),
                 ('category', 'order'),
                 ('is_active', 'is_featured'),
-                # 'short_description',  # ЗАКОММЕНТИРОВАНО
-                # 'main_description',   # ЗАКОММЕНТИРОВАНО
-                # 'slogan',             # ЗАКОММЕНТИРОВАНО
                 ('main_image', 'card_image'),
             )
         }),
     )
     
     inlines = [
-        ProductSpecificationGroupInline,  # Группы с параметрами
-        ProductFeatureInline,              # Характеристики с иконками
-        ProductCardSpecInline,             # Характеристики для карточки
-        ProductGalleryInline,              # Галерея
+        ProductParameterInline,   # 1. Параметры машины (с категориями)
+        ProductFeatureInline,      # 2. Характеристики с иконками (8 шт)
+        ProductCardSpecInline,     # 3. Характеристики для карточки (4 шт)
+        ProductGalleryInline,      # 4. Галерея
     ]
     
     def thumbnail(self, obj):
         img = obj.card_image or obj.main_image
         if img:
-            return format_html('<img src="{}" width="80" height="50" style="object-fit:cover;"/>', img.url)
+            return format_html('<img src="{}" width="80" height="50" style="object-fit:cover;border-radius:4px;"/>', img.url)
         return "—"
     thumbnail.short_description = "Фото"

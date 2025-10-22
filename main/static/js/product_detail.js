@@ -101,41 +101,60 @@ class ProductDetail {
 
     renderSpecifications() {
         const specsContainer = document.querySelector('.acardeon-cards_block');
-        if (!specsContainer || !this.product.spec_groups) return;
+        if (!specsContainer) return;
 
         // Очищаем контейнер
         specsContainer.innerHTML = '';
 
-        // Сортируем группы по order
-        const groups = this.product.spec_groups.sort((a, b) => a.order - b.order);
+        // Проверяем, есть ли параметры
+        if (!this.product.spec_groups || this.product.spec_groups.length === 0) {
+            specsContainer.innerHTML = '<p style="padding: 20px; text-align: center; color: #888;">Parametrlar hali qo\'shilmagan</p>';
+            return;
+        }
 
-        groups.forEach((group, index) => {
+        // Отображаем группы параметров (БЕЗ сортировки, порядок уже правильный из API)
+        this.product.spec_groups.forEach((group, index) => {
+            // Пропускаем пустые группы
+            if (!group.parameters || group.parameters.length === 0) {
+                return;
+            }
+
             const isOpen = index === 0; // Первая группа открыта
             const groupHTML = this.createAccordionCard(group, index, isOpen);
             specsContainer.insertAdjacentHTML('beforeend', groupHTML);
         });
+
+        // Если после фильтрации нет групп
+        if (specsContainer.innerHTML === '') {
+            specsContainer.innerHTML = '<p style="padding: 20px; text-align: center; color: #888;">Parametrlar hali qo\'shilmagan</p>';
+        }
     }
 
     createAccordionCard(group, index, isOpen) {
+        // Дополнительная проверка на всякий случай
+        if (!group.parameters || group.parameters.length === 0) {
+            return '';
+        }
+
         const parameters = group.parameters
             .sort((a, b) => a.order - b.order)
             .map(param => `<li class="specs-list__item">${param.text}</li>`)
             .join('');
 
         return `
-            <div class="acardeon-card">
-                <input type="checkbox" id="accordion-${index}" class="accordion-checkbox" ${isOpen ? 'checked' : ''}>
-                <label for="accordion-${index}" class="acardeon-card__header">
-                    <h3 class="acardeon-card__title">${group.category_name}</h3>
-                    <span class="acardeon-card__icon"></span>
-                </label>
-                <div class="acardeon-card__content">
-                    <ul class="specs-list custom-marker">
-                        ${parameters}
-                    </ul>
-                </div>
+        <div class="acardeon-card">
+            <input type="checkbox" id="accordion-${index}" class="accordion-checkbox" ${isOpen ? 'checked' : ''}>
+            <label for="accordion-${index}" class="acardeon-card__header">
+                <h3 class="acardeon-card__title">${group.category_name}</h3>
+                <span class="acardeon-card__icon"></span>
+            </label>
+            <div class="acardeon-card__content">
+                <ul class="specs-list custom-marker">
+                    ${parameters}
+                </ul>
             </div>
-        `;
+        </div>
+    `;
     }
 
     renderGallery() {

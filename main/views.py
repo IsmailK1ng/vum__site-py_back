@@ -178,22 +178,20 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     
     GET /api/uz/products/ - список всех активных продуктов
     GET /api/uz/products/?category=dump_truck - фильтр по категории
-    GET /api/uz/products/{id}/ - детальная информация о продукте
     GET /api/uz/products/{slug}/ - получить продукт по slug
     """
     permission_classes = [AllowAny]
-    lookup_field = 'slug'  # Можно получать по slug вместо id
+    lookup_field = 'slug'
     
     def get_queryset(self):
         queryset = Product.objects.filter(is_active=True).prefetch_related(
             'card_specs__icon',
-            'spec_groups__category',
-            'spec_groups__parameters',
+            'parameters',  # ← ИСПРАВЛЕНО!
             'features__icon',
             'gallery'
         ).order_by('order', 'title')
         
-        # Фильтрация по категории из query params
+        # Фильтрация по категории
         category = self.request.query_params.get('category', None)
         if category:
             queryset = queryset.filter(category=category)
@@ -205,8 +203,6 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return ProductDetailSerializer
         return ProductCardSerializer
-    
-
 # отображение страниц
 
 

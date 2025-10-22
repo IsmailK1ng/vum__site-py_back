@@ -240,21 +240,6 @@ class FeatureIcon(models.Model):
         return self.name
 
 
-class SpecificationCategory(models.Model):
-    """Категории параметров (Двигатель, Комфорт, и т.д.)"""
-    name = models.CharField("Название категории", max_length=100)
-    slug = models.SlugField("URL", max_length=100, unique=True)
-    order = models.PositiveIntegerField("Порядок", default=0)
-    
-    class Meta:
-        verbose_name = "Категория параметров"
-        verbose_name_plural = "Категории параметров"
-        ordering = ['order', 'name']
-    
-    def __str__(self):
-        return getattr(self, 'name', 'Без названия') or 'Без названия'
-
-
 class Product(models.Model):
     """Модель грузовика FAW"""
     CATEGORY_CHOICES = [
@@ -268,11 +253,6 @@ class Product(models.Model):
     title = models.CharField("Название модели", max_length=255)
     slug = models.SlugField("URL", max_length=255, unique=True)
     category = models.CharField("Категория", max_length=50, choices=CATEGORY_CHOICES)
-    
-    # ========== ЗАКОММЕНТИРОВАНО (можно раскомментировать при необходимости) ==========
-    # short_description = models.TextField("Краткое описание", max_length=500, blank=True)
-    # main_description = models.TextField("Основное описание", blank=True)
-    # slogan = models.CharField("Слоган", max_length=255, blank=True)
     
     main_image = models.ImageField("Главное изображение", upload_to="products/main/")
     card_image = models.ImageField("Изображение для карточки", upload_to="products/cards/", blank=True, null=True)
@@ -292,35 +272,29 @@ class Product(models.Model):
         return self.title
 
 
-class ProductSpecificationGroup(models.Model):
-    """Группа параметров для продукта (привязка категории к продукту)"""
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='spec_groups', verbose_name='Продукт')
-    category = models.ForeignKey(SpecificationCategory, on_delete=models.CASCADE, verbose_name='Категория')
-    order = models.PositiveIntegerField("Порядок", default=0)
-    
-    class Meta:
-        verbose_name = "Группа параметров"
-        verbose_name_plural = "Группы параметров"
-        ordering = ['order', 'category__order']
-        unique_together = ['product', 'category']
-    
-    def __str__(self):
-        return f"{self.category.name}"
-
-
 class ProductParameter(models.Model):
-    """Конкретный параметр внутри группы"""
-    group = models.ForeignKey(ProductSpecificationGroup, on_delete=models.CASCADE, related_name='parameters', verbose_name='Группа')
+    """Параметры продукта с предустановленными категориями"""
+    CATEGORY_CHOICES = [
+        ('main', 'Основные параметры'),
+        ('engine', 'Двигатель'),
+        ('weight', 'Весовые параметры'),
+        ('transmission', 'Трансмиссия'),
+        ('brakes', 'Система тормозов и шин'),
+        ('comfort', 'Удобства'),
+    ]
+    
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='parameters', verbose_name='Продукт')
+    category = models.CharField("Категория", max_length=50, choices=CATEGORY_CHOICES)
     text = models.CharField("Параметр", max_length=500, help_text='Например: Мощность двигателя: 300 л.с.')
     order = models.PositiveIntegerField("Порядок", default=0)
     
     class Meta:
         verbose_name = "Параметр"
-        verbose_name_plural = "Параметры"
-        ordering = ['order']
+        verbose_name_plural = "Параметры машины"
+        ordering = ['category', 'order']
     
     def __str__(self):
-        return self.text[:50]
+        return f"{self.get_category_display()}: {self.text[:50]}"
 
 
 class ProductFeature(models.Model):
