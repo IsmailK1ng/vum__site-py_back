@@ -261,3 +261,29 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True  # ТОЛЬКО ДЛЯ РАЗРАБОТКИ! В продакшене удалить!
+
+# ============================================
+# НАСТРОЙКИ ДЛЯ ПРОДАКШЕНА
+# ============================================
+
+# URL фронтенда (для кнопок в админке)
+FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:3000')
+
+# В продакшене отключить CORS_ALLOW_ALL_ORIGINS и использовать только CORS_ALLOWED_ORIGINS
+if not DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = [
+        'https://faw.kg',
+        'https://www.faw.kg',
+    ]
+    
+    # Добавить домен в ALLOWED_HOSTS
+    ALLOWED_HOSTS = ['faw.kg', 'www.faw.kg', 'api.faw.kg']
+    
+    # Настройки безопасности для продакшена
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'

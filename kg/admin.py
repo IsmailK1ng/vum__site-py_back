@@ -204,7 +204,10 @@ class KGVehicleAdmin(admin.ModelAdmin):
     category_badge.short_description = "Серия"
 
     def action_buttons(self, obj):
-        frontend_url = f"http://localhost:3000/vehicle-details.html?id={obj.slug_ru or obj.slug}&lang=ru"
+        from django.conf import settings
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
+        vehicle_url = f"{frontend_url}/vehicle-details.html?id={obj.slug_ru or obj.slug}&lang=ru"
+        
         return format_html(
             '<div style="display:flex; gap:8px;">'
             '<a href="{}"><img src="/static/media/icon-adminpanel/pencil.png" width="28"></a>'
@@ -214,7 +217,7 @@ class KGVehicleAdmin(admin.ModelAdmin):
             f'/admin/kg/kgvehicle/{obj.id}/change/',
             f'/admin/kg/kgvehicle/{obj.id}/delete/',
             obj.title_ru or 'машину',
-            frontend_url
+            vehicle_url
         )
     action_buttons.short_description = "Действия"
 
@@ -339,7 +342,10 @@ class KGFeedbackAdmin(admin.ModelAdmin):
     vehicle_display.admin_order_field = 'vehicle__title_ru'
 
     def action_buttons(self, obj):
-        frontend_url = f"http://localhost:3000/vehicle-details.html?id={obj.vehicle.slug_ru}&lang=ru" if obj.vehicle else "#"
+        from django.conf import settings
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
+        vehicle_url = f"{frontend_url}/vehicle-details.html?id={obj.vehicle.slug_ru}&lang=ru" if obj.vehicle else "#"
+        
         return format_html(
             '<div class="action-buttons">'
             '<a href="{}"><img src="/static/media/icon-adminpanel/pencil.png" width="28" title="Редактировать"></a>'
@@ -349,7 +355,7 @@ class KGFeedbackAdmin(admin.ModelAdmin):
             f'/admin/kg/kgfeedback/{obj.id}/change/',
             f'/admin/kg/kgfeedback/{obj.id}/delete/',
             obj.name,
-            frontend_url
+            vehicle_url
         )
     action_buttons.short_description = "Действия"
 
@@ -409,7 +415,7 @@ class KGFeedbackAdmin(admin.ModelAdmin):
 
 @admin.register(IconTemplate)
 class IconTemplateAdmin(admin.ModelAdmin):
-    list_display = ('icon_preview', 'name', 'order', 'created_display')
+    list_display = ('icon_preview', 'name', 'order')  
     list_editable = ('order',)
     fields = ('name', 'icon', 'icon_preview', 'order')
     readonly_fields = ('icon_preview',)
@@ -418,8 +424,4 @@ class IconTemplateAdmin(admin.ModelAdmin):
     def icon_preview(self, obj):
         return format_html('<img src="{}" width="60" style="border-radius:8px;">', obj.icon.url) if obj.icon else "—"
     icon_preview.short_description = "Превью"
-    
-    def created_display(self, obj):
-        return "—"
-    created_display.short_description = "Создано"
 
