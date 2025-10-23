@@ -171,7 +171,7 @@
             </p>
           </div>
           <div class="slide-image">
-            <img src="{% static 'images/news/1.jpg' %}" alt="Conference Image">
+            <img src="{% static 'images/news/9.jpg' %}" alt="Conference Image">
           </div>
         </a>
       </div>
@@ -436,124 +436,161 @@
   <script src="{% static 'js/libs.min.js' %}"></script>
   <!-- <script src="template/js/app.js"></script> -->
   <script src="{% static 'js/faw.js' %}"></script>
-  <!-- <script src="{% static 'js/about.js' %}"></script> -->
-  <script>
 
+  <script>
     document.addEventListener('DOMContentLoaded', () => {
       const cardGrid = document.getElementById('card-grid');
       const pagination = document.getElementById('pagination');
-      const cards = Array.from(cardGrid.getElementsByClassName('mxd-card'));
-      const cardsPerPage = 6; // 6 карточек на страницу
-      const totalPages = Math.ceil(cards.length / cardsPerPage); // 8 карточек → 2 страницы
+      const cards = Array.from(cardGrid?.getElementsByClassName('mxd-card') || []);
+      const cardsPerPage = 6;
+      const totalPages = Math.ceil(cards.length / cardsPerPage);
       let currentPage = 1;
 
-      // Функция для показа карточек на текущей странице
+      // Показ карточек на текущей странице
       function showPage(page) {
-        // Скрываем все карточки
+        const start = (page - 1) * cardsPerPage;
+        const end = page * cardsPerPage;
+
         cards.forEach((card, index) => {
-          card.style.display =
-            index >= (page - 1) * cardsPerPage && index < page * cardsPerPage
-              ? 'block'
-              : 'none';
+          card.style.display = (index >= start && index < end) ? 'block' : 'none';
         });
 
-        // Обновляем активную кнопку пагинации
-        const pageLinks = pagination.getElementsByClassName('mxd-blog-pagination__item');
-        Array.from(pageLinks).forEach((link) => {
+        // Обновление активной кнопки
+        pagination.querySelectorAll('.mxd-blog-pagination__item').forEach(link => {
           link.classList.toggle('active', parseInt(link.dataset.page) === page);
         });
 
-        // Обновляем состояние кнопок Previous/Next
+        // Обновление состояния кнопок навигации
         const prevButton = pagination.querySelector('.prev');
         const nextButton = pagination.querySelector('.next');
-        prevButton.classList.toggle('disabled', page === 1);
-        nextButton.classList.toggle('disabled', page === totalPages);
+        prevButton?.classList.toggle('disabled', page === 1);
+        nextButton?.classList.toggle('disabled', page === totalPages);
       }
 
-      // Генерация кнопок пагинации
+      // Генерация пагинации
       function createPagination() {
-        pagination.innerHTML = ''; // Очищаем контейнер
+        pagination.innerHTML = '';
 
         // Кнопка Previous
-        const prevButton = document.createElement('a');
-        prevButton.href = 'javascript:void(0);';
-        prevButton.className = 'mxd-blog-pagination__item blog-pagination-control prev btn btn-anim btn-line-small btn-bright anim-no-delay slide-left';
-        prevButton.innerHTML = `
-      <i class="ph ph-arrow-left"></i>
-      <span class="btn-caption">Ortga</span>
-    `;
-        prevButton.dataset.page = 'prev';
-        // prevButton.addEventListener('click', (e) => {
-        //   e.preventDefault();
-        //   if (currentPage > 1) {
-        //     currentPage--;
-        //     showPage(currentPage);
-        //   }
-        // });
-        prevButton.setAttribute('role', 'button');
-        prevButton.setAttribute('aria-label', 'Previous page');
-        pagination.appendChild(prevButton);
+        const prevBtn = createButton('prev', 'Ortga', 'ph-arrow-left', 'slide-left');
+        prevBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (currentPage > 1) {
+            currentPage--;
+            showPage(currentPage);
+          }
+        });
+        pagination.appendChild(prevBtn);
 
         // Кнопки страниц
         for (let i = 1; i <= totalPages; i++) {
-          const pageLink = document.createElement('a');
-          pageLink.href = 'javascript:void(0);';
-          pageLink.className = `mxd-blog-pagination__item blog-pagination-number btn btn-anim ${i === 1 ? 'active' : ''}`;
-          pageLink.dataset.page = i;
-          pageLink.innerHTML = `<span class="btn-caption">${i}</span>`;
-          // pageLink.addEventListener('click', (e) => {
-          //   e.preventDefault();
-          //   currentPage = parseInt(pageLink.dataset.page);
-          //   showPage(currentPage);
-          // });
-          pageLink.setAttribute('role', 'button');
-          pageLink.setAttribute('aria-label', `Page ${i}`);
-          pagination.appendChild(pageLink);
+          const pageBtn = createPageButton(i);
+          pageBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentPage = i;
+            showPage(currentPage);
+          });
+          pagination.appendChild(pageBtn);
         }
 
         // Кнопка Next
-        const nextButton = document.createElement('a');
-        nextButton.href = 'javascript:void(0);';
-        nextButton.className = 'mxd-blog-pagination__item blog-pagination-control next btn btn-anim btn-line-small btn-bright anim-no-delay slide-right';
-        nextButton.innerHTML = `
-      <span class="btn-caption">Oldinga</span>
-      <i class="ph ph-arrow-right"></i>`;
-        nextButton.dataset.page = 'next';
-        // nextButton.addEventListener('click', (e) => {
-        //   e.preventDefault();
-        //   if (currentPage < totalPages) {
-        //     currentPage++;
-        //     showPage(currentPage);
-        //   }
-        // });
-        nextButton.setAttribute('role', 'button');
-        nextButton.setAttribute('aria-label', 'Next page');
-        pagination.appendChild(nextButton);
+        const nextBtn = createButton('next', 'Oldinga', 'ph-arrow-right', 'slide-right', true);
+        nextBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (currentPage < totalPages) {
+            currentPage++;
+            showPage(currentPage);
+          }
+        });
+        pagination.appendChild(nextBtn);
 
-        // Показываем первую страницу
         showPage(currentPage);
       }
 
-      // Разбиваем текст кнопок на буквы для анимации
+      // Создание кнопки навигации
+      function createButton(type, text, icon, slideClass, iconAfter = false) {
+        const btn = document.createElement('a');
+        btn.href = 'javascript:void(0);';
+        btn.className = `mxd-blog-pagination__item blog-pagination-control ${type} btn btn-anim btn-line-small btn-bright anim-no-delay ${slideClass}`;
+        btn.dataset.page = type;
+        btn.setAttribute('role', 'button');
+        btn.setAttribute('aria-label', `${type} page`);
+
+        btn.innerHTML = iconAfter
+          ? `<span class="btn-caption">${text}</span><i class="ph ${icon}"></i>`
+          : `<i class="ph ${icon}"></i><span class="btn-caption">${text}</span>`;
+
+        return btn;
+      }
+
+      // Создание кнопки страницы
+      function createPageButton(pageNum) {
+        const btn = document.createElement('a');
+        btn.href = 'javascript:void(0);';
+        btn.className = `mxd-blog-pagination__item blog-pagination-number btn btn-anim ${pageNum === 1 ? 'active' : ''}`;
+        btn.dataset.page = pageNum;
+        btn.innerHTML = `<span class="btn-caption">${pageNum}</span>`;
+        btn.setAttribute('role', 'button');
+        btn.setAttribute('aria-label', `Page ${pageNum}`);
+        return btn;
+      }
+
+      // Анимация текста кнопок
       function animateButtonText() {
-        const buttons = document.querySelectorAll('.btn-anim .btn-caption');
-        buttons.forEach((button) => {
+        document.querySelectorAll('.btn-anim .btn-caption').forEach(button => {
           const text = button.textContent;
-          button.innerHTML = text
-            .split('')
-            .map((char) => `<span class="btn-anim__letter">${char}</span>`)
-            .join('');
+          button.innerHTML = text.split('').map(char =>
+            `<span class="btn-anim__letter">${char}</span>`
+          ).join('');
         });
       }
 
-      // Инициализация пагинации
+      // ОПТИМИЗИРОВАННАЯ MARQUEE АНИМАЦИЯ - БЕЗ ОСТАНОВКИ
+      // ОПТИМИЗИРОВАННАЯ MARQUEE АНИМАЦИЯ - СЛЕВА НАПРАВО БЕЗ ПУСТОТ
+      function initMarquee() {
+        const marqueeContainers = document.querySelectorAll(".marquee-right--gsap");
+
+        marqueeContainers.forEach(container => {
+          const marqueeContent = container.querySelector(".marquee__toright");
+          if (!marqueeContent) return;
+
+          // Дублируем контент 3 раза для устранения пустоты
+          const originalHTML = marqueeContent.innerHTML;
+          marqueeContent.innerHTML = originalHTML + originalHTML + originalHTML;
+
+          // МЕДЛЕННАЯ анимация СЛЕВА НАПРАВО без пустот
+          const animation = gsap.to(marqueeContent, {
+            x: "33.333%", // Движение вправо на треть
+            duration: 60, // Увеличена длительность для медленного движения
+            ease: "none",
+            repeat: -1,
+            modifiers: {
+              x: gsap.utils.unitize(x => parseFloat(x) % 33.333)
+            }
+          });
+
+          // Ускорение при скролле (опционально)
+          ScrollTrigger.create({
+            start: 0,
+            end: "max",
+            onUpdate: (self) => {
+              const velocity = Math.abs(self.getVelocity());
+              const speed = gsap.utils.clamp(0.5, 2, 1 + velocity / 2000);
+              gsap.to(animation, { timeScale: speed, duration: 0.3 });
+            }
+          });
+        });
+      }
+
+      initMarquee();
+      // Инициализация
       if (cards.length > 0) {
         createPagination();
         animateButtonText();
       }
+
+      initMarquee();
     });
-
-
   </script>
 
 </body>

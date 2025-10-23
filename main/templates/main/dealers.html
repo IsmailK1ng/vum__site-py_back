@@ -173,264 +173,235 @@
     <script src="{% static 'faw-js/faw.js' %}"></script>
     <!-- Подключение Яндекс.Карт с вашим API ключом -->
     <script src="https://api-maps.yandex.ru/2.1/?apikey=145cca7b-9118-4b72-b7b6-261dbc414620&lang=ru_RU"></script>
+
     <script>
         // ========== ДАННЫЕ ДИЛЕРОВ ==========
         const dealers = [{
             id: 1, name: "MCHJ «Ideal Truck Sales»", address: "O'zbekiston, Toshkent shahri, Yangi Sergeli ko'chasi, 25-uy. Avtosentr.", coordinates: [41.237360, 69.213242],
-            phone: "+998 71 203-10-40",
-            email: "manideal@mail.ru",
-            website: "https://ideal-tehno.uz",
+            phone: "+998 71 203-10-40", email: "manideal@mail.ru", website: "https://ideal-tehno.uz",
             workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "Begzod",
-            city: "Toshkent"
+            services: ["Sotuv"], manager: "Begzod", city: "Toshkent"
         },
         {
-            id: 2,
-            name: "MCHJ «SHARQ GAVHARI TRANS»",
+            id: 2, name: "MCHJ «SHARQ GAVHARI TRANS»",
             address: "Toshkent shahri, Yangihayot tumani, Yangi Darxon MFY, Toshkent halqa avtomobil yoʼli ko'chasi, 23-uy",
-            coordinates: [41.222225, 69.192259],
-            phone: "+998 91 779-73-73",
-            email: "izzat@gmail.com",
+            coordinates: [41.222225, 69.192259], phone: "+998 91 779-73-73", email: "izzat@gmail.com",
             workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "Muhriddin",
-            city: "Toshkent"
+            services: ["Sotuv"], manager: "Muhriddin", city: "Toshkent"
         },
         {
-            id: 3,
-            name: "MCHJ «SHARQ GAVHARI TRANS»",
+            id: 3, name: "MCHJ «SHARQ GAVHARI TRANS»",
             address: "Toshkent shahri, Sirg'ali tumani, Qumariq MFY, Qum-Ariq ko'chasi, 24-a-uy",
-            coordinates: [41.245010, 69.255868],
-            phone: "+998 90 065-35-35",
-            email: "izzat@gmail.com",
+            coordinates: [41.245010, 69.255868], phone: "+998 90 065-35-35", email: "izzat@gmail.com",
             workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "Muslim",
-            city: "Toshkent"
+            services: ["Sotuv"], manager: "Muslim", city: "Toshkent"
         },
         {
-            id: 4,
-            name: "MCHJ «MAGISTRAL DIESEL SERVICE»",
+            id: 4, name: "MCHJ «MAGISTRAL DIESEL SERVICE»",
             address: "Toshkent viloyati, Zangiota tumani, Erkin QFY Tariq Teshar mahallesi, M39 Avtomagistral yo'li ko'chasi, 54 A-uy",
-            coordinates: [41.227780, 69.148816],
-            phone: "+998 99 808-09-90",
-            email: "info@magistral.uz",
-            website: "https://magistral.uz",
+            coordinates: [41.227780, 69.148816], phone: "+998 99 808-09-90", email: "info@magistral.uz", website: "https://magistral.uz",
             workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "Komron",
-            city: "Toshkent viloyati"
+            services: ["Sotuv"], manager: "Komron", city: "Toshkent viloyati"
         },
         {
-            id: 5,
-            name: "MCHJ «MAGISTRAL DIESEL SERVICE»",
+            id: 5, name: "MCHJ «MAGISTRAL DIESEL SERVICE»",
             address: "Toshkent viloyati, Zangiota tumani, Erkin QFY Tariq Teshar mahallesi, M39 Avtomagistral yo'li ko'chasi, 54 A-uy",
-            coordinates: [41.298308, 69.292843],
-            phone: "+998 99 040-09-90",
-            email: "info@magistral.uz",
-            website: "https://magistral.uz",
+            coordinates: [41.298308, 69.292843], phone: "+998 99 040-09-90", email: "info@magistral.uz", website: "https://magistral.uz",
             workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "Qodirov Zaid",
-            city: "Toshkent viloyati"
+            services: ["Sotuv"], manager: "Qodirov Zaid", city: "Toshkent viloyati"
         },
         {
-            id: 6,
-            name: "MCHJ «DELTA-AUTO MOTORS»",
+            id: 6, name: "MCHJ «DELTA-AUTO MOTORS»",
             address: "Toshkent viloyati, Olmaliq sh. Saxovat mahallasi, Ravnaq ko'chasi",
-            coordinates: [40.88795582024242, 69.5780345958458],
-            phone: "+998 99 93 515-09-99",
-            email: "sundj_83@mail.ru",
+            coordinates: [40.88795582024242, 69.5780345958458], phone: "+998 99 93 515-09-99", email: "sundj_83@mail.ru",
             website: "https://www.instagram.com/deltaautomotors/",
             workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "",
-            city: "Toshkent"
+            services: ["Sotuv"], manager: "", city: "Toshkent"
         },
         {
-            id: 7,
-            name: "MCHJ «DELTA-AUTO MOTORS»",
+            id: 7, name: "MCHJ «DELTA-AUTO MOTORS»",
             address: "Toshkent viloyati, Olmaliq sh. Saxovat mahallasi, Ravnaq ko'chasi",
-            coordinates: [41.231030, 69.155483],
-            phone: "+998 93 500-77-33",
-            email: "sundj_83@mail.ru",
+            coordinates: [41.231030, 69.155483], phone: "+998 93 500-77-33", email: "sundj_83@mail.ru",
             website: "https://www.instagram.com/deltaautomotors",
             workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "",
-            city: "Toshkent viloyati"
+            services: ["Sotuv"], manager: "", city: "Toshkent viloyati"
         },
         {
-            id: 8,
-            name: "MCHJ «COMTRANS AUTO SERVICE»",
+            id: 8, name: "MCHJ «COMTRANS AUTO SERVICE»",
             address: "Toshkent, Yangihayot tumani, Past Darkhon mahallasi, Navruz ko'chasi 26",
-            coordinates: [41.227671, 69.196490],
-            phone: "+998 77-417-00-33",
-            email: "Abdurasul0586@mail.ru",
+            coordinates: [41.227671, 69.196490], phone: "+998 77-417-00-33", email: "Abdurasul0586@mail.ru",
             workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "Nazir",
-            city: "Toshkent"
+            services: ["Sotuv"], manager: "Nazir", city: "Toshkent"
         },
         {
-            id: 9,
-            name: "BBT TRUCKS»",
+            id: 9, name: "BBT TRUCKS»",
             address: "Toshkent shahri, Yunusobod tumani XALQABOD MFY, 16 mavzesi, 28a-uy",
-            coordinates: [41.367297, 69.327222],
-            phone: "+998 33 711-33-65",
-            email: "azimovbek1993@gmail.com",
+            coordinates: [41.367297, 69.327222], phone: "+998 33 711-33-65", email: "azimovbek1993@gmail.com",
             website: "https://www.instagram.com/bbt_trucks",
             workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "Nodir",
-            city: "Toshkent"
+            services: ["Sotuv"], manager: "Nodir", city: "Toshkent"
         },
         {
-            id: 10,
-            name: "MCHJ «SHARQ GAVHARI TRANS»",
+            id: 10, name: "MCHJ «SHARQ GAVHARI TRANS»",
             address: "Farg'ona viloyat,Farg'ona shahar Ahmad Yassaviy ko'chasi 26",
-            coordinates: [40.379887, 71.806633],
-            phone: "+998 ",
-            email: "izzat@gmail.com",
+            coordinates: [40.379887, 71.806633], phone: "+998 ", email: "izzat@gmail.com",
             workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "",
-            city: "Farg'ona viloyati"
+            services: ["Sotuv"], manager: "", city: "Farg'ona viloyati"
         },
         {
-            id: 11,
-            name: "MCHJ «SHARQ GAVHARI TRANS»",
+            id: 11, name: "MCHJ «SHARQ GAVHARI TRANS»",
             address: "Farg'ona viloyati, Qo'qon shahri, Toshkentliguzar MFY, Tarovat",
-            coordinates: [40.535144, 70.937634],
-            phone: "+998 91 050-13-83",
-            email: "izzat@gmail.com",
+            coordinates: [40.535144, 70.937634], phone: "+998 91 050-13-83", email: "izzat@gmail.com",
             workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "Ulug'bek",
-            city: "Farg'ona viloyati"
+            services: ["Sotuv"], manager: "Ulug'bek", city: "Farg'ona viloyati"
         },
         {
-            id: 12,
-            name: "MCHJ «SHARQ GAVHARI TRANS»",
+            id: 12, name: "MCHJ «SHARQ GAVHARI TRANS»",
             address: "Andijon viloyati, Oltinko'l tumani, Mehnat MSG, Mehnat ko'chasi, 10-uy",
-            coordinates: [40.753081, 72.290714],
-            phone: "+998 ",
-            email: "izzat@gmail.com",
+            coordinates: [40.753081, 72.290714], phone: "+998 ", email: "izzat@gmail.com",
             workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "",
-            city: "Andijon viloyati"
+            services: ["Sotuv"], manager: "", city: "Andijon viloyati"
         },
         {
-            id: 13,
-            name: "MCHJ «KAMAZ TEXNIK MARKAZI»",
+            id: 13, name: "MCHJ «KAMAZ TEXNIK MARKAZI»",
             address: "Sirdaryo viloyati, Oqoltin tumani, Sardoba shaharchasi A.TOIROV SIU XUDUDI",
-            coordinates: [40.536946, 68.325411],
-            phone: "+998 97 706-10-61",
-            email: "shavkat@mail.ru",
+            coordinates: [40.536946, 68.325411], phone: "+998 97 706-10-61", email: "shavkat@mail.ru",
             workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "Shavkat",
-            city: "Sirdaryo viloyati"
+            services: ["Sotuv"], manager: "Shavkat", city: "Sirdaryo viloyati"
         },
         {
-            id: 14,
-            name: "MCHJ «INNOVATSION COMFORT TOMORQA HIZMATLARI»",
+            id: 14, name: "MCHJ «INNOVATSION COMFORT TOMORQA HIZMATLARI»",
             address: "Jizzax viloyati, Jizzax sh. Toshloq mahallasi, Sayiljoyi ko'chasi, 22-uy",
-            coordinates: [40.130849, 67.823168],
-            phone: "+998 95 268-33-63",
-            email: "mahmuovjavohir@gmail.com",
+            coordinates: [40.130849, 67.823168], phone: "+998 95 268-33-63", email: "mahmuovjavohir@gmail.com",
             workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "Hatamov Bekzod",
-            city: "Jizzax viloyati"
+            services: ["Sotuv"], manager: "Hatamov Bekzod", city: "Jizzax viloyati"
         },
         {
-            id: 15,
-            name: "MCHJ «SHARQ GAVHARI TRANS»",
+            id: 15, name: "MCHJ «SHARQ GAVHARI TRANS»",
             address: "Surxondaryo viloyati, Termiz shahar, Kattabogʻ MFY, Farovon-3 dahasi, 10-uy",
-            coordinates: [37.235186, 67.272631],
-            phone: "+998 91 772-04-44",
-            email: "izzat@gmail.com",
+            coordinates: [37.235186, 67.272631], phone: "+998 91 772-04-44", email: "izzat@gmail.com",
             workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "Ergashev Mirjalol Bahrom o'g'li",
-            city: "Surxondaryo viloyati"
+            services: ["Sotuv"], manager: "Ergashev Mirjalol Bahrom o'g'li", city: "Surxondaryo viloyati"
         }];
 
-        let map, clusterer;
-        let currentFilter = 'all';
-        let filteredDealers = [...dealers];
-
-        // Статические координаты границ и центра Узбекистана
-        const UZBEKISTAN_BOUNDS = [[37.0, 55.0], [45.8, 73.2]];
+        let map, clusterer, currentFilter = 'all', filteredDealers = [...dealers];
         const UZBEKISTAN_CENTER = [41.377491, 64.585262];
 
-        // Kartani ishga tushirish
-        ymaps.ready(function () {
-            initializeMap();
-        });
-
         // Инициализация карты
+        ymaps.ready(initializeMap);
+
         function initializeMap() {
             document.getElementById('mapLoading').style.display = 'none';
 
-            // Создаем карту
             map = new ymaps.Map('map', {
                 center: UZBEKISTAN_CENTER,
                 zoom: 6,
                 controls: ['zoomControl', 'fullscreenControl', 'geolocationControl']
             });
 
-            // Загружаем и отображаем границы Узбекистана
-            loadAndDisplayRegions();
+            // РАБОЧЕЕ РЕШЕНИЕ - полная блокировка скролла страницы над картой
+            const mapElement = document.getElementById('map');
 
-            // Инициализируем остальные компоненты
+            mapElement.addEventListener('wheel', (e) => {
+                e.stopPropagation(); // Останавливаем всплытие события
+            }, { passive: true });
+
+            loadAndDisplayRegions();
             initializeClusterer();
             initializeDealers();
             updateStats();
             setupEventListeners();
         }
+        function initializeMap() {
+            document.getElementById('mapLoading').style.display = 'none';
 
+            map = new ymaps.Map('map', {
+                center: UZBEKISTAN_CENTER,
+                zoom: 6,
+                controls: ['zoomControl', 'fullscreenControl', 'geolocationControl']
+            });
+
+            // ОГРАНИЧЕНИЕ ТОЛЬКО ТЕРРИТОРИЕЙ УЗБЕКИСТАНА
+            map.setBounds([
+                [37.172, 55.998],  // Юго-западный угол
+                [45.590, 73.132]   // Северо-восточный угол
+            ], {
+                checkZoomRange: true,
+                preciseZoom: true
+            });
+
+            // Запрет выхода за границы
+            map.options.set('restrictMapArea', [
+                [37.172, 55.998],
+                [45.590, 73.132]
+            ]);
+
+            // РАБОЧЕЕ РЕШЕНИЕ - полная блокировка скролла страницы над картой
+            const mapElement = document.getElementById('map');
+
+            mapElement.addEventListener('wheel', (e) => {
+                e.stopPropagation();
+            }, { passive: true });
+
+            loadAndDisplayRegions();
+            initializeClusterer();
+            initializeDealers();
+            updateStats();
+            setupEventListeners();
+        }
         function loadAndDisplayRegions() {
-            // Координаты границ Узбекистана для Yandex Maps API [широта, долгота]
             const uzbekistanBorder = [
-                [37.250789, 67.340123], [37.360214, 67.081543], [37.368912, 66.524178],
-                [37.970000, 66.550000], [37.981234, 66.551789], [38.410876, 65.221345],
-                [38.420567, 65.210123], [38.899123, 64.175892], [39.370456, 63.523467],
-                [39.948765, 62.905123], [40.060214, 62.379876], [40.505432, 62.005678],
-                [40.520123, 61.990456], [41.090123, 61.888456], [41.271890, 61.552345],
-                [41.225678, 60.471234], [41.430567, 60.088912], [41.440234, 60.080123],
-                [42.228456, 59.981789], [42.756789, 58.634567], [42.770123, 58.620456],
-                [42.175890, 57.791234], [41.831234, 56.937890], [41.327456, 57.101789],
-                [41.313890, 55.973456], [41.320123, 55.960789], [41.300000, 55.900000],
-                [42.500000, 55.800000], [43.200000, 55.600000], [44.100000, 55.750000],
-                [44.995858, 55.928917], [45.001234, 55.934123], [45.010567, 55.945456],
-                [45.050123, 56.000789], [45.070000, 56.050000], [45.100456, 56.120123],
-                [45.200789, 56.500456], [45.300123, 56.800789], [45.400456, 57.100123],
-                [45.500000, 57.500000], [45.505432, 57.505432], [45.592123, 58.508456],
-                [45.600789, 58.520123], [45.586804, 58.503127], [45.500014, 58.689989],
-                [45.490123, 58.700456], [44.789456, 60.245123], [44.800567, 60.250789],
-                [44.405817, 61.058320], [43.504477, 62.013300], [43.655432, 63.191234],
-                [43.733456, 64.906123], [43.740123, 64.920456], [43.002890, 66.103456],
-                [42.000123, 66.028789], [41.992890, 66.515432], [41.173789, 66.719234],
-                [41.141234, 67.991123], [40.667456, 68.265123], [40.673890, 68.637456],
-                [41.389456, 69.075123], [41.400123, 69.080456], [42.086543, 70.394123],
-                [42.271345, 70.967456], [42.172890, 71.264123], [41.525123, 70.425234],
-                [41.148789, 71.162890], [41.398123, 71.875234], [40.871234, 73.060123],
-                [40.880567, 73.070456], [40.151123, 71.780234], [40.249567, 71.019198],
-                [40.223789, 70.606543], [40.501678, 70.463234], [40.965432, 70.671789],
-                [40.2204216, 69.2579536], [40.217000, 69.253000], [40.225000, 69.262000],
-                [40.230000, 69.265000], [40.091234, 69.016789], [39.800000, 68.900000],
-                [39.650000, 68.750000], [39.538789, 68.541234], [39.585123, 67.706543],
-                [39.705432, 67.105123], [39.145432, 67.447456], [38.906789, 68.181234],
-                [38.162345, 68.397123], [38.170123, 68.410456], [37.725123, 68.305432],
-                [37.730456, 68.310123], [37.200789, 67.850456], [37.195000, 67.845000],
-                [37.190123, 67.840789], [37.250789, 67.340123]
-            ];
+                [37.250789, 67.340123], [37.360214, 67.081543],
+                [37.368912, 66.524178], [37.970000, 66.550000],
+                [37.981234, 66.551789], [38.410876, 65.221345],
+                [38.420567, 65.210123], [38.899123, 64.175892],
+                [39.370456, 63.523467], [39.948765, 62.905123],
+                [40.060214, 62.379876], [40.505432, 62.005678],
+                [40.520123, 61.990456], [41.090123, 61.888456],
+                [41.271890, 61.552345], [41.225678, 60.471234],
+                [41.430567, 60.088912], [41.440234, 60.080123],
+                [42.228456, 59.981789], [42.756789, 58.634567],
+                [42.770123, 58.620456], [42.175890, 57.791234],
+                [41.831234, 56.937890], [41.327456, 57.101789],
+                [41.313890, 55.973456], [41.320123, 55.960789],
+                [41.300000, 55.900000], [42.500000, 55.800000],
+                [43.200000, 55.600000], [44.100000, 55.750000],
+                [44.995858, 55.928917], [45.001234, 55.934123],
+                [45.010567, 55.945456], [45.050123, 56.000789],
+                [45.070000, 56.050000], [45.100456, 56.120123],
+                [45.200789, 56.500456], [45.300123, 56.800789],
+                [45.400456, 57.100123], [45.500000, 57.500000],
+                [45.505432, 57.505432], [45.592123, 58.508456],
+                [45.600789, 58.520123], [45.586804, 58.503127],
+                [45.500014, 58.689989], [45.490123, 58.700456],
+                [44.789456, 60.245123], [44.800567, 60.250789],
+                [44.405817, 61.058320], [43.504477, 62.013300],
+                [43.655432, 63.191234], [43.733456, 64.906123],
+                [43.740123, 64.920456], [43.002890, 66.103456],
+                [42.000123, 66.028789], [41.992890, 66.515432],
+                [41.173789, 66.719234], [41.141234, 67.991123],
+                [40.667456, 68.265123], [40.673890, 68.637456],
+                [41.389456, 69.075123], [41.400123, 69.080456],
+                [42.086543, 70.394123], [42.271345, 70.967456],
+                [42.172890, 71.264123], [41.525123, 70.425234],
+                [41.148789, 71.162890], [41.398123, 71.875234],
+                [40.871234, 73.060123], [40.880567, 73.070456],
+                [40.151123, 71.780234], [40.249567, 71.019198],
+                [40.223789, 70.606543], [40.501678, 70.463234],
+                [40.965432, 70.671789], [40.2204216, 69.2579536],
+                [40.217000, 69.253000], [40.225000, 69.262000],
+                [40.230000, 69.265000], [40.091234, 69.016789],
+                [39.800000, 68.900000], [39.650000, 68.750000],
+                [39.538789, 68.541234], [39.585123, 67.706543],
+                [39.705432, 67.105123], [39.145432, 67.447456],
+                [38.906789, 68.181234], [38.162345, 68.397123],
+                [38.170123, 68.410456], [37.725123, 68.305432],
+                [37.730456, 68.310123], [37.200789, 67.850456],
+                [37.195000, 67.845000], [37.190123, 67.840789],
+                [37.250789, 67.340123]];
 
-            const border = new ymaps.Polygon([uzbekistanBorder], {
+
+            map.geoObjects.add(new ymaps.Polygon([uzbekistanBorder], {
                 hintContent: 'O\'zbekiston Respublikasi'
             }, {
                 strokeColor: '#0a2883',
@@ -438,13 +409,9 @@
                 strokeOpacity: 1,
                 fillColor: 'rgba(231, 76, 60, 0.1)',
                 fillOpacity: 0
-            });
-
-            map.geoObjects.add(border);
-            console.log('Граница Узбекистана добавлена');
+            }));
         }
 
-        // Klasterni ishga tushirish
         function initializeClusterer() {
             clusterer = new ymaps.Clusterer({
                 preset: 'islands#blueClusterIcons',
@@ -453,369 +420,181 @@
             });
         }
 
-        // Diler belgilarini yaratish
         function createPlacemark(dealer) {
-            const placemark = new ymaps.Placemark(
-                dealer.coordinates,
-                {
-                    id: dealer.id,
-                    name: dealer.name,
-                    address: dealer.address,
-                    phone: dealer.phone,
-                    balloonContentHeader: `<strong>${dealer.name}</strong>`,
-                    balloonContentBody: `
-                <div style="padding: 10px;">
-                    <p><strong>📍 Manzil:</strong><br>${dealer.address}</p>
-                    <p><strong>📞 Telefon:</strong><br><a href="tel:${dealer.phone}">${dealer.phone}</a></p>
-                    <p><strong>🕒 Ish vaqti:</strong><br>${dealer.workingHours}</p>
-                    <p><strong>🛠️ Xizmatlar:</strong><br>
-                        ${dealer.services.map(service => `<span style="background: #e3f2fd; color: #0a2883; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin: 2px;">${service}</span>`).join('')}
-                    </p>
-                    <button onclick="showDealerDetails(${dealer.id})" 
-                            style="background: #0a2883; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 10px;">
-                        Batafsil ma'lumot
-                    </button>
-                </div>
-            `,
-                    hintContent: `${dealer.name} - ${dealer.city}`
-                },
-                {
-                    preset: 'islands#redDotIcon',
-                    iconColor: '#0a2883'
-                }
-            );
-            return placemark;
+            return new ymaps.Placemark(dealer.coordinates, {
+                id: dealer.id,
+                name: dealer.name,
+                address: dealer.address,
+                phone: dealer.phone,
+                balloonContentHeader: `<strong>${dealer.name}</strong>`,
+                balloonContentBody: `<div style="padding:10px"><p><strong>📍 Manzil:</strong><br>${dealer.address}</p><p><strong>📞 Telefon:</strong><br><a href="tel:${dealer.phone}">${dealer.phone}</a></p><p><strong>🕒 Ish vaqti:</strong><br>${dealer.workingHours}</p><p><strong>🛠️ Xizmatlar:</strong><br>${dealer.services.map(s => `<span style="background:#e3f2fd;color:#0a2883;padding:2px 6px;border-radius:4px;font-size:11px;margin:2px">${s}</span>`).join('')}</p><button onclick="showDealerDetails(${dealer.id})" style="background:#0a2883;color:white;border:none;padding:8px 15px;border-radius:4px;cursor:pointer;width:100%;margin-top:10px">Batafsil ma'lumot</button></div>`,
+                hintContent: `${dealer.name} - ${dealer.city}`
+            }, {
+                preset: 'islands#redDotIcon',
+                iconColor: '#0a2883'
+            });
         }
 
-        // Dilerlarni ishga tushirish
         function initializeDealers() {
-            const placemarks = dealers.map(dealer => createPlacemark(dealer));
+            const placemarks = dealers.map(createPlacemark);
             clusterer.add(placemarks);
             map.geoObjects.add(clusterer);
 
-            // Kartani barcha dilerlarni ko'rsatish uchun moslashtirish
             if (placemarks.length > 0) {
                 try {
                     const bounds = clusterer.getBounds();
-                    if (bounds) {
-                        map.setBounds(bounds, {
-                            checkZoomRange: true,
-                            zoomMargin: [60, 60, 60, 60]
-                        });
-                    }
+                    bounds && map.setBounds(bounds, { checkZoomRange: true, zoomMargin: [60, 60, 60, 60] });
                 } catch (e) {
-                    console.warn('Kartani moslashtirish xatoligi');
                     map.setCenter(UZBEKISTAN_CENTER, 6);
                 }
             }
         }
 
-        // Batafsil ma'lumotlarni ko'rsatish
         function showDealerDetails(dealerId) {
             const dealer = dealers.find(d => d.id === dealerId);
             if (!dealer) return;
 
             document.getElementById('modalTitle').textContent = dealer.name;
             document.getElementById('modalSubtitle').textContent = dealer.city;
-
-            const infoHTML = `
-        <div class="info-item">
-            <div class="info-icon">📍</div>
-            <div class="info-text">
-                <strong>Manzil</strong>
-                ${dealer.address}
-            </div>
-        </div>
-        <div class="info-item">
-            <div class="info-icon">📞</div>
-            <div class="info-text">
-                <strong>Telefon</strong>
-                <a href="tel:${dealer.phone}" style="color: #0a2883; text-decoration: none;">${dealer.phone}</a>
-            </div>
-        </div>
-        <div class="info-item">
-            <div class="info-icon">✉️</div>
-            <div class="info-text">
-                <strong>Email</strong>
-                <a href="mailto:${dealer.email}" style="color: #0a2883; text-decoration: none;">${dealer.email}</a>
-            </div>
-        </div>
-        <div class="info-item">
-            <div class="info-icon">🌐</div>
-            <div class="info-text">
-                <strong>Veb-sayt</strong>
-                <a href="${dealer.website || '#'}" target="_blank" style="color: #0a2883; text-decoration: none;">${dealer.website || 'Ko\'rsatilmagan'}</a>
-            </div>
-        </div>
-        <div class="info-item">
-            <div class="info-icon">🕒</div>
-            <div class="info-text">
-                <strong>Ish vaqti</strong>
-                ${dealer.workingHours}
-            </div>
-        </div>
-        <div class="info-item">
-            <div class="info-icon">👤</div>
-            <div class="info-text">
-                <strong>Menejer</strong>
-                ${dealer.manager || 'Ko\'rsatilmagan'}
-            </div>
-        </div>
-        <div class="info-item">
-            <div class="info-icon">🛠️</div>
-            <div class="info-text">
-                <strong>Xizmatlar</strong>
-                <div class="services">
-                    ${dealer.services.map(service => `<span class="service-tag">${service}</span>`).join('')}
-                </div>
-            </div>
-        </div>
-        <div class="contact-buttons">
-            <a href="tel:${dealer.phone}" class="contact-btn btn-primary">
-                📞 Qo'ng'iroq qilish
-            </a>
-            <button onclick="buildRoute([${dealer.coordinates.join(',')}])" class="contact-btn btn-secondary">
-                🗺️ Yo'nalish
-            </button>
-        </div>
-    `;
-
-            document.getElementById('dealerInfo').innerHTML = infoHTML;
+            document.getElementById('dealerInfo').innerHTML = `
+            <div class="info-item"><div class="info-icon">📍</div><div class="info-text"><strong>Manzil</strong>${dealer.address}</div></div>
+            <div class="info-item"><div class="info-icon">📞</div><div class="info-text"><strong>Telefon</strong><a href="tel:${dealer.phone}" style="color:#0a2883;text-decoration:none">${dealer.phone}</a></div></div>
+            <div class="info-item"><div class="info-icon">✉️</div><div class="info-text"><strong>Email</strong><a href="mailto:${dealer.email}" style="color:#0a2883;text-decoration:none">${dealer.email}</a></div></div>
+            <div class="info-item"><div class="info-icon">🌐</div><div class="info-text"><strong>Veb-sayt</strong><a href="${dealer.website || '#'}" target="_blank" style="color:#0a2883;text-decoration:none">${dealer.website || 'Ko\'rsatilmagan'}</a></div></div>
+            <div class="info-item"><div class="info-icon">🕒</div><div class="info-text"><strong>Ish vaqti</strong>${dealer.workingHours}</div></div>
+            <div class="info-item"><div class="info-icon">👤</div><div class="info-text"><strong>Menejer</strong>${dealer.manager || 'Ko\'rsatilmagan'}</div></div>
+            <div class="info-item"><div class="info-icon">🛠️</div><div class="info-text"><strong>Xizmatlar</strong><div class="services">${dealer.services.map(s => `<span class="service-tag">${s}</span>`).join('')}</div></div></div>
+            <div class="contact-buttons">
+                <a href="tel:${dealer.phone}" class="contact-btn btn-primary">📞 Qo'ng'iroq qilish</a>
+                <button onclick="buildRoute([${dealer.coordinates}])" class="contact-btn btn-secondary">🗺️ Yo'nalish</button>
+            </div>`;
             document.getElementById('dealerModal').style.display = 'block';
         }
 
-        // Yo'nalish qurish
         function buildRoute(dealerCoordinates) {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    const userCoords = [position.coords.latitude, position.coords.longitude];
-                    createRoute(userCoords, dealerCoordinates);
-                }, function () {
-                    const centerCoords = map.getCenter();
-                    createRoute(centerCoords, dealerCoordinates);
-                });
-            } else {
-                const centerCoords = map.getCenter();
-                createRoute(centerCoords, dealerCoordinates);
-            }
+            navigator.geolocation ? navigator.geolocation.getCurrentPosition(
+                pos => createRoute([pos.coords.latitude, pos.coords.longitude], dealerCoordinates),
+                () => createRoute(map.getCenter(), dealerCoordinates)
+            ) : createRoute(map.getCenter(), dealerCoordinates);
         }
 
-        function createRoute(fromCoords, toCoords) {
-            // Oldingi yo'nalishlarni o'chirish
-            map.geoObjects.each(function (geoObject) {
-                if (geoObject.geometry && geoObject.geometry.getType() === 'LineString') {
-                    map.geoObjects.remove(geoObject);
-                }
-            });
+        function createRoute(from, to) {
+            map.geoObjects.each(obj => obj.geometry?.getType() === 'LineString' && map.geoObjects.remove(obj));
 
-            ymaps.route([fromCoords, toCoords], {
-                mapStateAutoApply: true,
-                routingMode: 'auto'
-            }).then(function (route) {
-                route.getWayPoints().options.set({
-                    preset: 'islands#redStretchyIcon',
-                    iconColor: '#0a2883'
-                });
-                route.getRoutes().options.set({
-                    strokeColor: '#0a2883',
-                    strokeWidth: 5,
-                    strokeOpacity: 0.9
-                });
-
-                map.geoObjects.add(route);
-                document.getElementById('dealerModal').style.display = 'none';
-
-                const distance = route.getLength() / 1000;
-                const duration = route.getTime() / 60;
-
-                setTimeout(() => {
-                    alert(`Yo'nalish qurildi!\nMasofa: ${distance.toFixed(1)} km\nVaqt: ${Math.round(duration)} daqiqa`);
-                }, 500);
-            }).catch(function (error) {
-                console.error('Yo\'nalish qurishda xatolik:', error);
-                alert('Yo\'nalish qurib bo\'lmadi. Keyinroq urinib ko\'ring.');
-            });
+            ymaps.route([from, to], { mapStateAutoApply: true, routingMode: 'auto' })
+                .then(route => {
+                    route.getWayPoints().options.set({ preset: 'islands#redStretchyIcon', iconColor: '#0a2883' });
+                    route.getRoutes().options.set({ strokeColor: '#0a2883', strokeWidth: 5, strokeOpacity: 0.9 });
+                    map.geoObjects.add(route);
+                    document.getElementById('dealerModal').style.display = 'none';
+                    setTimeout(() => alert(`Yo'nalish qurildi!\nMasofa: ${(route.getLength() / 1000).toFixed(1)} km\nVaqt: ${Math.round(route.getTime() / 60)} daqiqa`), 500);
+                })
+                .catch(() => alert('Yo\'nalish qurib bo\'lmadi. Keyinroq urinib ko\'ring.'));
         }
 
-        // Qidiruv va filtrlash
         function setupEventListeners() {
-            const searchBox = document.getElementById('searchBox');
-            let searchTimeout;
-
-            searchBox.addEventListener('input', function (e) {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    filterDealers(e.target.value);
-                }, 300);
+            let timeout;
+            document.getElementById('searchBox').addEventListener('input', e => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => filterDealers(e.target.value), 300);
             });
 
-            // Filtr tugmalari
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function () {
                     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     currentFilter = this.dataset.service;
-                    filterDealers(searchBox.value);
+                    filterDealers(document.getElementById('searchBox').value);
                 });
             });
 
-            // Modal oyna
             const modal = document.getElementById('dealerModal');
-            const closeBtn = document.querySelector('.close');
-
-            closeBtn.onclick = function () {
-                modal.style.display = 'none';
-            };
-
-            window.onclick = function (event) {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
-            };
-
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && modal.style.display === 'block') {
-                    modal.style.display = 'none';
-                }
-            });
+            document.querySelector('.close').onclick = () => modal.style.display = 'none';
+            window.onclick = e => e.target === modal && (modal.style.display = 'none');
+            document.addEventListener('keydown', e => e.key === 'Escape' && modal.style.display === 'block' && (modal.style.display = 'none'));
         }
 
-        // Dilerlarni filtrlash
-        function filterDealers(searchQuery = '') {
-            const query = searchQuery.toLowerCase().trim();
+        function filterDealers(query = '') {
+            query = query.toLowerCase().trim();
             let filtered = dealers;
 
-            // Matn bo'yicha qidiruv
             if (query.length >= 2) {
-                filtered = filtered.filter(dealer =>
-                    dealer.name.toLowerCase().includes(query) ||
-                    dealer.address.toLowerCase().includes(query) ||
-                    dealer.city.toLowerCase().includes(query) ||
-                    dealer.manager.toLowerCase().includes(query) ||
-                    dealer.services.some(service => service.toLowerCase().includes(query))
+                filtered = filtered.filter(d =>
+                    d.name.toLowerCase().includes(query) ||
+                    d.address.toLowerCase().includes(query) ||
+                    d.city.toLowerCase().includes(query) ||
+                    d.manager.toLowerCase().includes(query) ||
+                    d.services.some(s => s.toLowerCase().includes(query))
                 );
             }
 
-            // Xizmat bo'yicha filtrlash
-            if (currentFilter !== 'all') {
-                filtered = filtered.filter(dealer =>
-                    dealer.services.includes(currentFilter)
-                );
-            }
-
+            currentFilter !== 'all' && (filtered = filtered.filter(d => d.services.includes(currentFilter)));
             filteredDealers = filtered;
             updateMapWithDealers(filtered);
             updateStats();
         }
 
-        // Kartani yangilash
-        function updateMapWithDealers(dealersToShow) {
+        function updateMapWithDealers(dealers) {
             clusterer.removeAll();
+            if (!dealers.length) { updateStats(); return; }
 
-            if (dealersToShow.length === 0) {
-                updateStats();
-                return;
-            }
-
-            const placemarks = dealersToShow.map(dealer => createPlacemark(dealer));
+            const placemarks = dealers.map(createPlacemark);
             clusterer.add(placemarks);
 
-            if (dealersToShow.length === 1) {
-                map.setCenter(dealersToShow[0].coordinates, 12);
-            } else if (dealersToShow.length > 1) {
+            if (dealers.length === 1) {
+                map.setCenter(dealers[0].coordinates, 12);
+            } else {
                 try {
                     const bounds = clusterer.getBounds();
-                    if (bounds) {
-                        map.setBounds(bounds, {
-                            checkZoomRange: true,
-                            zoomMargin: [60, 60, 60, 60]
-                        });
-                    }
-                } catch (e) {
-                    console.warn('Karta chegaralarini moslashtirish xatoligi');
-                }
+                    bounds && map.setBounds(bounds, { checkZoomRange: true, zoomMargin: [60, 60, 60, 60] });
+                } catch (e) { }
             }
         }
 
-        // Statistikani yangilash
         function updateStats() {
-            const totalDealers = dealers.length;
-            const visibleDealers = filteredDealers.length;
-            const cities = new Set(dealers.map(d => d.city)).size;
-            const allServices = new Set(dealers.flatMap(d => d.services)).size;
-
-            // Animatsiya bilan raqamlarni yangilash
-            animateNumber(document.getElementById('totalDealers'), totalDealers);
-            animateNumber(document.getElementById('visibleDealers'), visibleDealers);
-            animateNumber(document.getElementById('citiesCount'), cities);
-            animateNumber(document.getElementById('servicesCount'), allServices);
+            animateNumber(document.getElementById('totalDealers'), dealers.length);
+            animateNumber(document.getElementById('visibleDealers'), filteredDealers.length);
+            animateNumber(document.getElementById('citiesCount'), new Set(dealers.map(d => d.city)).size);
+            animateNumber(document.getElementById('servicesCount'), new Set(dealers.flatMap(d => d.services)).size);
         }
 
-        // Raqamlar animatsiyasi
-        function animateNumber(element, targetValue) {
-            const currentValue = parseInt(element.textContent) || 0;
-            const increment = targetValue > currentValue ? 1 : -1;
-            const duration = 500;
-            const steps = Math.abs(targetValue - currentValue);
-            const stepDuration = steps > 0 ? duration / steps : 0;
+        function animateNumber(el, target) {
+            const current = parseInt(el.textContent) || 0;
+            const increment = target > current ? 1 : -1;
+            const steps = Math.abs(target - current);
+            const duration = steps > 0 ? 500 / steps : 0;
+            let step = 0;
 
-            let currentStep = 0;
             const timer = setInterval(() => {
-                currentStep++;
-                const newValue = currentValue + (increment * currentStep);
-
-                if ((increment > 0 && newValue >= targetValue) || (increment < 0 && newValue <= targetValue)) {
-                    element.textContent = targetValue;
-                    clearInterval(timer);
-                } else {
-                    element.textContent = newValue;
-                }
-            }, stepDuration);
+                const val = current + (increment * ++step);
+                (increment > 0 && val >= target) || (increment < 0 && val <= target)
+                    ? (el.textContent = target, clearInterval(timer))
+                    : el.textContent = val;
+            }, duration);
         }
 
-        // Eng yaqin dilerni topish
         function findNearestDealer() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    const userCoords = [position.coords.latitude, position.coords.longitude];
-                    let nearestDealer = null;
-                    let minDistance = Infinity;
+            if (!navigator.geolocation) return alert('Brauzeringiz geolokatsiyani qo\'llab-quvvatlamaydi');
 
-                    dealers.forEach(dealer => {
-                        const distance = calculateDistance(userCoords, dealer.coordinates);
-                        if (distance < minDistance) {
-                            minDistance = distance;
-                            nearestDealer = dealer;
-                        }
-                    });
+            navigator.geolocation.getCurrentPosition(pos => {
+                const userCoords = [pos.coords.latitude, pos.coords.longitude];
+                let nearest = null, minDist = Infinity;
 
-                    if (nearestDealer) {
-                        map.setCenter(nearestDealer.coordinates, 14);
-                        setTimeout(() => {
-                            showDealerDetails(nearestDealer.id);
-                        }, 800);
-                    }
-                }, function () {
-                    alert('Joylashuvingizni aniqlab bo\'lmadi');
+                dealers.forEach(d => {
+                    const dist = calculateDistance(userCoords, d.coordinates);
+                    if (dist < minDist) { minDist = dist; nearest = d; }
                 });
-            } else {
-                alert('Brauzeringiz geolokatsiyani qo\'llab-quvvatlamaydi');
-            }
+
+                nearest && (map.setCenter(nearest.coordinates, 14), setTimeout(() => showDealerDetails(nearest.id), 800));
+            }, () => alert('Joylashuvingizni aniqlab bo\'lmadi'));
         }
 
-        // Masofa hisoblash
-        function calculateDistance(coords1, coords2) {
-            const R = 6371; // Yer radiusi km da
-            const dLat = (coords2[0] - coords1[0]) * Math.PI / 180;
-            const dLon = (coords2[1] - coords1[1]) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(coords1[0] * Math.PI / 180) * Math.cos(coords2[0] * Math.PI / 180) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c;
+        function calculateDistance(c1, c2) {
+            const R = 6371, dLat = (c2[0] - c1[0]) * Math.PI / 180, dLon = (c2[1] - c1[1]) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) ** 2 + Math.cos(c1[0] * Math.PI / 180) * Math.cos(c2[0] * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         }
 
-        // Global funksiyalar
         window.showDealerDetails = showDealerDetails;
         window.buildRoute = buildRoute;
         window.findNearestDealer = findNearestDealer;

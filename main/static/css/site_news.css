@@ -252,6 +252,7 @@ h1 {
 
 /* Стили для карточек */
 .slide-content {
+    max-height: 560px;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -399,7 +400,7 @@ h1 {
 /* Изображение */
 .slide-image {
     width: 100%;
-    height: 45%;
+    height: 55%;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: none;

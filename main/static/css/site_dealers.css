@@ -45,6 +45,12 @@
     margin: 0 auto;
     position: relative;
     z-index: 1;
+    /* ДОБАВЬТЕ ЭТО */
+    isolation: isolate;
+}
+
+#map ymaps {
+    touch-action: pan-x pan-y;
 }
 
 .map-header {

@@ -1111,9 +1111,10 @@ const testimonialsSlider = document.querySelector("testimonials-slider");
 
 if (!testimonialsSlider) {
   const swiper = new Swiper('.swiper-testimonials', {
-    slidesPerView: 'auto',
-    grabCursor: true,
+    slidesPerView: 1.2, // Показываем 1 полный + кусок следующего
     spaceBetween: 30,
+    centeredSlides: false, // Важно: false для показа следующего
+    grabCursor: true,
     autoplay: {
       delay: 3000,
       disableOnInteraction: false,
@@ -1121,7 +1122,6 @@ if (!testimonialsSlider) {
     speed: 1000,
     loop: true,
     parallax: true,
-    loopFillGroupWithBlank: true,
     pagination: {
       el: ".swiper-pagination",
       type: "fraction",
@@ -1130,6 +1130,25 @@ if (!testimonialsSlider) {
       nextEl: '.swiper-button-next',
       prevEl: '.swiper-button-prev',
     },
+    breakpoints: {
+      // Адаптив для разных экранов
+      320: {
+        slidesPerView: 1.1,
+        spaceBetween: 20
+      },
+      768: {
+        slidesPerView: 1.3,
+        spaceBetween: 25
+      },
+      1024: {
+        slidesPerView: 1.5,
+        spaceBetween: 30
+      },
+      1200: {
+        slidesPerView: 1.8, // На больших экранах видно больше
+        spaceBetween: 30
+      }
+    }
   });
 
   // Функция для управления автоплеем при взаимодействии с карточками
