@@ -33,6 +33,7 @@
 }
 
 .mxd-hero-06__car {
+    min-height: 450px;
     padding: 0 10px 10px;
     position: relative;
 }
