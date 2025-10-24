@@ -1,62 +1,3 @@
-/*! ------------------------------------------------
- * Project Name: Rayo - Digital Agency & Personal Portfolio HTML Template
- * Project Description: Elevate your digital presence with Rayo - dynamic and stylish HTML template designed for creative agencies and personal brands. With modern layouts, smooth interactions and a polished aesthetic, Rayo template helps showcase projects, services and expertise with clarity and impact.
- * Tags: mix_design, resume, portfolio, personal page, cv, template, one page, responsive, html5, css3, creative, clean, agency, studio
- * Version: 1.0.0
- * Build Date: July 2025
- * Last Update: July 2025
- * This product is available exclusively on Themeforest
- * Author: mix_design
- * Author URI: https://themeforest.net/user/mix_design
- * File name: app.js
- * ------------------------------------------------
-
- * ------------------------------------------------
- * Table of Contents
- * ------------------------------------------------
- *
- *  01. Loader & Loading Animation
- *  02. Lenis Scroll Plugin
- *  03. Typed.js Plugin
- *  04. Header Scroll Behavior
- *  05. Hero #02 Scroll Out Animation
- *  06. Hero #07 Scroll Out Animation
- *  07. Hero #08 Scroll Out Animation
- *  08. SVG Fallback
- *  09. Chrome Smooth Scroll
- *  10. Images Moving Ban
- *  11. Detecting Mobile/Desktop
- *  12. Smooth Scrolling
- *  13. Menu & Hamburger
- *  14. Menu Accordion
- *  15. Layout Masonry
- *  16. Accordion
- *  17. Magnific Popup Video
- *  18. Mailchimp Subscribe Form
- *  19. Contact Form
- *  20. Parallax - Ukiyo Images & Video
- *  21. Pinned Images
- *  22. Stacking Cards
- *  23. Animation - Buttons Common
- *  24. Animation - Text Reveal
- *  25. Animation - Scroll Universal
- *  26. Animation - Images Reveal on Hover
- *  27. Swiper Slider - Testimonials #01
- *  28. Swiper Slider - Testimonials #02
- *  29. Swiper Slider - Inner Pages Demo
- *  30. CountUp - All Counters Options
- *  31. Marquee - Two Lines
- *  32. Marquee - One Line To Right
- *  33. Marquee - One Line To Left
- *  34. SVG DOM Injection
- *  35. Color Switch
- *  36. Scroll to Top Button
- *  37. Parallax Universal
- *
- * ------------------------------------------------
- * Table of Contents End
- * ------------------------------------------------ */
-
 gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(Flip);
 
@@ -85,16 +26,6 @@ function startLoader() {
   updateCounter();
 }
 startLoader();
-
-
-
-// function hideLoader() {
-//   gsap.to(".loader__count", { duration: 0.8, ease: 'power2.in', y: "100%", delay: 1.8 });
-//   gsap.to(".loader__wrapper", { duration: 0.8, ease: 'power4.in', y: "-100%", delay: 2.2 });
-//   setTimeout(() => {
-//     document.getElementById("loader").classList.add("loaded");
-//   }, 3200);
-// }
 
 function pageAppearance() {
   gsap.set(loadingItems, { opacity: 0 })

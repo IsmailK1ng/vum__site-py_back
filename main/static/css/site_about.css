@@ -1,16 +1,9 @@
-/* ========================================
-   1. ПЕРЕМЕННЫЕ И ОСНОВА
-======================================== */
-:root {
-  --spacing-xs: 1rem;
-  --spacing-sm: 2rem;
-  --spacing-md: 4rem;
-  --spacing-lg: 6rem;
-  --spacing-xl: 10rem;
-  --radius-s: 0.8rem;
-  --radius-m: 1.6rem;
-  --radius-l: 2.4rem;
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
 }
+
 
 /* ========================================
    2. ТИПОГРАФИКА
@@ -371,6 +364,10 @@ p.t-140 {
   transition: transform 200ms;
 }
 
+.mxd-section.padding-grid-pre-mtext {
+  padding-bottom: 0rem;
+}
+
 /* ========================================
    12. SWIPER TESTIMONIALS (ОТЗЫВЫ)
 ======================================== */
@@ -398,14 +395,15 @@ p.t-140 {
   z-index: 1;
   display: flex;
   transition-property: transform;
-  box-sizing: content-box;
+  box-sizing: border-box;
 }
 
 /* Слайды с эффектами */
 .swiper-slide {
-  width: auto !important;
+  width: 100%;
   max-width: 800px;
   height: auto;
+  box-sizing: border-box;
   position: relative;
   flex-shrink: 0;
   opacity: 0.5;
@@ -550,6 +548,7 @@ p.t-140 {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -577,14 +576,36 @@ p.t-140 {
 @media (max-width: 767px) {
   .mxd-divider {
     border-radius: 0;
+    height: 400px;
   }
 
   .mxd-container {
-    padding: 0;
+    padding: 0rem;
+    box-sizing: border-box;
+  }
+
+  .mxd-divider__video .text-overlay {
+    padding: 0rem 0rem 2rem 1rem;
+
+
+  }
+
+  .pw-text-style-overline {
+    font: 200 clamp(10px, 1.5vw, 16px) / 1.5 var(--_font-accent);
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0px;
+  }
+
+  .pw-text-style-hl--xl {
+    font: 200 clamp(2.5rem, 6vw, 7rem) / 0.9 var(--_font-accent);
+    margin: 0 0 clamp(0px, 0vw, 16px);
+    letter-spacing: 0px;
   }
 
   .px-0 {
-    margin-top: -13rem;
+    margin-top: -0rem;
   }
 
   .hero-00-manifest .mxd-manifest {
@@ -637,14 +658,31 @@ p.t-140 {
 
 /* ПЛАНШЕТЫ (768px - 1199px) */
 @media (min-width: 768px) and (max-width: 1199px) {
+  .mxd-container {
+    padding: 0 0rem;
+  }
+
+  .mxd-divider {
+    border-radius: 0;
+    height: 550px;
+  }
+
+  .pw-text-style-hl--xl {
+    font: 200 clamp(2.5rem, 6vw, 7rem) / 0.9 var(--_font-accent);
+    letter-spacing: 2px;
+  }
+
+  .mxd-divider__video .text-overlay {
+    padding: clamp(20px, 0vw, 80px);
+  }
+
   .hero-00-manifest .mxd-manifest {
     font-size: 2rem;
-    margin: 70px 50px 30px;
-    max-width: 95%;
+    margin: 0px 16px 15px;
   }
 
   .px-0 {
-    margin-top: -14rem;
+    margin-top: 0rem;
   }
 
   .marquee {
