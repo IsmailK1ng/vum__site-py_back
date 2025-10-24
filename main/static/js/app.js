@@ -1184,10 +1184,10 @@ if (!testimonialsSlider2) {
 // --------------------------------------------- //
 // Swiper Slider - Inner Pages Demo Start
 // --------------------------------------------- //
-const innerDemoSlider = document.querySelector("mxd-demo-swiper");
+const innerDemoSlider = document.querySelector(".mxd-demo-swiper:not([data-custom-init])");
 
-if (!innerDemoSlider) {
-  const swiper = new Swiper('.mxd-demo-swiper', {
+if (innerDemoSlider) {  // ✅ Теперь правильная проверка
+  const swiper = new Swiper('.mxd-demo-swiper:not([data-custom-init])', {
     breakpoints: {
       640: {
         slidesPerView: 1,

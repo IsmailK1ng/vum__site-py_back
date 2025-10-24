@@ -175,20 +175,43 @@ class ProductDetail {
             });
         }
 
-        // ✅ ИСПОЛЬЗУЕМ imagesLoaded (уже есть в libs.min.js)
-        const swiperContainer = document.querySelector('.mxd-demo-swiper');
+        // ✅ КРИТИЧНО: Ждём загрузки ВСЕХ изображений
+        const allImages = galleryContainer.querySelectorAll('img');
 
-        if (typeof imagesLoaded !== 'undefined') {
-            imagesLoaded(galleryContainer, { background: true }, () => {
-                console.log('Все изображения галереи загружены');
-                this.initSwiper();
-            });
-        } else {
-            // Фоллбэк если imagesLoaded недоступен
-            this.waitForImages(galleryContainer).then(() => {
-                this.initSwiper();
-            });
+        if (allImages.length === 0) {
+            console.warn('No images found in gallery');
+            this.initSwiper();
+            return;
         }
+
+        console.log(`Waiting for ${allImages.length} images to load...`);
+
+        // Используем Promise.all для ожидания всех изображений
+        const imagePromises = Array.from(allImages).map(img => {
+            return new Promise((resolve) => {
+                if (img.complete && img.naturalHeight !== 0) {
+                    console.log('✅ Image already loaded:', img.src);
+                    resolve();
+                } else {
+                    img.addEventListener('load', () => {
+                        console.log('✅ Image loaded:', img.src);
+                        resolve();
+                    });
+                    img.addEventListener('error', () => {
+                        console.error('❌ Image failed to load:', img.src);
+                        resolve(); // Resolve anyway to not block
+                    });
+                }
+            });
+        });
+
+        Promise.all(imagePromises).then(() => {
+            console.log('🎉 All images loaded! Initializing Swiper...');
+            // Даём небольшую задержку для стабильности DOM
+            setTimeout(() => {
+                this.initSwiper();
+            }, 200);
+        });
     }
 
     // Фоллбэк метод ожидания загрузки изображений
@@ -241,10 +264,28 @@ class ProductDetail {
             return;
         }
 
-        // ✅ Уничтожаем предыдущий инстанс если есть
+        // ✅ Уничтожаем предыдущий инстанс
         const existingSwiper = document.querySelector('.mxd-demo-swiper')?.swiper;
         if (existingSwiper) {
             existingSwiper.destroy(true, true);
+        }
+
+        // ✅ Считаем реальные слайды
+        const realSlides = document.querySelectorAll('.swiper-wrapper .swiper-slide').length;
+        console.log('📊 Количество слайдов:', realSlides);
+
+        // ✅ Дублируем слайды если нужно для стабильного loop
+        const minSlidesForLoop = 6;
+        if (realSlides > 0 && realSlides < minSlidesForLoop) {
+            const wrapper = document.querySelector('.swiper-wrapper');
+            const slides = Array.from(wrapper.children);
+
+            while (wrapper.children.length < minSlidesForLoop) {
+                slides.forEach(slide => {
+                    wrapper.appendChild(slide.cloneNode(true));
+                });
+            }
+            console.log('🔄 Слайды продублированы:', wrapper.children.length);
         }
 
         setTimeout(() => {
@@ -265,85 +306,90 @@ class ProductDetail {
                     },
                 },
 
-                // Loop settings
+                // ✅ ВСЕГДА loop
                 loop: true,
-                loopAdditionalSlides: 2, // Увеличили до 2
-                loopedSlides: null, // Auto-calculate
+                loopAdditionalSlides: 2,
 
-                // Core
+                // ✅ ВАЖНО: centeredSlides для правильного фокуса!
                 centeredSlides: true,
+
                 initialSlide: 0,
                 speed: 600,
                 grabCursor: true,
+                slidesPerGroup: 1,
 
-                // Autoplay - ОТКЛЮЧАЕМ при старте
-                autoplay: false, // ⚠️ Включим после init
+                // ✅ parallax false
+                parallax: false,
 
-                // Features
-                parallax: true,
-                keyboard: { enabled: true },
+                // Autoplay выключен
+                autoplay: false,
 
-                // Navigation
+                keyboard: {
+                    enabled: true,
+                    onlyInViewport: true
+                },
+
                 navigation: {
                     nextEl: '.swiper-button-next',
                     prevEl: '.swiper-button-prev',
                 },
 
-                // Observers
+                // Observers для динамического контента
                 observer: true,
                 observeParents: true,
                 observeSlideChildren: true,
 
-                // Sizing
                 watchOverflow: true,
                 watchSlidesProgress: true,
-                watchSlidesVisibility: true,
-
-                // Prevent issues
                 preventInteractionOnTransition: true,
-                touchRatio: 1,
-                touchAngle: 45,
 
-                // Callbacks
+                // ✅ КРИТИЧНО для правильной работы loop
+                loopPreventsSlide: false,
+                loopedSlides: null, // auto-calculate
+
                 on: {
                     init: function () {
-                        console.log('Swiper инициализирован');
+                        console.log('✅ Swiper initialized, total slides:', this.slides.length);
 
-                        // ✅ Принудительное обновление после init
+                        // ✅ Двойное обновление для стабильности
                         setTimeout(() => {
                             this.update();
-                            this.slideToLoop(0, 0); // Перейти на первый слайд без анимации
+                            console.log('🔄 First update done');
 
-                            // ✅ ВКЛЮЧАЕМ autoplay ПОСЛЕ полной инициализации
-                            if (this.params.autoplay !== false) {
-                                this.params.autoplay = {
-                                    delay: 3000,
-                                    disableOnInteraction: false,
-                                };
-                                this.autoplay.start();
+                            // ✅ Переход на первый слайд
+                            if (this.params.loop) {
+                                this.slideToLoop(0, 0, false);
+                            } else {
+                                this.slideTo(0, 0, false);
                             }
-                        }, 200);
+
+                            this.update();
+                            console.log('🔄 Second update done, active:', this.realIndex);
+                        }, 150);
+
+                        // ✅ Autoplay запуск
+                        setTimeout(() => {
+                            this.params.autoplay = {
+                                delay: 4000,
+                                disableOnInteraction: false,
+                                pauseOnMouseEnter: true,
+                            };
+                            this.autoplay.start();
+                            console.log('▶️ Autoplay started');
+                        }, 1000);
                     },
 
-                    slideChangeTransitionStart: function () {
-                        // Останавливаем parallax во время transition для стабильности
-                        this.params.parallax = false;
-                    },
-
-                    slideChangeTransitionEnd: function () {
-                        // Включаем parallax обратно
-                        this.params.parallax = true;
-                        this.update();
+                    slideChange: function () {
+                        console.log('→ Slide changed to:', this.realIndex);
                     },
                 }
             });
 
-            // Сохраняем ссылку на swiper
             window.gallerySwiper = swiper;
-
-            console.log('Swiper создан, количество слайдов:', swiper.slides.length);
-        }, 200); // Увеличили задержку до 200ms
+            console.log('🎯 Swiper ready!');
+        }, 400); // Увеличенная задержка для стабильности
     }
+
     updateBreadcrumbs() {
         const breadcrumbLinks = document.querySelectorAll('.breadcrumb-ol li a');
         if (breadcrumbLinks.length >= 3) {
