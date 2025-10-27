@@ -1,10 +1,34 @@
+/* ========== ПЕРЕМЕННЫЕ ========== */
+:root {
+    --color-primary: #0a2883;
+    --color-primary-dark: #003599;
+    --color-white: #ffffff;
+    --color-black: #000000;
+    --color-gray-50: #f8fafc;
+    --color-gray-100: #f1f5f9;
+    --color-gray-200: #e2e8f0;
+    --color-gray-300: #cbd5e1;
+    --color-gray-500: #64748b;
+    --color-gray-700: #374151;
+    --color-blue-500: #3b82f6;
+    --color-red-500: #ef4444;
+    --shadow-sm: 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    --border-width: 2px;
+    --border-radius: 28px;
+    --button-padding: 13px 24px;
+    --font-size-base: 16px;
+}
+
+/* ========== БАЗОВЫЕ СТИЛИ ========== */
 .container {
-    max-width: 100%;
-    margin: 0;
-    margin-top: 15rem;
+    max-width: 1650px;
+    margin: 15rem auto 0;
+    padding: 0 20px;
     position: relative;
-    animation: fadeIn 0.6s ease-out forwards;
-    opacity: 0;
 }
 
 .faw-history-title {
@@ -12,32 +36,18 @@
     position: relative;
     z-index: 2;
     font-family: var(--_font-accent);
-    margin-top: 0rem;
-    margin-bottom: 5rem;
+    margin: 0 0 5rem;
 }
 
-
-
 .faw-history-title h2 {
-    font-size: 6rem;
+    font-size: clamp(2.5rem, 5vw, 6rem);
     font-family: var(--_font-accent);
-    color: #000000;
+    color: var(--color-black);
     position: relative;
     display: inline-block;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
+/* ========== КАРТА ========== */
 #map {
     width: 100%;
     max-width: 1650px;
@@ -45,75 +55,125 @@
     margin: 0 auto;
     position: relative;
     z-index: 1;
-    /* ДОБАВЬТЕ ЭТО */
-    isolation: isolate;
+    border-radius: 12px;
+    overflow: hidden;
+    will-change: transform;
+    transform: translateZ(0);
 }
 
-#map ymaps {
-    touch-action: pan-x pan-y;
-}
-
+/* ========== ЗАГОЛОВОК КАРТЫ ========== */
 .map-header {
-    position: absolute;
-    top: -120px;
-    left: 20px;
-    right: 20px;
-    z-index: 1001;
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(10px);
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
     display: flex;
     gap: 15px;
     align-items: center;
     flex-wrap: wrap;
-    animation: slideDown 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
-    opacity: 0;
-    transform: translateY(-50px);
-}
-
-@keyframes slideDown {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    margin-bottom: 20px;
 }
 
 .controls {
     flex: 1;
     display: flex;
-    gap: 10px;
+    gap: 12px;
     align-items: center;
     flex-wrap: wrap;
 }
 
-.become-dealer-btn {
-    background: #161616;
-    color: var(--nl-white);
-    border: none;
-    padding: 10px 20px;
-    border-radius: var(--_radius-m);
+.search-container {
+    flex: 1;
+    min-width: 300px;
+    position: relative;
+}
+
+/* ========== ПОИСК ========== */
+.search-box {
+    width: 100%;
+    padding: var(--button-padding);
+    border: var(--border-width) solid #161616;
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    background: var(--color-gray-50);
+    transition: var(--transition);
+    outline: none;
+    font-family: var(--_font-accent);
+    line-height: 1.5;
+    height: 50px;
+    box-sizing: border-box;
+}
+
+.search-box:focus {
+    background: var(--color-white);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    transform: scale(1.01);
+}
+
+.search-box::placeholder {
+    color: var(--color-gray-500);
+    font-weight: 400;
+}
+
+/* ========== КНОПКИ ФИЛЬТРОВ ========== */
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-btn {
+    padding: var(--button-padding);
+    border: var(--border-width) solid #161616;
+    border-radius: var(--border-radius);
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(var(--accent-rgb--light), 0.2);
-    font-size: 25px;
-    font-weight: var(--fw-semibold--light);
-    transition: var(--_animspeed-medium) var(--_animbezier);
+    transition: var(--transition);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: var(--_font-accent);
+    background: var(--color-white);
+    line-height: 1.5;
+    height: 50px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 
-.become-dealer-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 18px rgba(var(--accent-rgb--light), 0.3);
+.filter-btn:hover {
+    background: var(--color-gray-200);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
 }
 
+.filter-btn.active {
+    background: linear-gradient(100deg, var(--color-primary-dark) 50%, var(--color-primary) 50%);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 12px rgba(0, 53, 153, 0.3);
+}
 
+.filter-btn i {
+    font-size: 18px;
+    line-height: 1;
+}
+
+/* ========== КНОПКА ПОИСКА БЛИЖАЙШЕГО ========== */
 .find-nearest-btn {
     position: absolute;
     bottom: 24px;
     right: 24px;
     z-index: 1001;
-    background: #ffffff;
-    color: #374151;
+    background: var(--color-white);
+    color: var(--color-gray-700);
     border: none;
     padding: 16px;
     border-radius: 12px;
@@ -124,181 +184,29 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow:
-        0 10px 15px -3px rgba(0, 0, 0, 0.1),
-        0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    animation: pulse 3s ease-in-out infinite;
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
 }
 
 .find-nearest-btn:hover {
-    background: #0a2883;
-    color: #ffffff;
+    background: var(--color-primary);
+    color: var(--color-white);
     transform: translateY(-4px) scale(1.05);
-    box-shadow:
-        0 20px 25px -5px rgba(59, 130, 246, 0.25),
-        0 10px 10px -5px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.25);
 }
 
-@keyframes pulse {
-
-    0%,
-    100% {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    }
-
-    50% {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 0 0 4px rgba(59, 130, 246, 0.1);
-    }
-}
-
-.search-container {
-    flex: 1;
-    min-width: 280px;
-    position: relative;
-}
-
-.search-box {
-    width: 100%;
-    padding: 14px 20px 14px 10px;
-    border: 2px solid transparent;
-    border-radius: 2.8rem;
-    font-size: 14px;
-    font-weight: 500;
-    background: #f8fafc;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    outline: none;
-    font-family: var(--_font-accent);
-    border-color: #161616;
-}
-
-.search-box:focus {
-    background: #ffffff;
-    border-color: #0a2883;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    transform: scale(1.02);
-}
-
-.search-box::placeholder {
-    color: #64748b;
-    font-weight: 400;
-}
-
-.search-container::before {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
-    opacity: 0.6;
-    transition: opacity 0.3s ease;
-}
-
-.search-container:focus-within::before {
-    opacity: 1;
-}
-
-.filter-buttons {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.btn-outline {
-    background-color: transparent;
-    border-style: solid;
-    border-color: var(--st-bright);
-    color: var(--t-bright);
-}
-
-/* .btn-anim .btn-caption {
-    display: block !important;
-    height: 3.3rem;
-    line-height: 3.3rem;
-    color: #1f206b;
-    overflow: hidden;
-    font-size: 3rem;
-} */
-
-/* .btn-default i {
-    font-size: 2.6rem;
-    overflow: hidden;
-    color: #2e2f75;
-} */
-
-
-
-.filter-btn {
-    padding: 12px 20px;
-    border: 2px solid transparent;
-    border-radius: 2.8rem;
-    border-color: #161616;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    font-size: 20px;
-    font-weight: 500;
-    position: relative;
-    overflow: hidden;
-    white-space: nowrap;
-    font-family: var(--_font-accent);
-    background: white;
-}
-
-.filter-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    transition: left 0.5s;
-}
-
-.filter-btn:hover {
-    background: #e2e8f0;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.filter-btn:hover::before {
-    left: 100%;
-}
-
-.filter-btn.active {
-    background: linear-gradient(100deg, #003599 50%, #0a2883 50%);
-    color: #ffffff;
-    border-color: #0a2883;
-    box-shadow: 0 4px 12px #003599 50%;
-}
-
-.filter-btn.active::before {
-    display: none;
-}
-
+/* ========== СТАТИСТИКА ========== */
 .stats {
-    position: relative;
-    margin: 40px auto;
+    width: 100%;
     max-width: 1650px;
-    background: #ffffff;
+    background: var(--color-white);
     padding: 32px;
+    margin: 40px auto;
     border-radius: 20px;
-    box-shadow:
-        0 10px 15px -3px rgba(0, 0, 0, 0.1),
-        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 24px;
-    animation: statsAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
-    opacity: 0;
-    transform: translateY(20px);
-}
-
-@keyframes statsAppear {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 .stat-item {
@@ -306,32 +214,31 @@
     padding: 24px 16px;
     border-radius: 16px;
     position: relative;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: var(--transition);
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .stat-item:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, var(--color-white) 0%, var(--color-gray-50) 100%);
 }
 
 .stat-number {
     font-size: 32px;
     font-weight: 700;
-    color: #0a2883;
+    color: var(--color-primary);
     margin-bottom: 8px;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: var(--transition);
     font-family: var(--_font-accent);
 }
 
 .stat-item:hover .stat-number {
-    color: #0a2883;
     transform: scale(1.1);
 }
 
 .stat-label {
-    color: #0a2883;
+    color: var(--color-primary);
     font-size: 14px;
     font-weight: 500;
     text-transform: uppercase;
@@ -339,22 +246,19 @@
     font-family: var(--_font-accent);
 }
 
+/* ========== МОДАЛЬНОЕ ОКНО ========== */
 .modal {
     display: none;
     position: fixed;
+    inset: 0;
     z-index: 2000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
     background-color: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    animation: modalOverlayFade 0.3s ease-out;
+    animation: modalFade 0.3s ease-out;
 }
 
 .modal-content {
-    background: #ffffff;
+    background: var(--color-white);
     margin: 5% auto;
     padding: 0;
     border-radius: 20px;
@@ -362,14 +266,11 @@
     max-width: 520px;
     max-height: 90vh;
     overflow: hidden;
-    box-shadow:
-        0 25px 50px -12px rgba(0, 0, 0, 0.25),
-        0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    animation: modalContentSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-xl);
+    animation: modalSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes modalOverlayFade {
+@keyframes modalFade {
     from {
         opacity: 0;
     }
@@ -379,7 +280,7 @@
     }
 }
 
-@keyframes modalContentSlide {
+@keyframes modalSlide {
     from {
         opacity: 0;
         transform: translateY(40px) scale(0.95);
@@ -392,10 +293,10 @@
 }
 
 .modal-header {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    background: linear-gradient(135deg, #000000 0%, #000000 100%);
     padding: 24px 32px;
     position: relative;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgb(0 0 0);
 }
 
 .modal-header h3 {
@@ -403,24 +304,23 @@
     font-weight: 600;
     margin: 0 40px 6px 0;
     line-height: 1.3;
-    color: #0a2883;
+    color: #ffffff;
 }
 
 .modal-subtitle {
     font-size: 14px;
-    color: #000000;
+    color: #ffffff;
     font-weight: 500;
-    color: #0a2883;
 }
 
 .close {
     position: absolute;
     right: 20px;
     top: 20px;
-    color: #64748b;
+    color: var(--color-gray-500);
     font-size: 24px;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: var(--transition);
     width: 32px;
     height: 32px;
     border-radius: 8px;
@@ -430,7 +330,7 @@
 }
 
 .close:hover {
-    color: #ef4444;
+    color: var(--color-red-500);
     background: rgba(239, 68, 68, 0.1);
     transform: scale(1.1);
 }
@@ -441,168 +341,206 @@
     overflow-y: auto;
 }
 
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: var(--color-gray-100);
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--color-gray-300);
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gray-500);
+}
+
+/* ========== ИНФОРМАЦИЯ О ДИЛЕРЕ ========== */
 .dealer-info {
     display: grid;
-    gap: 16px;
+    gap: 12px;
 }
 
 .info-item {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
-    padding: 16px;
-    border-radius: 12px;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    border: 1px solid transparent;
+    gap: 14px;
+    padding: 14px;
+    border-radius: 10px;
+    transition: var(--transition);
+    background: #ffffff;
+    border: 1px solid #ffffff;
 }
 
 .info-item:hover {
-    background: #f1f5f9;
-    border-color: #e2e8f0;
-    transform: translateX(4px);
+    background: var(--color-white);
+    border-color: var(--color-gray-200);
+    transform: translateX(3px);
+    box-shadow: var(--shadow-sm);
 }
 
-.info-icon {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #0a2883 0%, #1d4ed8 100%);
-    border-radius: 10px;
+.info-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #000000 0%, #000000 100%);
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ffffff;
-    font-size: 16px;
     flex-shrink: 0;
+}
 
+.info-icon-img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
 }
 
 .info-text {
     flex: 1;
-    color: #000000;
-    line-height: 1.5;
+    min-width: 0;
 }
 
-.info-text strong {
+.info-label {
+    font-size: 11px;
     color: #000000;
-    display: block;
-    margin-bottom: 4px;
     font-weight: 600;
-    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.info-value {
+    font-size: 14px;
+    color: var(--color-gray-700);
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+.info-link {
+    color: #000000;
+    text-decoration: none;
+    transition: var(--transition);
+    font-weight: 600;
+}
+
+.info-link:hover {
+    color: #1e40af;
+    text-decoration: underline;
 }
 
 .services {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
+    gap: 6px;
+    margin-top: 6px;
 }
 
 .service-tag {
-    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-    color: #0a2883;
-    padding: 6px 12px;
-    border-radius: 8px;
+    background: linear-gradient(135deg, #000000 0%, #000000 100%);
+    color: #ffffff;
+    padding: 5px 12px;
+    border-radius: 6px;
     font-size: 12px;
-    font-weight: 500;
-    transition: all 0.2s ease;
+    font-weight: 600;
+    transition: var(--transition);
+    border: 1px solid transparent;
 }
 
 .service-tag:hover {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    color: #ffffff;
+    background: linear-gradient(135deg, var(--color-primary) 0%, #1e40af 100%);
+    color: var(--color-white);
     transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(10, 40, 131, 0.3);
 }
 
+/* ========== КНОПКИ КОНТАКТОВ ========== */
 .contact-buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 24px;
+    gap: 10px;
+    margin-top: 20px;
 }
 
 .contact-btn {
-    padding: 14px 18px;
+    padding: 13px 16px;
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
     text-align: center;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    position: relative;
-    overflow: hidden;
-}
-
-.contact-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
-}
-
-.contact-btn:hover::before {
-    left: 100%;
+    font-family: var(--_font-accent);
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #0a2883 0%, #0a2883 100%);
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, #000000 0%, #000000 100%);
+    color: var(--color-white);
+    box-shadow: 0 4px 12px rgba(10, 40, 131, 0.3);
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 8px 20px rgba(10, 40, 131, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
 }
 
 .btn-secondary {
     background: #ffffff;
-    color: #0a2883;
-    border: 2px solid #0a2883;
+    color: #000000;
+    border: 2px solid #000000;
 }
 
 .btn-secondary:hover {
-    background: #f8fafc;
-    border-color: #cbd5e1;
+    background: var(--color-gray-50);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
 }
 
+.btn-secondary:active {
+    transform: translateY(0);
+}
+
+.btn-secondary svg {
+    color: #000000;
+}
+
+/* ========== ЗАГРУЗКА ========== */
 .loading {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 200px;
-    color: #64748b;
-    animation: loadingFade 0.5s ease-out;
+    color: var(--color-gray-500);
     gap: 16px;
 }
 
 .spinner {
     width: 48px;
     height: 48px;
-    border: 3px solid #e2e8f0;
-    border-top: 3px solid #3b82f6;
+    border: 3px solid var(--color-gray-200);
+    border-top: 3px solid var(--color-blue-500);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
+    to {
         transform: rotate(360deg);
     }
 }
@@ -612,1297 +550,140 @@
     font-size: 14px;
 }
 
-@media only screen and (min-width: 1187px) and (max-width: 1500px) {
-    .map-header {
-        position: static;
-        margin-bottom: 0px;
-        padding: 12px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        border-radius: 8px;
-    }
+/* ========== АДАПТИВНОСТЬ ========== */
 
+/* Средние десктопы */
+@media (max-width: 1500px) {
     .container {
-        max-width: 100%;
-        margin: 0;
-        margin-top: 0rem;
-        position: relative;
-        animation: fadeIn 0.6s ease-out forwards;
-        opacity: 0;
+        margin-top: 12rem;
+        padding: 0 16px;
     }
 
     .faw-history-title {
-        text-align: center;
-        position: relative;
-        z-index: 2;
-        font-family: var(--_font-accent);
-        margin-top: 0rem;
-        margin-bottom: 0rem;
+        margin-bottom: 3rem;
     }
-
 }
 
-@media only screen and (min-width: 1187px) and (max-width: 1287px) {
-    .container {
-        margin-top: 2rem;
-        padding: 0 0px;
+/* Планшеты */
+@media (max-width: 1024px) {
+    :root {
+        --font-size-base: 15px;
+        --button-padding: 12px 20px;
     }
 
-    .faw-history-title {
-        margin-bottom: 0rem;
+    .container {
+        margin-top: 10rem;
     }
 
     .faw-history-title h2 {
         font-size: 4rem;
-        letter-spacing: 2px;
-        margin: 8px;
-        line-height: 1.1;
     }
 
     #map {
-        width: 100%;
-        height: 50vh;
-        min-height: 350px;
+        height: 500px;
     }
 
     .map-header {
-        position: static;
-        margin-bottom: 0px;
-        padding: 12px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        border-radius: 8px;
-    }
-
-    .controls {
-        flex-direction: column;
-        align-items: stretch;
+        padding: 16px;
         gap: 12px;
     }
 
     .search-container {
-        min-width: auto;
-    }
-
-    .search-box {
-        padding: 12px 16px;
-        font-size: 16px;
-        border-radius: 25px;
+        min-width: 100%;
+        order: -1;
     }
 
     .filter-buttons {
+        width: 100%;
         justify-content: center;
-        gap: 10px;
-    }
-
-    .filter-btn {
-        padding: 14px 47px;
-        border: 2px solid transparent;
-        border-radius: 2.8rem;
-        border-color: #161616;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        font-size: 20px;
-        font-weight: 500;
-        position: relative;
-        overflow: hidden;
-        white-space: nowrap;
-        font-family: var(--_font-accent);
-        background: white;
-    }
-
-    .filter-btn .active {
-        padding: 8px 3px;
-        font-size: 12px;
-        white-space: nowrap;
-        flex: 1;
-        min-width: 0;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-
-    .find-nearest-btn {
-        width: 44px;
-        height: 44px;
-        bottom: -190px;
-        right: 12px;
-        font-size: 16px;
-        padding: 10px;
     }
 
     .stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        padding: 16px;
-        margin: 20px 8px;
-        margin-top: 23rem;
-        border-radius: 12px;
-    }
-
-    .stat-item {
-        padding: 16px 8px;
-    }
-
-    .stat-number {
-        font-size: 24px;
-        margin-bottom: 4px;
-    }
-
-    .stat-label {
-        font-size: 11px;
-        line-height: 1.2;
-    }
-
-    .modal-content {
-        margin: 5% auto;
-        width: calc(100% - 16px);
-        max-width: none;
-        border-radius: 12px;
-    }
-
-    .modal-header {
-        padding: 16px;
-    }
-
-    .modal-header h3 {
-        font-size: 16px;
-        margin: 0 30px 4px 0;
-    }
-
-    .modal-subtitle {
-        font-size: 12px;
-    }
-
-    .close {
-        right: 12px;
-        top: 12px;
-        width: 28px;
-        height: 28px;
-        font-size: 20px;
-    }
-
-    .modal-body {
-        padding: 16px;
-    }
-
-    .info-item {
-        padding: 12px;
-        gap: 12px;
-    }
-
-    .info-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-    }
-
-    .info-text strong {
-        font-size: 16px;
-    }
-
-    .contact-buttons {
-        grid-template-columns: 1fr;
-        gap: 8px;
-        margin-top: 16px;
-    }
-
-    .contact-btn {
-        padding: 12px 16px;
-        font-size: 13px;
-    }
-
-    .diler-btn {
-        width: 190px;
-    }
-
-    /* .btn-mobile-icon .btn-caption {
-        display: flex !important;
-        flex-direction: column;
-    } */
-
-    .btn-mobile-icon {
-        border-radius: 2.8rem;
-
-    }
-}
-
-@media only screen and (min-width: 1086px) and (max-width: 1186px) {
-    .container {
-        margin-top: 2rem;
-        padding: 0 0px;
-    }
-
-    .faw-history-title {
-        margin-bottom: 0rem;
-    }
-
-    .faw-history-title h2 {
-        font-size: 4rem;
-        letter-spacing: 2px;
-        margin: 8px;
-        line-height: 1.1;
-    }
-
-    #map {
-        width: 100%;
-        height: 50vh;
-        min-height: 350px;
-    }
-
-    .map-header {
-        position: static;
-        margin-bottom: 0px;
-        padding: 12px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        border-radius: 8px;
-    }
-
-    .controls {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-
-    .search-container {
-        min-width: auto;
-    }
-
-    .search-box {
-        padding: 12px 16px;
-        font-size: 16px;
-        border-radius: 25px;
-    }
-
-    .filter-buttons {
-        justify-content: center;
-        gap: 10px;
-    }
-
-    .filter-btn {
-        padding: 14px 89px;
-        border: 2px solid transparent;
-        border-radius: 2.8rem;
-        border-color: #161616;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        font-size: 20px;
-        font-weight: 500;
-        position: relative;
-        overflow: hidden;
-        white-space: nowrap;
-        font-family: var(--_font-accent);
-        background: white;
-    }
-
-    .filter-btn .active {
-        padding: 8px 3px;
-        font-size: 12px;
-        white-space: nowrap;
-        flex: 1;
-        min-width: 0;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-
-    .find-nearest-btn {
-        width: 44px;
-        height: 44px;
-        bottom: -190px;
-        right: 12px;
-        font-size: 16px;
-        padding: 10px;
-    }
-
-
-    .stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        padding: 16px;
-        margin: 20px 8px;
-        margin-top: 29rem;
-        border-radius: 12px;
-    }
-
-    .stat-item {
-        padding: 16px 8px;
-    }
-
-    .stat-number {
-        font-size: 24px;
-        margin-bottom: 4px;
-    }
-
-    .stat-label {
-        font-size: 11px;
-        line-height: 1.2;
-    }
-
-    .modal-content {
-        margin: 5% auto;
-        width: calc(100% - 16px);
-        max-width: none;
-        border-radius: 12px;
-    }
-
-    .modal-header {
-        padding: 16px;
-    }
-
-    .modal-header h3 {
-        font-size: 16px;
-        margin: 0 30px 4px 0;
-    }
-
-    .modal-subtitle {
-        font-size: 12px;
-    }
-
-    .close {
-        right: 12px;
-        top: 12px;
-        width: 28px;
-        height: 28px;
-        font-size: 20px;
-    }
-
-    .modal-body {
-        padding: 16px;
-    }
-
-    .info-item {
-        padding: 12px;
-        gap: 12px;
-    }
-
-    .info-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-    }
-
-    .info-text strong {
-        font-size: 16px;
-    }
-
-    .contact-buttons {
-        grid-template-columns: 1fr;
-        gap: 8px;
-        margin-top: 16px;
-    }
-
-    .contact-btn {
-        padding: 12px 16px;
-        font-size: 13px;
-    }
-
-    .diler-btn {
-        width: 190px;
-    }
-
-    /* .btn-mobile-icon .btn-caption {
-        display: flex !important;
-        flex-direction: column;
-    } */
-
-    .btn-mobile-icon {
-        border-radius: 2.8rem;
-
-    }
-}
-
-@media only screen and (min-width: 985px) and (max-width: 1085px) {
-    .container {
-        margin-top: 2rem;
-        padding: 0 0px;
-    }
-
-    .faw-history-title {
-        margin-bottom: 0rem;
-    }
-
-    .faw-history-title h2 {
-        font-size: 4rem;
-        letter-spacing: 2px;
-        margin: 8px;
-        line-height: 1.1;
-    }
-
-    #map {
-        width: 100%;
-        height: 50vh;
-        min-height: 350px;
-    }
-
-    .map-header {
-        position: static;
-        margin-bottom: 0px;
-        padding: 12px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        border-radius: 8px;
-    }
-
-    .controls {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-
-    .search-container {
-        min-width: auto;
-    }
-
-    .search-box {
-        padding: 12px 16px;
-        font-size: 16px;
-        /* Prevents zoom on iOS */
-        border-radius: 25px;
-    }
-
-    .filter-buttons {
-        justify-content: center;
-        gap: 10px;
-    }
-
-    .filter-btn {
-        padding: 14px 69px;
-        border: 2px solid transparent;
-        border-radius: 2.8rem;
-        border-color: #161616;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        font-size: 20px;
-        font-weight: 500;
-        position: relative;
-        overflow: hidden;
-        white-space: nowrap;
-        font-family: var(--_font-accent);
-        background: white;
-    }
-
-    .filter-btn .active {
-        padding: 8px 3px;
-        font-size: 12px;
-        white-space: nowrap;
-        flex: 1;
-        min-width: 0;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-
-    .find-nearest-btn {
-        width: 44px;
-        height: 44px;
-        bottom: -190px;
-        right: 12px;
-        font-size: 16px;
-        padding: 10px;
-    }
-
-    .stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        padding: 16px;
-        margin: 20px 8px;
-        margin-top: 29rem;
-        border-radius: 12px;
-    }
-
-    .stat-item {
-        padding: 16px 8px;
-    }
-
-    .stat-number {
-        font-size: 24px;
-        margin-bottom: 4px;
-    }
-
-    .stat-label {
-        font-size: 11px;
-        line-height: 1.2;
-    }
-
-    .modal-content {
-        margin: 5% auto;
-        width: calc(100% - 16px);
-        max-width: none;
-        border-radius: 12px;
-    }
-
-    .modal-header {
-        padding: 16px;
-    }
-
-    .modal-header h3 {
-        font-size: 16px;
-        margin: 0 30px 4px 0;
-    }
-
-    .modal-subtitle {
-        font-size: 12px;
-    }
-
-    .close {
-        right: 12px;
-        top: 12px;
-        width: 28px;
-        height: 28px;
-        font-size: 20px;
-    }
-
-    .modal-body {
-        padding: 16px;
-    }
-
-    .info-item {
-        padding: 12px;
-        gap: 12px;
-    }
-
-    .info-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-    }
-
-    .info-text strong {
-        font-size: 16px;
-    }
-
-    .contact-buttons {
-        grid-template-columns: 1fr;
-        gap: 8px;
-        margin-top: 16px;
-    }
-
-    .contact-btn {
-        padding: 12px 16px;
-        font-size: 13px;
-    }
-
-    .diler-btn {
-        width: 190px;
-    }
-
-    /* .btn-mobile-icon .btn-caption {
-        display: flex !important;
-        flex-direction: column;
-    } */
-
-    .btn-mobile-icon {
-        border-radius: 2.8rem;
-
-    }
-}
-
-@media only screen and (min-width: 884px) and (max-width: 984px) {
-    .container {
-        margin-top: 2rem;
-        padding: 0 0px;
-    }
-
-    .faw-history-title {
-        margin-bottom: 0rem;
-    }
-
-    .faw-history-title h2 {
-        font-size: 4rem;
-        letter-spacing: 2px;
-        margin: 8px;
-        line-height: 1.1;
-    }
-
-    #map {
-        width: 100%;
-        height: 50vh;
-        min-height: 350px;
-    }
-
-    .map-header {
-        position: static;
-        margin-bottom: 0px;
-        padding: 12px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        border-radius: 8px;
-    }
-
-    .controls {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-
-    .search-container {
-        min-width: auto;
-    }
-
-    .search-box {
-        padding: 12px 16px;
-        font-size: 16px;
-        /* Prevents zoom on iOS */
-        border-radius: 25px;
-    }
-
-    .filter-buttons {
-        justify-content: center;
-        gap: 10px;
-    }
-
-    .filter-btn {
-        padding: 14px 64px;
-        border: 2px solid transparent;
-        border-radius: 2.8rem;
-        border-color: #161616;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        font-size: 20px;
-        font-weight: 500;
-        position: relative;
-        overflow: hidden;
-        white-space: nowrap;
-        font-family: var(--_font-accent);
-        background: white;
-    }
-
-    .filter-btn .active {
-        padding: 8px 3px;
-        font-size: 12px;
-        white-space: nowrap;
-        flex: 1;
-        min-width: 0;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-
-    .find-nearest-btn {
-        width: 44px;
-        height: 44px;
-        bottom: -190px;
-        right: 12px;
-        font-size: 16px;
-        padding: 10px;
-    }
-
-    .stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        padding: 16px;
-        margin: 20px 8px;
-        margin-top: 29rem;
-        border-radius: 12px;
-    }
-
-    .stat-item {
-        padding: 16px 8px;
-    }
-
-    .stat-number {
-        font-size: 24px;
-        margin-bottom: 4px;
-    }
-
-    .stat-label {
-        font-size: 11px;
-        line-height: 1.2;
-    }
-
-    .modal-content {
-        margin: 5% auto;
-        width: calc(100% - 16px);
-        max-width: none;
-        border-radius: 12px;
-    }
-
-    .modal-header {
-        padding: 16px;
-    }
-
-    .modal-header h3 {
-        font-size: 16px;
-        margin: 0 30px 4px 0;
-    }
-
-    .modal-subtitle {
-        font-size: 12px;
-    }
-
-    .close {
-        right: 12px;
-        top: 12px;
-        width: 28px;
-        height: 28px;
-        font-size: 20px;
-    }
-
-    .modal-body {
-        padding: 16px;
-    }
-
-    .info-item {
-        padding: 12px;
-        gap: 12px;
-    }
-
-    .info-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-    }
-
-    .info-text strong {
-        font-size: 16px;
-    }
-
-    .contact-buttons {
-        grid-template-columns: 1fr;
-        gap: 8px;
-        margin-top: 16px;
-    }
-
-    .contact-btn {
-        padding: 12px 16px;
-        font-size: 13px;
-    }
-
-    .diler-btn {
-        width: 190px;
-    }
-
-    /* .btn-mobile-icon .btn-caption {
-        display: flex !important;
-        flex-direction: column;
-    } */
-
-    .btn-mobile-icon {
-        border-radius: 2.8rem;
-
-    }
-}
-
-@media only screen and (min-width: 783px) and (max-width: 883px) {
-    .container {
-        margin-top: 2rem;
-        padding: 0 0px;
-    }
-
-    .faw-history-title {
-        margin-bottom: 0rem;
-    }
-
-    .faw-history-title h2 {
-        font-size: 4rem;
-        letter-spacing: 2px;
-        margin: 8px;
-        line-height: 1.1;
-    }
-
-    #map {
-        width: 100%;
-        height: 50vh;
-        min-height: 350px;
-    }
-
-    .map-header {
-        position: static;
-        margin-bottom: 0px;
-        padding: 12px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        border-radius: 8px;
-    }
-
-    .controls {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-
-    .search-container {
-        min-width: auto;
-    }
-
-    .search-box {
-        padding: 12px 16px;
-        font-size: 16px;
-        /* Prevents zoom on iOS */
-        border-radius: 25px;
-    }
-
-    .filter-buttons {
-        justify-content: center;
+        grid-template-columns: repeat(2, 1fr);
         gap: 16px;
-    }
-
-    .filter-btn {
-        padding: 14px 49px;
-        border: 2px solid transparent;
-        border-radius: 2.8rem;
-        border-color: #161616;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        font-size: 20px;
-        font-weight: 500;
-        position: relative;
-        overflow: hidden;
-        white-space: nowrap;
-        font-family: var(--_font-accent);
-        background: white;
-    }
-
-    .filter-btn .active {
-        padding: 8px 3px;
-        font-size: 12px;
-        white-space: nowrap;
-        flex: 1;
-        min-width: 0;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-
-    .find-nearest-btn {
-        width: 44px;
-        height: 44px;
-        bottom: -190px;
-        right: 12px;
-        font-size: 16px;
-        padding: 10px;
-    }
-
-    .stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        padding: 16px;
-        margin: 20px 8px;
-        margin-top: 23rem;
-        border-radius: 12px;
-    }
-
-    .stat-item {
-        padding: 16px 8px;
-    }
-
-    .stat-number {
-        font-size: 24px;
-        margin-bottom: 4px;
-    }
-
-    .stat-label {
-        font-size: 11px;
-        line-height: 1.2;
-    }
-
-    .modal-content {
-        margin: 5% auto;
-        width: calc(100% - 16px);
-        max-width: none;
-        border-radius: 12px;
-    }
-
-    .modal-header {
-        padding: 16px;
-    }
-
-    .modal-header h3 {
-        font-size: 16px;
-        margin: 0 30px 4px 0;
-    }
-
-    .modal-subtitle {
-        font-size: 12px;
-    }
-
-    .close {
-        right: 12px;
-        top: 12px;
-        width: 28px;
-        height: 28px;
-        font-size: 20px;
-    }
-
-    .modal-body {
-        padding: 16px;
-    }
-
-    .info-item {
-        padding: 12px;
-        gap: 12px;
-    }
-
-    .info-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-    }
-
-    .info-text strong {
-        font-size: 16px;
-    }
-
-    .contact-buttons {
-        grid-template-columns: 1fr;
-        gap: 8px;
-        margin-top: 16px;
-    }
-
-    .contact-btn {
-        padding: 12px 16px;
-        font-size: 13px;
-    }
-
-    .diler-btn {
-        width: 190px;
-    }
-
-    /* .btn-mobile-icon .btn-caption {
-        display: flex !important;
-        flex-direction: column;
-    } */
-
-    .btn-mobile-icon {
-        border-radius: 2.8rem;
-
+        padding: 24px;
+        margin: 24px auto 20px;
     }
 }
 
-@media only screen and (min-width: 682px) and (max-width: 782px) {
+/* Мобильные устройства */
+@media (max-width: 768px) {
+    :root {
+        --font-size-base: 14px;
+        --button-padding: 11px 18px;
+        --border-radius: 24px;
+    }
+
     .container {
-        margin-top: 2rem;
-        padding: 0 0px;
+        margin-top: 8rem;
+        padding: 0 12px;
     }
 
     .faw-history-title {
-        margin-bottom: 0rem;
+        margin-bottom: 2rem;
     }
 
     .faw-history-title h2 {
-        font-size: 4rem;
-        letter-spacing: 2px;
-        margin: 8px;
-        line-height: 1.1;
+        font-size: 3rem;
     }
 
     #map {
-        width: 100%;
-        height: 50vh;
-        min-height: 350px;
+        height: 400px;
     }
 
     .map-header {
-        position: static;
-        margin-bottom: 0px;
         padding: 12px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        border-radius: 8px;
+        gap: 10px;
     }
 
     .controls {
         flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
+        gap: 10px;
     }
 
-    .search-container {
-        min-width: auto;
-    }
-
-    .search-box {
-        padding: 12px 16px;
-        font-size: 16px;
-        /* Prevents zoom on iOS */
-        border-radius: 25px;
-    }
-
-    .filter-buttons {
-        justify-content: center;
-        gap: 16px;
-    }
-
+    .search-box,
     .filter-btn {
-        padding: 16px 35px;
-        border: 2px solid transparent;
-        border-radius: 2.8rem;
-        border-color: #161616;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        font-size: 20px;
-        font-weight: 500;
-        position: relative;
-        overflow: hidden;
-        white-space: nowrap;
-        font-family: var(--_font-accent);
-        background: white;
-    }
-
-    .filter-btn .active {
-        padding: 8px 3px;
-        font-size: 12px;
-        white-space: nowrap;
-        flex: 1;
-        min-width: 0;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-
-    .find-nearest-btn {
-        width: 44px;
-        height: 44px;
-        bottom: -190px;
-        right: 12px;
-        font-size: 16px;
-        padding: 10px;
-    }
-
-    .stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        padding: 16px;
-        margin: 20px 8px;
-        margin-top: 29rem;
-        border-radius: 12px;
-    }
-
-
-    .stat-item {
-        padding: 16px 8px;
-    }
-
-    .stat-number {
-        font-size: 24px;
-        margin-bottom: 4px;
-    }
-
-    .stat-label {
-        font-size: 11px;
-        line-height: 1.2;
-    }
-
-    .modal-content {
-        margin: 5% auto;
-        width: calc(100% - 16px);
-        max-width: none;
-        border-radius: 12px;
-    }
-
-    .modal-header {
-        padding: 16px;
-    }
-
-    .modal-header h3 {
-        font-size: 16px;
-        margin: 0 30px 4px 0;
-    }
-
-    .modal-subtitle {
-        font-size: 12px;
-    }
-
-    .close {
-        right: 12px;
-        top: 12px;
-        width: 28px;
-        height: 28px;
-        font-size: 20px;
-    }
-
-    .modal-body {
-        padding: 16px;
-    }
-
-    .info-item {
-        padding: 12px;
-        gap: 12px;
-    }
-
-    .info-icon {
-        width: 32px;
-        height: 32px;
+        height: 46px;
         font-size: 14px;
     }
 
-    .info-text strong {
-        font-size: 16px;
-    }
-
-    .contact-buttons {
-        grid-template-columns: 1fr;
-        gap: 8px;
-        margin-top: 16px;
-    }
-
-    .contact-btn {
-        padding: 12px 16px;
-        font-size: 13px;
-    }
-
-    .diler-btn {
-        width: 190px;
-    }
-
-    /* 
-    .btn-mobile-icon .btn-caption {
-        display: flex !important;
-        flex-direction: column;
-    } */
-
-    .btn-mobile-icon {
-        border-radius: 2.8rem;
-
-    }
-}
-
-@media only screen and (min-width: 581px) and (max-width: 681px) {
-    .container {
-        margin-top: 2rem;
-        padding: 0 0px;
-    }
-
-    .faw-history-title {
-        margin-bottom: 0rem;
-    }
-
-    .faw-history-title h2 {
-        font-size: 4rem;
-        letter-spacing: 2px;
-        margin: 8px;
-        line-height: 1.1;
-    }
-
-    #map {
-        width: 100%;
-        height: 50vh;
-        min-height: 350px;
-    }
-
-    .map-header {
-        position: static;
-        margin-bottom: 0px;
-        padding: 12px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        border-radius: 8px;
-    }
-
-    .controls {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-
-    .search-container {
-        min-width: auto;
-    }
-
-    .search-box {
-        padding: 10px 16px;
-        font-size: 16px;
-        border-radius: 25px;
-    }
-
-    .filter-buttons {
-        justify-content: center;
-        gap: 15px;
-    }
-
-    .filter-btn {
-        padding: 16px 29px;
-        border: 2px solid transparent;
-        border-radius: 2.8rem;
-        border-color: #161616;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    .find-nearest-btn {
+        width: 48px;
+        height: 48px;
+        bottom: 16px;
+        right: 16px;
         font-size: 18px;
-        font-weight: 500;
-        position: relative;
-        overflow: hidden;
-        white-space: nowrap;
-        font-family: var(--_font-accent);
-        background: white;
     }
-
-    .filter-btn .active {
-        padding: 8px 3px;
-        font-size: 12px;
-        white-space: nowrap;
-        flex: 1;
-        min-width: 0;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-
-    .find-nearest-btn {
-        width: 44px;
-        height: 44px;
-        bottom: -190px;
-        right: 12px;
-        font-size: 16px;
-        padding: 10px;
-    }
-
 
     .stats {
-        grid-template-columns: 1fr 1fr;
+        padding: 20px;
         gap: 12px;
-        padding: 16px;
-        margin: 20px 8px;
-        margin-top: 28rem;
-        border-radius: 12px;
-    }
-
-    .stat-item {
-        padding: 16px 8px;
+        margin: 20px auto 16px;
     }
 
     .stat-number {
-        font-size: 24px;
-        margin-bottom: 4px;
+        font-size: 28px;
     }
 
     .stat-label {
-        font-size: 11px;
-        line-height: 1.2;
-    }
-
-    .modal-content {
-        margin: 5% auto;
-        width: calc(100% - 16px);
-        max-width: none;
-        border-radius: 12px;
-    }
-
-    .modal-header {
-        padding: 16px;
-    }
-
-    .modal-header h3 {
-        font-size: 16px;
-        margin: 0 30px 4px 0;
-    }
-
-    .modal-subtitle {
         font-size: 12px;
     }
 
-    .close {
-        right: 12px;
-        top: 12px;
-        width: 28px;
-        height: 28px;
-        font-size: 20px;
+    .modal-content {
+        width: calc(100% - 24px);
+        margin: 10% auto;
+    }
+
+    .modal-header {
+        padding: 20px;
+    }
+
+    .modal-header h3 {
+        font-size: 18px;
     }
 
     .modal-body {
-        padding: 16px;
+        padding: 20px;
     }
 
     .info-item {
@@ -1910,442 +691,61 @@
         gap: 12px;
     }
 
-    .info-icon {
+    .info-icon-wrapper {
         width: 32px;
         height: 32px;
-        font-size: 14px;
     }
 
-    .info-text strong {
-        font-size: 16px;
+    .info-icon-img {
+        width: 16px;
+        height: 16px;
+    }
+
+    .info-label {
+        font-size: 10px;
+    }
+
+    .info-value {
+        font-size: 13px;
     }
 
     .contact-buttons {
         grid-template-columns: 1fr;
-        gap: 8px;
-        margin-top: 16px;
-    }
-
-    .contact-btn {
-        padding: 12px 16px;
-        font-size: 13px;
-    }
-
-    .diler-btn {
-        width: 190px;
-    }
-
-    /* .btn-mobile-icon .btn-caption {
-        display: flex !important;
-        flex-direction: column;
-    } */
-
-    .btn-mobile-icon {
-        border-radius: 2.8rem;
-
     }
 }
 
-@media only screen and (min-width: 480px) and (max-width: 580px) {
-    .container {
-        margin-top: 2rem;
-        padding: 0 0px;
+/* Маленькие мобильные */
+@media (max-width: 480px) {
+    :root {
+        --font-size-base: 13px;
+        --button-padding: 10px 16px;
     }
 
-    .faw-history-title {
-        margin-bottom: 0rem;
+    .container {
+        margin-top: 6rem;
+        padding: 0 8px;
     }
 
     .faw-history-title h2 {
-        font-size: 4rem;
-        letter-spacing: 2px;
-        margin: 8px;
-        line-height: 1.1;
+        font-size: 2.5rem;
     }
 
-    #map {
-        width: 100%;
-        height: 50vh;
-        min-height: 350px;
-    }
-
-    .map-header {
-        position: static;
-        margin-bottom: 0px;
-        padding: 12px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        border-radius: 8px;
-    }
-
-    .controls {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-
-    .search-container {
-        min-width: auto;
-    }
-
-    .search-box {
-        padding: 10px 16px;
-        font-size: 16px;
-        border-radius: 25px;
-    }
-
-    .filter-buttons {
-        justify-content: center;
-        gap: 12px;
-    }
-
+    .search-box,
     .filter-btn {
-        padding: 16px 22px;
-        border: 2px solid transparent;
-        border-radius: 2.8rem;
-        border-color: #161616;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        font-size: 16px;
-        font-weight: 500;
-        position: relative;
-        overflow: hidden;
-        white-space: nowrap;
-        font-family: var(--_font-accent);
-        background: white;
-    }
-
-    .filter-btn .active {
-        padding: 8px 3px;
-        font-size: 12px;
-        white-space: nowrap;
-        flex: 1;
-        min-width: 0;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-
-    .find-nearest-btn {
-        width: 44px;
         height: 44px;
-        bottom: -160px;
-        right: 12px;
-        font-size: 16px;
-        padding: 10px;
+        font-size: 13px;
     }
 
-    .stat-item {
-        padding: 16px 8px;
+    .stats {
+        padding: 16px;
+        gap: 10px;
     }
 
     .stat-number {
         font-size: 24px;
-        margin-bottom: 4px;
     }
 
     .stat-label {
         font-size: 11px;
-        line-height: 1.2;
-    }
-
-    .stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        padding: 16px;
-        margin: 20px 8px;
-        margin-top: 28rem;
-        border-radius: 12px;
-    }
-
-    .modal-content {
-        margin: 5% auto;
-        width: calc(100% - 16px);
-        max-width: none;
-        border-radius: 12px;
-    }
-
-    .modal-header {
-        padding: 16px;
-    }
-
-    .modal-header h3 {
-        font-size: 16px;
-        margin: 0 30px 4px 0;
-    }
-
-    .modal-subtitle {
-        font-size: 12px;
-    }
-
-    .close {
-        right: 12px;
-        top: 12px;
-        width: 28px;
-        height: 28px;
-        font-size: 20px;
-    }
-
-    .modal-body {
-        padding: 16px;
-    }
-
-    .info-item {
-        padding: 12px;
-        gap: 12px;
-    }
-
-    .info-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-    }
-
-    .info-text strong {
-        font-size: 16px;
-    }
-
-    .contact-buttons {
-        grid-template-columns: 1fr;
-        gap: 8px;
-        margin-top: 16px;
-    }
-
-    .contact-btn {
-        padding: 12px 16px;
-        font-size: 13px;
-    }
-
-    .diler-btn {
-        width: 190px;
-    }
-
-    /* .btn-mobile-icon .btn-caption {
-        display: flex !important;
-        flex-direction: column;
-    } */
-
-    .btn-mobile-icon {
-        border-radius: 2.8rem;
-
-    }
-}
-
-@media only screen and (max-width: 479px) {
-    .container {
-        margin-top: 2rem;
-        padding: 0 0px;
-    }
-
-    .faw-history-title {
-        margin-bottom: 0rem;
-    }
-
-    .faw-history-title h2 {
-        font-size: 4rem;
-        letter-spacing: 3px;
-        margin: 8px;
-        line-height: 1;
-
-    }
-
-    #map {
-        width: 100%;
-        height: 50vh;
-        min-height: 350px;
-    }
-
-    .map-header {
-        position: static;
-        margin-bottom: 0px;
-        padding: 12px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        border-radius: 8px;
-    }
-
-    .controls {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-
-    .search-container {
-        min-width: auto;
-    }
-
-    .search-box {
-        padding: 12px 12px;
-        font-size: 16px;
-        border-radius: 25px;
-    }
-
-    .filter-buttons {
-        justify-content: center;
-        gap: 12px;
-    }
-
-    .filter-btn {
-        padding: 15px 34px;
-        border: 2px solid transparent;
-        border-radius: 2.8rem;
-        border-color: #161616;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        font-size: 16px;
-        font-weight: 500;
-        position: relative;
-        overflow: hidden;
-        white-space: nowrap;
-        font-family: var(--_font-accent);
-        background: white;
-    }
-
-    .filter-btn .active {
-        padding: 8px 3px;
-        font-size: 12px;
-        white-space: nowrap;
-        flex: 1;
-        min-width: 0;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-
-    .find-nearest-btn {
-        width: 44px;
-        height: 44px;
-        bottom: -160px;
-        right: 12px;
-        font-size: 16px;
-        padding: 10px;
-    }
-
-    .stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        padding: 16px;
-        margin: 20px 8px;
-        margin-top: 20rem;
-        border-radius: 12px;
-    }
-
-    .stat-item {
-        padding: 16px 8px;
-    }
-
-    .stat-number {
-        font-size: 24px;
-        margin-bottom: 4px;
-    }
-
-    .stat-label {
-        font-size: 11px;
-        line-height: 1.2;
-    }
-
-    .modal-content {
-        margin: 5% auto;
-        width: calc(100% - 16px);
-        max-width: none;
-        border-radius: 12px;
-    }
-
-    .modal-header {
-        padding: 16px;
-    }
-
-    .modal-header h3 {
-        font-size: 16px;
-        margin: 0 30px 4px 0;
-    }
-
-    .modal-subtitle {
-        font-size: 12px;
-    }
-
-    .close {
-        right: 12px;
-        top: 12px;
-        width: 28px;
-        height: 28px;
-        font-size: 20px;
-    }
-
-    .modal-body {
-        padding: 16px;
-    }
-
-    .info-item {
-        padding: 12px;
-        gap: 12px;
-    }
-
-    .info-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-    }
-
-    .info-text strong {
-        font-size: 16px;
-    }
-
-    .contact-buttons {
-        grid-template-columns: 1fr;
-        gap: 8px;
-        margin-top: 16px;
-    }
-
-    .contact-btn {
-        padding: 12px 16px;
-        font-size: 13px;
-    }
-
-    .diler-btn {
-        width: 190px;
-    }
-
-    /* .btn-mobile-icon .btn-caption {
-        display: flex !important;
-        flex-direction: column;
-    } */
-
-    .btn-mobile-icon {
-        border-radius: 2.8rem;
-
-    }
-}
-
-@media only screen and (min-width: 376px) and (max-width: 478px) {
-    .stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        padding: 16px;
-        margin: 20px 8px;
-        margin-top: 35rem;
-        border-radius: 12px;
-    }
-}
-
-@media only screen and (min-width: 321px) and (max-width: 375px) {
-    .stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        padding: 16px;
-        margin: 20px 8px;
-        margin-top: 35rem;
-        border-radius: 12px;
-    }
-}
-
-@media only screen and (max-width: 320px) {
-    .stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        padding: 16px;
-        margin: 20px 8px;
-        margin-top: 35rem;
-        border-radius: 12px;
     }
 }
