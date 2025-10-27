@@ -243,11 +243,13 @@ class FeatureIcon(models.Model):
 class Product(models.Model):
     """Модель грузовика FAW"""
     CATEGORY_CHOICES = [
-        ('dump_truck', 'Самосвал'),
-        ('tractor', 'Тягач'),
-        ('chassis', 'Шасси'),
-        ('van', 'Фургон'),
-        ('special', 'Спецтехника'),
+        ('shatakchi', 'Shatakchi mashinalar'),  # Седельные тягачи
+        ('samosval', 'Samosvallar'),            # Самосвалы
+        ('maxsus', 'Maxsus texnika'),           # Спецтехника
+        ('furgon', 'Avtofurgonlar'),            # Автофургоны
+        ('shassi', 'Shassilar'),                # Шасси
+        ('tiger_v', 'Tiger V'),                 # Tiger V
+        ('tiger_vr', 'Tiger VR'),  
     ]
     
     title = models.CharField("Название модели", max_length=255)

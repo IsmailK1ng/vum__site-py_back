@@ -391,18 +391,54 @@ class ProductDetail {
     }
 
     updateBreadcrumbs() {
-        const breadcrumbLinks = document.querySelectorAll('.breadcrumb-ol li a');
-        if (breadcrumbLinks.length >= 3) {
-            // Обновляем последнюю крошку с названием продукта
-            breadcrumbLinks[2].textContent = this.product.title;
-            breadcrumbLinks[2].href = 'javascript:void(0)';
+        console.log('🔗 Updating breadcrumbs for:', this.product.title);
+        console.log('📦 Product data:', this.product); // ✅ Проверим что приходит
 
-            // Обновляем ссылку на категорию
-            if (this.product.category) {
-                breadcrumbLinks[1].href = `/products/?category=${this.product.category}`;
-                breadcrumbLinks[1].textContent = this.product.category_display;
-            }
+        // ✅ Маппинг категорий (на всякий случай)
+        const categoryNames = {
+            'shatakchi': 'Shatakchi mashinalar',
+            'samosval': 'Samosvallar',
+            'maxsus': 'Maxsus texnika',
+            'furgon': 'Avtofurgonlar',
+            'shassi': 'Shassilar',
+            'tiger_v': 'Tiger V',
+            'tiger_vr': 'Tiger VR'
+        };
+
+        // Находим все ссылки в breadcrumb
+        const breadcrumbLinks = document.querySelectorAll('.breadcrumb-ol li a');
+        console.log('Found breadcrumb links:', breadcrumbLinks.length);
+
+        if (breadcrumbLinks.length < 3) {
+            console.warn('Not enough breadcrumb links found');
+            return;
         }
+
+        // Обновляем последнюю крошку (название продукта)
+        const productLink = breadcrumbLinks[2];
+        if (productLink) {
+            productLink.textContent = this.product.title;
+            productLink.href = 'javascript:void(0)';
+            console.log('✅ Product name updated:', this.product.title);
+        }
+
+        // Обновляем вторую крошку (категория)
+        const categoryLink = breadcrumbLinks[1];
+        if (categoryLink) {
+            // ✅ Проверяем все возможные варианты
+            const categoryName = this.product.category_display ||
+                categoryNames[this.product.category] ||
+                'Modellar';
+
+            categoryLink.textContent = categoryName;
+            categoryLink.href = `/#models`;
+            console.log('✅ Category updated:', categoryName);
+            console.log('   - category_display:', this.product.category_display);
+            console.log('   - category code:', this.product.category);
+        }
+
+        // Обновляем title страницы
+        document.title = `${this.product.title} - FAW Trucks`;
     }
 
     showLoader() {
