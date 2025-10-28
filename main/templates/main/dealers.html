@@ -158,40 +158,28 @@
 
     <script>
         // ========== ДАННЫЕ ДИЛЕРОВ ==========
-        const dealers = [{
-            id: 1,
-            name: "MCHJ «Ideal Truck Sales»",
-            address: "O'zbekiston, Toshkent shahri, Yangi Sergeli ko'chasi, 25-uy. Avtosentr.",
-            coordinates: [41.237360, 69.213242],
-            phone: "+998 71 203-10-40",
-            email: "manideal@mail.ru",
-            website: "https://ideal-tehno.uz",
-            workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish<br>Ya: Dam olish",
-            services: ["Sotuv"],
-            manager: "Begzod",
-            city: "Toshkent"
-        },
-    ];
+        const dealers = [
+            { id: 1, name: "MCHJ «Ideal Truck Sales»", address: "O'zbekiston, Toshkent shahri, Yangi Sergeli ko'chasi, 25-uy. Avtosentr.", coordinates: [41.237360, 69.213242], phone: "+998 71 203-10-40", email: "manideal@mail.ru", website: "https://ideal-tehno.uz", workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish<br>Ya: Dam olish", services: ["Sotuv"], manager: "Begzod", city: "Toshkent" },
+            { id: 2, name: "MCHJ «SHARQ GAVHARI TRANS»", address: "Toshkent shahri, Yangihayot tumani, Yangi Darxon MFY, Toshkent halqa avtomobil yoʼli ko'chasi, 23-uy", coordinates: [41.222225, 69.192259], phone: "+998 91 779-73-73", email: "izzat@gmail.com", workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish", services: ["Sotuv"], manager: "Muhriddin", city: "Toshkent" },
+            { id: 3, name: "MCHJ «SHARQ GAVHARI TRANS»", address: "Toshkent shahri, Sirg'ali tumani, Qumariq MFY, Qum-Ariq ko'chasi, 24-a-uy", coordinates: [41.245010, 69.255868], phone: "+998 90 065-35-35", email: "izzat@gmail.com", workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish", services: ["Sotuv"], manager: "Muslim", city: "Toshkent" },
+            { id: 4, name: "MCHJ «MAGISTRAL DIESEL SERVICE»", address: "Toshkent viloyati, Zangiota tumani, Erkin QFY Tariq Teshar mahallesi, M39 Avtomagistral yo'li ko'chasi, 54 A-uy", coordinates: [41.227780, 69.148816], phone: "+998 99 808-09-90", email: "info@magistral.uz", website: "https://magistral.uz", workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish", services: ["Sotuv"], manager: "Komron", city: "Toshkent viloyati" },
+            { id: 5, name: "MCHJ «MAGISTRAL DIESEL SERVICE»", address: "Toshkent viloyati, Zangiota tumani, Erkin QFY Tariq Teshar mahallesi, M39 Avtomagistral yo'li ko'chasi, 54 A-uy", coordinates: [41.298308, 69.292843], phone: "+998 99 040-09-90", email: "info@magistral.uz", website: "https://magistral.uz", workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish", services: ["Sotuv"], manager: "Qodirov Zaid", city: "Toshkent viloyati" },
+            { id: 6, name: "MCHJ «DELTA-AUTO MOTORS»", address: "Toshkent viloyati, Olmaliq sh. Saxovat mahallasi, Ravnaq ko'chasi", coordinates: [40.88795582024242, 69.5780345958458], phone: "+998 99 93 515-09-99", email: "sundj_83@mail.ru", website: "https://www.instagram.com/deltaautomotors/", workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish", services: ["Sotuv"], manager: "", city: "Toshkent" },
+            { id: 7, name: "MCHJ «DELTA-AUTO MOTORS»", address: "Toshkent viloyati, Olmaliq sh. Saxovat mahallasi, Ravnaq ko'chasi", coordinates: [41.231030, 69.155483], phone: "+998 93 500-77-33", email: "sundj_83@mail.ru", website: "https://www.instagram.com/deltaautomotors", workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish", services: ["Sotuv"], manager: "", city: "Toshkent viloyati" },
+            { id: 8, name: "MCHJ «COMTRANS AUTO SERVICE»", address: "Toshkent, Yangihayot tumani, Past Darkhon mahallasi, Navruz ko'chasi 26", coordinates: [41.227671, 69.196490], phone: "+998 77-417-00-33", email: "Abdurasul0586@mail.ru", workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish", services: ["Sotuv"], manager: "Nazir", city: "Toshkent" },
+            { id: 9, name: "BBT TRUCKS»", address: "Toshkent shahri, Yunusobod tumani XALQABOD MFY, 16 mavzesi, 28a-uy", coordinates: [41.367297, 69.327222], phone: "+998 33 711-33-65", email: "azimovbek1993@gmail.com", website: "https://www.instagram.com/bbt_trucks", workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish", services: ["Sotuv"], manager: "Nodir", city: "Toshkent" },
+            { id: 10, name: "MCHJ «SHARQ GAVHARI TRANS»", address: "Farg'ona viloyat,Farg'ona shahar Ahmad Yassaviy ko'chasi 26", coordinates: [40.379887, 71.806633], phone: "+998 ", email: "izzat@gmail.com", workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish", services: ["Sotuv"], manager: "", city: "Farg'ona viloyati" },
+            { id: 11, name: "MCHJ «SHARQ GAVHARI TRANS»", address: "Farg'ona viloyati, Qo'qon shahri, Toshkentliguzar MFY, Tarovat", coordinates: [40.535144, 70.937634], phone: "+998 91 050-13-83", email: "izzat@gmail.com", workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish", services: ["Sotuv"], manager: "Ulug'bek", city: "Farg'ona viloyati" },
+            { id: 12, name: "MCHJ «SHARQ GAVHARI TRANS»", address: "Andijon viloyati, Oltinko'l tumani, Mehnat MSG, Mehnat ko'chasi, 10-uy", coordinates: [40.753081, 72.290714], phone: "+998 ", email: "izzat@gmail.com", workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish", services: ["Sotuv"], manager: "", city: "Andijon viloyati" },
+            { id: 13, name: "MCHJ «KAMAZ TEXNIK MARKAZI»", address: "Sirdaryo viloyati, Oqoltin tumani, Sardoba shaharchasi A.TOIROV SIU XUDUDI", coordinates: [40.536946, 68.325411], phone: "+998 97 706-10-61", email: "shavkat@mail.ru", workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish", services: ["Sotuv"], manager: "Shavkat", city: "Sirdaryo viloyati" },
+            { id: 14, name: "MCHJ «INNOVATSION COMFORT TOMORQA HIZMATLARI»", address: "Jizzax viloyati, Jizzax sh. Toshloq mahallasi, Sayiljoyi ko'chasi, 22-uy", coordinates: [40.130849, 67.823168], phone: "+998 95 268-33-63", email: "mahmuovjavohir@gmail.com", workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish", services: ["Sotuv"], manager: "Hatamov Bekzod", city: "Jizzax viloyati" },
+            { id: 15, name: "MCHJ «SHARQ GAVHARI TRANS»", address: "Surxondaryo viloyati, Termiz shahar, Kattabogʻ MFY, Farovon-3 dahasi, 10-uy", coordinates: [37.235186, 67.272631], phone: "+998 91 772-04-44", email: "izzat@gmail.com", workingHours: "Du-Ju: 9:00-20:00<br>Sha: Dam olish <br>Ya: Dam olish", services: ["Sotuv"], manager: "Ergashev Mirjalol Bahrom o'g'li", city: "Surxondaryo viloyati" }
+        ];
 
         let map, clusterer, currentFilter = 'all', filteredDealers = [...dealers];
         const UZBEKISTAN_CENTER = [41.377491, 64.585262];
         const UZBEKISTAN_BOUNDS = [[37.172, 55.998], [45.590, 73.132]];
-
-        const uzbekistanBorder = [
-            [37.250789, 67.340123], [37.368912, 66.524178], [38.410876, 65.221345],
-            [38.899123, 64.175892], [39.948765, 62.905123], [40.505432, 62.005678],
-            [41.090123, 61.888456], [41.430567, 60.088912], [42.228456, 59.981789],
-            [42.756789, 58.634567], [42.175890, 57.791234], [41.831234, 56.937890],
-            [41.313890, 55.973456], [44.995858, 55.928917], [45.592123, 58.508456],
-            [44.789456, 60.245123], [43.504477, 62.013300], [43.655432, 63.191234],
-            [43.002890, 66.103456], [41.992890, 66.515432], [41.173789, 66.719234],
-            [40.667456, 68.265123], [41.389456, 69.075123], [42.086543, 70.394123],
-            [41.525123, 70.425234], [41.398123, 71.875234], [40.871234, 73.060123],
-            [40.151123, 71.780234], [40.249567, 71.019198], [40.501678, 70.463234],
-            [40.2204216, 69.2579536], [39.800000, 68.900000], [39.538789, 68.541234],
-            [38.906789, 68.181234], [38.162345, 68.397123], [37.725123, 68.305432],
-            [37.200789, 67.850456], [37.250789, 67.340123]
-        ];
+        const uzbekistanBorder = [[37.250789, 67.340123], [37.368912, 66.524178], [38.410876, 65.221345], [38.899123, 64.175892], [39.948765, 62.905123], [40.505432, 62.005678], [41.090123, 61.888456], [41.430567, 60.088912], [42.228456, 59.981789], [42.756789, 58.634567], [42.175890, 57.791234], [41.831234, 56.937890], [41.313890, 55.973456], [44.995858, 55.928917], [45.592123, 58.508456], [44.789456, 60.245123], [43.504477, 62.013300], [43.655432, 63.191234], [43.002890, 66.103456], [41.992890, 66.515432], [41.173789, 66.719234], [40.667456, 68.265123], [41.389456, 69.075123], [42.086543, 70.394123], [41.525123, 70.425234], [41.398123, 71.875234], [40.871234, 73.060123], [40.151123, 71.780234], [40.249567, 71.019198], [40.501678, 70.463234], [40.2204216, 69.2579536], [39.800000, 68.900000], [39.538789, 68.541234], [38.906789, 68.181234], [38.162345, 68.397123], [37.725123, 68.305432], [37.200789, 67.850456], [37.250789, 67.340123]];
 
         ymaps.ready(initializeMap);
 
@@ -200,8 +188,8 @@
             if (loader) loader.style.display = 'none';
 
             map = new ymaps.Map('map', {
-                center: UZBEKISTAN_CENTER,
-                zoom: 6,
+                center: [41.311151, 69.279737],
+                zoom: 11,
                 controls: ['zoomControl', 'fullscreenControl', 'geolocationControl']
             }, {
                 suppressMapOpenBlock: true,
@@ -209,18 +197,9 @@
                 maxAnimationZoomDifference: 5
             });
 
-            map.setBounds(UZBEKISTAN_BOUNDS, {
-                checkZoomRange: true,
-                preciseZoom: false,
-                duration: 0
-            });
-
             map.options.set('restrictMapArea', UZBEKISTAN_BOUNDS);
-
             const mapElement = document.getElementById('map');
-            if (mapElement) {
-                mapElement.addEventListener('wheel', (e) => e.stopPropagation(), { passive: true });
-            }
+            if (mapElement) mapElement.addEventListener('wheel', (e) => e.stopPropagation(), { passive: true });
 
             loadAndDisplayRegions();
             initializeClusterer();
@@ -240,68 +219,82 @@
                 fillOpacity: 0
             }));
         }
-
         function initializeClusterer() {
             clusterer = new ymaps.Clusterer({
-                preset: 'islands#blueClusterIcons',
                 groupByCoordinates: false,
                 clusterDisableClickZoom: false,
-                clusterIconContentLayout: ymaps.templateLayoutFactory.createClass(
-                    '<div style="color: #fff; font-weight: bold;">{{ properties.geoObjects.length }}</div>'
-                )
+                clusterHideIconOnBalloonOpen: false,
+                geoObjectHideIconOnBalloonOpen: false,
+                clusterIconLayout: ymaps.templateLayoutFactory.createClass(
+                    '<div style="position:absolute;left:-30px;top:-30px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#0a2883 0%,#1e40af 100%);border:4px solid white;box-shadow:0 4px 16px rgba(10,40,131,0.4);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:white;font-family:Arial,sans-serif;">' +
+                    '$[properties.geoObjects.length]' +
+                    '</div>'
+                ),
+                clusterIconShape: {
+                    type: 'Circle',
+                    coordinates: [0, 0],
+                    radius: 30
+                }
             });
         }
-
         function createPlacemark(dealer) {
+            const truckIconUrl = "{% static 'images/dealers-icon/icon-info/truck.png' %}";
+
             const balloonContent = `
-            <div style="padding:16px;max-width:320px;font-family:var(--_font-accent)">
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #e2e8f0">
-                    <img src="{% static 'images/dealers-icon/icon-info/location.png' %}" style="width:20px;height:20px;object-fit:contain" alt="location">
-                    <div style="flex:1">
-                        <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:2px">Manzil</div>
-                        <div style="font-size:13px;color:#1e293b;line-height:1.4">${dealer.address}</div>
-                    </div>
+        <div style="padding:16px;max-width:320px;font-family:var(--_font-accent)">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #e2e8f0">
+                <img src="{% static 'images/dealers-icon/icon-info/location.png' %}" style="width:20px;height:20px;object-fit:contain" alt="location">
+                <div style="flex:1">
+                    <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:2px">Manzil</div>
+                    <div style="font-size:13px;color:#1e293b;line-height:1.4">${dealer.address}</div>
                 </div>
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-                    <img src="{% static 'images/dealers-icon/icon-info/call.png' %}" style="width:20px;height:20px;object-fit:contain" alt="phone">
-                    <div style="flex:1">
-                        <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:2px">Telefon</div>
-                        <a href="tel:${dealer.phone}" style="font-size:14px;color:#0a2883;text-decoration:none;font-weight:600">${dealer.phone}</a>
-                    </div>
-                </div>
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-                    <img src="{% static 'images/dealers-icon/icon-info/clock.png' %}" style="width:20px;height:20px;object-fit:contain" alt="clock">
-                    <div style="flex:1">
-                        <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:2px">Ish vaqti</div>
-                        <div style="font-size:13px;color:#1e293b;line-height:1.4">${dealer.workingHours}</div>
-                    </div>
-                </div>
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-                    <img src="{% static 'images/dealers-icon/icon-info/service.png' %}" style="width:20px;height:20px;object-fit:contain" alt="service">
-                    <div style="flex:1">
-                        <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:4px">Xizmatlar</div>
-                        <div style="display:flex;flex-wrap:wrap;gap:6px">${dealer.services.map(s =>
-                `<span style="background:#e0f2fe;color:#0369a1;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500">${s}</span>`
-            ).join('')}</div>
-                    </div>
-                </div>
-                <button onclick="showDealerDetails(${dealer.id})" style="background:linear-gradient(135deg,#0a2883 0%,#1e40af 100%);color:white;border:none;padding:12px 20px;border-radius:10px;cursor:pointer;width:100%;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(10,40,131,0.3);transition:all 0.3s">Batafsil ma'lumot</button>
             </div>
-        `;
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                <img src="{% static 'images/dealers-icon/icon-info/call.png' %}" style="width:20px;height:20px;object-fit:contain" alt="phone">
+                <div style="flex:1">
+                    <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:2px">Telefon</div>
+                    <a href="tel:${dealer.phone}" style="font-size:14px;color:#0a2883;text-decoration:none;font-weight:600">${dealer.phone}</a>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                <img src="{% static 'images/dealers-icon/icon-info/clock.png' %}" style="width:20px;height:20px;object-fit:contain" alt="clock">
+                <div style="flex:1">
+                    <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:2px">Ish vaqti</div>
+                    <div style="font-size:13px;color:#1e293b;line-height:1.4">${dealer.workingHours}</div>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+                <img src="{% static 'images/dealers-icon/icon-info/service.png' %}" style="width:20px;height:20px;object-fit:contain" alt="service">
+                <div style="flex:1">
+                    <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:4px">Xizmatlar</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px">${dealer.services.map(s =>
+                `<span style="background:#ffffff;color:#000000;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500">${s}</span>`
+            ).join('')}</div>
+                </div>
+            </div>
+            <button onclick="showDealerDetails(${dealer.id})" style="background:linear-gradient(135deg,#0a2883 0%,#1e40af 100%);color:white;border:none;padding:12px 20px;border-radius:10px;cursor:pointer;width:100%;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(10,40,131,0.3);transition:all 0.3s">Batafsil ma'lumot</button>
+        </div>
+    `;
 
             return new ymaps.Placemark(dealer.coordinates, {
                 id: dealer.id,
-                balloonContentHeader: `<div style="padding:12px 16px; background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);border-bottom:1px solid #000000;font-family:var(--_font-accent)">
-                <div style="font-size:16px;font-weight:700;color:#000000;margin-bottom:4px">${dealer.name}</div>
-                <div style="font-size:12px;color:#000000;font-weight:500">${dealer.city}</div>
-            </div>`,
+                balloonContentHeader: `<div style="padding:12px 16px;background:#ffffff;border-bottom:1px solid #000000;font-family:var(--_font-accent)">
+            <div style="font-size:16px;font-weight:700;color:#000000;margin-bottom:4px">${dealer.name}</div>
+            <div style="font-size:12px;color:#000000;font-weight:500">${dealer.city}</div>
+        </div>`,
                 balloonContentBody: balloonContent,
                 hintContent: `${dealer.name} - ${dealer.city}`
             }, {
-                iconLayout: 'default#image',
-                iconImageHref: "{% static 'images/dealers-icon/icon-info/truck.png' %}",
-                iconImageSize: [40, 40],
-                iconImageOffset: [-20, -40]
+                iconLayout: ymaps.templateLayoutFactory.createClass(
+                    '<div style="width:44px;height:44px;border-radius:50%;background:white;border:3px solid #0a2883;box-shadow:0 4px 12px rgba(10,40,131,0.3);display:flex;align-items:center;justify-content:center;position:absolute;left:-22px;top:-22px;pointer-events:all;">' +
+                    '<img src="' + truckIconUrl + '" style="width:26px;height:26px;object-fit:contain;pointer-events:none;"/>' +
+                    '</div>'
+                ),
+                iconShape: {
+                    type: 'Circle',
+                    coordinates: [0, 0],
+                    radius: 22
+                }
             });
         }
 
@@ -309,21 +302,6 @@
             const placemarks = dealers.map(createPlacemark);
             clusterer.add(placemarks);
             map.geoObjects.add(clusterer);
-
-            if (placemarks.length > 0) {
-                try {
-                    const bounds = clusterer.getBounds();
-                    if (bounds) {
-                        map.setBounds(bounds, {
-                            checkZoomRange: true,
-                            zoomMargin: [60, 60, 60, 60],
-                            duration: 300
-                        });
-                    }
-                } catch (e) {
-                    map.setCenter(UZBEKISTAN_CENTER, 6);
-                }
-            }
         }
 
         function showDealerDetails(dealerId) {
@@ -331,90 +309,93 @@
             if (!dealer) return;
 
             const modal = document.getElementById('dealerModal');
+            document.body.style.overflow = 'hidden';
+
             document.getElementById('modalTitle').textContent = dealer.name;
             document.getElementById('modalSubtitle').textContent = dealer.city;
             document.getElementById('dealerInfo').innerHTML = `
-            <div class="info-item">
-                <div class="info-icon-wrapper">
-                    <img src="{% static 'images/dealers-icon/icon-info-details/location.png' %}" class="info-icon-img" alt="location">
-                </div>
-                <div class="info-text">
-                    <div class="info-label">Manzil</div>
-                    <div class="info-value">${dealer.address}</div>
-                </div>
+        <div class="info-item">
+            <div class="info-icon-wrapper">
+                <img src="{% static 'images/dealers-icon/icon-info-details/location.png' %}" class="info-icon-img" alt="location">
             </div>
-            <div class="info-item">
-                <div class="info-icon-wrapper">
-                    <img src="{% static 'images/dealers-icon/icon-info-details/call.png' %}" class="info-icon-img" alt="phone">
-                </div>
-                <div class="info-text">
-                    <div class="info-label">Telefon</div>
-                    <a href="tel:${dealer.phone}" class="info-value info-link">${dealer.phone}</a>
-                </div>
+            <div class="info-text">
+                <div class="info-label">Manzil</div>
+                <div class="info-value">${dealer.address}</div>
             </div>
-            <div class="info-item">
-                <div class="info-icon-wrapper">
-                    <img src="{% static 'images/dealers-icon/icon-info-details/mail.png' %}" class="info-icon-img" alt="email">
-                </div>
-                <div class="info-text">
-                    <div class="info-label">Email</div>
-                    <a href="mailto:${dealer.email}" class="info-value info-link">${dealer.email}</a>
-                </div>
+        </div>
+        <div class="info-item">
+            <div class="info-icon-wrapper">
+                <img src="{% static 'images/dealers-icon/icon-info-details/call.png' %}" class="info-icon-img" alt="phone">
             </div>
-            <div class="info-item">
-                <div class="info-icon-wrapper">
-                    <img src="{% static 'images/dealers-icon/icon-info-details/web.png' %}" class="info-icon-img" alt="website">
-                </div>
-                <div class="info-text">
-                    <div class="info-label">Veb-sayt</div>
-                    <a href="${dealer.website || '#'}" target="_blank" rel="noopener" class="info-value info-link">${dealer.website || 'Ko\'rsatilmagan'}</a>
-                </div>
+            <div class="info-text">
+                <div class="info-label">Telefon</div>
+                <a href="tel:${dealer.phone}" class="info-value info-link">${dealer.phone}</a>
             </div>
-            <div class="info-item">
-                <div class="info-icon-wrapper">
-                    <img src="{% static 'images/dealers-icon/icon-info-details/clock.png' %}" class="info-icon-img" alt="clock">
-                </div>
-                <div class="info-text">
-                    <div class="info-label">Ish vaqti</div>
-                    <div class="info-value">${dealer.workingHours}</div>
-                </div>
+        </div>
+        <div class="info-item">
+            <div class="info-icon-wrapper">
+                <img src="{% static 'images/dealers-icon/icon-info-details/mail.png' %}" class="info-icon-img" alt="email">
             </div>
-            ${dealer.manager ? `
-            <div class="info-item">
-                <div class="info-icon-wrapper">
-                    <svg class="info-icon-img" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="currentColor" stroke-width="2"/>
-                        <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <div class="info-text">
-                    <div class="info-label">Menejer</div>
-                    <div class="info-value">${dealer.manager}</div>
-                </div>
-            </div>` : ''}
-            <div class="info-item">
-                <div class="info-icon-wrapper">
-                    <img src="{% static 'images/dealers-icon/icon-info/service.png' %}" class="info-icon-img" alt="services">
-                </div>
-                <div class="info-text">
-                    <div class="info-label">Xizmatlar</div>
-                    <div class="services">${dealer.services.map(s => `<span class="service-tag">${s}</span>`).join('')}</div>
-                </div>
+            <div class="info-text">
+                <div class="info-label">Email</div>
+                <a href="mailto:${dealer.email}" class="info-value info-link">${dealer.email}</a>
             </div>
-            <div class="contact-buttons">
-                <a href="tel:${dealer.phone}" class="contact-btn btn-primary">
-                    <img src="{% static 'images/dealers-icon/icon-info-details/call.png' %}" style="width:18px;height:18px;filter:brightness(0) invert(1)" alt="call">
-                    Qo'ng'iroq qilish
-                </a>
-                <button onclick="buildRoute([${dealer.coordinates}])" class="contact-btn btn-secondary">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L12 22M12 2L5 9M12 2L19 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M12 13L17 18L12 22L7 18L12 13Z" fill="currentColor"/>
-                    </svg>
-                    Yo'nalish
-                </button>
+        </div>
+        <div class="info-item">
+            <div class="info-icon-wrapper">
+                <img src="{% static 'images/dealers-icon/icon-info-details/web.png' %}" class="info-icon-img" alt="website">
             </div>
-        `;
+            <div class="info-text">
+                <div class="info-label">Veb-sayt</div>
+                <a href="${dealer.website || '#'}" target="_blank" rel="noopener" class="info-value info-link">${dealer.website || 'Ko\'rsatilmagan'}</a>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-icon-wrapper">
+                <img src="{% static 'images/dealers-icon/icon-info-details/clock.png' %}" class="info-icon-img" alt="clock">
+            </div>
+            <div class="info-text">
+                <div class="info-label">Ish vaqti</div>
+                <div class="info-value">${dealer.workingHours}</div>
+            </div>
+        </div>
+        ${dealer.manager ? `
+        <div class="info-item">
+            <div class="info-icon-wrapper">
+                <svg class="info-icon-img" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="info-text">
+                <div class="info-label">Menejer</div>
+                <div class="info-value">${dealer.manager}</div>
+            </div>
+        </div>` : ''}
+        <div class="info-item">
+            <div class="info-icon-wrapper">
+                <img src="{% static 'images/dealers-icon/icon-info/service.png' %}" class="info-icon-img" alt="services">
+            </div>
+            <div class="info-text">
+                <div class="info-label">Xizmatlar</div>
+                <div class="services">${dealer.services.map(s => `<span class="service-tag">${s}</span>`).join('')}</div>
+            </div>
+        </div>
+        <div class="contact-buttons">
+            <a href="tel:${dealer.phone}" class="contact-btn btn-primary">
+                <img src="{% static 'images/dealers-icon/icon-info-details/call.png' %}" style="width:18px;height:18px;filter:brightness(0) invert(1)" alt="call">
+                Qo'ng'iroq qilish
+            </a>
+            <button onclick="buildRoute([${dealer.coordinates}])" class="contact-btn btn-secondary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L12 22M12 2L5 9M12 2L19 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 13L17 18L12 22L7 18L12 13Z" fill="currentColor"/>
+                </svg>
+                Yo'nalish
+            </button>
+        </div>
+    `;
+
             modal.style.display = 'block';
         }
 
@@ -489,19 +470,35 @@
             const modal = document.getElementById('dealerModal');
             const closeBtn = document.querySelector('.close');
 
+            const closeModal = () => {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.width = '';
+            };
+
             if (closeBtn) {
-                closeBtn.onclick = () => modal.style.display = 'none';
+                closeBtn.onclick = closeModal;
             }
 
             window.onclick = (e) => {
-                if (e.target === modal) modal.style.display = 'none';
+                if (e.target === modal) closeModal();
             };
 
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && modal.style.display === 'block') {
-                    modal.style.display = 'none';
+                    closeModal();
                 }
             });
+
+            // КРИТИЧЕСКИ ВАЖНО: блокируем скролл страницы когда модалка открыта
+            modal.addEventListener('wheel', (e) => {
+                e.stopPropagation();
+            }, { passive: true });
+
+            modal.addEventListener('touchmove', (e) => {
+                e.stopPropagation();
+            }, { passive: true });
         }
 
         function filterDealers(query = '') {

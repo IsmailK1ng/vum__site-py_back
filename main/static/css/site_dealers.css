@@ -26,7 +26,7 @@
 /* ========== БАЗОВЫЕ СТИЛИ ========== */
 .container {
     max-width: 1650px;
-    margin: 15rem auto 0;
+    margin: 0rem auto 0;
     padding: 0 20px;
     position: relative;
 }
@@ -247,6 +247,7 @@
 }
 
 /* ========== МОДАЛЬНОЕ ОКНО ========== */
+/* ========== МОДАЛЬНОЕ ОКНО ========== */
 .modal {
     display: none;
     position: fixed;
@@ -255,19 +256,26 @@
     background-color: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(8px);
     animation: modalFade 0.3s ease-out;
+    overflow: hidden;
+    padding: 20px;
 }
 
 .modal-content {
     background: var(--color-white);
-    margin: 5% auto;
+    margin: 0 auto;
     padding: 0;
     border-radius: 20px;
     width: 90%;
     max-width: 520px;
-    max-height: 90vh;
-    overflow: hidden;
+    height: calc(100vh - 40px);
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
     box-shadow: var(--shadow-xl);
     animation: modalSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 @keyframes modalFade {
@@ -283,20 +291,22 @@
 @keyframes modalSlide {
     from {
         opacity: 0;
-        transform: translateY(40px) scale(0.95);
+        top: 45%;
     }
 
     to {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        top: 50%;
     }
 }
 
 .modal-header {
-    background: linear-gradient(135deg, #000000 0%, #000000 100%);
+    background: linear-gradient(135deg, #0a2883 0%, #1e40af 100%);
     padding: 24px 32px;
     position: relative;
-    border-bottom: 1px solid rgb(0 0 0);
+    border-bottom: none;
+    flex-shrink: 0;
+    border-radius: 20px 20px 0 0;
 }
 
 .modal-header h3 {
@@ -309,7 +319,7 @@
 
 .modal-subtitle {
     font-size: 14px;
-    color: #ffffff;
+    color: rgba(255, 255, 255, 0.9);
     font-weight: 500;
 }
 
@@ -317,7 +327,7 @@
     position: absolute;
     right: 20px;
     top: 20px;
-    color: var(--color-gray-500);
+    color: rgba(255, 255, 255, 0.8);
     font-size: 24px;
     cursor: pointer;
     transition: var(--transition);
@@ -330,15 +340,18 @@
 }
 
 .close:hover {
-    color: var(--color-red-500);
-    background: rgba(239, 68, 68, 0.1);
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
     transform: scale(1.1);
 }
 
 .modal-body {
     padding: 24px 32px 32px;
-    max-height: calc(90vh - 200px);
     overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1 1 auto;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal-body::-webkit-scrollbar {
@@ -351,14 +364,25 @@
 }
 
 .modal-body::-webkit-scrollbar-thumb {
-    background: var(--color-gray-300);
+    background: var(--color-primary);
     border-radius: 4px;
 }
 
 .modal-body::-webkit-scrollbar-thumb:hover {
-    background: var(--color-gray-500);
+    background: var(--color-primary-dark);
 }
 
+/* ========== СТИЛИ ДЛЯ YANDEX MAPS ========== */
+/* Стили для одиночных маркеров */
+ymaps[class*="placemark"] {
+    border-radius: 50% !important;
+    border: 3px solid #0a2883 !important;
+    background: white !important;
+    padding: 4px !important;
+    box-shadow: 0 4px 12px rgba(10, 40, 131, 0.3) !important;
+}
+
+/* ========== ИНФОРМАЦИЯ О ДИЛЕРЕ ========== */
 /* ========== ИНФОРМАЦИЯ О ДИЛЕРЕ ========== */
 .dealer-info {
     display: grid;
@@ -373,12 +397,12 @@
     border-radius: 10px;
     transition: var(--transition);
     background: #ffffff;
-    border: 1px solid #ffffff;
+    border: 1px solid var(--color-gray-200);
 }
 
 .info-item:hover {
-    background: var(--color-white);
-    border-color: var(--color-gray-200);
+    background: var(--color-gray-50);
+    border-color: var(--color-primary);
     transform: translateX(3px);
     box-shadow: var(--shadow-sm);
 }
@@ -386,7 +410,7 @@
 .info-icon-wrapper {
     width: 36px;
     height: 36px;
-    background: linear-gradient(135deg, #000000 0%, #000000 100%);
+    background: linear-gradient(135deg, #0a2883 0%, #1e40af 100%);
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -408,7 +432,7 @@
 
 .info-label {
     font-size: 11px;
-    color: #000000;
+    color: var(--color-primary);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -417,13 +441,13 @@
 
 .info-value {
     font-size: 14px;
-    color: var(--color-gray-700);
+    color: var(--color-black);
     line-height: 1.5;
     font-weight: 500;
 }
 
 .info-link {
-    color: #000000;
+    color: var(--color-primary);
     text-decoration: none;
     transition: var(--transition);
     font-weight: 600;
@@ -442,7 +466,7 @@
 }
 
 .service-tag {
-    background: linear-gradient(135deg, #000000 0%, #000000 100%);
+    background: linear-gradient(135deg, #0a2883 0%, #1e40af 100%);
     color: #ffffff;
     padding: 5px 12px;
     border-radius: 6px;
@@ -453,12 +477,12 @@
 }
 
 .service-tag:hover {
-    background: linear-gradient(135deg, var(--color-primary) 0%, #1e40af 100%);
-    color: var(--color-white);
+    background: linear-gradient(135deg, #1e40af 0%, #0a2883 100%);
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(10, 40, 131, 0.3);
 }
 
+/* ========== КНОПКИ КОНТАКТОВ ========== */
 /* ========== КНОПКИ КОНТАКТОВ ========== */
 .contact-buttons {
     display: grid;
@@ -485,7 +509,7 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #000000 0%, #000000 100%);
+    background: linear-gradient(135deg, #0a2883 0%, #1e40af 100%);
     color: var(--color-white);
     box-shadow: 0 4px 12px rgba(10, 40, 131, 0.3);
 }
@@ -501,12 +525,13 @@
 
 .btn-secondary {
     background: #ffffff;
-    color: #000000;
-    border: 2px solid #000000;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
 }
 
 .btn-secondary:hover {
-    background: var(--color-gray-50);
+    background: var(--color-primary);
+    color: #ffffff;
     transform: translateY(-2px);
     box-shadow: var(--shadow-sm);
 }
@@ -516,7 +541,7 @@
 }
 
 .btn-secondary svg {
-    color: #000000;
+    color: inherit;
 }
 
 /* ========== ЗАГРУЗКА ========== */
@@ -551,20 +576,18 @@
 }
 
 /* ========== АДАПТИВНОСТЬ ========== */
-
-/* Средние десктопы */
 @media (max-width: 1500px) {
     .container {
-        margin-top: 12rem;
+        margin-top: 0rem;
         padding: 0 16px;
     }
 
     .faw-history-title {
         margin-bottom: 3rem;
+        margin-top: 3rem;
     }
 }
 
-/* Планшеты */
 @media (max-width: 1024px) {
     :root {
         --font-size-base: 15px;
@@ -572,7 +595,7 @@
     }
 
     .container {
-        margin-top: 10rem;
+        margin-top: 0rem;
     }
 
     .faw-history-title h2 {
@@ -606,7 +629,6 @@
     }
 }
 
-/* Мобильные устройства */
 @media (max-width: 768px) {
     :root {
         --font-size-base: 14px;
@@ -615,12 +637,13 @@
     }
 
     .container {
-        margin-top: 8rem;
+        margin-top: 0rem;
         padding: 0 12px;
     }
 
     .faw-history-title {
-        margin-bottom: 2rem;
+        margin-top: 3rem;
+        margin-bottom: 3rem;
     }
 
     .faw-history-title h2 {
@@ -714,7 +737,6 @@
     }
 }
 
-/* Маленькие мобильные */
 @media (max-width: 480px) {
     :root {
         --font-size-base: 13px;
@@ -722,7 +744,7 @@
     }
 
     .container {
-        margin-top: 6rem;
+        margin-top: 0rem;
         padding: 0 8px;
     }
 
