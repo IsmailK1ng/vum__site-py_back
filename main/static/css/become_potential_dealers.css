@@ -1,6 +1,3 @@
-/* ========================================
-   BASE STYLES
-   ======================================== */
 
 :root {
     --title-size-desktop: 6rem;
@@ -38,7 +35,7 @@
 }
 
 .intro-text p {
-    font-size: 2rem;
+    font-size: 3rem;
     line-height: 1.8;
     font-weight: 400;
     color: #333;
@@ -66,7 +63,7 @@
     margin-bottom: 1.5rem;
     position: relative;
     font-weight: 400;
-    font-size: 2rem;
+    font-size: 3rem;
 }
 
 .dealer-requirements li::before {
@@ -150,11 +147,11 @@
     .intro-text p,
     .dealer-requirements li,
     .important-note {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
 
     .section-subtitle {
-        font-size: 3rem;
+        font-size: 4rem;
         margin: 3rem 0 3rem;
     }
 

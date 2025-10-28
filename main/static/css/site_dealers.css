@@ -247,7 +247,6 @@
 }
 
 /* ========== МОДАЛЬНОЕ ОКНО ========== */
-/* ========== МОДАЛЬНОЕ ОКНО ========== */
 .modal {
     display: none;
     position: fixed;
@@ -373,7 +372,7 @@
 }
 
 /* ========== СТИЛИ ДЛЯ YANDEX MAPS ========== */
-/* Стили для одиночных маркеров */
+
 ymaps[class*="placemark"] {
     border-radius: 50% !important;
     border: 3px solid #0a2883 !important;
@@ -382,7 +381,7 @@ ymaps[class*="placemark"] {
     box-shadow: 0 4px 12px rgba(10, 40, 131, 0.3) !important;
 }
 
-/* ========== ИНФОРМАЦИЯ О ДИЛЕРЕ ========== */
+
 /* ========== ИНФОРМАЦИЯ О ДИЛЕРЕ ========== */
 .dealer-info {
     display: grid;
@@ -482,7 +481,6 @@ ymaps[class*="placemark"] {
     box-shadow: 0 2px 8px rgba(10, 40, 131, 0.3);
 }
 
-/* ========== КНОПКИ КОНТАКТОВ ========== */
 /* ========== КНОПКИ КОНТАКТОВ ========== */
 .contact-buttons {
     display: grid;

@@ -153,7 +153,8 @@
     <!-- Scripts -->
     <script src="{% static 'js/libs.min.js' %}"></script>
     <script src="{% static 'js/app.js' %}"></script>
-    <script src="{% static 'faw-js/faw.js' %}"></script>
+    <script src="{% static 'js/faw.js' %}"></script>
+
     <script src="https://api-maps.yandex.ru/2.1/?apikey=145cca7b-9118-4b72-b7b6-261dbc414620&lang=ru_RU"></script>
 
     <script>
@@ -491,7 +492,7 @@
                 }
             });
 
-            // КРИТИЧЕСКИ ВАЖНО: блокируем скролл страницы когда модалка открыта
+        
             modal.addEventListener('wheel', (e) => {
                 e.stopPropagation();
             }, { passive: true });
