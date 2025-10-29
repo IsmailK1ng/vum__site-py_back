@@ -18,11 +18,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   <!-- Template Favicon & Icons Start -->
-    <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
-    <link rel="apple-touch-icon" href="{% static 'images/icon/_iiiiapple.png' %}" />
-    <link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/icon/_iiii176.png' %}" />
-    <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/icon/_iiii1156.png' %}" />
-    <link rel="apple-touch-startup-image" href="{% static 'images/icon/_iiii1.png' %}" />
+  <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="{% static 'images/icon/_iiiiapple.png' %}" />
+  <link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/icon/_iiii176.png' %}" />
+  <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/icon/_iiii1156.png' %}" />
+  <link rel="apple-touch-startup-image" href="{% static 'images/icon/_iiii1.png' %}" />
   <!-- Template Favicon & Icons End -->
 
   <!-- Facebook Metadata Start -->
@@ -1189,5 +1189,107 @@
   <!-- <script src="template/js/app.js"></script> -->
   <script src="{% static 'js/faw.js' %}"></script>
   <script src="{% static 'js/about.js' %}"></script>
+  <script>
+    // ========== МОДАЛЬНОЕ ОКНО ДЛЯ ИСТОРИИ ==========
+    document.addEventListener('DOMContentLoaded', function () {
+      const modal = document.getElementById('modal');
+      const modalImage = document.getElementById('modal-image');
+      const modalTitle = document.getElementById('modal-title');
+      const modalDescription = document.getElementById('modal-description');
+      const closeBtn = document.querySelector('.close');
+
+      // Находим все карточки в marquee
+      const historyCards = document.querySelectorAll('.marquee__item.image .marquee__link');
+
+      // Обработчик для каждой карточки
+      historyCards.forEach(card => {
+        card.addEventListener('click', function (e) {
+          e.preventDefault();
+
+          // Получаем данные из карточки
+          const img = this.querySelector('img');
+          const title = this.querySelector('.history-section-elemet_title');
+          const description = this.querySelector('.mxd-section.text');
+
+          // Заполняем модальное окно
+          if (img) modalImage.src = img.src;
+          if (title) modalTitle.innerHTML = title.innerHTML;
+          if (description) modalDescription.innerHTML = description.innerHTML;
+
+          // Показываем модальное окно
+          modal.style.display = 'flex';
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      // Закрытие модального окна
+      function closeModal() {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+
+      // Клик по кнопке закрытия
+      if (closeBtn) {
+        closeBtn.addEventListener('click', closeModal);
+      }
+
+      // Клик вне модального окна
+      window.addEventListener('click', function (e) {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+
+      // Закрытие по ESC
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.style.display === 'flex') {
+          closeModal();
+        }
+      });
+    });
+
+    // ========== СЧЕТЧИКИ СТАТИСТИКИ ==========
+    function animateCounter(element, target, duration = 2000) {
+      let current = 0;
+      const increment = target / (duration / 16);
+
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          element.textContent = target.toLocaleString();
+          clearInterval(timer);
+        } else {
+          element.textContent = Math.floor(current).toLocaleString();
+        }
+      }, 16);
+    }
+
+    // Запуск счетчиков при видимости
+    const counters = [
+      { id: 'stats-counter-1', value: 6000000 },
+      { id: 'stats-counter-2', value: 150 },
+      { id: 'stats-counter-3', value: 70 },
+      { id: 'stats-counter-4', value: 5000 }
+    ];
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const counterId = entry.target.id;
+          const counter = counters.find(c => c.id === counterId);
+          if (counter) {
+            animateCounter(entry.target, counter.value);
+            observer.unobserve(entry.target);
+          }
+        }
+      });
+    }, { threshold: 0.5 });
+
+    counters.forEach(counter => {
+      const element = document.getElementById(counter.id);
+      if (element) observer.observe(element);
+    });
+  </script>
 </body>
+
 </html>

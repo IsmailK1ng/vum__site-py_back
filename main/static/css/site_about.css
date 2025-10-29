@@ -242,7 +242,7 @@ p.t-140 {
 .marquee__text {
   position: absolute;
   inset: auto 0 0;
-  padding: clamp(10px, 2.5vw, 24px);
+  padding: 0rem 2rem 1rem 2rem;
   color: var(--t-opp-bright);
   font-size: clamp(1.2rem, 2.5vw, 3rem);
   z-index: 3;
@@ -576,7 +576,7 @@ p.t-140 {
 @media (max-width: 767px) {
   .mxd-divider {
     border-radius: 0;
-    height: 400px;
+    height: 401px;
   }
 
   .mxd-container {
@@ -652,7 +652,7 @@ p.t-140 {
   }
 
   .swiper-testimonials {
-    padding-bottom: 5rem;
+    padding-bottom: 8rem;
   }
 }
 
@@ -742,4 +742,215 @@ p.t-140 {
   .mxd-stats-number {
     font-size: 9rem;
   }
+}
+
+/* ========================================
+   ТЕМНАЯ ТЕМА (ЧЕРНО-БЕЛАЯ)
+======================================== */
+body[data-theme="dark"] {
+  --t-bright: #ffffff;
+  --t-opp-bright: #000000;
+  --t-muted: #a3a3a3;
+  --base-tint: #1a1a1a;
+  --bg-card: #262626;
+  --bg-card-hover: #333333;
+  --radius-m: 12px;
+}
+
+/* Типографика */
+body[data-theme="dark"] h2 {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .faw-history-title h2 {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] p.t-bright {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .pw-text-style-overline,
+body[data-theme="dark"] .pw-text-style-hl--xl,
+body[data-theme="dark"] .pw-text-style-intro,
+body[data-theme="dark"] .inner-headline__text {
+  color: #ffffff;
+}
+
+/* Секции */
+body[data-theme="dark"] .mxd-section.text {
+  color: #e5e5e5;
+}
+
+/* Видео баннер */
+body[data-theme="dark"] .mxd-divider__video .text-overlay {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.98), rgba(0, 0, 0, 0.85) 30%, transparent 100%);
+}
+
+/* Статистика */
+body[data-theme="dark"] .stats-bar {
+  border-top-color: rgba(255, 255, 255, 0.15);
+}
+
+body[data-theme="dark"] .stat-value {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .stat-label {
+  color: #a3a3a3;
+}
+
+/* Счетчики */
+body[data-theme="dark"] .mxd-stats-number {
+  color: #ffffff;
+}
+
+/* Marquee (лента истории) */
+body[data-theme="dark"] .marquee__item {
+  background: #1a1a1a;
+}
+
+body[data-theme="dark"] .marquee__overlay {
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.9));
+}
+
+body[data-theme="dark"] .marquee__text {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .marquee__text span {
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.95);
+}
+
+/* Модальные окна */
+body[data-theme="dark"] .modal {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+body[data-theme="dark"] .modal-content {
+  background: #1a1a1a;
+  box-shadow: 0 40px 60px rgba(0, 0, 0, 0.8);
+}
+
+body[data-theme="dark"] .modal-text {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .history-section-elemet_title {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .close {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .close:hover {
+  color: #999999;
+}
+
+/* Партнеры */
+body[data-theme="dark"] .mxd-partners-cards__inner::before {
+  background: #1a1a1a;
+  border: 1px solid #333333;
+}
+
+body[data-theme="dark"] .no-touch .mxd-partners-cards__inner:hover::before {
+  background: #262626;
+}
+
+body[data-theme="dark"] .mxd-partners-cards__logo img {
+  filter: brightness(0) invert(1);
+}
+
+/* Отзывы (Testimonials) */
+body[data-theme="dark"] .mxd-testimonials-card {
+  background: #1a1a1a;
+  border-color: #333333;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+body[data-theme="dark"] .swiper-slide-active .mxd-testimonials-card {
+  border-color: #404040;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+}
+
+body[data-theme="dark"] .mxd-testimonials-card__name {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .mxd-testimonials-card__position {
+  color: #a3a3a3;
+}
+
+body[data-theme="dark"] .mxd-testimonials-card__text p {
+  color: #e5e5e5;
+}
+
+body[data-theme="dark"] .mxd-testimonials-card__video {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+}
+
+/* Swiper пагинация и навигация */
+body[data-theme="dark"] .swiper-pagination-bullet {
+  background: #666666;
+  opacity: 0.5;
+}
+
+body[data-theme="dark"] .swiper-pagination-bullet-active {
+  background: #ffffff;
+  opacity: 1;
+}
+
+body[data-theme="dark"] .swiper-button-next,
+body[data-theme="dark"] .swiper-button-prev {
+  color: #ffffff;
+}
+
+/* Тени для Swiper */
+body[data-theme="dark"] .testimonials-slider__shadow {
+  background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
+}
+
+/* Дополнительные элементы */
+body[data-theme="dark"] .hero-00-manifest .mxd-manifest {
+  color: #ffffff;
+}
+
+/* Модальное окно - улучшенные стили */
+body[data-theme="dark"] .modal {
+  background: rgba(0, 0, 0, 0.90);
+  backdrop-filter: blur(8px);
+}
+
+body[data-theme="dark"] .modal-content {
+  background: #1a1a1a;
+  box-shadow: 0 40px 60px rgba(0, 0, 0, 0.9);
+  border: 1px solid #333333;
+}
+
+body[data-theme="dark"] .modal-text {
+  color: #ffffff;
+  background: #1a1a1a;
+}
+
+body[data-theme="dark"] .history-section-elemet_title {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .close {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+body[data-theme="dark"] .close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
 }

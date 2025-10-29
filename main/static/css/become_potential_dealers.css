@@ -358,7 +358,7 @@ body[data-theme="dark"] .faw-history-title h2 {
 }
 
 body[data-theme="dark"] .intro-text p {
-    color: #ACACAC !important;
+    color: #ffffff !important;
 }
 
 body[data-theme="dark"] .section-subtitle,
@@ -368,7 +368,7 @@ body[data-theme="dark"] h4.section-subtitle {
 }
 
 body[data-theme="dark"] .dealer-requirements li {
-    color: #ACACAC !important;
+    color: #ffffff !important;
 }
 
 body[data-theme="dark"] .dealer-requirements li::before {
@@ -391,7 +391,7 @@ body[data-theme="dark"] .contact-info {
 }
 
 body[data-theme="dark"] .contact-info__description {
-    color: #ACACAC !important;
+    color: #ffffff !important;
 }
 
 body[data-theme="dark"] .contact-detail__icon {
