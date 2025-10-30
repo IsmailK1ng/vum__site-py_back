@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-    <title>Diler bo'lish | FAW Trucks Uzbekistan</title>
+    <title>{{ page_data.title }} | FAW Trucks Uzbekistan</title>
 
     <!-- SEO Meta -->
     <meta name="description" content="FAW Trucks dileri bo'lish - avtomobil texnikasini sotish va servis xizmatlari" />
@@ -21,7 +21,7 @@
     <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/icon/_iiii1156.png' %}" />
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Diler bo'lish | FAW Trucks" />
+    <meta property="og:title" content="{{ page_data.title }} | FAW Trucks" />
     <meta property="og:description" content="FAW Trucks dileri bo'lish imkoniyati" />
     <meta property="og:url" content="https://fawtrucks.uz/become-dealer" />
     <meta property="og:image" content="{% static 'images/og-image.jpg' %}" />
@@ -72,7 +72,7 @@
                     <div class="section-filter">
                         <ol class="breadcrumb-ol">
                             <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
-                            <li class="active" aria-current="page">Diler bo'lish</li>
+                            <li class="active" aria-current="page">{{ page_data.title }}</li>
                         </ol>
                     </div>
                 </div>
@@ -82,41 +82,40 @@
         <!-- Page Title & Content -->
         <article class="dealer-content">
             <header class="faw-history-title fade-in reveal-type anim-uni-in-up">
-                <h1>Qanday qilib diler bo'lish mumkin</h1>
+                <h1>{{ page_data.title }}</h1>
             </header>
 
             <!-- Intro Text -->
             <div class="intro-text">
-                <p>
-                    FAW Trucks dileri maqomiga ega bo'lishni istagan tijorat kompaniyasi
-                    avtomobil texnikasini sotish bo'yicha tegishli tajribaga ega bo'lishi
-                    kerak. Shuningdek, potensial diler o'z hududidagi avtotexnika bozorini
-                    bilishi lozim: uning sig'imi, tuzilmasi va yuk avtomobillari parki
-                    holati, raqobatchilar va asosiy mijozlar faoliyati.
-                </p>
+                <p>{{ page_data.intro_text|safe }}</p>
             </div>
 
             <!-- Section Subtitle -->
-            <h4 class="section-subtitle">Potensial diler kompaniyasining minimal tarkibi:</h4>
+            <h4 class="section-subtitle">{{ page_data.subtitle }}</h4>
 
             <!-- Requirements List -->
             <ul class="dealer-requirements">
-                <li>Tijorat bo'limi (kamida ikki kishi)</li>
-                <li>Reklama bo'limi</li>
-                <li>Tayyor texnika uchun ombor-avtoturargoh</li>
-                <li>Ehtiyot qismlar ombori</li>
-                <li>Texnik xizmat ko'rsatish uchun sertifikatlangan servis markazi</li>
-                <li>Texnik xizmat ko'rsatish uchun sertifikatlangan mobil servis</li>
-                <li>Sertifikatlangan va malakali servis markazi hamda savdo bo'limi mutaxassislari</li>
+                {% for requirement in requirements %}
+                    <li>{{ requirement.text }}</li>
+                {% empty %}
+                    <li>Tijorat bo'limi (kamida ikki kishi)</li>
+                    <li>Reklama bo'limi</li>
+                    <li>Tayyor texnika uchun ombor-avtoturargoh</li>
+                    <li>Ehtiyot qismlar ombori</li>
+                    <li>Texnik xizmat ko'rsatish uchun sertifikatlangan servis markazi</li>
+                    <li>Texnik xizmat ko'rsatish uchun sertifikatlangan mobil servis</li>
+                    <li>Sertifikatlangan va malakali servis markazi hamda savdo bo'limi mutaxassislari</li>
+                {% endfor %}
             </ul>
 
             <!-- Important Note -->
             <p class="important-note">
-                <strong>Servis markazi omborida doimiy ravishda asl ehtiyot qismlar (GOF) saqlanishi shart.</strong>
+                <strong>{{ page_data.important_note|safe }}</strong>
             </p>
         </article>
+
         <!-- Contact Form Section -->
-        <section class="mxd-section" id="faw-main-contact-form" aria-labelledby="contact-heading">
+        <section class="mxd-section" id="faw-dealer-form-section" aria-labelledby="contact-heading">
             <div class="mxd-container mxd-form-container">
                 <div class="container-fluid px-0">
                     <div class="row gx-0">
@@ -137,8 +136,8 @@
                                             </div>
                                             <div class="contact-detail__content">
                                                 <h3 class="contact-detail__title">Telefon</h3>
-                                                <a href="tel:+998712345678" class="contact-detail__value">
-                                                    +998 71 234-56-78
+                                                <a href="tel:{{ page_data.contact_phone }}" class="contact-detail__value">
+                                                    {{ page_data.contact_phone }}
                                                 </a>
                                             </div>
                                         </div>
@@ -149,8 +148,8 @@
                                             </div>
                                             <div class="contact-detail__content">
                                                 <h3 class="contact-detail__title">Email</h3>
-                                                <a href="mailto:info@fawtrucks.uz" class="contact-detail__value">
-                                                    info@fawtrucks.uz
+                                                <a href="mailto:{{ page_data.contact_email }}" class="contact-detail__value">
+                                                    {{ page_data.contact_email }}
                                                 </a>
                                             </div>
                                         </div>
@@ -162,7 +161,7 @@
                                             <div class="contact-detail__content">
                                                 <h3 class="contact-detail__title">Manzil</h3>
                                                 <address class="contact-detail__value">
-                                                    Toshkent, Abdulla Kaxxar ko'chasi 2А
+                                                    {{ page_data.contact_address }}
                                                 </address>
                                             </div>
                                         </div>
@@ -177,7 +176,7 @@
                                 <div class="mxd-block__inner-form loading__fade">
                                     <div class="form-container">
                                         <!-- Success Message -->
-                                        <div class="form__reply centered text-center" role="alert" aria-live="polite">
+                                        <div class="form__reply centered text-center" style="display: none;" role="alert" aria-live="polite">
                                             <i class="ph-fill ph-smiley-wink reply__icon" aria-hidden="true"></i>
                                             <p class="reply__title">Bajarildi!</p>
                                             <span class="reply__text">
@@ -186,24 +185,33 @@
                                         </div>
 
                                         <!-- Form -->
-                                        <form class="form contact-form" method="post" novalidate>
+                                        <form class="form contact-form" id="becomeADealerForm" method="post" novalidate>
+                                            {% csrf_token %}
                                             <input type="hidden" name="project_name" value="FAW Trucks" />
-                                            <input type="hidden" name="admin_email" value="info@fawtrucks.uz" />
+                                            <input type="hidden" name="admin_email" value="{{ page_data.contact_email }}" />
                                             <input type="hidden" name="form_subject" value="FAW Dealer Inquiry" />
 
                                             <div class="container-fluid p-0">
                                                 <div class="row gx-0">
                                                     <div class="col-12 mxd-grid-item anim-uni-in-up">
-                                                        <label for="name" class="visually-hidden">F.I.SH</label>
-                                                        <input type="text" id="name" name="Name" placeholder="F.I.SH*"
-                                                            required autocomplete="name" />
+                                                        <label for="dealer_name" class="visually-hidden">F.I.SH</label>
+                                                        <input type="text" id="dealer_name" name="Name" placeholder="F.I.SH*" required autocomplete="name" />
                                                     </div>
 
                                                     <div class="col-12 mxd-grid-item anim-uni-in-up">
-                                                        <label for="region" class="visually-hidden">Viloyat</label>
-                                                        <select id="region" name="Region" required>
-                                                            <option value="" disabled selected>Viloyatni tanlang*
-                                                            </option>
+                                                        <label for="dealer_company" class="visually-hidden">Kompaniya</label>
+                                                        <input type="text" id="dealer_company" name="Company" placeholder="Kompaniya nomi (ixtiyoriy)" autocomplete="organization" />
+                                                    </div>
+
+                                                    <div class="col-12 mxd-grid-item anim-uni-in-up">
+                                                        <label for="dealer_experience" class="visually-hidden">Tajriba</label>
+                                                        <input type="number" id="dealer_experience" name="Experience" placeholder="Tajriba (yil)" min="0" max="50" />
+                                                    </div>
+
+                                                    <div class="col-12 mxd-grid-item anim-uni-in-up">
+                                                        <label for="dealer_region" class="visually-hidden">Viloyat</label>
+                                                        <select id="dealer_region" name="Region" required>
+                                                            <option value="" disabled selected>Viloyatni tanlang*</option>
                                                             <option value="Toshkent shahri">Toshkent shahri</option>
                                                             <option value="Andijon viloyati">Andijon viloyati</option>
                                                             <option value="Buxoro viloyati">Buxoro viloyati</option>
@@ -212,37 +220,27 @@
                                                             <option value="Xorazm viloyati">Xorazm viloyati</option>
                                                             <option value="Namangan viloyati">Namangan viloyati</option>
                                                             <option value="Navoiy viloyati">Navoiy viloyati</option>
-                                                            <option value="Qashqadaryo viloyati">Qashqadaryo viloyati
-                                                            </option>
-                                                            <option value="Samarqand viloyati">Samarqand viloyati
-                                                            </option>
+                                                            <option value="Qashqadaryo viloyati">Qashqadaryo viloyati</option>
+                                                            <option value="Samarqand viloyati">Samarqand viloyati</option>
                                                             <option value="Sirdaryo viloyati">Sirdaryo viloyati</option>
-                                                            <option value="Surxondaryo viloyati">Surxondaryo viloyati
-                                                            </option>
+                                                            <option value="Surxondaryo viloyati">Surxondaryo viloyati</option>
                                                             <option value="Toshkent viloyati">Toshkent viloyati</option>
-                                                            <option value="Qoraqalpogʻiston Respublikasi">
-                                                                Qoraqalpogʻiston Respublikasi</option>
+                                                            <option value="Qoraqalpogʻiston Respublikasi">Qoraqalpogʻiston Respublikasi</option>
                                                         </select>
                                                     </div>
 
                                                     <div class="col-12 mxd-grid-item anim-uni-in-up">
-                                                        <label for="phone" class="visually-hidden">Telefon</label>
-                                                        <input type="tel" id="phone" name="Phone"
-                                                            placeholder="Telefon raqami" pattern="[+]*[0-9\s\-\(\)]*"
-                                                            autocomplete="tel" />
+                                                        <label for="dealer_phone" class="visually-hidden">Telefon</label>
+                                                        <input type="tel" id="dealer_phone" name="Phone" placeholder="Telefon raqami*" required pattern="[+]*[0-9\s\-\(\)]*" autocomplete="tel" />
                                                     </div>
 
                                                     <div class="col-12 mxd-grid-item anim-uni-in-up">
-                                                        <label for="message" class="visually-hidden">Xabar</label>
-                                                        <textarea id="message" name="Message"
-                                                            placeholder="Qo'shimcha savol*" required
-                                                            rows="5"></textarea>
+                                                        <label for="dealer_message" class="visually-hidden">Xabar</label>
+                                                        <textarea id="dealer_message" name="Message" placeholder="Qo'shimcha savol*" required rows="5"></textarea>
                                                     </div>
 
                                                     <div class="col-12 mxd-grid-item anim-uni-in-up">
-                                                        <button
-                                                            class="btn btn-anim btn-default btn-large btn-opposite slide-right-up shimmer-btn"
-                                                            type="submit">
+                                                        <button class="btn btn-anim btn-default btn-large btn-opposite slide-right-up shimmer-btn" type="submit">
                                                             <span class="btn-caption">Jo'natish</span>
                                                             <span class="shimmer" aria-hidden="true"></span>
                                                             <i class="ph-bold ph-arrow-up-right" aria-hidden="true"></i>

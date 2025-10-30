@@ -2,10 +2,12 @@ from modeltranslation.translator import register, TranslationOptions
 from .models import (
     News, NewsBlock, Vacancy, 
     VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
-    Product, ProductFeature, ProductCardSpec, ProductParameter
+    Product, ProductFeature, ProductCardSpec, ProductParameter,
+    DealerService, Dealer, BecomeADealerPage, DealerRequirement
 )
 
 
+# ========== НОВОСТИ ==========
 @register(News)
 class NewsTranslationOptions(TranslationOptions):
     fields = ('title', 'desc')
@@ -16,6 +18,7 @@ class NewsBlockTranslationOptions(TranslationOptions):
     fields = ('text',)
 
 
+# ========== ВАКАНСИИ ==========
 @register(Vacancy)
 class VacancyTranslationOptions(TranslationOptions):
     fields = ('title', 'short_description', 'contact_info')
@@ -41,6 +44,7 @@ class VacancyIdealCandidateTranslationOptions(TranslationOptions):
     fields = ('text',)
 
 
+# ========== ПРОДУКТЫ ==========
 @register(Product)
 class ProductTranslationOptions(TranslationOptions):
     fields = ('title',)
@@ -58,4 +62,25 @@ class ProductCardSpecTranslationOptions(TranslationOptions):
 
 @register(ProductParameter)
 class ProductParameterTranslationOptions(TranslationOptions):
+    fields = ('text',)
+
+
+# ========== ДИЛЕРЫ ==========
+@register(DealerService)
+class DealerServiceTranslationOptions(TranslationOptions):
+    fields = ('name',)
+
+
+@register(Dealer)
+class DealerTranslationOptions(TranslationOptions):
+    fields = ('address', 'working_hours')
+
+
+@register(BecomeADealerPage)
+class BecomeADealerPageTranslationOptions(TranslationOptions):
+    fields = ('title', 'intro_text', 'subtitle', 'important_note', 'contact_address')
+
+
+@register(DealerRequirement)
+class DealerRequirementTranslationOptions(TranslationOptions):
     fields = ('text',)

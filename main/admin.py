@@ -1,11 +1,13 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from modeltranslation.admin import TabbedTranslationAdmin, TranslationTabularInline, TranslationStackedInline
+from modeltranslation.admin import TranslationAdmin, TranslationTabularInline, TranslationStackedInline, TabbedTranslationAdmin
+from nested_admin import NestedModelAdmin, NestedStackedInline, NestedTabularInline
 from .models import (
-    News, NewsBlock, ContactForm, Vacancy, JobApplication, 
+    News, NewsBlock, ContactForm, Vacancy, 
     VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
-    Product, ProductFeature, ProductCardSpec, ProductGallery, ProductParameter,
-    FeatureIcon,
+    JobApplication, FeatureIcon, Product, ProductParameter, ProductFeature, 
+    ProductCardSpec, ProductGallery, DealerService, Dealer,
+    BecomeADealerPage, DealerRequirement, BecomeADealerApplication
 )
 import nested_admin
 import openpyxl
@@ -171,13 +173,13 @@ class VacancyAdmin(TabbedTranslationAdmin):
     inlines = [VacancyResponsibilityInline, VacancyRequirementInline, VacancyIdealCandidateInline, VacancyConditionInline]
     
     fieldsets = (
-        ('📋 Основная информация', {
+        ('Основная информация', {
             'fields': ('title', 'slug', 'short_description', 'is_active', 'order')
         }),
-        ('📞 Контактная информация', {
+        ('Контактная информация', {
             'fields': ('contact_info',)
         }),
-        ('📊 Статистика', {
+        ('Статистика', {
             'fields': ('applications_count', 'created_at', 'updated_at'),
             'classes': ('collapse',)
         }),
@@ -187,7 +189,7 @@ class VacancyAdmin(TabbedTranslationAdmin):
         count = obj.get_applications_count()
         if count > 0:
             return format_html(
-                '<a href="/admin/main/jobapplication/?vacancy__id__exact={}" style="color:#007bff;font-weight:bold;">📋 {} заявок</a>',
+                '<a href="/admin/main/jobapplication/?vacancy__id__exact={}" style="color:#007bff;font-weight:bold;"> {} заявок</a>',
                 obj.id, count
             )
         return '0 заявок'
@@ -204,15 +206,15 @@ class JobApplicationAdmin(admin.ModelAdmin):
     autocomplete_fields = ['vacancy']
     
     fieldsets = (
-        ('📋 Информация о заявке', {'fields': ('vacancy', 'region', 'created_at')}),
-        ('📄 Резюме', {'fields': ('resume', 'file_size_display', 'resume_preview')}),
-        ('👤 Контакты кандидата', {'fields': ('applicant_name', 'applicant_phone', 'applicant_email')}),
-        ('✅ Обработка', {'fields': ('is_processed', 'admin_comment'), 'classes': ('wide',)}),
+        ('Информация о заявке', {'fields': ('vacancy', 'region', 'created_at')}),
+        ('Резюме', {'fields': ('resume', 'file_size_display', 'resume_preview')}),
+        ('Контакты кандидата', {'fields': ('applicant_name', 'applicant_phone', 'applicant_email')}),
+        ('Обработка', {'fields': ('is_processed', 'admin_comment'), 'classes': ('wide',)}),
     )
     
     def resume_link(self, obj):
         if obj.resume:
-            return format_html('<a href="{}" target="_blank" style="color:#007bff;font-weight:bold;">📥 Скачать</a>', obj.resume.url)
+            return format_html('<a href="{}" target="_blank" style="color:#007bff;font-weight:bold;"> Скачать</a>', obj.resume.url)
         return "—"
     resume_link.short_description = 'Резюме'
     
@@ -226,14 +228,14 @@ class JobApplicationAdmin(admin.ModelAdmin):
             file_ext = obj.resume.name.split('.')[-1].lower()
             if file_ext in ['jpg', 'jpeg', 'png']:
                 return format_html('<img src="{}" width="300" style="border-radius:8px;">', obj.resume.url)
-            return format_html('<p style="color:#888;">📄 {}</p>', obj.resume.name)
+            return format_html('<p style="color:#888;"> {}</p>', obj.resume.name)
         return "—"
     resume_preview.short_description = 'Превью'
     
     def is_processed_badge(self, obj):
         if obj.is_processed:
-            return format_html('<span style="color:green;font-weight:bold;">✅ Рассмотрено</span>')
-        return format_html('<span style="color:orange;font-weight:bold;">⏳ Новая</span>')
+            return format_html('<span style="color:green;font-weight:bold;"> Рассмотрено</span>')
+        return format_html('<span style="color:orange;font-weight:bold;">Новая</span>')
     is_processed_badge.short_description = 'Статус'
 
 # ============ ИКОНКИ ============
@@ -251,6 +253,213 @@ class FeatureIconAdmin(admin.ModelAdmin):
     icon_preview.short_description = "Иконка"
 
 
+
+# ============ ДИЛЕРЫ ============
+
+@admin.register(DealerService)
+class DealerServiceAdmin(TabbedTranslationAdmin):
+    """Админка для услуг дилеров"""
+    list_display = ['name', 'slug', 'order', 'is_active']
+    list_editable = ['order', 'is_active']
+    search_fields = ['name']
+    prepopulated_fields = {'slug': ('name',)}
+    
+    def has_delete_permission(self, request, obj=None):
+        """Защита базовых услуг от удаления"""
+        if obj and obj.slug in ['sotuv', 'servis', 'ehtiyot-qismlar']:
+            return False  # Нельзя удалить базовые услуги
+        return super().has_delete_permission(request, obj)
+
+
+@admin.register(Dealer)
+class DealerAdmin(TabbedTranslationAdmin):
+    """Админка для дилеров"""
+    list_display = [
+        'logo_preview', 'name', 'city', 'phone', 
+        'services_list', 'is_active', 'order'
+    ]
+    list_filter = ['is_active', 'city', 'services']
+    search_fields = ['name', 'city', 'address', 'manager']
+    list_editable = ['is_active', 'order']
+    readonly_fields = ['logo_preview', 'created_at', 'updated_at']
+    filter_horizontal = ['services']  # Удобный виджет для выбора услуг
+    
+    fieldsets = (
+        ('Основная информация', {
+            'fields': ('name', 'city', 'address', 'logo', 'logo_preview')
+        }),
+        ('Координаты на карте', {
+            'fields': ('latitude', 'longitude'),
+            'description': 'Получить координаты можно на yandex.uz Яндекс.Картах (ПКМ на точке → "Что здесь?")'
+        }),
+        ('Контактная информация', {
+            'fields': ('phone', 'email', 'website', 'manager')
+        }),
+        ('Рабочее время', {
+            'fields': ('working_hours',),
+            'description': 'Используйте &lt;br&gt; для переноса строки. Пример: Du-Ju: 9:00-20:00&lt;br&gt;Sha: Dam olish'
+        }),
+        ('Услуги', {
+            'fields': ('services',)
+        }),
+        ('Настройки', {
+            'fields': ('is_active', 'order', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def logo_preview(self, obj):
+        """Превью логотипа"""
+        if obj.logo:
+            return format_html(
+                '<img src="{}" width="80" height="50" style="object-fit:contain;border-radius:4px;"/>',
+                obj.logo.url
+            )
+        return "—"
+    logo_preview.short_description = "Лого"
+    
+    def services_list(self, obj):
+        """Список услуг дилера"""
+        services = obj.services.all()
+        if services:
+            tags = ' '.join([
+                f'<span style="background:#e3f2fd;color:#1976d2;padding:4px 8px;border-radius:4px;font-size:11px;margin-right:4px;">{s.name}</span>'
+                for s in services
+            ])
+            return format_html(tags)
+        return "—"
+    services_list.short_description = "Услуги"
+
+
+# ============ СТРАНИЦА "СТАТЬ ДИЛЕРОМ" ============
+
+class DealerRequirementInline(TranslationTabularInline):
+    """Inline для списка требований"""
+    model = DealerRequirement
+    extra = 1
+    fields = ('text', 'order')
+    verbose_name = "Требование"
+    verbose_name_plural = "Список требований"
+
+
+@admin.register(BecomeADealerPage)
+class BecomeADealerPageAdmin(TabbedTranslationAdmin):
+    """Админка для страницы 'Стать дилером' (Singleton)"""
+    
+    fieldsets = (
+        ('Контент страницы', {
+            'fields': ('title', 'intro_text', 'subtitle', 'important_note')
+        }),
+        ('Контактная информация (в форме)', {
+            'fields': ('contact_phone', 'contact_email', 'contact_address')
+        }),
+    )
+    
+    inlines = [DealerRequirementInline]
+    
+    def has_add_permission(self, request):
+        """Запретить создание новых записей (Singleton)"""
+        return not BecomeADealerPage.objects.exists()
+    
+    def has_delete_permission(self, request, obj=None):
+        """Запретить удаление единственной записи"""
+        return False
+    
+    def changelist_view(self, request, extra_context=None):
+        """Автоматически открывать форму редактирования"""
+        obj = BecomeADealerPage.get_instance()
+        return self.changeform_view(request, str(obj.pk), '', extra_context)
+
+
+# ============ ЗАЯВКИ НА ДИЛЕРСТВО ============
+
+@admin.register(BecomeADealerApplication)
+class BecomeADealerApplicationAdmin(admin.ModelAdmin):
+    """Админка для заявок на дилерство"""
+    list_display = [
+        'dealer_badge', 'name', 'company_name', 'phone', 'region', 
+        'experience_years', 'status', 'priority', 'manager', 'created_at'
+    ]
+    list_filter = ['status', 'priority', 'region', 'created_at']
+    search_fields = ['name', 'company_name', 'phone', 'message']
+    list_editable = ['status', 'priority', 'manager']
+    readonly_fields = ['created_at']
+    autocomplete_fields = ['manager']
+    date_hierarchy = 'created_at'
+    actions = ['export_to_excel']
+    
+    fieldsets = (
+        ('Информация о заявителе', {
+            'fields': ('name', 'company_name', 'experience_years', 'region', 'phone')
+        }),
+        ('Сообщение', {
+            'fields': ('message',)
+        }),
+        ('Управление заявкой', {
+            'fields': ('status', 'priority', 'manager', 'admin_comment', 'created_at')
+        }),
+    )
+    
+    def dealer_badge(self, obj):
+        """Бейдж 'Заявка на дилерство'"""
+        return format_html(
+            '<span style="background:#ff9800;color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;"> ДИЛЕРСТВО</span>'
+        )
+    dealer_badge.short_description = "Тип"
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        """Настройки для выбора менеджера"""
+        formfield = super().formfield_for_foreignkey(db_field, request, **kwargs)
+        if db_field.name == "manager":
+            formfield.widget.can_add_related = False
+            formfield.widget.can_change_related = False
+            formfield.widget.can_delete_related = False
+            formfield.widget.can_view_related = False
+        return formfield
+    
+    def export_to_excel(self, request, queryset):
+        """Экспорт заявок в Excel"""
+        import openpyxl
+        from django.http import HttpResponse
+        from datetime import datetime
+        
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Заявки на дилерство"
+        
+        headers = ['№', 'ФИО', 'Компания', 'Опыт (лет)', 'Регион', 'Телефон', 'Статус', 'Приоритет', 'Менеджер', 'Дата']
+        ws.append(headers)
+        
+        from openpyxl.styles import Font, PatternFill, Alignment
+        header_fill = PatternFill(start_color='FF9800', end_color='FF9800', fill_type='solid')
+        header_font = Font(bold=True, color='FFFFFF')
+        
+        for cell in ws[1]:
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+        
+        for idx, app in enumerate(queryset, start=1):
+            ws.append([
+                idx, app.name, app.company_name or '-', app.experience_years or '-',
+                app.get_region_display(), app.phone,
+                app.get_status_display(), app.get_priority_display(),
+                app.manager.username if app.manager else '-',
+                app.created_at.strftime('%d.%m.%Y %H:%M')
+            ])
+        
+        for column in ws.columns:
+            max_length = max(len(str(cell.value)) for cell in column)
+            ws.column_dimensions[column[0].column_letter].width = min(max_length + 2, 50)
+        
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="dealer_applications_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+        wb.save(response)
+        return response
+    
+    export_to_excel.short_description = '📥 Экспорт в Excel'
 # ============ ПРОДУКТЫ - ПРОСТАЯ ВЕРСИЯ БЕЗ ВЛОЖЕННОСТИ ============
 
 class ProductParameterInline(TranslationTabularInline):
@@ -259,7 +468,7 @@ class ProductParameterInline(TranslationTabularInline):
     extra = 1
     fields = ('category', 'text', 'order')
     verbose_name = "Параметр"
-    verbose_name_plural = "📋 Параметры машины"
+    verbose_name_plural = "Параметры машины"
 
 
 class ProductFeatureInline(TranslationTabularInline):
@@ -268,7 +477,7 @@ class ProductFeatureInline(TranslationTabularInline):
     extra = 1
     max_num = 8
     fields = ('icon', 'name', 'order')
-    verbose_name_plural = "🔧 Характеристики с иконками (макс 8)"
+    verbose_name_plural = "Характеристики с иконками (макс 8)"
 
 
 class ProductCardSpecInline(TranslationTabularInline):
@@ -277,7 +486,7 @@ class ProductCardSpecInline(TranslationTabularInline):
     extra = 1
     max_num = 4
     fields = ('icon', 'value', 'order')
-    verbose_name_plural = "📦 Характеристики для карточки (макс 4)"
+    verbose_name_plural = "Характеристики для карточки (макс 4)"
 
 
 class ProductGalleryInline(admin.TabularInline):
@@ -285,7 +494,7 @@ class ProductGalleryInline(admin.TabularInline):
     model = ProductGallery
     extra = 1
     fields = ('image', 'order')
-    verbose_name_plural = "📸 Галерея"
+    verbose_name_plural = "Галерея"
 
 
 @admin.register(Product)
@@ -297,7 +506,7 @@ class ProductAdmin(TabbedTranslationAdmin):
     prepopulated_fields = {'slug': ('title',)}
     
     fieldsets = (
-        ('📋 Основная информация', {
+        ('Основная информация', {
             'fields': (
                 ('title', 'slug'),
                 ('category', 'order'),

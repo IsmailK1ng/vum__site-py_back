@@ -16,10 +16,11 @@
     padding: 0 9rem;
     gap: 10px;
 }
+
 @media only screen and (min-width: 1200px) {
-.breadcrumb-ol {
-    padding: 0 6rem;
-}
+    .breadcrumb-ol {
+        padding: 0 6rem;
+    }
 }
 
 .breadcrumb-ol a {
@@ -238,9 +239,9 @@ body[data-theme="dark"] .vacancy-details {
 
 body[data-theme="dark"] .job-application-form .select-job,
 body[data-theme="dark"] .resume-drop-area {
-    background: #23272f;
+    background: #161616;
     color: #f3f3f3;
-    border-color: #333a4d;
+    border-color: #ffffff;
 }
 
 body[data-theme="dark"] .resume-drop-area.dragover {
@@ -258,7 +259,7 @@ body[data-theme="dark"] .file-error {
 }
 
 body[data-theme="dark"] .job-application-form .btn {
-    background: #23272f;
+    background: #161616;
     color: #ffffff;
     border-color: #ffffff;
 }

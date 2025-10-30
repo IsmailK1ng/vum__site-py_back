@@ -4,7 +4,11 @@ from .views import (
     NewsViewSet, 
     ContactFormViewSet, 
     JobApplicationViewSet,
-    ProductViewSet  # ← ДОБАВИЛИ
+    ProductViewSet,
+    DealerViewSet,
+    DealerServiceViewSet,
+    BecomeADealerPageViewSet,
+    BecomeADealerApplicationViewSet
 )
 
 # Роутер для UZ
@@ -12,29 +16,13 @@ uz_router = DefaultRouter()
 uz_router.register(r'news', NewsViewSet, basename='news')
 uz_router.register(r'contact', ContactFormViewSet, basename='contact')
 uz_router.register(r'job-applications', JobApplicationViewSet, basename='job-application')
-uz_router.register(r'products', ProductViewSet, basename='products')  # ← ДОБАВИЛИ
+uz_router.register(r'products', ProductViewSet, basename='products')
+uz_router.register(r'dealers', DealerViewSet, basename='dealers')
+uz_router.register(r'dealer-services', DealerServiceViewSet, basename='dealer-services')
+uz_router.register(r'become-dealer-page', BecomeADealerPageViewSet, basename='become-dealer-page')
+uz_router.register(r'dealer-applications', BecomeADealerApplicationViewSet, basename='dealer-applications')
 
 urlpatterns = [
-    # API для faw.uz
     path('uz/', include(uz_router.urls)),
-    
-    # API для faw.kg
-    path('kg/', include('kg.urls')),
+    path('kg/', include('kg.api_urls')),
 ]
-
-## 🚀 Как использовать API
-
-### 1️⃣ Список всех машин:
-### GET http://localhost:8000/api/uz/products/
-
-### 2️⃣ Только самосвалы:
-### GET http://localhost:8000/api/uz/products/?category=dump_truck
-
-### 3️⃣ Только тягачи:
-### GET http://localhost:8000/api/uz/products/?category=tractor
-
-### 4️⃣ Детальная страница по slug:
-### GET http://localhost:8000/api/uz/products/faw-tiger-v-4x2/
-
-### 5️⃣ Детальная страница по ID:
-### GET http://localhost:8000/api/uz/products/1/

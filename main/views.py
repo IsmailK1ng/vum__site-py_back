@@ -1,3 +1,5 @@
+# main/views.py
+
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.utils import translation
@@ -7,8 +9,17 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
-from .models import News, ContactForm, JobApplication, Vacancy, Product
-from .serializers import NewsSerializer, ContactFormSerializer, JobApplicationSerializer, ProductCardSerializer, ProductDetailSerializer
+from django.http import HttpResponseRedirect
+from .models import (
+    News, ContactForm, JobApplication, Vacancy, Product,
+    Dealer, DealerService, BecomeADealerPage, BecomeADealerApplication
+)
+from .serializers import (
+    NewsSerializer, ContactFormSerializer, JobApplicationSerializer, 
+    ProductCardSerializer, ProductDetailSerializer,
+    DealerSerializer, DealerServiceSerializer, 
+    BecomeADealerPageSerializer, BecomeADealerApplicationSerializer
+)
 
 
 # === FRONTEND views === 
@@ -28,7 +39,13 @@ def product_detail(request, product_id):
     return render(request, 'main/product_detail.html', {'product_id': product_id})
 
 def become_a_dealer(request):
-    return render(request, 'main/become_a_dealer.html')
+    page_data = BecomeADealerPage.get_instance()
+    
+    context = {
+        'page_data': page_data,
+        'requirements': page_data.requirements.all().order_by('order')
+    }
+    return render(request, 'main/become_a_dealer.html', context)
 
 def lizing(request):
     return render(request, 'main/lizing.html')
@@ -54,12 +71,30 @@ def new_detail(request, new_id):
     return render(request, 'main/news_detail.html', {'new_id': new_id})
 
 
-# === LANGUAGE SWITCH ===
 def set_language_get(request):
-    lang = request.GET.get("language")
-    if lang in dict(settings.LANGUAGES):
+    """Переключение языка через GET или POST"""
+    from django.http import HttpResponseRedirect
+    
+    lang = request.GET.get("language") or request.POST.get("language")
+    
+    supported_languages = [code for code, name in settings.LANGUAGES]
+    
+    if lang and lang in supported_languages:
         translation.activate(lang)
         request.session[translation.LANGUAGE_SESSION_KEY] = lang
+        
+        response = HttpResponseRedirect(request.META.get("HTTP_REFERER", "/"))
+        response.set_cookie(
+            settings.LANGUAGE_COOKIE_NAME,
+            lang,
+            max_age=settings.LANGUAGE_COOKIE_AGE,
+            path='/',
+        )
+        
+        print(f"✅ Language switched to: {lang}")
+        return response
+    
+    print(f"❌ Invalid language: {lang}")
     return redirect(request.META.get("HTTP_REFERER", "/"))
 
 
@@ -73,11 +108,7 @@ class NewsViewSet(viewsets.ModelViewSet):
 
 class ContactFormViewSet(viewsets.ModelViewSet):
     """
-    API для контактных форм FAW.UZ (обновленная версия)
-    GET /uz/contact/ - список заявок (с фильтрацией)
-    POST /uz/contact/ - создание заявки
-    GET /uz/contact/{id}/ - детальная заявка
-    GET /uz/contact/stats/ - статистика по заявкам
+    API для контактных форм FAW.UZ
     """
     serializer_class = ContactFormSerializer
     permission_classes = [AllowAny]
@@ -88,24 +119,37 @@ class ContactFormViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         queryset = ContactForm.objects.all().order_by('-created_at')
-        
-        # Фильтр по статусу из query params
         status_filter = self.request.query_params.get('status', None)
         if status_filter:
             queryset = queryset.filter(status=status_filter)
-        
         return queryset
     
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        
-        return Response({
-            'success': True,
-            'message': 'Ваша заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.',
-            'data': serializer.data
-        }, status=status.HTTP_201_CREATED)
+        """
+        Создание заявки с обработкой ошибок
+        """
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            
+            return Response({
+                'success': True,
+                'message': 'Ваша заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.',
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            # Логируем ошибку
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"ContactForm creation error: {str(e)}", exc_info=True)
+            
+            return Response({
+                'success': False,
+                'message': 'Произошла ошибка при отправке заявки. Попробуйте позже.',
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     @action(detail=False, methods=['get'])
     def stats(self, request):
@@ -121,6 +165,7 @@ class ContactFormViewSet(viewsets.ModelViewSet):
             'in_process': in_process,
             'done': done
         })
+
 
 class JobApplicationViewSet(viewsets.ModelViewSet):
     """API endpoint для приема заявок на вакансии"""
@@ -168,17 +213,12 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
             'status': 'processed',
             'message': f'Ariza #{application.id} ko\'rib chiqilgan deb belgilandi'
         })
-    
-    # ========== API ДЛЯ ПРОДУКТОВ ==========
 
 
+# ========== API ДЛЯ ПРОДУКТОВ ==========
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API для продуктов FAW
-    
-    GET /api/uz/products/ - список всех активных продуктов
-    GET /api/uz/products/?category=dump_truck - фильтр по категории
-    GET /api/uz/products/{slug}/ - получить продукт по slug
     """
     permission_classes = [AllowAny]
     lookup_field = 'slug'
@@ -186,12 +226,11 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         queryset = Product.objects.filter(is_active=True).prefetch_related(
             'card_specs__icon',
-            'parameters',  # ← ИСПРАВЛЕНО!
+            'parameters',
             'features__icon',
             'gallery'
         ).order_by('order', 'title')
         
-        # Фильтрация по категории
         category = self.request.query_params.get('category', None)
         if category:
             queryset = queryset.filter(category=category)
@@ -199,20 +238,18 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset
     
     def get_serializer_class(self):
-        """Используем разные сериализаторы для списка и детали"""
         if self.action == 'retrieve':
             return ProductDetailSerializer
         return ProductCardSerializer
-# отображение страниц
 
 
+# ========== СТРАНИЦЫ С КАТЕГОРИЯМИ ==========
 def products(request):
-    # Получаем категорию из URL параметров (обязательно должна быть)
-    category = request.GET.get('category', 'tractor')  # По умолчанию тягачи
+    """Страница со списком продуктов по категориям"""
+    category = request.GET.get('category', 'shatakchi')
     
-    # Данные для каждой категории
     CATEGORY_DATA = {
-        'tractor': {
+        'shatakchi': {
             'title': 'Shatakchi mashinalar',
             'title_ru': 'Седельные тягачи',
             'title_en': 'Truck Tractors',
@@ -222,7 +259,7 @@ def products(request):
             'hero_image': 'images/slider-foto_img/3.png',
             'breadcrumb': 'Shatakchi mashinalar'
         },
-        'dump_truck': {
+        'samosval': {
             'title': 'Samosvallar',
             'title_ru': 'Самосвалы',
             'title_en': 'Dump Trucks',
@@ -232,7 +269,7 @@ def products(request):
             'hero_image': 'images/slider-foto_img/1.png',
             'breadcrumb': 'Samosvallar'
         },
-        'chassis': {
+        'shassi': {
             'title': 'Shassilar',
             'title_ru': 'Шасси',
             'title_en': 'Chassis',
@@ -242,7 +279,7 @@ def products(request):
             'hero_image': 'images/slider-foto_img/2.png',
             'breadcrumb': 'Shassilar'
         },
-        'van': {
+        'furgon': {
             'title': 'Avtofurgonlar',
             'title_ru': 'Фургоны',
             'title_en': 'Vans',
@@ -252,7 +289,7 @@ def products(request):
             'hero_image': 'images/slider-foto_img/4.png',
             'breadcrumb': 'Avtofurgonlar'
         },
-        'special': {
+        'maxsus': {
             'title': 'Maxsus texnika',
             'title_ru': 'Спецтехника',
             'title_en': 'Special Equipment',
@@ -262,40 +299,75 @@ def products(request):
             'hero_image': 'images/slider-foto_img/5.png',
             'breadcrumb': 'Maxsus texnika'
         },
-        'faw_tiger_v': {
+        'tiger_v': {
             'title': 'FAW Tiger V',
             'title_ru': 'FAW Tiger V',
             'title_en': 'FAW Tiger V',
-            'slogan': 'Tigar V modeli yuk tashish vositalari',
-            'slogan_ru': 'Перевозные транспортные средства модели Tiger V',
-            'slogan_en': 'FAW Tiger V model cargo vehicles',
+            'slogan': 'Zamonaviy texnologiyalar bilan jihozlangan Tiger V modeli',
+            'slogan_ru': 'Модель Tiger V с современными технологиями',
+            'slogan_en': 'Tiger V model with modern technologies',
             'hero_image': 'images/slider-foto_img/5.png',
-            'breadcrumb': 'Maxsus texnika'
+            'breadcrumb': 'FAW Tiger V'
         },
-        'faw_tiger_vr': {
+        'tiger_vr': {
             'title': 'FAW Tiger VR',
             'title_ru': 'FAW Tiger VR',
             'title_en': 'FAW Tiger VR',
-            'slogan': 'Tigar VR modeli yuk tashish vositalari',
-            'slogan_ru': 'Перевозные транспортные средства модели Tiger VR',
-            'slogan_en': 'FAW Tiger VR model cargo vehicles',
+            'slogan': 'Yuqori sifatli Tiger VR modeli',
+            'slogan_ru': 'Высококачественная модель Tiger VR',
+            'slogan_en': 'High-quality Tiger VR model',
             'hero_image': 'images/slider-foto_img/5.png',
-            'breadcrumb': 'Maxsus texnika'
+            'breadcrumb': 'FAW Tiger VR'
         },
-
     }
     
-    # Получаем данные для текущей категории
-    category_info = CATEGORY_DATA.get(category, CATEGORY_DATA['tractor'])
+    category_info = CATEGORY_DATA.get(category, CATEGORY_DATA['shatakchi'])
     
     return render(request, 'main/products.html', {
         'category': category,
         'category_info': category_info
     })
+# API для дилеров
+
+class DealerViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Dealer.objects.filter(is_active=True).prefetch_related('services').order_by('order', 'city')
+    serializer_class = DealerSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_fields = ['city', 'services__slug']
+    search_fields = ['name', 'city', 'address']
 
 
-def product_detail(request, product_id):
-    # product_id это на самом деле slug из URL
-    return render(request, 'main/product_detail.html', {
-        'product_slug': product_id
-    })
+class DealerServiceViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = DealerService.objects.filter(is_active=True).order_by('order')
+    serializer_class = DealerServiceSerializer
+    permission_classes = [AllowAny]
+
+
+class BecomeADealerPageViewSet(viewsets.ViewSet):
+    permission_classes = [AllowAny]
+    
+    def list(self, request):
+        page = BecomeADealerPage.get_instance()
+        serializer = BecomeADealerPageSerializer(page)
+        return Response(serializer.data)
+
+
+class BecomeADealerApplicationViewSet(viewsets.ModelViewSet):
+    queryset = BecomeADealerApplication.objects.all().order_by('-created_at')
+    serializer_class = BecomeADealerApplicationSerializer
+    
+    def get_permissions(self):
+        if self.action == 'create':
+            return [AllowAny()]
+        return [IsAdminUser()]
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        
+        return Response({
+            'success': True,
+            'message': "Arizangiz qabul qilindi! Tez orada siz bilan bog'lanamiz."
+        }, status=status.HTTP_201_CREATED)

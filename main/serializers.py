@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import News, NewsBlock, ContactForm, JobApplication, Product, FeatureIcon, ProductCardSpec, ProductParameter, ProductFeature, ProductGallery
+from .models import News, NewsBlock, ContactForm, JobApplication, Product, FeatureIcon,ProductCardSpec, ProductParameter, ProductFeature, ProductGallery,  DealerService, Dealer, BecomeADealerPage, BecomeADealerApplication
 
 
 class NewsBlockSerializer(serializers.ModelSerializer):
@@ -33,9 +33,9 @@ class ContactFormSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'status_display', 'priority_display', 'region_display']
     
     def create(self, validated_data):
-        # По умолчанию создаем новую заявку со статусом 'new' и приоритетом 'medium'
-        validated_data['status'] = 'new'
-        validated_data['priority'] = 'medium'
+        # Используем setdefault вместо прямого присваивания
+        validated_data.setdefault('status', 'new')
+        validated_data.setdefault('priority', 'medium')
         return super().create(validated_data)
 
 class JobApplicationSerializer(serializers.ModelSerializer):
@@ -213,3 +213,56 @@ class ProductDetailSerializer(serializers.ModelSerializer):
                 return request.build_absolute_uri(obj.card_image.url)
             return obj.card_image.url
         return None
+# Сериализаторы для дилеров
+
+class DealerServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DealerService
+        fields = ['id', 'name', 'slug']
+
+
+class DealerSerializer(serializers.ModelSerializer):
+    services = serializers.SerializerMethodField()
+    coordinates = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Dealer
+        fields = [
+            'id', 'name', 'city', 'address', 'coordinates',
+            'phone', 'email', 'website', 'working_hours',
+            'manager', 'services'
+        ]
+    
+    def get_services(self, obj):
+        return [service.name for service in obj.services.all()]
+    
+    def get_coordinates(self, obj):
+        return [float(obj.latitude), float(obj.longitude)]
+
+
+class BecomeADealerPageSerializer(serializers.ModelSerializer):
+    requirements = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = BecomeADealerPage
+        fields = [
+            'title', 'intro_text', 'subtitle', 'important_note',
+            'requirements', 'contact_phone', 'contact_email', 'contact_address'
+        ]
+    
+    def get_requirements(self, obj):
+        return [req.text for req in obj.requirements.all().order_by('order')]
+
+
+class BecomeADealerApplicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BecomeADealerApplication
+        fields = [
+            'name', 'company_name', 'experience_years', 
+            'region', 'phone', 'message'
+        ]
+    
+    def create(self, validated_data):
+        validated_data['status'] = 'new'
+        validated_data['priority'] = 'medium'
+        return super().create(validated_data)

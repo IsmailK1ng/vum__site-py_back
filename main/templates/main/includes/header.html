@@ -1,11 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>FAW Trucks</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400;600;700&family=Funnel+Sans:wght@400;600;700&display=swap');
 
@@ -13,76 +13,82 @@
             font-family: var(--_font-default);
         }
 
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6,
-        a,
-        .mxd-logo__text,
-        .btn-caption {
+        h1, h2, h3, h4, h5, h6, a, .mxd-logo__text, .btn-caption {
             font-family: var(--_font-accent);
         }
     </style>
 </head>
 
 <body>
-    <!-- Меню и шапка (начало) -->
     <nav id="header" class="mxd-nav__wrap" data-lenis-prevent="">
-
-        <!-- Логотип в шапке (начало) -->
+        <!-- Логотип -->
         <div class="mxd-header__logo loading__fade">
             <a href="{% url 'home' %}" class="mxd-logo">
                 <img src="{% static 'images/LOGO-VUM.png' %}" class="mxd-logo__image" alt="FAW Logo">
-                <!-- <span class="mxd-logo__text">Faw</span> -->
             </a>
         </div>
-        <!-- Логотип в шапке (конец) -->
 
-        <!-- Навигация для десктопа (начало) -->
+        <!-- Десктопное меню -->
         <div class="mxd-header__nav loading__fade">
             <ul class="desktop-menu">
                 <li class="desktop-menu__item active">
-                    <a href="{% url 'home' %}" class="desktop-menu__link">Bosh sahifa</a>
+                    <a href="{% url 'home' %}" class="desktop-menu__link">
+                        {% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}
+                    </a>
                 </li>
                 <li class="desktop-menu__item">
                     <a href="{% url 'dealers' %}" class="desktop-menu__link">
-                        Dilerlar
+                        {% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}
                         <span class="desktop-menu__arrow">▼</span>
                     </a>
                     <ul class="desktop-submenu">
                         <li class="desktop-submenu__item">
-                            <a href="{% url 'dealers' %}" class="desktop-submenu__link">Diler topish</a>
+                            <a href="{% url 'dealers' %}" class="desktop-submenu__link">
+                                {% if LANGUAGE_CODE == 'uz' %}Diler topish{% elif LANGUAGE_CODE == 'ru' %}Найти дилера{% else %}Find dealer{% endif %}
+                            </a>
                         </li>
                         <li class="desktop-submenu__item">
-                            <a href="{% url 'become_a_dealer' %}" class="desktop-submenu__link">Diler bo'lish</a>
+                            <a href="{% url 'become_a_dealer' %}" class="desktop-submenu__link">
+                                {% if LANGUAGE_CODE == 'uz' %}Diler bo'lish{% elif LANGUAGE_CODE == 'ru' %}Стать дилером{% else %}Become dealer{% endif %}
+                            </a>
                         </li>
                     </ul>
                 </li>
                 <li class="desktop-menu__item">
-                    <a href="{% url 'news' %}" class="desktop-menu__link">Kompaniya yangiliklari</a>
+                    <a href="{% url 'news' %}" class="desktop-menu__link">
+                        {% if LANGUAGE_CODE == 'uz' %}Kompaniya yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Новости компании{% else %}Company news{% endif %}
+                    </a>
                 </li>
                 <li class="desktop-menu__item">
                     <a href="javascript:void(0)" class="desktop-menu__link">
-                        Modellar
+                        {% if LANGUAGE_CODE == 'uz' %}Modellar{% elif LANGUAGE_CODE == 'ru' %}Модели{% else %}Models{% endif %}
                         <span class="desktop-menu__arrow">▼</span>
                     </a>
                     <ul class="desktop-submenu">
                         <li class="desktop-submenu__item">
-                            <a href="{% url 'products' %}?category=tractor" class="desktop-submenu__link">Shatakchi mashinalar</a>
+                            <a href="{% url 'products' %}?category=tractor" class="desktop-submenu__link">
+                                {% if LANGUAGE_CODE == 'uz' %}Shatakchi mashinalar{% elif LANGUAGE_CODE == 'ru' %}Седельные тягачи{% else %}Truck tractors{% endif %}
+                            </a>
                         </li>
                         <li class="desktop-submenu__item">
-                            <a href="{% url 'products' %}?category=dump_truck" class="desktop-submenu__link">Samosvallar</a>
+                            <a href="{% url 'products' %}?category=dump_truck" class="desktop-submenu__link">
+                                {% if LANGUAGE_CODE == 'uz' %}Samosvallar{% elif LANGUAGE_CODE == 'ru' %}Самосвалы{% else %}Dump trucks{% endif %}
+                            </a>
                         </li>
                         <li class="desktop-submenu__item">
-                            <a href="{% url 'products' %}?category=special" class="desktop-submenu__link">Maxsus texnika</a>
+                            <a href="{% url 'products' %}?category=special" class="desktop-submenu__link">
+                                {% if LANGUAGE_CODE == 'uz' %}Maxsus texnika{% elif LANGUAGE_CODE == 'ru' %}Спецтехника{% else %}Special equipment{% endif %}
+                            </a>
                         </li>
                         <li class="desktop-submenu__item">
-                            <a href="{% url 'products' %}?category=van" class="desktop-submenu__link">Avtofurgonlar</a>
+                            <a href="{% url 'products' %}?category=van" class="desktop-submenu__link">
+                                {% if LANGUAGE_CODE == 'uz' %}Avtofurgonlar{% elif LANGUAGE_CODE == 'ru' %}Фургоны{% else %}Vans{% endif %}
+                            </a>
                         </li>
                         <li class="desktop-submenu__item">
-                            <a href="{% url 'products' %}?category=chassis" class="desktop-submenu__link">Shassilar</a>
+                            <a href="{% url 'products' %}?category=chassis" class="desktop-submenu__link">
+                                {% if LANGUAGE_CODE == 'uz' %}Shassilar{% elif LANGUAGE_CODE == 'ru' %}Шасси{% else %}Chassis{% endif %}
+                            </a>
                         </li>
                         <li class="desktop-submenu__item">
                             <a href="{% url 'products' %}?category=faw_tiger_v" class="desktop-submenu__link">Tiger V</a>
@@ -93,153 +99,140 @@
                     </ul>
                 </li>
                 <li class="desktop-menu__item">
-                    <a href="{% url 'about' %}" class="desktop-menu__link">Kompaniya haqida</a>
+                    <a href="{% url 'about' %}" class="desktop-menu__link">
+                        {% if LANGUAGE_CODE == 'uz' %}Kompaniya haqida{% elif LANGUAGE_CODE == 'ru' %}О компании{% else %}About{% endif %}
+                    </a>
                 </li>
                 <li class="desktop-menu__item">
-                    <a href="{% url 'lizing' %}" class="desktop-menu__link">Lizing</a>
+                    <a href="{% url 'lizing' %}" class="desktop-menu__link">
+                        {% if LANGUAGE_CODE == 'uz' %}Lizing{% elif LANGUAGE_CODE == 'ru' %}Лизинг{% else %}Leasing{% endif %}
+                    </a>
                 </li>
                 <li class="desktop-menu__item">
-                    <a href="{% url 'services' %}" class="desktop-menu__link">Servis</a>
+                    <a href="{% url 'services' %}" class="desktop-menu__link">
+                        {% if LANGUAGE_CODE == 'uz' %}Servis{% elif LANGUAGE_CODE == 'ru' %}Сервис{% else %}Service{% endif %}
+                    </a>
                 </li>
                 <li class="desktop-menu__item">
-                    <a href="{% url 'contact' %}" class="desktop-menu__link">Bo'glanish</a>
+                    <a href="{% url 'contact' %}" class="desktop-menu__link">
+                        {% if LANGUAGE_CODE == 'uz' %}Bog'lanish{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %}
+                    </a>
                 </li>
                 <li class="desktop-menu__item">
-                    <a href="{% url 'jobs' %}" class="desktop-menu__link">Vakansiya</a>
+                    <a href="{% url 'jobs' %}" class="desktop-menu__link">
+                        {% if LANGUAGE_CODE == 'uz' %}Vakansiya{% elif LANGUAGE_CODE == 'ru' %}Вакансии{% else %}Jobs{% endif %}
+                    </a>
                 </li>
             </ul>
         </div>
-        <!-- Навигация для десктопа (конец) -->
 
-        <!-- Элементы управления шапкой (начало) -->
+        <!-- Элементы управления -->
         <div class="mxd-header__controls loading__fade">
-            <div class="language-switcher">
-                <span class="language-current">UZ</span>
-                <span class="language-arrow">▼</span>
-                <div class="language-dropdown">
-                    <a href="#" class="language-option" data-lang="uz">O'zbek</a>
-                    <a href="#" class="language-option" data-lang="ru">Русский</a>
-                    <a href="#" class="language-option" data-lang="en">English</a>
+            <!-- Переключатель языка -->
+            <form action="{% url 'set_language' %}" method="post" class="language-switcher-form" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="language" value="" id="language-input">
+                <div class="language-switcher">
+                    <span class="language-current">
+                        {% if LANGUAGE_CODE == 'uz' %}UZ{% elif LANGUAGE_CODE == 'ru' %}RU{% elif LANGUAGE_CODE == 'en' %}EN{% else %}UZ{% endif %}
+                    </span>
+                    <span class="language-arrow">▼</span>
+                    <div class="language-dropdown">
+                        <a href="#" class="language-option {% if LANGUAGE_CODE == 'uz' %}active{% endif %}" data-lang="uz" onclick="switchLanguage('uz'); return false;">O'zbek</a>
+                        <a href="#" class="language-option {% if LANGUAGE_CODE == 'ru' %}active{% endif %}" data-lang="ru" onclick="switchLanguage('ru'); return false;">Русский</a>
+                        <a href="#" class="language-option {% if LANGUAGE_CODE == 'en' %}active{% endif %}" data-lang="en" onclick="switchLanguage('en'); return false;">English</a>
+                    </div>
                 </div>
-            </div>
-            <button id="color-switcher" class="mxd-color-switcher" type="button" role="switch"
-                aria-label="light/dark mode" aria-checked="true">
-            </button>
+            </form>
+
+            <button id="color-switcher" class="mxd-color-switcher" type="button" role="switch" aria-label="light/dark mode" aria-checked="true"></button>
+
             {% if request.resolver_match.url_name == 'home' %}
-            <a class="btn btn-anim btn-default btn-mobile-icon btn-outline slide-right-up" style="gap: 0;"
-                href="#faw-main-contact-form" aria-label="Перейти к форме связи">
+            <a class="btn btn-anim btn-default btn-mobile-icon btn-outline slide-right-up" style="gap: 0;" href="#faw-main-contact-form" aria-label="Перейти к форме связи">
                 <span class="btn-caption"></span>
                 <i class="ph-bold ph-arrow-up-right"></i>
             </a>
             {% endif %}
         </div>
-        <!-- Элементы управления шапкой (конец) -->
 
-        <!-- Гамбургер (начало) -->
+        <!-- Гамбургер -->
         <div class="mxd-nav__contain loading__fade">
             <a href="#0" class="mxd-nav__hamburger">
-                <!-- flip element -->
                 <div class="hamburger__base"></div>
                 <div class="hamburger__line"></div>
                 <div class="hamburger__line"></div>
             </a>
         </div>
-        <!-- Гамбургер (конец) -->
 
-        <!-- Основная мобильная навигация (начало) -->
+        <!-- Мобильное меню -->
         <div class="mxd-menu__wrapper">
-            <!-- background active layer -->
             <div class="mxd-menu__base"></div>
-            <!-- menu container -->
             <div class="mxd-menu__contain">
                 <div class="mxd-menu__inner">
-                    <!-- left side -->
                     <div class="mxd-menu__left">
-                        <p class="mxd-menu__caption menu-fade-in">🚚 FAW Trucks Uzbekistan<br>Ishonchli transport
-                            yechimlari</p>
+                        <p class="mxd-menu__caption menu-fade-in">
+                            🚚 FAW Trucks Uzbekistan<br>
+                            {% if LANGUAGE_CODE == 'uz' %}Ishonchli transport yechimlari{% elif LANGUAGE_CODE == 'ru' %}Надежные транспортные решения{% else %}Reliable transport solutions{% endif %}
+                        </p>
                         <div class="main-menu">
                             <nav class="main-menu__content">
                                 <ul id="main-menu" class="main-menu__accordion">
                                     <li class="main-menu__item">
                                         <a class="main-menu__link btn btn-anim" href="{% url 'home' %}">
-                                            <span class="btn-caption">Bosh sahifa</span>
+                                            <span class="btn-caption">
+                                                {% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}
+                                            </span>
                                         </a>
                                     </li>
                                     <li class="main-menu__item">
                                         <div class="main-menu__toggle">
                                             <span class="main-menu__link btn btn-anim">
-                                                <span class="btn-caption">Dilerlar</span>
+                                                <span class="btn-caption">
+                                                    {% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}
+                                                </span>
                                             </span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" version="1.1"
-                                                viewBox="0 0 20 20">
-                                                <path
-                                                    d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0-1.2,0-1.7.2H.4c-.2,0-.4.2-.4.4s.2.4.4.4h4.1c.4,0,1.7.2,1.7.2.6,0,1.1.2,1.6.6.4.3.8.7,1.1,1.1.3.5.5,1,.6,1.6,0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4h0Z" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" version="1.1" viewBox="0 0 20 20">
+                                                <path d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0-1.2,0-1.7.2H.4c-.2,0-.4.2-.4.4s.2.4.4.4h4.1c.4,0,1.7.2,1.7.2.6,0,1.1.2,1.6.6.4.3.8.7,1.1,1.1.3.5.5,1,.6,1.6,0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4h0Z" />
                                             </svg>
                                         </div>
                                         <ul class="submenu">
                                             <li class="submenu__item">
-                                                <a href="{% url 'dealers' %}">Diler topish</a>
+                                                <a href="{% url 'dealers' %}">
+                                                    {% if LANGUAGE_CODE == 'uz' %}Diler topish{% elif LANGUAGE_CODE == 'ru' %}Найти дилера{% else %}Find dealer{% endif %}
+                                                </a>
                                             </li>
                                             <li class="submenu__item">
-                                                <a href="{% url 'become_a_dealer' %}">Diler bo'lish</a>
+                                                <a href="{% url 'become_a_dealer' %}">
+                                                    {% if LANGUAGE_CODE == 'uz' %}Diler bo'lish{% elif LANGUAGE_CODE == 'ru' %}Стать дилером{% else %}Become dealer{% endif %}
+                                                </a>
                                             </li>
                                         </ul>
                                     </li>
                                     <li class="main-menu__item">
                                         <a class="main-menu__link btn btn-anim" href="{% url 'news' %}">
-                                            <span class="btn-caption">Kompaniya yangiliklari</span>
+                                            <span class="btn-caption">
+                                                {% if LANGUAGE_CODE == 'uz' %}Kompaniya yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Новости компании{% else %}Company news{% endif %}
+                                            </span>
                                         </a>
                                     </li>
                                     <li class="main-menu__item">
-                                        <div class="main-menu__toggle">
-                                            <span class="main-menu__link btn btn-anim">
-                                                <span class="btn-caption">Modellar</span>
-                                            </span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" version="1.1"
-                                                viewBox="0 0 20 20">
-                                                <path
-                                                    d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0-1.2,0-1.7.2H.4c-.2,0-.4.2-.4.4s.2.4.4.4h4.1c.4,0,1.7.2,1.7.2.6,0,1.1.2,1.6.6.4.3.8.7,1.1,1.1.3.5.5,1,.6,1.6,0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4h0Z" />
-                                            </svg>
-                                        </div>
-                                        <ul class="submenu">
-                                            <li class="submenu__item">
-                                                <a href="{% url 'products' %}?category=tractor" class="submenu__link">Shatakchi mashinalar</a>
-                                            </li>
-                                            <li class="submenu__item">
-                                                <a href="{% url 'products' %}?category=dump_truck" class="submenu__link">Samosvallar</a>
-                                            </li>
-                                            <li class="submenu__item">
-                                                <a href="{% url 'products' %}?category=special" class="submenu__link">Maxsus texnika</a>
-                                            </li>
-                                            <li class="submenu__item">
-                                                <a href="{% url 'products' %}?category=van" class="submenu__link">Avtofurgonlar</a>
-                                            </li>
-                                            <li class="submenu__item">
-                                                <a href="{% url 'products' %}?category=chassis" class="submenu__link">Shassilar</a>
-                                            </li>
-                                            <li class="submenu__item">
-                                                <a href="{% url 'products' %}?category=faw_tiger_v" class="submenu__link">Tiger V</a>
-                                            </li>
-                                            <li class="submenu__item">
-                                                <a href="{% url 'products' %}?category=faw_tiger_vr" class="submenu__link">Tiger VR</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li class="main-menu__item">
                                         <a class="main-menu__link btn btn-anim" href="{% url 'about' %}">
-                                            <span class="btn-caption">Kompaniya haqida</span>
+                                            <span class="btn-caption">
+                                                {% if LANGUAGE_CODE == 'uz' %}Kompaniya haqida{% elif LANGUAGE_CODE == 'ru' %}О компании{% else %}About{% endif %}
+                                            </span>
                                         </a>
                                     </li>
                                     <li class="main-menu__item">
                                         <a class="main-menu__link btn btn-anim" href="{% url 'contact' %}">
-                                            <span class="btn-caption">Bog'lanish</span>
+                                            <span class="btn-caption">
+                                                {% if LANGUAGE_CODE == 'uz' %}Bog'lanish{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %}
+                                            </span>
                                         </a>
                                     </li>
                                 </ul>
                             </nav>
                         </div>
                     </div>
-                    <!-- нижняя информационная строка -->
                     <div class="mxd-menu__data menu-fade-in">
                         <p class="t-xsmall">
                             FAW Trucks Uzbekistan
@@ -253,10 +246,14 @@
                 </div>
             </div>
         </div>
-        <!-- Основная мобильная навигация (конец) -->
-
     </nav>
-    <!-- Меню и шапка (конец) -->
-</body>
 
+    <script>
+    function switchLanguage(lang) {
+        console.log('Switching to language:', lang);
+        document.getElementById('language-input').value = lang;
+        document.querySelector('.language-switcher-form').submit();
+    }
+    </script>
+</body>
 </html>
