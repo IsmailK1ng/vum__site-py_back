@@ -193,7 +193,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         wb.save(response)
         return response
     
-    export_to_excel.short_description = '📥 Экспорт в Excel'
+    export_to_excel.short_description = 'Экспорт в Excel'
 
 
 # ============ ВАКАНСИИ ============
@@ -293,8 +293,8 @@ class JobApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
     
     def is_processed_badge(self, obj):
         if obj.is_processed:
-            return format_html('<span style="color:green;font-weight:bold;">✅ Рассмотрено</span>')
-        return format_html('<span style="color:orange;font-weight:bold;">🆕 Новая</span>')
+            return format_html('<span style="color:green;font-weight:bold;"> Рассмотрено</span>')
+        return format_html('<span style="color:orange;font-weight:bold;"> Новая</span>')
     is_processed_badge.short_description = 'Статус'
 
 
@@ -311,9 +311,6 @@ class FeatureIconAdmin(ContentAdminMixin, admin.ModelAdmin):
             return format_html('<img src="{}" width="30" height="30"/>', obj.icon.url)
         return "—"
     icon_preview.short_description = "Превью"
-
-
-# ============ ДИЛЕРЫ ============
 
 # ============ ДИЛЕРЫ ============
 
@@ -492,7 +489,10 @@ class BecomeADealerPageAdmin(ContentAdminMixin, TabbedTranslationAdmin):
 
 @admin.register(BecomeADealerApplication)
 class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
-    list_display = ['dealer_badge', 'name', 'company_name', 'phone', 'region', 'experience_years', 'status', 'priority', 'manager', 'created_at']
+    list_display = [
+        'dealer_badge', 'name', 'company_name', 'phone', 'region', 
+        'experience_years', 'status', 'priority', 'manager', 'created_at', 'action_buttons'  
+    ]
     list_filter = ['status', 'priority', 'region', 'created_at']
     search_fields = ['name', 'company_name', 'phone', 'message']
     list_editable = ['status', 'priority', 'manager']
@@ -515,9 +515,30 @@ class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
     
     def dealer_badge(self, obj):
         return format_html(
-            '<span style="background:#ff9800;color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;">🤝 ДИЛЕРСТВО</span>'
+            '<span style="background:#000000;color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;">ДИЛЕРСТВО</span>'  
         )
     dealer_badge.short_description = "Тип"
+    
+    # ← ДОБАВИТЬ ИКОНКИ ДЕЙСТВИЙ
+    def action_buttons(self, obj):
+        return format_html('''
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <a href="{}" title="Редактировать" style="display: inline-block;">
+                    <img src="/static/media/icon-adminpanel/pencil.png" width="24" height="24" style="object-fit: contain; cursor: pointer;">
+                </a>
+                <a href="/become-a-dealer/" title="Просмотр на сайте" target="_blank" style="display: inline-block;">
+                    <img src="/static/media/icon-adminpanel/eyes.png" width="24" height="24" style="object-fit: contain; cursor: pointer;">
+                </a>
+                <a href="{}" title="Удалить" onclick="return confirm('Удалить заявку от {}?')" style="display: inline-block;">
+                    <img src="/static/media/icon-adminpanel/recycle-bin.png" width="24" height="24" style="object-fit: contain; cursor: pointer;">
+                </a>
+            </div>
+        ''',
+            f'/admin/main/becomeadealer application/{obj.id}/change/',
+            f'/admin/main/becomeadealer application/{obj.id}/delete/',
+            obj.name
+        )
+    action_buttons.short_description = "Действия"
     
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         formfield = super().formfield_for_foreignkey(db_field, request, **kwargs)
@@ -565,8 +586,7 @@ class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
         wb.save(response)
         return response
     
-    export_to_excel.short_description = '📥 Экспорт в Excel'
-
+    export_to_excel.short_description = 'Экспорт в Excel'  
 
 # ============ ПРОДУКТЫ ============
 

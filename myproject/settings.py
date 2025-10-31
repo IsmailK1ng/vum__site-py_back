@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     'nested_admin',
     'django_filters',
     'corsheaders',
-    'reversion',  # ← ДОБАВЛЕНО для истории изменений
+    'reversion',
     
     'main',
     'kg',
@@ -51,7 +51,7 @@ REST_FRAMEWORK = {
 
 # ============ ЯЗЫКОВЫЕ НАСТРОЙКИ ============
 
-LANGUAGE_CODE = 'ru-RU'
+LANGUAGE_CODE = 'ru'
 
 USE_I18N = True
 USE_L10N = True
@@ -87,6 +87,7 @@ JAZZMIN_SETTINGS = {
     "show_ui_builder": False,
     "custom_css": "css/custom_admin.css",
     "language_chooser": False,
+    "show_language_switcher": False,  # ← ДОБАВЛЕНО
     
     "topmenu_links": [
         {"name": "Сайт UZ", "url": "https://faw.uz", "new_window": True},
@@ -155,13 +156,14 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'myproject.middleware.ForceRussianMiddleware',  # ← ДОБАВЛЕНО
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'reversion.middleware.RevisionMiddleware',  # ← ДОБАВЛЕНО для истории
+    'reversion.middleware.RevisionMiddleware',
 ]
 
 ROOT_URLCONF = 'myproject.urls'
