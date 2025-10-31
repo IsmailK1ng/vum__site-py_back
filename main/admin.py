@@ -14,8 +14,8 @@ import openpyxl
 from datetime import datetime
 from django.http import HttpResponse
 
-admin.site.site_header = "VUM Admin Panel"
-admin.site.site_title = "VUM"
+admin.site.site_header = "Панель управления VUM"
+admin.site.site_title = "VUM Admin"
 admin.site.index_title = "Управление сайтами FAW"
 
 
@@ -26,6 +26,8 @@ class NewsBlockInline(TranslationTabularInline):
     extra = 1
     fields = ('block_type', 'text', 'image', 'youtube_url', 'video_file', 'order', 'image_tag')
     readonly_fields = ('image_tag',)
+    verbose_name = "Блок новости"
+    verbose_name_plural = "Блоки новости"
 
     def image_tag(self, obj):
         if obj.image:
@@ -42,6 +44,8 @@ class NewsAdmin(TabbedTranslationAdmin):
     list_filter = ('created_at',)
     ordering = ('-created_at',)
     inlines = [NewsBlockInline]
+    verbose_name = "Новость"
+    verbose_name_plural = "Новости"
 
     def preview_image_tag(self, obj):
         if obj.preview_image:
@@ -68,6 +72,8 @@ class ContactFormAdmin(admin.ModelAdmin):
     autocomplete_fields = ['manager']
     date_hierarchy = 'created_at'
     actions = ['export_to_excel']
+    verbose_name = "Заявка с сайта"
+    verbose_name_plural = "Заявки с сайта"
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         formfield = super().formfield_for_foreignkey(db_field, request, **kwargs)
@@ -143,24 +149,32 @@ class VacancyResponsibilityInline(TranslationStackedInline):
     model = VacancyResponsibility
     extra = 2
     fields = (('title', 'order'), 'text')
+    verbose_name = "Обязанность"
+    verbose_name_plural = "Обязанности"
 
 
 class VacancyRequirementInline(TranslationTabularInline):
     model = VacancyRequirement
     extra = 3
     fields = ('text', 'order')
+    verbose_name = "Требование"
+    verbose_name_plural = "Требования"
 
 
 class VacancyConditionInline(TranslationTabularInline):
     model = VacancyCondition
     extra = 3
     fields = ('text', 'order')
+    verbose_name = "Условие"
+    verbose_name_plural = "Условия работы"
 
 
 class VacancyIdealCandidateInline(TranslationTabularInline):
     model = VacancyIdealCandidate
     extra = 3
     fields = ('text', 'order')
+    verbose_name = "Качество кандидата"
+    verbose_name_plural = "Идеальный кандидат"
 
 
 @admin.register(Vacancy)
@@ -171,6 +185,8 @@ class VacancyAdmin(TabbedTranslationAdmin):
     prepopulated_fields = {'slug': ('title',)}
     readonly_fields = ['created_at', 'updated_at', 'applications_count']
     inlines = [VacancyResponsibilityInline, VacancyRequirementInline, VacancyIdealCandidateInline, VacancyConditionInline]
+    verbose_name = "Вакансия"
+    verbose_name_plural = "Вакансии"
     
     fieldsets = (
         ('Основная информация', {
@@ -189,7 +205,7 @@ class VacancyAdmin(TabbedTranslationAdmin):
         count = obj.get_applications_count()
         if count > 0:
             return format_html(
-                '<a href="/admin/main/jobapplication/?vacancy__id__exact={}" style="color:#007bff;font-weight:bold;"> {} заявок</a>',
+                '<a href="/admin/main/jobapplication/?vacancy__id__exact={}" style="color:#007bff;font-weight:bold;">📋 {} заявок</a>',
                 obj.id, count
             )
         return '0 заявок'
@@ -204,6 +220,8 @@ class JobApplicationAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'file_size_display', 'resume_preview']
     date_hierarchy = 'created_at'
     autocomplete_fields = ['vacancy']
+    verbose_name = "Отклик на вакансию"
+    verbose_name_plural = "Отклики на вакансии"
     
     fieldsets = (
         ('Информация о заявке', {'fields': ('vacancy', 'region', 'created_at')}),
@@ -214,7 +232,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
     
     def resume_link(self, obj):
         if obj.resume:
-            return format_html('<a href="{}" target="_blank" style="color:#007bff;font-weight:bold;"> Скачать</a>', obj.resume.url)
+            return format_html('<a href="{}" target="_blank" style="color:#007bff;font-weight:bold;">📄 Скачать</a>', obj.resume.url)
         return "—"
     resume_link.short_description = 'Резюме'
     
@@ -228,15 +246,16 @@ class JobApplicationAdmin(admin.ModelAdmin):
             file_ext = obj.resume.name.split('.')[-1].lower()
             if file_ext in ['jpg', 'jpeg', 'png']:
                 return format_html('<img src="{}" width="300" style="border-radius:8px;">', obj.resume.url)
-            return format_html('<p style="color:#888;"> {}</p>', obj.resume.name)
+            return format_html('<p style="color:#888;">📄 {}</p>', obj.resume.name)
         return "—"
     resume_preview.short_description = 'Превью'
     
     def is_processed_badge(self, obj):
         if obj.is_processed:
-            return format_html('<span style="color:green;font-weight:bold;"> Рассмотрено</span>')
-        return format_html('<span style="color:orange;font-weight:bold;">Новая</span>')
+            return format_html('<span style="color:green;font-weight:bold;">✅ Рассмотрено</span>')
+        return format_html('<span style="color:orange;font-weight:bold;">🆕 Новая</span>')
     is_processed_badge.short_description = 'Статус'
+
 
 # ============ ИКОНКИ ============
 
@@ -245,35 +264,35 @@ class FeatureIconAdmin(admin.ModelAdmin):
     list_display = ['icon_preview', 'name', 'order']
     list_editable = ['name', 'order']
     search_fields = ['name']
+    verbose_name = "Иконка"
+    verbose_name_plural = "Иконки для характеристик"
     
     def icon_preview(self, obj):
         if obj.icon:
             return format_html('<img src="{}" width="30" height="30"/>', obj.icon.url)
         return "—"
-    icon_preview.short_description = "Иконка"
-
+    icon_preview.short_description = "Превью"
 
 
 # ============ ДИЛЕРЫ ============
 
 @admin.register(DealerService)
 class DealerServiceAdmin(TabbedTranslationAdmin):
-    """Админка для услуг дилеров"""
     list_display = ['name', 'slug', 'order', 'is_active']
     list_editable = ['order', 'is_active']
     search_fields = ['name']
     prepopulated_fields = {'slug': ('name',)}
+    verbose_name = "Услуга дилера"
+    verbose_name_plural = "Услуги дилеров"
     
     def has_delete_permission(self, request, obj=None):
-        """Защита базовых услуг от удаления"""
         if obj and obj.slug in ['sotuv', 'servis', 'ehtiyot-qismlar']:
-            return False  # Нельзя удалить базовые услуги
+            return False
         return super().has_delete_permission(request, obj)
 
 
 @admin.register(Dealer)
 class DealerAdmin(TabbedTranslationAdmin):
-    """Админка для дилеров"""
     list_display = [
         'logo_preview', 'name', 'city', 'phone', 
         'services_list', 'is_active', 'order'
@@ -282,7 +301,9 @@ class DealerAdmin(TabbedTranslationAdmin):
     search_fields = ['name', 'city', 'address', 'manager']
     list_editable = ['is_active', 'order']
     readonly_fields = ['logo_preview', 'created_at', 'updated_at']
-    filter_horizontal = ['services']  # Удобный виджет для выбора услуг
+    filter_horizontal = ['services']
+    verbose_name = "Дилер"
+    verbose_name_plural = "Дилеры"
     
     fieldsets = (
         ('Основная информация', {
@@ -297,7 +318,7 @@ class DealerAdmin(TabbedTranslationAdmin):
         }),
         ('Рабочее время', {
             'fields': ('working_hours',),
-            'description': 'Используйте &lt;br&gt; для переноса строки. Пример: Du-Ju: 9:00-20:00&lt;br&gt;Sha: Dam olish'
+            'description': 'Используйте &lt;br&gt; для переноса строки. Пример: Пн-Пт: 9:00-20:00&lt;br&gt;Сб: Выходной'
         }),
         ('Услуги', {
             'fields': ('services',)
@@ -309,17 +330,15 @@ class DealerAdmin(TabbedTranslationAdmin):
     )
     
     def logo_preview(self, obj):
-        """Превью логотипа"""
         if obj.logo:
             return format_html(
                 '<img src="{}" width="80" height="50" style="object-fit:contain;border-radius:4px;"/>',
                 obj.logo.url
             )
         return "—"
-    logo_preview.short_description = "Лого"
+    logo_preview.short_description = "Логотип"
     
     def services_list(self, obj):
-        """Список услуг дилера"""
         services = obj.services.all()
         if services:
             tags = ' '.join([
@@ -334,7 +353,6 @@ class DealerAdmin(TabbedTranslationAdmin):
 # ============ СТРАНИЦА "СТАТЬ ДИЛЕРОМ" ============
 
 class DealerRequirementInline(TranslationTabularInline):
-    """Inline для списка требований"""
     model = DealerRequirement
     extra = 1
     fields = ('text', 'order')
@@ -344,8 +362,6 @@ class DealerRequirementInline(TranslationTabularInline):
 
 @admin.register(BecomeADealerPage)
 class BecomeADealerPageAdmin(TabbedTranslationAdmin):
-    """Админка для страницы 'Стать дилером' (Singleton)"""
-    
     fieldsets = (
         ('Контент страницы', {
             'fields': ('title', 'intro_text', 'subtitle', 'important_note')
@@ -356,17 +372,16 @@ class BecomeADealerPageAdmin(TabbedTranslationAdmin):
     )
     
     inlines = [DealerRequirementInline]
+    verbose_name = "Страница 'Стать дилером'"
+    verbose_name_plural = "Страница 'Стать дилером'"
     
     def has_add_permission(self, request):
-        """Запретить создание новых записей (Singleton)"""
         return not BecomeADealerPage.objects.exists()
     
     def has_delete_permission(self, request, obj=None):
-        """Запретить удаление единственной записи"""
         return False
     
     def changelist_view(self, request, extra_context=None):
-        """Автоматически открывать форму редактирования"""
         obj = BecomeADealerPage.get_instance()
         return self.changeform_view(request, str(obj.pk), '', extra_context)
 
@@ -375,7 +390,6 @@ class BecomeADealerPageAdmin(TabbedTranslationAdmin):
 
 @admin.register(BecomeADealerApplication)
 class BecomeADealerApplicationAdmin(admin.ModelAdmin):
-    """Админка для заявок на дилерство"""
     list_display = [
         'dealer_badge', 'name', 'company_name', 'phone', 'region', 
         'experience_years', 'status', 'priority', 'manager', 'created_at'
@@ -387,6 +401,8 @@ class BecomeADealerApplicationAdmin(admin.ModelAdmin):
     autocomplete_fields = ['manager']
     date_hierarchy = 'created_at'
     actions = ['export_to_excel']
+    verbose_name = "Заявка на дилерство"
+    verbose_name_plural = "Заявки на дилерство"
     
     fieldsets = (
         ('Информация о заявителе', {
@@ -401,14 +417,12 @@ class BecomeADealerApplicationAdmin(admin.ModelAdmin):
     )
     
     def dealer_badge(self, obj):
-        """Бейдж 'Заявка на дилерство'"""
         return format_html(
-            '<span style="background:#ff9800;color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;"> ДИЛЕРСТВО</span>'
+            '<span style="background:#ff9800;color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;">🤝 ДИЛЕРСТВО</span>'
         )
     dealer_badge.short_description = "Тип"
     
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        """Настройки для выбора менеджера"""
         formfield = super().formfield_for_foreignkey(db_field, request, **kwargs)
         if db_field.name == "manager":
             formfield.widget.can_add_related = False
@@ -418,7 +432,6 @@ class BecomeADealerApplicationAdmin(admin.ModelAdmin):
         return formfield
     
     def export_to_excel(self, request, queryset):
-        """Экспорт заявок в Excel"""
         import openpyxl
         from django.http import HttpResponse
         from datetime import datetime
@@ -460,10 +473,11 @@ class BecomeADealerApplicationAdmin(admin.ModelAdmin):
         return response
     
     export_to_excel.short_description = '📥 Экспорт в Excel'
-# ============ ПРОДУКТЫ - ПРОСТАЯ ВЕРСИЯ БЕЗ ВЛОЖЕННОСТИ ============
+
+
+# ============ ПРОДУКТЫ ============
 
 class ProductParameterInline(TranslationTabularInline):
-    """Параметры машины с предустановленными категориями"""
     model = ProductParameter
     extra = 1
     fields = ('category', 'text', 'order')
@@ -472,28 +486,28 @@ class ProductParameterInline(TranslationTabularInline):
 
 
 class ProductFeatureInline(TranslationTabularInline):
-    """8 характеристик с иконками"""
     model = ProductFeature
     extra = 1
     max_num = 8
     fields = ('icon', 'name', 'order')
+    verbose_name = "Характеристика"
     verbose_name_plural = "Характеристики с иконками (макс 8)"
 
 
 class ProductCardSpecInline(TranslationTabularInline):
-    """4 характеристики для карточки"""
     model = ProductCardSpec
     extra = 1
     max_num = 4
     fields = ('icon', 'value', 'order')
+    verbose_name = "Характеристика карточки"
     verbose_name_plural = "Характеристики для карточки (макс 4)"
 
 
 class ProductGalleryInline(admin.TabularInline):
-    """Галерея продукта"""
     model = ProductGallery
     extra = 1
     fields = ('image', 'order')
+    verbose_name = "Фото"
     verbose_name_plural = "Галерея"
 
 
@@ -504,6 +518,8 @@ class ProductAdmin(TabbedTranslationAdmin):
     search_fields = ['title', 'slug']
     list_editable = ['is_active', 'is_featured', 'order']
     prepopulated_fields = {'slug': ('title',)}
+    verbose_name = "Продукт"
+    verbose_name_plural = "Продукты (грузовики)"
     
     fieldsets = (
         ('Основная информация', {
@@ -517,10 +533,10 @@ class ProductAdmin(TabbedTranslationAdmin):
     )
     
     inlines = [
-        ProductParameterInline,   # 1. Параметры машины (с категориями)
-        ProductFeatureInline,      # 2. Характеристики с иконками (8 шт)
-        ProductCardSpecInline,     # 3. Характеристики для карточки (4 шт)
-        ProductGalleryInline,      # 4. Галерея
+        ProductParameterInline,
+        ProductFeatureInline,
+        ProductCardSpecInline,
+        ProductGalleryInline,
     ]
     
     def thumbnail(self, obj):

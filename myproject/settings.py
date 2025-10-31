@@ -50,24 +50,34 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
 }
 
-LANGUAGE_CODE = 'ru'
+# ============ ЯЗЫКОВЫЕ НАСТРОЙКИ ============
+
+# ЯЗЫК АДМИНКИ (только для Django Admin)
+LANGUAGE_CODE = 'ru'  # ← Админка полностью на русском
+
+# Включить поддержку переводов
 USE_I18N = True
 USE_L10N = True
 
+# Доступные языки для ФРОНТЕНДА
 LANGUAGES = [
     ('ru', 'Русский'),
-    ('en', 'English'),
     ('uz', "O'zbek"),
+    ('en', 'English'),
     ('ky', 'Кыргызский'),
 ]
 
-MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz'
-MODELTRANSLATION_LANGUAGES = ('ru', 'en', 'uz')
+# Настройки ModelTranslation (ТОЛЬКО для контента моделей, НЕ для админки)
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz'  # Язык по умолчанию для фронтенда
+MODELTRANSLATION_LANGUAGES = ('uz', 'ru', 'en')  # Порядок важен!
 MODELTRANSLATION_FALLBACK_LANGUAGES = {
-    'default': (), 
+    'default': (),
 }
 
+# Папка с переводами Django
 LOCALE_PATHS = [BASE_DIR / 'locale']
+
+# ============ JAZZMIN НАСТРОЙКИ ============
 
 JAZZMIN_SETTINGS = {
     "site_header": "FAW Admin",
@@ -77,9 +87,14 @@ JAZZMIN_SETTINGS = {
     "search_model": ["auth.User"],
     "copyright": "VUM",
     "show_sidebar": True,
-    "navigation_expanded": False,  # Закрыто по умолчанию (аккордеон)
+    "navigation_expanded": False,
     "show_ui_builder": False,
     "custom_css": "css/custom_admin.css",
+    
+
+    
+    # Принудительно установить русский язык для админки
+    "language_chooser": False,  # Отключить выбор языка в админке
     
     "topmenu_links": [
         {"name": "Сайт", "url": "home", "new_window": True},
@@ -107,25 +122,19 @@ JAZZMIN_SETTINGS = {
         "kg.KGFeedback": "fas fa-comment-dots",
     },
     
-    # ГЛАВНОЕ: Группировка моделей
     "order_with_respect_to": [
         "main",
         "kg",
         "auth",
     ],
     
-    # Настройка сайдбара с группировкой
     "custom_links": {},
-    
-    # Скрыть ненужные модели
     "hide_models": [],
     
-    # Настройка меню пользователя
     "usermenu_links": [
         {"model": "auth.user"}
     ],
     
-    # Кастомная структура меню для FAW.UZ
     "show_ui_builder": False,
 }
 
@@ -135,11 +144,13 @@ JAZZMIN_UI_TWEAKS = {
     "brand_small_text": False,
 }
 
+# ============ MIDDLEWARE ============
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # ← Это для фронтенда
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -232,7 +243,7 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
 
-# Настройки языковых cookies
+# Настройки языковых cookies (для фронтенда)
 LANGUAGE_COOKIE_NAME = 'django_language'
 LANGUAGE_COOKIE_AGE = 365 * 24 * 60 * 60  # 1 год
 LANGUAGE_COOKIE_PATH = '/'

@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="uz" dir="ltr">
+<html lang="{{ LANGUAGE_CODE|default:'uz' }}" dir="ltr">
 
 <head>
     <meta charset="UTF-8" />
@@ -10,8 +10,8 @@
     <title>{{ page_data.title }} | FAW Trucks Uzbekistan</title>
 
     <!-- SEO Meta -->
-    <meta name="description" content="FAW Trucks dileri bo'lish - avtomobil texnikasini sotish va servis xizmatlari" />
-    <meta name="keywords" content="FAW Trucks, Uzbekistan, diler, yuk mashinalari" />
+    <meta name="description" content="{% if LANGUAGE_CODE == 'uz' %}FAW Trucks dileri bo'lish - avtomobil texnikasini sotish va servis xizmatlari{% elif LANGUAGE_CODE == 'ru' %}Стать дилером FAW Trucks - продажа автомобильной техники и сервисные услуги{% else %}Become a FAW Trucks dealer - automotive sales and service{% endif %}" />
+    <meta name="keywords" content="FAW Trucks, {% if LANGUAGE_CODE == 'uz' %}O'zbekiston, diler, yuk mashinalari{% elif LANGUAGE_CODE == 'ru' %}Узбекистан, дилер, грузовики{% else %}Uzbekistan, dealer, trucks{% endif %}" />
     <meta name="author" content="mix_design" />
 
     <!-- Favicons -->
@@ -22,7 +22,7 @@
 
     <!-- Open Graph -->
     <meta property="og:title" content="{{ page_data.title }} | FAW Trucks" />
-    <meta property="og:description" content="FAW Trucks dileri bo'lish imkoniyati" />
+    <meta property="og:description" content="{% if LANGUAGE_CODE == 'uz' %}FAW Trucks dileri bo'lish imkoniyati{% elif LANGUAGE_CODE == 'ru' %}Возможность стать дилером FAW Trucks{% else %}Opportunity to become a FAW Trucks dealer{% endif %}" />
     <meta property="og:url" content="https://fawtrucks.uz/become-dealer" />
     <meta property="og:image" content="{% static 'images/og-image.jpg' %}" />
     <meta property="og:image:width" content="1200" />
@@ -71,7 +71,7 @@
                 <div class="mxd-grid-item-1">
                     <div class="section-filter">
                         <ol class="breadcrumb-ol">
-                            <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
+                            <li><a href="{% url 'home' %}">{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}</a></li>
                             <li class="active" aria-current="page">{{ page_data.title }}</li>
                         </ol>
                     </div>
@@ -98,13 +98,13 @@
                 {% for requirement in requirements %}
                     <li>{{ requirement.text }}</li>
                 {% empty %}
-                    <li>Tijorat bo'limi (kamida ikki kishi)</li>
-                    <li>Reklama bo'limi</li>
-                    <li>Tayyor texnika uchun ombor-avtoturargoh</li>
-                    <li>Ehtiyot qismlar ombori</li>
-                    <li>Texnik xizmat ko'rsatish uchun sertifikatlangan servis markazi</li>
-                    <li>Texnik xizmat ko'rsatish uchun sertifikatlangan mobil servis</li>
-                    <li>Sertifikatlangan va malakali servis markazi hamda savdo bo'limi mutaxassislari</li>
+                    <li>{% if LANGUAGE_CODE == 'uz' %}Tijorat bo'limi (kamida ikki kishi){% elif LANGUAGE_CODE == 'ru' %}Коммерческий отдел (минимум два человека){% else %}Commercial department (at least two people){% endif %}</li>
+                    <li>{% if LANGUAGE_CODE == 'uz' %}Reklama bo'limi{% elif LANGUAGE_CODE == 'ru' %}Рекламный отдел{% else %}Advertising department{% endif %}</li>
+                    <li>{% if LANGUAGE_CODE == 'uz' %}Tayyor texnika uchun ombor-avtoturargoh{% elif LANGUAGE_CODE == 'ru' %}Склад-автостоянка для готовой техники{% else %}Warehouse-parking for finished equipment{% endif %}</li>
+                    <li>{% if LANGUAGE_CODE == 'uz' %}Ehtiyot qismlar ombori{% elif LANGUAGE_CODE == 'ru' %}Склад запчастей{% else %}Spare parts warehouse{% endif %}</li>
+                    <li>{% if LANGUAGE_CODE == 'uz' %}Texnik xizmat ko'rsatish uchun sertifikatlangan servis markazi{% elif LANGUAGE_CODE == 'ru' %}Сертифицированный сервисный центр для технического обслуживания{% else %}Certified service center for maintenance{% endif %}</li>
+                    <li>{% if LANGUAGE_CODE == 'uz' %}Texnik xizmat ko'rsatish uchun sertifikatlangan mobil servis{% elif LANGUAGE_CODE == 'ru' %}Сертифицированный мобильный сервис для технического обслуживания{% else %}Certified mobile service for maintenance{% endif %}</li>
+                    <li>{% if LANGUAGE_CODE == 'uz' %}Sertifikatlangan va malakali servis markazi hamda savdo bo'limi mutaxassislari{% elif LANGUAGE_CODE == 'ru' %}Сертифицированные и квалифицированные специалисты сервисного центра и отдела продаж{% else %}Certified and qualified service center and sales department specialists{% endif %}</li>
                 {% endfor %}
             </ul>
 
@@ -124,9 +124,13 @@
                             <aside class="contact-info">
                                 <div class="contact-info__content">
                                     <p class="contact-info__description anim-uni-in-up">
-                                        FAW dileri bo'lish bo'yicha savollaringiz bormi? Bizning
-                                        mutaxassislar sizga yordam berishga tayyor. Formani
-                                        to'ldiring va biz tez orada siz bilan bog'lanamiz.
+                                        {% if LANGUAGE_CODE == 'uz' %}
+                                        FAW dileri bo'lish bo'yicha savollaringiz bormi? Bizning mutaxassislar sizga yordam berishga tayyor. Formani to'ldiring va biz tez orada siz bilan bog'lanamiz.
+                                        {% elif LANGUAGE_CODE == 'ru' %}
+                                        Есть вопросы о том, как стать дилером FAW? Наши специалисты готовы помочь вам. Заполните форму, и мы свяжемся с вами в ближайшее время.
+                                        {% else %}
+                                        Have questions about becoming a FAW dealer? Our specialists are ready to help you. Fill out the form and we will contact you soon.
+                                        {% endif %}
                                     </p>
 
                                     <div class="contact-info__details">
@@ -135,7 +139,7 @@
                                                 <i class="ph-fill ph-phone"></i>
                                             </div>
                                             <div class="contact-detail__content">
-                                                <h3 class="contact-detail__title">Telefon</h3>
+                                                <h3 class="contact-detail__title">{% if LANGUAGE_CODE == 'uz' %}Telefon{% elif LANGUAGE_CODE == 'ru' %}Телефон{% else %}Phone{% endif %}</h3>
                                                 <a href="tel:{{ page_data.contact_phone }}" class="contact-detail__value">
                                                     {{ page_data.contact_phone }}
                                                 </a>
@@ -159,7 +163,7 @@
                                                 <i class="ph-fill ph-map-pin"></i>
                                             </div>
                                             <div class="contact-detail__content">
-                                                <h3 class="contact-detail__title">Manzil</h3>
+                                                <h3 class="contact-detail__title">{% if LANGUAGE_CODE == 'uz' %}Manzil{% elif LANGUAGE_CODE == 'ru' %}Адрес{% else %}Address{% endif %}</h3>
                                                 <address class="contact-detail__value">
                                                     {{ page_data.contact_address }}
                                                 </address>
@@ -178,9 +182,15 @@
                                         <!-- Success Message -->
                                         <div class="form__reply centered text-center" style="display: none;" role="alert" aria-live="polite">
                                             <i class="ph-fill ph-smiley-wink reply__icon" aria-hidden="true"></i>
-                                            <p class="reply__title">Bajarildi!</p>
+                                            <p class="reply__title">{% if LANGUAGE_CODE == 'uz' %}Bajarildi!{% elif LANGUAGE_CODE == 'ru' %}Выполнено!{% else %}Done!{% endif %}</p>
                                             <span class="reply__text">
+                                                {% if LANGUAGE_CODE == 'uz' %}
                                                 Xabaringiz uchun rahmat. Biz tez orada javob beramiz.
+                                                {% elif LANGUAGE_CODE == 'ru' %}
+                                                Спасибо за ваше сообщение. Мы скоро ответим.
+                                                {% else %}
+                                                Thank you for your message. We will respond soon.
+                                                {% endif %}
                                             </span>
                                         </div>
 
@@ -194,54 +204,54 @@
                                             <div class="container-fluid p-0">
                                                 <div class="row gx-0">
                                                     <div class="col-12 mxd-grid-item anim-uni-in-up">
-                                                        <label for="dealer_name" class="visually-hidden">F.I.SH</label>
-                                                        <input type="text" id="dealer_name" name="Name" placeholder="F.I.SH*" required autocomplete="name" />
+                                                        <label for="dealer_name" class="visually-hidden">{% if LANGUAGE_CODE == 'uz' %}F.I.SH{% elif LANGUAGE_CODE == 'ru' %}Ф.И.О{% else %}Full name{% endif %}</label>
+                                                        <input type="text" id="dealer_name" name="Name" placeholder="{% if LANGUAGE_CODE == 'uz' %}F.I.SH*{% elif LANGUAGE_CODE == 'ru' %}Ф.И.О*{% else %}Full name*{% endif %}" required autocomplete="name" />
                                                     </div>
 
                                                     <div class="col-12 mxd-grid-item anim-uni-in-up">
-                                                        <label for="dealer_company" class="visually-hidden">Kompaniya</label>
-                                                        <input type="text" id="dealer_company" name="Company" placeholder="Kompaniya nomi (ixtiyoriy)" autocomplete="organization" />
+                                                        <label for="dealer_company" class="visually-hidden">{% if LANGUAGE_CODE == 'uz' %}Kompaniya{% elif LANGUAGE_CODE == 'ru' %}Компания{% else %}Company{% endif %}</label>
+                                                        <input type="text" id="dealer_company" name="Company" placeholder="{% if LANGUAGE_CODE == 'uz' %}Kompaniya nomi (ixtiyoriy){% elif LANGUAGE_CODE == 'ru' %}Название компании (необязательно){% else %}Company name (optional){% endif %}" autocomplete="organization" />
                                                     </div>
 
                                                     <div class="col-12 mxd-grid-item anim-uni-in-up">
-                                                        <label for="dealer_experience" class="visually-hidden">Tajriba</label>
-                                                        <input type="number" id="dealer_experience" name="Experience" placeholder="Tajriba (yil)" min="0" max="50" />
+                                                        <label for="dealer_experience" class="visually-hidden">{% if LANGUAGE_CODE == 'uz' %}Tajriba{% elif LANGUAGE_CODE == 'ru' %}Опыт{% else %}Experience{% endif %}</label>
+                                                        <input type="number" id="dealer_experience" name="Experience" placeholder="{% if LANGUAGE_CODE == 'uz' %}Tajriba (yil){% elif LANGUAGE_CODE == 'ru' %}Опыт (лет){% else %}Experience (years){% endif %}" min="0" max="50" />
                                                     </div>
 
                                                     <div class="col-12 mxd-grid-item anim-uni-in-up">
-                                                        <label for="dealer_region" class="visually-hidden">Viloyat</label>
+                                                        <label for="dealer_region" class="visually-hidden">{% if LANGUAGE_CODE == 'uz' %}Viloyat{% elif LANGUAGE_CODE == 'ru' %}Регион{% else %}Region{% endif %}</label>
                                                         <select id="dealer_region" name="Region" required>
-                                                            <option value="" disabled selected>Viloyatni tanlang*</option>
-                                                            <option value="Toshkent shahri">Toshkent shahri</option>
-                                                            <option value="Andijon viloyati">Andijon viloyati</option>
-                                                            <option value="Buxoro viloyati">Buxoro viloyati</option>
-                                                            <option value="Fargʻona viloyati">Fargʻona viloyati</option>
-                                                            <option value="Jizzax viloyati">Jizzax viloyati</option>
-                                                            <option value="Xorazm viloyati">Xorazm viloyati</option>
-                                                            <option value="Namangan viloyati">Namangan viloyati</option>
-                                                            <option value="Navoiy viloyati">Navoiy viloyati</option>
-                                                            <option value="Qashqadaryo viloyati">Qashqadaryo viloyati</option>
-                                                            <option value="Samarqand viloyati">Samarqand viloyati</option>
-                                                            <option value="Sirdaryo viloyati">Sirdaryo viloyati</option>
-                                                            <option value="Surxondaryo viloyati">Surxondaryo viloyati</option>
-                                                            <option value="Toshkent viloyati">Toshkent viloyati</option>
-                                                            <option value="Qoraqalpogʻiston Respublikasi">Qoraqalpogʻiston Respublikasi</option>
+                                                            <option value="" disabled selected>{% if LANGUAGE_CODE == 'uz' %}Viloyatni tanlang*{% elif LANGUAGE_CODE == 'ru' %}Выберите регион*{% else %}Select region*{% endif %}</option>
+                                                            <option value="Toshkent shahri">{% if LANGUAGE_CODE == 'uz' %}Toshkent shahri{% elif LANGUAGE_CODE == 'ru' %}г. Ташкент{% else %}Tashkent city{% endif %}</option>
+                                                            <option value="Andijon viloyati">{% if LANGUAGE_CODE == 'uz' %}Andijon viloyati{% elif LANGUAGE_CODE == 'ru' %}Андижанская область{% else %}Andijan region{% endif %}</option>
+                                                            <option value="Buxoro viloyati">{% if LANGUAGE_CODE == 'uz' %}Buxoro viloyati{% elif LANGUAGE_CODE == 'ru' %}Бухарская область{% else %}Bukhara region{% endif %}</option>
+                                                            <option value="Fargʻona viloyati">{% if LANGUAGE_CODE == 'uz' %}Fargʻona viloyati{% elif LANGUAGE_CODE == 'ru' %}Ферганская область{% else %}Fergana region{% endif %}</option>
+                                                            <option value="Jizzax viloyati">{% if LANGUAGE_CODE == 'uz' %}Jizzax viloyati{% elif LANGUAGE_CODE == 'ru' %}Джизакская область{% else %}Jizzakh region{% endif %}</option>
+                                                            <option value="Xorazm viloyati">{% if LANGUAGE_CODE == 'uz' %}Xorazm viloyati{% elif LANGUAGE_CODE == 'ru' %}Хорезмская область{% else %}Khorezm region{% endif %}</option>
+                                                            <option value="Namangan viloyati">{% if LANGUAGE_CODE == 'uz' %}Namangan viloyati{% elif LANGUAGE_CODE == 'ru' %}Наманганская область{% else %}Namangan region{% endif %}</option>
+                                                            <option value="Navoiy viloyati">{% if LANGUAGE_CODE == 'uz' %}Navoiy viloyati{% elif LANGUAGE_CODE == 'ru' %}Навоийская область{% else %}Navoiy region{% endif %}</option>
+                                                            <option value="Qashqadaryo viloyati">{% if LANGUAGE_CODE == 'uz' %}Qashqadaryo viloyati{% elif LANGUAGE_CODE == 'ru' %}Кашкадарьинская область{% else %}Kashkadarya region{% endif %}</option>
+                                                            <option value="Samarqand viloyati">{% if LANGUAGE_CODE == 'uz' %}Samarqand viloyati{% elif LANGUAGE_CODE == 'ru' %}Самаркандская область{% else %}Samarkand region{% endif %}</option>
+                                                            <option value="Sirdaryo viloyati">{% if LANGUAGE_CODE == 'uz' %}Sirdaryo viloyati{% elif LANGUAGE_CODE == 'ru' %}Сырдарьинская область{% else %}Sirdaryo region{% endif %}</option>
+                                                            <option value="Surxondaryo viloyati">{% if LANGUAGE_CODE == 'uz' %}Surxondaryo viloyati{% elif LANGUAGE_CODE == 'ru' %}Сурхандарьинская область{% else %}Surkhandarya region{% endif %}</option>
+                                                            <option value="Toshkent viloyati">{% if LANGUAGE_CODE == 'uz' %}Toshkent viloyati{% elif LANGUAGE_CODE == 'ru' %}Ташкентская область{% else %}Tashkent region{% endif %}</option>
+                                                            <option value="Qoraqalpogʻiston Respublikasi">{% if LANGUAGE_CODE == 'uz' %}Qoraqalpogʻiston Respublikasi{% elif LANGUAGE_CODE == 'ru' %}Республика Каракалпакстан{% else %}Republic of Karakalpakstan{% endif %}</option>
                                                         </select>
                                                     </div>
 
                                                     <div class="col-12 mxd-grid-item anim-uni-in-up">
-                                                        <label for="dealer_phone" class="visually-hidden">Telefon</label>
-                                                        <input type="tel" id="dealer_phone" name="Phone" placeholder="Telefon raqami*" required pattern="[+]*[0-9\s\-\(\)]*" autocomplete="tel" />
+                                                        <label for="dealer_phone" class="visually-hidden">{% if LANGUAGE_CODE == 'uz' %}Telefon{% elif LANGUAGE_CODE == 'ru' %}Телефон{% else %}Phone{% endif %}</label>
+                                                        <input type="tel" id="dealer_phone" name="Phone" placeholder="{% if LANGUAGE_CODE == 'uz' %}Telefon raqami*{% elif LANGUAGE_CODE == 'ru' %}Номер телефона*{% else %}Phone number*{% endif %}" required pattern="[+]*[0-9\s\-\(\)]*" autocomplete="tel" />
                                                     </div>
 
                                                     <div class="col-12 mxd-grid-item anim-uni-in-up">
-                                                        <label for="dealer_message" class="visually-hidden">Xabar</label>
-                                                        <textarea id="dealer_message" name="Message" placeholder="Qo'shimcha savol*" required rows="5"></textarea>
+                                                        <label for="dealer_message" class="visually-hidden">{% if LANGUAGE_CODE == 'uz' %}Xabar{% elif LANGUAGE_CODE == 'ru' %}Сообщение{% else %}Message{% endif %}</label>
+                                                        <textarea id="dealer_message" name="Message" placeholder="{% if LANGUAGE_CODE == 'uz' %}Qo'shimcha savol*{% elif LANGUAGE_CODE == 'ru' %}Дополнительный вопрос*{% else %}Additional question*{% endif %}" required rows="5"></textarea>
                                                     </div>
 
                                                     <div class="col-12 mxd-grid-item anim-uni-in-up">
                                                         <button class="btn btn-anim btn-default btn-large btn-opposite slide-right-up shimmer-btn" type="submit">
-                                                            <span class="btn-caption">Jo'natish</span>
+                                                            <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Jo'natish{% elif LANGUAGE_CODE == 'ru' %}Отправить{% else %}Send{% endif %}</span>
                                                             <span class="shimmer" aria-hidden="true"></span>
                                                             <i class="ph-bold ph-arrow-up-right" aria-hidden="true"></i>
                                                         </button>
