@@ -21,7 +21,6 @@ from .serializers import (
     BecomeADealerPageSerializer, BecomeADealerApplicationSerializer
 )
 
-
 # === FRONTEND views === 
 def index(request):
     return render(request, 'main/index.html')
@@ -90,11 +89,8 @@ def set_language_get(request):
             max_age=settings.LANGUAGE_COOKIE_AGE,
             path='/',
         )
-        
-        print(f"✅ Language switched to: {lang}")
         return response
     
-    print(f"❌ Invalid language: {lang}")
     return redirect(request.META.get("HTTP_REFERER", "/"))
 
 

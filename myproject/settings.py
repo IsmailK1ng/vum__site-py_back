@@ -6,18 +6,14 @@ from pathlib import Path
 from decouple import config
 import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
-
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
 
-# Application definition
+# ============ ПРИЛОЖЕНИЯ ============
+
 INSTALLED_APPS = [
     'modeltranslation',
     'jazzmin',
@@ -34,10 +30,13 @@ INSTALLED_APPS = [
     'nested_admin',
     'django_filters',
     'corsheaders',
+    'reversion',  # ← ДОБАВЛЕНО для истории изменений
     
     'main',
     'kg',
 ]
+
+# ============ REST FRAMEWORK ============
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
@@ -52,30 +51,27 @@ REST_FRAMEWORK = {
 
 # ============ ЯЗЫКОВЫЕ НАСТРОЙКИ ============
 
-# ЯЗЫК АДМИНКИ (только для Django Admin)
-LANGUAGE_CODE = 'ru'  # ← Админка полностью на русском
+LANGUAGE_CODE = 'ru-RU'
 
-# Включить поддержку переводов
 USE_I18N = True
 USE_L10N = True
+USE_TZ = True
 
-# Доступные языки для ФРОНТЕНДА
 LANGUAGES = [
-    ('ru', 'Русский'),
     ('uz', "O'zbek"),
+    ('ru', 'Русский'),
     ('en', 'English'),
     ('ky', 'Кыргызский'),
 ]
 
-# Настройки ModelTranslation (ТОЛЬКО для контента моделей, НЕ для админки)
-MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz'  # Язык по умолчанию для фронтенда
-MODELTRANSLATION_LANGUAGES = ('uz', 'ru', 'en')  # Порядок важен!
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz' 
+MODELTRANSLATION_LANGUAGES = ('uz', 'ru', 'en')
 MODELTRANSLATION_FALLBACK_LANGUAGES = {
     'default': (),
 }
 
-# Папка с переводами Django
-LOCALE_PATHS = [BASE_DIR / 'locale']
+USE_THOUSAND_SEPARATOR = True
+NUMBER_GROUPING = 3
 
 # ============ JAZZMIN НАСТРОЙКИ ============
 
@@ -90,14 +86,11 @@ JAZZMIN_SETTINGS = {
     "navigation_expanded": False,
     "show_ui_builder": False,
     "custom_css": "css/custom_admin.css",
-    
-
-    
-    # Принудительно установить русский язык для админки
-    "language_chooser": False,  # Отключить выбор языка в админке
+    "language_chooser": False,
     
     "topmenu_links": [
-        {"name": "Сайт", "url": "home", "new_window": True},
+        {"name": "Сайт UZ", "url": "https://faw.uz", "new_window": True},
+        {"name": "Сайт KG", "url": "https://faw.kg", "new_window": True},
     ],
     
     "icons": {
@@ -128,13 +121,25 @@ JAZZMIN_SETTINGS = {
         "auth",
     ],
     
-    "custom_links": {},
-    "hide_models": [],
+    "custom_links": {
+        "main": [{
+            "name": "FAW Узбекистан",
+            "url": "https://faw.uz",
+            "icon": "fas fa-flag",
+            "new_window": True
+        }],
+        "kg": [{
+            "name": "FAW Кыргызстан", 
+            "url": "https://faw.kg",
+            "icon": "fas fa-mountain",
+            "new_window": True
+        }]
+    },
     
+    "hide_models": [],
     "usermenu_links": [
         {"model": "auth.user"}
     ],
-    
     "show_ui_builder": False,
 }
 
@@ -149,21 +154,24 @@ JAZZMIN_UI_TWEAKS = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.locale.LocaleMiddleware',  # ← Это для фронтенда
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'reversion.middleware.RevisionMiddleware',  # ← ДОБАВЛЕНО для истории
 ]
 
 ROOT_URLCONF = 'myproject.urls'
 
+# ============ TEMPLATES ============
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'kg' / 'templates'],
+        'DIRS': [BASE_DIR / 'kg' / 'templates', BASE_DIR / 'main' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -179,6 +187,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
+# ============ DATABASE ============
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -190,6 +200,8 @@ DATABASES = {
     }
 }
 
+# ============ ВАЛИДАЦИЯ ПАРОЛЕЙ ============
+
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -197,8 +209,11 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-TIME_ZONE = config('TIME_ZONE', default='UTC')
-USE_TZ = True
+# ============ ЛОКАЛИЗАЦИЯ ============
+
+TIME_ZONE = config('TIME_ZONE', default='Asia/Tashkent')
+
+# ============ СТАТИЧЕСКИЕ ФАЙЛЫ ============
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -212,30 +227,47 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# ============ БЕЗОПАСНОСТЬ ============
+
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
     'http://localhost:8000',
-    'http://127.0.0.1',
-    'http://localhost',
+    'https://faw.uz',
+    'https://www.faw.uz',
+    'https://faw.kg',
+    'https://www.faw.kg',
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'https://faw.kg',
     'https://faw.uz',
+    'https://www.faw.uz',
+    'https://faw.kg',
+    'https://www.faw.kg',
     'http://localhost:3000',
     'http://localhost:5173',
     'http://127.0.0.1:5173',
     'http://localhost:8080',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True  # Только для разработки
+CORS_ALLOW_ALL_ORIGINS = DEBUG
 
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:3000')
 
+# ============ ПРОДАКШЕН НАСТРОЙКИ ============
+
 if not DEBUG:
     CORS_ALLOW_ALL_ORIGINS = False
-    CORS_ALLOWED_ORIGINS = ['https://faw.kg', 'https://www.faw.kg']
-    ALLOWED_HOSTS = ['faw.kg', 'www.faw.kg', 'api.faw.kg']
+    CORS_ALLOWED_ORIGINS = [
+        'https://faw.uz',
+        'https://www.faw.uz',
+        'https://faw.kg', 
+        'https://www.faw.kg'
+    ]
+    ALLOWED_HOSTS = [
+        'faw.uz', 'www.faw.uz',
+        'faw.kg', 'www.faw.kg',
+        'api.faw.uz', 'api.faw.kg'
+    ]
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
@@ -243,11 +275,12 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
 
-# Настройки языковых cookies (для фронтенда)
+# ============ ЯЗЫКОВЫЕ COOKIES ============
+
 LANGUAGE_COOKIE_NAME = 'django_language'
-LANGUAGE_COOKIE_AGE = 365 * 24 * 60 * 60  # 1 год
+LANGUAGE_COOKIE_AGE = 365 * 24 * 60 * 60
 LANGUAGE_COOKIE_PATH = '/'
 LANGUAGE_COOKIE_DOMAIN = None
-LANGUAGE_COOKIE_SECURE = False  # True в продакшене
+LANGUAGE_COOKIE_SECURE = not DEBUG
 LANGUAGE_COOKIE_HTTPONLY = False
 LANGUAGE_COOKIE_SAMESITE = 'Lax'

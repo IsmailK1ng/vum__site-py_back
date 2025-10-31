@@ -98,8 +98,8 @@ class Product(models.Model):
     is_active = models.BooleanField("Активен", default=True)
     is_featured = models.BooleanField("Показывать на главной", default=False)
     order = models.PositiveIntegerField("Порядок", default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
+    updated_at = models.DateTimeField("Дата обновления", auto_now=True)
 
     class Meta:
         verbose_name = "Контент - Грузовик"
@@ -344,8 +344,8 @@ class Dealer(models.Model):
     logo = models.ImageField("Логотип", upload_to="dealers/logos/", blank=True, null=True)
     is_active = models.BooleanField("Активен", default=True)
     order = models.PositiveIntegerField("Порядок", default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
+    updated_at = models.DateTimeField("Дата обновления", auto_now=True)
     
     class Meta:
         verbose_name = "Дилеры - Дилер"
@@ -366,8 +366,8 @@ class Vacancy(models.Model):
     contact_info = models.TextField("Контакты", default='Присылайте резюме на info@faw.uz')
     is_active = models.BooleanField("Активна", default=True)
     order = models.PositiveIntegerField("Порядок", default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
+    updated_at = models.DateTimeField("Дата обновления", auto_now=True)
 
     class Meta:
         verbose_name = "Вакансии - Вакансия"
@@ -436,3 +436,5 @@ class VacancyIdealCandidate(models.Model):
 
     def __str__(self):
         return self.text[:50]
+# ========== 05. СТАТИЧНЫЕ СТРАНИЦЫ ==========
+

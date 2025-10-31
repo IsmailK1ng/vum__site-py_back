@@ -24,5 +24,4 @@ uz_router.register(r'dealer-applications', BecomeADealerApplicationViewSet, base
 
 urlpatterns = [
     path('uz/', include(uz_router.urls)),
-    path('kg/', include('kg.api_urls')),
 ]

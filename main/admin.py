@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from modeltranslation.admin import TranslationAdmin, TranslationTabularInline, TranslationStackedInline, TabbedTranslationAdmin
-from nested_admin import NestedModelAdmin, NestedStackedInline, NestedTabularInline
+from django import forms  # ← ДОБАВЛЕНО
+from modeltranslation.admin import TranslationTabularInline, TranslationStackedInline, TabbedTranslationAdmin
+from reversion.admin import VersionAdmin  # ← ДОБАВЛЕНО
 from .models import (
     News, NewsBlock, ContactForm, Vacancy, 
     VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
@@ -9,7 +10,6 @@ from .models import (
     ProductCardSpec, ProductGallery, DealerService, Dealer,
     BecomeADealerPage, DealerRequirement, BecomeADealerApplication
 )
-import nested_admin
 import openpyxl
 from datetime import datetime
 from django.http import HttpResponse
@@ -17,6 +17,63 @@ from django.http import HttpResponse
 admin.site.site_header = "Панель управления VUM"
 admin.site.site_title = "VUM Admin"
 admin.site.index_title = "Управление сайтами FAW"
+
+
+# ============ БАЗОВЫЕ МИКСИНЫ ДЛЯ ПРАВ ДОСТУПА ============
+
+class ContentAdminMixin:
+    """Миксин для контент-админов"""
+    def has_module_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        return request.user.groups.filter(
+            name__in=['Главные админы', 'Контент-админы']
+        ).exists()
+    
+    def has_change_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        return request.user.groups.filter(
+            name__in=['Главные админы', 'Контент-админы']
+        ).exists()
+    
+    def has_delete_permission(self, request, obj=None):
+        # Superuser и Главные админы всегда могут
+        if request.user.is_superuser:
+            return True
+        if request.user.groups.filter(name='Главные админы').exists():
+            return True
+        
+        # Обычные админы - проверяем конкретное право
+        # Например: user.has_perm('main.delete_news')
+        model_name = self.model._meta.model_name
+        perm = f'main.delete_{model_name}'
+        return request.user.has_perm(perm)
+
+
+class LeadManagerMixin:
+    """Миксин для лид-менеджеров"""
+    def has_module_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        return request.user.groups.filter(
+            name__in=['Главные админы', 'Лид-менеджеры']
+        ).exists()
+    
+    def has_add_permission(self, request):
+        # Заявки создаются только с фронта
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        if request.user.groups.filter(name='Главные админы').exists():
+            return True
+        
+        # Проверка конкретного права
+        model_name = self.model._meta.model_name
+        perm = f'main.delete_{model_name}'
+        return request.user.has_perm(perm)
 
 
 # ============ НОВОСТИ ============
@@ -37,15 +94,13 @@ class NewsBlockInline(TranslationTabularInline):
 
 
 @admin.register(News)
-class NewsAdmin(TabbedTranslationAdmin):
+class NewsAdmin(ContentAdminMixin, VersionAdmin, TabbedTranslationAdmin):
     list_display = ('title', 'author', 'preview_image_tag', 'created_at')
     readonly_fields = ('preview_image_tag', 'author_photo_tag')
     search_fields = ('title', 'author__username')
     list_filter = ('created_at',)
     ordering = ('-created_at',)
     inlines = [NewsBlockInline]
-    verbose_name = "Новость"
-    verbose_name_plural = "Новости"
 
     def preview_image_tag(self, obj):
         if obj.preview_image:
@@ -63,7 +118,7 @@ class NewsAdmin(TabbedTranslationAdmin):
 # ============ ЗАЯВКИ ============
 
 @admin.register(ContactForm)
-class ContactFormAdmin(admin.ModelAdmin):
+class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     list_display = ['name', 'phone', 'region', 'priority', 'status', 'manager', 'created_at', 'action_buttons']
     list_editable = ['priority', 'status', 'manager']
     list_filter = ['status', 'priority', 'region', 'created_at']
@@ -72,17 +127,6 @@ class ContactFormAdmin(admin.ModelAdmin):
     autocomplete_fields = ['manager']
     date_hierarchy = 'created_at'
     actions = ['export_to_excel']
-    verbose_name = "Заявка с сайта"
-    verbose_name_plural = "Заявки с сайта"
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        formfield = super().formfield_for_foreignkey(db_field, request, **kwargs)
-        if db_field.name == "manager":
-            formfield.widget.can_add_related = False
-            formfield.widget.can_change_related = False
-            formfield.widget.can_delete_related = False
-            formfield.widget.can_view_related = False
-        return formfield
 
     fieldsets = (
         ('Информация о клиенте', {
@@ -92,6 +136,15 @@ class ContactFormAdmin(admin.ModelAdmin):
             'fields': ('status', 'priority', 'manager', 'admin_comment')
         }),
     )
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        formfield = super().formfield_for_foreignkey(db_field, request, **kwargs)
+        if db_field.name == "manager":
+            formfield.widget.can_add_related = False
+            formfield.widget.can_change_related = False
+            formfield.widget.can_delete_related = False
+            formfield.widget.can_view_related = False
+        return formfield
     
     def action_buttons(self, obj):
         return format_html('''
@@ -149,44 +202,34 @@ class VacancyResponsibilityInline(TranslationStackedInline):
     model = VacancyResponsibility
     extra = 2
     fields = (('title', 'order'), 'text')
-    verbose_name = "Обязанность"
-    verbose_name_plural = "Обязанности"
 
 
 class VacancyRequirementInline(TranslationTabularInline):
     model = VacancyRequirement
     extra = 3
     fields = ('text', 'order')
-    verbose_name = "Требование"
-    verbose_name_plural = "Требования"
 
 
 class VacancyConditionInline(TranslationTabularInline):
     model = VacancyCondition
     extra = 3
     fields = ('text', 'order')
-    verbose_name = "Условие"
-    verbose_name_plural = "Условия работы"
 
 
 class VacancyIdealCandidateInline(TranslationTabularInline):
     model = VacancyIdealCandidate
     extra = 3
     fields = ('text', 'order')
-    verbose_name = "Качество кандидата"
-    verbose_name_plural = "Идеальный кандидат"
 
 
 @admin.register(Vacancy)
-class VacancyAdmin(TabbedTranslationAdmin):
+class VacancyAdmin(ContentAdminMixin, VersionAdmin, TabbedTranslationAdmin):
     list_display = ['title', 'is_active', 'applications_count', 'order', 'created_at']
     list_filter = ['is_active', 'created_at']
     search_fields = ['title', 'short_description']
     prepopulated_fields = {'slug': ('title',)}
     readonly_fields = ['created_at', 'updated_at', 'applications_count']
     inlines = [VacancyResponsibilityInline, VacancyRequirementInline, VacancyIdealCandidateInline, VacancyConditionInline]
-    verbose_name = "Вакансия"
-    verbose_name_plural = "Вакансии"
     
     fieldsets = (
         ('Основная информация', {
@@ -205,7 +248,7 @@ class VacancyAdmin(TabbedTranslationAdmin):
         count = obj.get_applications_count()
         if count > 0:
             return format_html(
-                '<a href="/admin/main/jobapplication/?vacancy__id__exact={}" style="color:#007bff;font-weight:bold;">📋 {} заявок</a>',
+                '<a href="/admin/main/jobapplication/?vacancy__id__exact={}" style="color:#007bff;font-weight:bold;"> {} Заявок</a>',
                 obj.id, count
             )
         return '0 заявок'
@@ -213,15 +256,13 @@ class VacancyAdmin(TabbedTranslationAdmin):
 
 
 @admin.register(JobApplication)
-class JobApplicationAdmin(admin.ModelAdmin):
+class JobApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
     list_display = ['vacancy', 'region', 'applicant_name', 'resume_link', 'file_size_display', 'created_at', 'is_processed_badge']
     list_filter = ['is_processed', 'vacancy', 'region', 'created_at']
     search_fields = ['applicant_name', 'applicant_phone', 'applicant_email', 'vacancy__title']
     readonly_fields = ['created_at', 'file_size_display', 'resume_preview']
     date_hierarchy = 'created_at'
     autocomplete_fields = ['vacancy']
-    verbose_name = "Отклик на вакансию"
-    verbose_name_plural = "Отклики на вакансии"
     
     fieldsets = (
         ('Информация о заявке', {'fields': ('vacancy', 'region', 'created_at')}),
@@ -232,7 +273,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
     
     def resume_link(self, obj):
         if obj.resume:
-            return format_html('<a href="{}" target="_blank" style="color:#007bff;font-weight:bold;">📄 Скачать</a>', obj.resume.url)
+            return format_html('<a href="{}" target="_blank" style="color:#007bff;font-weight:bold;"> Скачать</a>', obj.resume.url)
         return "—"
     resume_link.short_description = 'Резюме'
     
@@ -246,7 +287,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
             file_ext = obj.resume.name.split('.')[-1].lower()
             if file_ext in ['jpg', 'jpeg', 'png']:
                 return format_html('<img src="{}" width="300" style="border-radius:8px;">', obj.resume.url)
-            return format_html('<p style="color:#888;">📄 {}</p>', obj.resume.name)
+            return format_html('<p style="color:#888;"> {}</p>', obj.resume.name)
         return "—"
     resume_preview.short_description = 'Превью'
     
@@ -260,12 +301,10 @@ class JobApplicationAdmin(admin.ModelAdmin):
 # ============ ИКОНКИ ============
 
 @admin.register(FeatureIcon)
-class FeatureIconAdmin(admin.ModelAdmin):
+class FeatureIconAdmin(ContentAdminMixin, admin.ModelAdmin):
     list_display = ['icon_preview', 'name', 'order']
     list_editable = ['name', 'order']
     search_fields = ['name']
-    verbose_name = "Иконка"
-    verbose_name_plural = "Иконки для характеристик"
     
     def icon_preview(self, obj):
         if obj.icon:
@@ -276,34 +315,76 @@ class FeatureIconAdmin(admin.ModelAdmin):
 
 # ============ ДИЛЕРЫ ============
 
+# ============ ДИЛЕРЫ ============
+
 @admin.register(DealerService)
-class DealerServiceAdmin(TabbedTranslationAdmin):
-    list_display = ['name', 'slug', 'order', 'is_active']
+class DealerServiceAdmin(ContentAdminMixin, VersionAdmin, TabbedTranslationAdmin):
+    list_display = ['name', 'slug', 'order', 'is_active', 'action_buttons']
     list_editable = ['order', 'is_active']
     search_fields = ['name']
     prepopulated_fields = {'slug': ('name',)}
-    verbose_name = "Услуга дилера"
-    verbose_name_plural = "Услуги дилеров"
+    history_latest_first = True
     
     def has_delete_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        
         if obj and obj.slug in ['sotuv', 'servis', 'ehtiyot-qismlar']:
             return False
+        
         return super().has_delete_permission(request, obj)
+    
+    def action_buttons(self, obj):
+        is_base_service = obj.slug in ['sotuv', 'servis', 'ehtiyot-qismlar']
+        
+        if is_base_service:
+            # Базовые услуги: без кнопки удаления
+            return format_html('''
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <a href="{}" title="Редактировать" style="display: inline-block;">
+                        <img src="/static/media/icon-adminpanel/pencil.png" width="24" height="24" style="object-fit: contain; cursor: pointer;">
+                    </a>
+                    <a href="/dealers/" title="Просмотр на сайте" target="_blank" style="display: inline-block;">
+                        <img src="/static/media/icon-adminpanel/eyes.png" width="24" height="24" style="object-fit: contain; cursor: pointer;">
+                    </a>
+                    <span style="display: inline-block; width: 24px; height: 24px; opacity: 0.2;" title="Базовая услуга защищена">🔒</span>
+                </div>
+            ''',
+                f'/admin/main/dealerservice/{obj.id}/change/'
+            )
+        else:
+            # Обычные услуги: все три кнопки
+            return format_html('''
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <a href="{}" title="Редактировать" style="display: inline-block;">
+                        <img src="/static/media/icon-adminpanel/pencil.png" width="24" height="24" style="object-fit: contain; cursor: pointer;">
+                    </a>
+                    <a href="/dealers/" title="Просмотр на сайте" target="_blank" style="display: inline-block;">
+                        <img src="/static/media/icon-adminpanel/eyes.png" width="24" height="24" style="object-fit: contain; cursor: pointer;">
+                    </a>
+                    <a href="{}" title="Удалить" onclick="return confirm('Удалить услугу {}?')" style="display: inline-block;">
+                        <img src="/static/media/icon-adminpanel/recycle-bin.png" width="24" height="24" style="object-fit: contain; cursor: pointer;">
+                    </a>
+                </div>
+            ''',
+                f'/admin/main/dealerservice/{obj.id}/change/',
+                f'/admin/main/dealerservice/{obj.id}/delete/',
+                obj.name
+            )
+    action_buttons.short_description = "Действия"
 
 
 @admin.register(Dealer)
-class DealerAdmin(TabbedTranslationAdmin):
+class DealerAdmin(ContentAdminMixin, VersionAdmin, TabbedTranslationAdmin):
     list_display = [
         'logo_preview', 'name', 'city', 'phone', 
-        'services_list', 'is_active', 'order'
+        'services_list', 'is_active', 'order', 'action_buttons'
     ]
     list_filter = ['is_active', 'city', 'services']
     search_fields = ['name', 'city', 'address', 'manager']
     list_editable = ['is_active', 'order']
     readonly_fields = ['logo_preview', 'created_at', 'updated_at']
-    filter_horizontal = ['services']
-    verbose_name = "Дилер"
-    verbose_name_plural = "Дилеры"
+    history_latest_first = True
     
     fieldsets = (
         ('Основная информация', {
@@ -318,7 +399,7 @@ class DealerAdmin(TabbedTranslationAdmin):
         }),
         ('Рабочее время', {
             'fields': ('working_hours',),
-            'description': 'Используйте &lt;br&gt; для переноса строки. Пример: Пн-Пт: 9:00-20:00&lt;br&gt;Сб: Выходной'
+            'description': 'Используйте <br> для переноса строки. Пример: Пн-Пт: 9:00-20:00<br>Сб: Выходной'
         }),
         ('Услуги', {
             'fields': ('services',)
@@ -328,6 +409,12 @@ class DealerAdmin(TabbedTranslationAdmin):
             'classes': ('collapse',)
         }),
     )
+    
+    # ← ИСПРАВЛЕННЫЙ МЕТОД
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "services":
+            kwargs['widget'] = forms.CheckboxSelectMultiple()  # ← ИСПРАВЛЕНО: forms, а не admin
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
     
     def logo_preview(self, obj):
         if obj.logo:
@@ -348,7 +435,26 @@ class DealerAdmin(TabbedTranslationAdmin):
             return format_html(tags)
         return "—"
     services_list.short_description = "Услуги"
-
+    
+    def action_buttons(self, obj):
+        return format_html('''
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <a href="{}" title="Редактировать" style="display: inline-block;">
+                    <img src="/static/media/icon-adminpanel/pencil.png" width="24" height="24" style="object-fit: contain; cursor: pointer;">
+                </a>
+                <a href="/dealers/" title="Просмотр на сайте" target="_blank" style="display: inline-block;">
+                    <img src="/static/media/icon-adminpanel/eyes.png" width="24" height="24" style="object-fit: contain; cursor: pointer;">
+                </a>
+                <a href="{}" title="Удалить" onclick="return confirm('Удалить дилера {}?')" style="display: inline-block;">
+                    <img src="/static/media/icon-adminpanel/recycle-bin.png" width="24" height="24" style="object-fit: contain; cursor: pointer;">
+                </a>
+            </div>
+        ''',
+            f'/admin/main/dealer/{obj.id}/change/',
+            f'/admin/main/dealer/{obj.id}/delete/',
+            obj.name
+        )
+    action_buttons.short_description = "Действия"
 
 # ============ СТРАНИЦА "СТАТЬ ДИЛЕРОМ" ============
 
@@ -356,12 +462,10 @@ class DealerRequirementInline(TranslationTabularInline):
     model = DealerRequirement
     extra = 1
     fields = ('text', 'order')
-    verbose_name = "Требование"
-    verbose_name_plural = "Список требований"
 
 
 @admin.register(BecomeADealerPage)
-class BecomeADealerPageAdmin(TabbedTranslationAdmin):
+class BecomeADealerPageAdmin(ContentAdminMixin, TabbedTranslationAdmin):
     fieldsets = (
         ('Контент страницы', {
             'fields': ('title', 'intro_text', 'subtitle', 'important_note')
@@ -372,8 +476,6 @@ class BecomeADealerPageAdmin(TabbedTranslationAdmin):
     )
     
     inlines = [DealerRequirementInline]
-    verbose_name = "Страница 'Стать дилером'"
-    verbose_name_plural = "Страница 'Стать дилером'"
     
     def has_add_permission(self, request):
         return not BecomeADealerPage.objects.exists()
@@ -389,11 +491,8 @@ class BecomeADealerPageAdmin(TabbedTranslationAdmin):
 # ============ ЗАЯВКИ НА ДИЛЕРСТВО ============
 
 @admin.register(BecomeADealerApplication)
-class BecomeADealerApplicationAdmin(admin.ModelAdmin):
-    list_display = [
-        'dealer_badge', 'name', 'company_name', 'phone', 'region', 
-        'experience_years', 'status', 'priority', 'manager', 'created_at'
-    ]
+class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
+    list_display = ['dealer_badge', 'name', 'company_name', 'phone', 'region', 'experience_years', 'status', 'priority', 'manager', 'created_at']
     list_filter = ['status', 'priority', 'region', 'created_at']
     search_fields = ['name', 'company_name', 'phone', 'message']
     list_editable = ['status', 'priority', 'manager']
@@ -401,8 +500,6 @@ class BecomeADealerApplicationAdmin(admin.ModelAdmin):
     autocomplete_fields = ['manager']
     date_hierarchy = 'created_at'
     actions = ['export_to_excel']
-    verbose_name = "Заявка на дилерство"
-    verbose_name_plural = "Заявки на дилерство"
     
     fieldsets = (
         ('Информация о заявителе', {
@@ -432,10 +529,6 @@ class BecomeADealerApplicationAdmin(admin.ModelAdmin):
         return formfield
     
     def export_to_excel(self, request, queryset):
-        import openpyxl
-        from django.http import HttpResponse
-        from datetime import datetime
-        
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "Заявки на дилерство"
@@ -481,8 +574,6 @@ class ProductParameterInline(TranslationTabularInline):
     model = ProductParameter
     extra = 1
     fields = ('category', 'text', 'order')
-    verbose_name = "Параметр"
-    verbose_name_plural = "Параметры машины"
 
 
 class ProductFeatureInline(TranslationTabularInline):
@@ -490,8 +581,6 @@ class ProductFeatureInline(TranslationTabularInline):
     extra = 1
     max_num = 8
     fields = ('icon', 'name', 'order')
-    verbose_name = "Характеристика"
-    verbose_name_plural = "Характеристики с иконками (макс 8)"
 
 
 class ProductCardSpecInline(TranslationTabularInline):
@@ -499,27 +588,21 @@ class ProductCardSpecInline(TranslationTabularInline):
     extra = 1
     max_num = 4
     fields = ('icon', 'value', 'order')
-    verbose_name = "Характеристика карточки"
-    verbose_name_plural = "Характеристики для карточки (макс 4)"
 
 
 class ProductGalleryInline(admin.TabularInline):
     model = ProductGallery
     extra = 1
     fields = ('image', 'order')
-    verbose_name = "Фото"
-    verbose_name_plural = "Галерея"
 
 
 @admin.register(Product)
-class ProductAdmin(TabbedTranslationAdmin):
+class ProductAdmin(ContentAdminMixin, VersionAdmin, TabbedTranslationAdmin):
     list_display = ['thumbnail', 'title', 'category', 'is_active', 'is_featured', 'order']
     list_filter = ['category', 'is_active', 'is_featured']
     search_fields = ['title', 'slug']
     list_editable = ['is_active', 'is_featured', 'order']
     prepopulated_fields = {'slug': ('title',)}
-    verbose_name = "Продукт"
-    verbose_name_plural = "Продукты (грузовики)"
     
     fieldsets = (
         ('Основная информация', {
