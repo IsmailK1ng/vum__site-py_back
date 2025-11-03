@@ -391,255 +391,78 @@
       </div>
     </div>
     <!-- Секция — контактная форма (конец) -->
+
     <!-- Section - Inner Pages Slider Start -->
     <div class="mxd-section padding-pre-grid">
       <div class="mxd-container grid-container">
 
         <!-- Block - Inner Pages Slider Start -->
         <div class="mxd-block">
+          <!-- Заголовок с переводами -->
+          {% if LANGUAGE_CODE == 'uz' %}
           <h2 class="reveal-type anim-uni-in-up" style="text-align: center;">Yangiliklar</h2>
+          {% elif LANGUAGE_CODE == 'ru' %}
+          <h2 class="reveal-type anim-uni-in-up" style="text-align: center;">Новости</h2>
+          {% else %}
+          <h2 class="reveal-type anim-uni-in-up" style="text-align: center;">News</h2>
+          {% endif %}
+
           <!-- Slider main container -->
           <div class="mxd-demo-swiper mxd-grid-item anim-uni-in-up">
             <!-- Additional required wrapper -->
             <div class="swiper-wrapper">
+
+              {% for news in news_list %}
               <!-- single slide -->
               <div class="swiper-slide mxd-demo-swiper__slide">
-                <div class="slide-content">
+                <a href="{% url 'news_detail' news.slug %}" class="slide-content"
+                  style="text-decoration: none; color: inherit;">
                   <!-- Аватарка и заголовок в одной строке -->
                   <div class="slide-header-row">
                     <div class="slide-avatar">
-                      <img src="{% static 'images/avatars/Umarhoja.jpg' %}" alt="Avatar" class="avatar-image">
+                      {% if news.author_photo %}
+                      <img src="{{ news.author_photo.url }}" alt="{{ news.author.username }}" class="avatar-image">
+                      {% else %}
+                      <img src="{% static 'images/icon/_iiii176.png' %}" alt="VUM Logo" class="avatar-image">
+                      {% endif %}
                     </div>
                     <div class="slide-header">
-                      <h3 class="slide-header__title">Ishonchli hamkor – barqaror kelajak: VUM kompaniyasi dilerlik
-                        konferensiyasi bo‘lib o‘td</h3>
+                      <h3 class="slide-header__title">{{ news.title }}</h3>
                     </div>
                   </div>
 
-                  <!-- Полный текст -->
+                  <!-- Полный текст БЕЗ ДАТЫ -->
                   <div class="slide-text">
-                    <p class="slide-text__content">
-                      13 iyul kuni Toshkentda Van Universal Motors (VUM) kompaniyasi tashabbusi bilan O‘zbekiston
-                      bo‘ylab faoliyat yuritayotgan dilerlik markazlari vakillari ishtirokida yirik konferensiya bo‘lib
-                      o‘tdi. Tadbir “Ishonchli hamkor — barqaror kelajak” shiori ostida o‘tkazildi.
-                    </p>
+                    <p class="slide-text__content">{{ news.desc }}</p>
                   </div>
 
                   <!-- Картинка -->
                   <div class="slide-image">
-                    <img src="{% static 'images/news/1.jpg' %}" alt="Services Image">
+                    {% if news.preview_image %}
+                    <img src="{{ news.preview_image.url }}" alt="{{ news.title }}">
+                    {% else %}
+                    <img src="{% static 'images/news/placeholder.jpg' %}" alt="{{ news.title }}">
+                    {% endif %}
                   </div>
-                </div>
+                </a>
               </div>
-              <!-- single slide -->
+              {% empty %}
+              <!-- Пустая заглушка -->
               <div class="swiper-slide mxd-demo-swiper__slide">
-                <div class="slide-content">
-                  <!-- Аватарка и заголовок в одной строке -->
-                  <div class="slide-header-row">
-                    <div class="slide-avatar">
-                      <img src="{% static 'images/avatars/Umarhoja.jpg' %}" alt="Avatar" class="avatar-image">
-                    </div>
-                    <div class="slide-header">
-                      <h3 class="slide-header__title">Van Universal Motors (VUM) va FAW Jiefang ShOS doirasida sanoat
-                        kooperatsiyasi bo‘yicha memorandum imzoladi</h3>
-                    </div>
-                  </div>
-
-                  <!-- Полный текст -->
-                  <div class="slide-text">
-                    <p class="slide-text__content">10 aprel kuni Tyanszin Binhay Yangi hududida Xitoy–Shanxay hamkorlik
-                      tashkiloti (ShHT)ning barqaror rivojlanish yo‘lida sanoat kooperatsiyasi bo‘yicha konferensiyasi
-                      bo‘lib o‘tdi. Tadbirning asosiy voqeasi Van Universal Motors kompaniyasi va FAW Jiefang Group Co.,
-                      Ltd. o‘rtasida ishlab chiqarishni mahalliylashtirish va sanoat hamkorligini rivojlantirishga
-                      qaratilgan qo‘shma loyiha bo‘yicha memorandum imzolanishi bo‘ldi.</p>
-                  </div>
-
-                  <!-- Картинка -->
-                  <div class="slide-image">
-                    <img src="{% static 'images/news/5.jpg' %}" alt="About Us Image">
-                  </div>
+                <div class="slide-content" style="text-align: center; padding: 60px 20px;">
+                  <p style="font-size: 18px; color: #888;">
+                    {% if LANGUAGE_CODE == 'uz' %}
+                    Hozircha yangiliklar yo'q
+                    {% elif LANGUAGE_CODE == 'ru' %}
+                    Пока нет новостей
+                    {% else %}
+                    No news yet
+                    {% endif %}
+                  </p>
                 </div>
               </div>
-              <!-- single slide -->
-              <div class="swiper-slide mxd-demo-swiper__slide">
-                <div class="slide-content">
-                  <!-- Аватарка и заголовок в одной строке -->
-                  <div class="slide-header-row">
-                    <div class="slide-avatar">
-                      <img src="{% static 'images/avatars/Umarhoja.jpg' %}" alt="Avatar" class="avatar-image">
-                    </div>
-                    <div class="slide-header">
-                      <h3 class="slide-header__title">VAN UNIVERSAL MOTORS va ASSET LEASING AND FINANCE: Foydali lizing
-                        – ishonchli yechim!VAN UNIVERSAL MOTORS va ASSET LEASING AND FINANCE: Foydali lizing – ishonchli
-                        yechim!</h3>
-                    </div>
-                  </div>
+              {% endfor %}
 
-                  <!-- Полный текст -->
-                  <div class="slide-text">
-                    <p class="slide-text__content">
-                      VAN UNIVERSAL MOTORS – O‘zbekistonda FAW yuk va maxsus texnika avtomobillari rasmiy ishlab
-                      chiqaruvchisi, ASSET LEASING AND FINANCE bilan hamkorlik o‘rnatdi!
-                      Bu sizga FAW yuk avtomobillari va maxsus texnikasini qulay lizing shartlarida xarid qilish
-                      imkoniyatini taqdim etadi. Ushbu imkoniyatdan foydalanib, biznesingizni rivojlantiring va uni
-                      yangi bosqichga olib chiqing!
-                    </p>
-                  </div>
-
-                  <!-- Картинка -->
-                  <div class="slide-image">
-                    <img src="{% static 'images/news/2.jpg' %}" alt="Team Image">
-                  </div>
-                </div>
-              </div>
-              <!-- single slide -->
-              <div class="swiper-slide mxd-demo-swiper__slide">
-                <div class="slide-content">
-                  <!-- Аватарка и заголовок в одной строке -->
-                  <div class="slide-header-row">
-                    <div class="slide-avatar">
-                      <img src="{% static 'images/avatars/Umarhoja.jpg' %}" alt="Avatar" class="avatar-image">
-                    </div>
-                    <div class="slide-header">
-                      <h3 class="slide-header__title">VAN UNIVERSAL MOTORS va Mikro Leasing: ishonchli hamkorlik,
-                        foydali yechimlar!</h3>
-                    </div>
-                  </div>
-
-                  <!-- Полный текст -->
-                  <div class="slide-text">
-                    <p class="slide-text__content">
-                      FAW yuk avtomobillari va maxsus texnikasini qulay lizing shartlarida xarid qiling!
-                      VAN UNIVERSAL MOTORS – O‘zbekistonda FAW yuk va maxsus texnika avtomobillari rasmiy ishlab
-                      chiqaruvchisi, Mikro Leasing bilan hamkorlik o‘rnatdi!
-                    </p>
-                  </div>
-
-                  <!-- Картинка -->
-                  <div class="slide-image">
-                    <img src="{% static 'images/news/3.jpg' %}" alt="Pricing Image">
-                  </div>
-                </div>
-              </div>
-              <!-- single slide -->
-              <div class="swiper-slide mxd-demo-swiper__slide">
-                <div class="slide-content">
-                  <!-- Аватарка и заголовок в одной строке -->
-                  <div class="slide-header-row">
-                    <div class="slide-avatar">
-                      <img src="{% static 'images/avatars/Umarhoja.jpg' %}" alt="Avatar" class="avatar-image">
-                    </div>
-                    <div class="slide-header">
-                      <h3 class="slide-header__title">VAN UNIVERSAL MOTORS va Hamkorbank: yangi hamkorlik – yangi
-                        imkoniyatlar!</h3>
-                    </div>
-                  </div>
-
-                  <!-- Полный текст -->
-                  <div class="slide-text">
-                    <p class="slide-text__content">
-                      Endi sizda FAW yuk avtomobillari va maxsus texnikasini dastlabki to‘lovsiz, imtiyozli foiz
-                      stavkalari bo‘yicha yoki halol islomiy lizing doirasida xarid qilish imkoniyati mavjud. Xarid
-                      qilish uchun texnika qiymatining 30% miqdorida garov kiritish talab etiladi. Yillik foiz
-                      stavkalari 20% dan boshlanadi. Biz sizning biznesingizni rivojlantirish uchun qulay
-                      shart-sharoitlar yaratamiz.
-                    </p>
-                  </div>
-
-                  <!-- Картинка -->
-                  <div class="slide-image">
-                    <img src="{% static 'images/news/4.jpg' %}" alt="About Me Image">
-                  </div>
-                </div>
-              </div>
-
-              <!-- single slide -->
-              <div class="swiper-slide mxd-demo-swiper__slide">
-                <div class="slide-content">
-                  <!-- Аватарка и заголовок в одной строке -->
-                  <div class="slide-header-row">
-                    <div class="slide-avatar">
-                      <img src="{% static 'images/avatars/Umarhoja.jpg' %}" alt="Avatar" class="avatar-image">
-                    </div>
-                    <div class="slide-header">
-                      <h3 class="slide-header__title">FAW TIGER V avtofurgonlariga 20 million so‘mgacha chegirma!</h3>
-                    </div>
-                  </div>
-
-                  <!-- Полный текст -->
-                  <div class="slide-text">
-                    <p class="slide-text__content">
-                      30 noyabrgacha sizda FAW TIGER V avtofurgonini 20 million so‘mgacha foyda bilan xarid qilishning
-                      noyob imkoniyati mavjud. Biznesingizni qulay shartlarda rivojlantirish imkoniyatini boy bermang!
-                      Aksiya tafsilotlarini bizning maslahatchilarimizdan bilib oling.
-                      <span>08.11.2024</span>
-                    </p>
-                  </div>
-
-                  <!-- Картинка -->
-                  <div class="slide-image">
-                    <img src="{% static 'images/news/6.jpg' %}" alt="Support Image">
-                  </div>
-                </div>
-              </div>
-              <!-- single slide -->
-              <div class="swiper-slide mxd-demo-swiper__slide">
-                <div class="slide-content">
-                  <!-- Аватарка и заголовок в одной строке -->
-                  <div class="slide-header-row">
-                    <div class="slide-avatar">
-                      <img src="{% static 'images/avatars/Umarhoja.jpg' %}" alt="Avatar" class="avatar-image">
-                    </div>
-                    <div class="slide-header">
-                      <h3 class="slide-header__title">Ishonchli FAW Tiger V samosvali — qurilish maydonchangizdagi
-                        hamkoringiz</h3>
-                    </div>
-                  </div>
-
-                  <!-- Полный текст -->
-                  <div class="slide-text">
-                    <p class="slide-text__content">
-                      FAW Tiger V samosvali — bu mustahkam va unumdor texnikani talab qiladigan qurilish va xo‘jalik
-                      vazifalari uchun ideal yechim. Ushbu ixcham va ishonchli yuk mashinasi har qanday sharoitda
-                      ishlash uchun yaratilgan bo‘lib, samaradorlik va tejamkorlikni ta’minlaydi.
-                    </p>
-                  </div>
-
-                  <!-- Картинка -->
-                  <div class="slide-image">
-                    <img src="{% static 'images/news/7.jpg' %}" alt="FAQ Image">
-                  </div>
-                </div>
-              </div>
-              <!-- single slide -->
-              <div class="swiper-slide mxd-demo-swiper__slide">
-                <div class="slide-content">
-                  <!-- Аватарка и заголовок в одной строке -->
-                  <div class="slide-header-row">
-                    <div class="slide-avatar">
-                      <img src="{% static 'images/avatars/Umarhoja.jpg' %}" alt="Avatar" class="avatar-image">
-                    </div>
-                    <div class="slide-header">
-                      <h3 class="slide-header__title">To‘liq metall korpusli FAW Tiger V avtofurgoni — biznes uchun
-                        maksimal universallik</h3>
-                    </div>
-                  </div>
-
-                  <!-- Полный текст -->
-                  <div class="slide-text">
-                    <p class="slide-text__content">
-                      To‘liq metall korpusli FAW Tiger V avtofurgoni — bu ishonchlilik, sig‘imdorlik va xavfsizlikni
-                      qadrlaydigan tadbirkorlar tanlovi. Ushbu model turli xil yuklarni, jumladan tashqi omillardan
-                      himoyani talab qiladigan tovarlarni tashish uchun ideal mos keladi.
-                    </p>
-                  </div>
-
-                  <!-- Картинка -->
-                  <div class="slide-image">
-                    <img src="{% static 'images/news/8.jpg' %}" alt="Contact Image">
-                  </div>
-                </div>
-              </div>
             </div>
             <!-- navigation buttons -->
             <div class="swiper-button-prev mxd-slider-btn mxd-slider-btn-round-prev v2">

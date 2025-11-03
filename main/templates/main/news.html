@@ -1,61 +1,46 @@
-<!DOCTYPE html>
 {% load static %}
-<html lang="en" dir="ltr">
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'uz' }}" dir="ltr">
 
 <head>
   <meta charset="UTF-8">
-
-  <!-- Page Title -->
-  <title>VUM yangiliklar</title>
-
-  <!-- Meta Tags -->
-  <meta name="description" content="Faw Trucks в Узбекистане">
-  <meta name="keywords" content="Faw Trucks в Узбекистане">
-  <meta name="author" content="mix_design">
-
-  <!-- Viewport Meta-->
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <!-- Template Favicon & Icons Start -->
+  <title>
+    {% if LANGUAGE_CODE == 'uz' %}
+      VUM Yangiliklar | FAW Trucks Uzbekistan
+    {% elif LANGUAGE_CODE == 'ru' %}
+      Новости VUM | FAW Trucks Uzbekistan
+    {% else %}
+      VUM News | FAW Trucks Uzbekistan
+    {% endif %}
+  </title>
+
+  <!-- Meta Tags -->
+  <meta name="description" content="{% if LANGUAGE_CODE == 'uz' %}VUM kompaniyasining so'nggi yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Последние новости компании VUM{% else %}Latest news from VUM company{% endif %}">
+  
+  <!-- Favicons -->
   <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
-  <link rel="apple-touch-icon" href="{% static 'images/icon/_iiiiapple.png' %}" />
-  <link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/icon/_iiii176.png' %}" />
-  <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/icon/_iiii1156.png' %}" />
-  <link rel="apple-touch-startup-image" href="{% static 'images/icon/_iiii1.png' %}" />
-  <!-- Template Favicon & Icons End -->
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="{% static 'css/loaders/loader.css' %}">
+  <link rel="stylesheet" href="{% static 'css/plugins.css' %}">
+  <link rel="stylesheet" href="{% static 'css/main_site.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site_main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site_news.css' %}">
 
-  <!-- Facebook Metadata Start -->
-  <meta property="og:image:height" content="1200">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:title" content="Faw Trucks в Узбекистане">
-  <meta property="og:description" content="Faw Trucks в Узбекистане">
-  <meta property="og:url" content="https://mixdesign.dev/themeforest/rayo">
-  <meta property="og:image" content="https://mixdesign.dev/themeforest/rayo/img/og-image.jpg">
-  <!-- Facebook Metadata End -->
-
-  <!-- Template Styles Start -->
-  <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static 'css/breadcrumbs.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static 'css/site_news.css' %}">
-  <!-- Template Styles End -->
-
-  <!-- Custom Browser Color Start -->
+  <!-- Browser Color -->
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
   <meta name="msapplication-navbutton-color" content="#161616">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <!-- Custom Browser Color End -->
-
 </head>
 
 <body>
-
-  <!-- Loader Start -->
+  <!-- Loader -->
   <div id="loader" style="display: none;" class="loader">
     <div class="loader__wrapper">
       <div class="loader__content">
@@ -65,11 +50,9 @@
       </div>
     </div>
   </div>
-  <!-- Loader End -->
 
-  <!-- Меню и шапка (начало) -->
+  <!-- Header -->
   {% include 'main/includes/header.html' %}
-  <!-- Меню и шапка (конец) -->
 
   <!-- Page Content Start -->
   <div class="mxd-block loading-wrap"></div>
@@ -82,8 +65,28 @@
           <div class="section-filter">
             <div aria-label="breadcrumb">
               <ol class="breadcrumb-ol">
-                <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
-                <li class="active"><a href="{% url 'news' %}">VUM yangiliklar</a></li>
+                <li>
+                  <a href="{% url 'home' %}">
+                    {% if LANGUAGE_CODE == 'uz' %}
+                      Bosh sahifa
+                    {% elif LANGUAGE_CODE == 'ru' %}
+                      Главная
+                    {% else %}
+                      Home
+                    {% endif %}
+                  </a>
+                </li>
+                <li class="active">
+                  <a href="{% url 'news' %}">
+                    {% if LANGUAGE_CODE == 'uz' %}
+                      VUM yangiliklar
+                    {% elif LANGUAGE_CODE == 'ru' %}
+                      Новости VUM
+                    {% else %}
+                      VUM News
+                    {% endif %}
+                  </a>
+                </li>
               </ol>
             </div>
           </div>
@@ -95,7 +98,15 @@
 
   <!-- Hero Section Start -->
   <div class="mxd-hero-07__top">
-    <h1 class="mxd-hero-07__title">VUM. Yangiliklar.</h1>
+    <h1 class="mxd-hero-07__title">
+      {% if LANGUAGE_CODE == 'uz' %}
+        VUM. Yangiliklar.
+      {% elif LANGUAGE_CODE == 'ru' %}
+        VUM. Новости.
+      {% else %}
+        VUM. News.
+      {% endif %}
+    </h1>
     <div class="mxd-hero-07__marquee loading__item">
       <div class="marquee marquee-right--gsap bright">
         <div class="marquee__toright">
@@ -104,30 +115,24 @@
             <p class="marquee__text">VUM</p>
             <div class="marquee__image">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="currentColor">
-                <path fill="currentColor"
-                  d="M78.4,38.4c0,0-11.8,0-15.8,0c-1.6,0-4.8-0.2-7.1-0.8c-2.3-0.6-4.3-0.8-6.3-2.4c-2-1.2-3.5-3.2-4.7-4.8
-                            c-1.2-1.6-1.6-3.6-2-5.5c-0.3-1.5-0.7-4.3-0.8-5.9c-0.2-4.3,0-17.4,0-17.4C41.8,0.8,41,0,40.2,0s-1.6,0.8-1.6,1.6c0,0,0,13.1,0,17.4
-                            c0,1.6-0.6,4.3-0.8,5.9c-0.3,2-0.8,4-2,5.5c-1.2,2-2.8,3.6-4.7,4.8s-4,1.8-6.3,2.4c-1.9,0.5-4.7,0.6-6.7,0.8c-3.9,0.4-16.6,0-16.6,0
-                            C0.8,38.4,0,39.2,0,40c0,0.8,0.8,1.6,1.6,1.6c0,0,12.2,0,16.6,0c1.6,0,4.8,0.3,6.7,0.8c2.3,0.6,4.3,0.8,6.3,2.4
-                            c1.6,1.2,3.2,2.8,4.3,4.4c1.2,2,2.1,3.9,2.4,6.3c0.2,1.7,0.7,4.7,0.8,6.7c0.2,4,0,16.2,0,16.2c0,0.8,0.8,1.6,1.6,1.6
-                            s1.6-0.8,1.6-1.6c0,0,0-12.3,0-16.2c0-1.6,0.5-5.1,0.8-6.7c0.5-2.3,0.8-4.4,2.4-6.3c1.2-1.6,2.8-3.2,4.3-4.4c2-1.2,3.9-2,6.3-2.4
-                            c1.8-0.3,5.1-0.7,7.1-0.8c3.5-0.2,15.8,0,15.8,0c0.8,0,1.6-0.8,1.6-1.6C80,39.2,79.2,38.4,78.4,38.4C78.4,38.4,78.4,38.4,78.4,38.4z" />
+                <path fill="currentColor" d="M78.4,38.4c0,0-11.8,0-15.8,0c-1.6,0-4.8-0.2-7.1-0.8c-2.3-0.6-4.3-0.8-6.3-2.4c-2-1.2-3.5-3.2-4.7-4.8 c-1.2-1.6-1.6-3.6-2-5.5c-0.3-1.5-0.7-4.3-0.8-5.9c-0.2-4.3,0-17.4,0-17.4C41.8,0.8,41,0,40.2,0s-1.6,0.8-1.6,1.6c0,0,0,13.1,0,17.4 c0,1.6-0.6,4.3-0.8,5.9c-0.3,2-0.8,4-2,5.5c-1.2,2-2.8,3.6-4.7,4.8s-4,1.8-6.3,2.4c-1.9,0.5-4.7,0.6-6.7,0.8c-3.9,0.4-16.6,0-16.6,0 C0.8,38.4,0,39.2,0,40c0,0.8,0.8,1.6,1.6,1.6c0,0,12.2,0,16.6,0c1.6,0,4.8,0.3,6.7,0.8c2.3,0.6,4.3,0.8,6.3,2.4 c1.6,1.2,3.2,2.8,4.3,4.4c1.2,2,2.1,3.9,2.4,6.3c0.2,1.7,0.7,4.7,0.8,6.7c0.2,4,0,16.2,0,16.2c0,0.8,0.8,1.6,1.6,1.6 s1.6-0.8,1.6-1.6c0,0,0-12.3,0-16.2c0-1.6,0.5-5.1,0.8-6.7c0.5-2.3,0.8-4.4,2.4-6.3c1.2-1.6,2.8-3.2,4.3-4.4c2-1.2,3.9-2,6.3-2.4 c1.8-0.3,5.1-0.7,7.1-0.8c3.5-0.2,15.8,0,15.8,0c0.8,0,1.6-0.8,1.6-1.6C80,39.2,79.2,38.4,78.4,38.4C78.4,38.4,78.4,38.4,78.4,38.4z"/>
               </svg>
             </div>
           </div>
           <!-- Marquee Item 2 -->
           <div class="marquee__item one-line item-regular text">
-            <p class="marquee__text">Yangiliklar</p>
+            <p class="marquee__text">
+              {% if LANGUAGE_CODE == 'uz' %}
+                Yangiliklar
+              {% elif LANGUAGE_CODE == 'ru' %}
+                Новости
+              {% else %}
+                News
+              {% endif %}
+            </p>
             <div class="marquee__image">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="currentColor">
-                <path fill="currentColor"
-                  d="M78.4,38.4c0,0-11.8,0-15.8,0c-1.6,0-4.8-0.2-7.1-0.8c-2.3-0.6-4.3-0.8-6.3-2.4c-2-1.2-3.5-3.2-4.7-4.8
-                            c-1.2-1.6-1.6-3.6-2-5.5c-0.3-1.5-0.7-4.3-0.8-5.9c-0.2-4.3,0-17.4,0-17.4C41.8,0.8,41,0,40.2,0s-1.6,0.8-1.6,1.6c0,0,0,13.1,0,17.4
-                            c0,1.6-0.6,4.3-0.8,5.9c-0.3,2-0.8,4-2,5.5c-1.2,2-2.8,3.6-4.7,4.8s-4,1.8-6.3,2.4c-1.9,0.5-4.7,0.6-6.7,0.8c-3.9,0.4-16.6,0-16.6,0
-                            C0.8,38.4,0,39.2,0,40c0,0.8,0.8,1.6,1.6,1.6c0,0,12.2,0,16.6,0c1.6,0,4.8,0.3,6.7,0.8c2.3,0.6,4.3,0.8,6.3,2.4
-                            c1.6,1.2,3.2,2.8,4.3,4.4c1.2,2,2.1,3.9,2.4,6.3c0.2,1.7,0.7,4.7,0.8,6.7c0.2,4,0,16.2,0,16.2c0,0.8,0.8,1.6,1.6,1.6
-                            s1.6-0.8,1.6-1.6c0,0,0-12.3,0-16.2c0-1.6,0.5-5.1,0.8-6.7c0.5-2.3,0.8-4.4,2.4-6.3c1.2-1.6,2.8-3.2,4.3-4.4c2-1.2,3.9-2,6.3-2.4
-                            c1.8-0.3,5.1-0.7,7.1-0.8c3.5-0.2,15.8,0,15.8,0c0.8,0,1.6-0.8,1.6-1.6C80,39.2,79.2,38.4,78.4,38.4C78.4,38.4,78.4,38.4,78.4,38.4z" />
+                <path fill="currentColor" d="M78.4,38.4c0,0-11.8,0-15.8,0c-1.6,0-4.8-0.2-7.1-0.8c-2.3-0.6-4.3-0.8-6.3-2.4c-2-1.2-3.5-3.2-4.7-4.8 c-1.2-1.6-1.6-3.6-2-5.5c-0.3-1.5-0.7-4.3-0.8-5.9c-0.2-4.3,0-17.4,0-17.4C41.8,0.8,41,0,40.2,0s-1.6,0.8-1.6,1.6c0,0,0,13.1,0,17.4 c0,1.6-0.6,4.3-0.8,5.9c-0.3,2-0.8,4-2,5.5c-1.2,2-2.8,3.6-4.7,4.8s-4,1.8-6.3,2.4c-1.9,0.5-4.7,0.6-6.7,0.8c-3.9,0.4-16.6,0-16.6,0 C0.8,38.4,0,39.2,0,40c0,0.8,0.8,1.6,1.6,1.6c0,0,12.2,0,16.6,0c1.6,0,4.8,0.3,6.7,0.8c2.3,0.6,4.3,0.8,6.3,2.4 c1.6,1.2,3.2,2.8,4.3,4.4c1.2,2,2.1,3.9,2.4,6.3c0.2,1.7,0.7,4.7,0.8,6.7c0.2,4,0,16.2,0,16.2c0,0.8,0.8,1.6,1.6,1.6 s1.6-0.8,1.6-1.6c0,0,0-12.3,0-16.2c0-1.6,0.5-5.1,0.8-6.7c0.5-2.3,0.8-4.4,2.4-6.3c1.2-1.6,2.8-3.2,4.3-4.4c2-1.2,3.9-2,6.3-2.4 c1.8-0.3,5.1-0.7,7.1-0.8c3.5-0.2,15.8,0,15.8,0c0.8,0,1.6-0.8,1.6-1.6C80,39.2,79.2,38.4,78.4,38.4C78.4,38.4,78.4,38.4,78.4,38.4z"/>
               </svg>
             </div>
           </div>
@@ -140,256 +145,57 @@
   <!-- News Cards Grid Start -->
   <div class="mxd-block">
     <div class="mxd-card-grid mxd-grid-item anim-uni-in-up" id="card-grid">
-
-      <!-- Card 1 -->
+      
+      {% for news in news_list %}
+      <!-- Card -->
       <div class="mxd-card">
-        <a href="{% url 'new_detail' new_id=1 %}" class="slide-content" style="text-decoration: none; color: inherit;">
+        <a href="{% url 'news_detail' news.slug %}" class="slide-content" style="text-decoration: none; color: inherit;">
           <div class="slide-header-row">
             <div class="slide-header__wrapper">
               <div class="slide-avatar">
-                <img src="{% static 'images/icon/_iiii176.png' %}" alt="VUM Logo" class="avatar-image">
+                {% if news.author_photo %}
+                  <img src="{{ news.author_photo.url }}" alt="{{ news.author.username }}" class="avatar-image">
+                {% else %}
+                  <img src="{% static 'images/icon/_iiii176.png' %}" alt="VUM Logo" class="avatar-image">
+                {% endif %}
               </div>
               <div class="slide-header">
-                <h3 class="slide-header__title">Ishonchli hamkor – barqaror kelajak: VUM kompaniyasi dilerlik
-                  konferensiyasi bo'lib o'tdi</h3>
+                <h3 class="slide-header__title">{{ news.title }}</h3>
               </div>
             </div>
             <div class="slide-header__meta">
               <svg class="slide-header__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                <path
-                  d="M224 64C206.3 64 192 78.3 192 96L192 128L160 128C124.7 128 96 156.7 96 192L96 240L544 240L544 192C544 156.7 515.3 128 480 128L448 128L448 96C448 78.3 433.7 64 416 64C398.3 64 384 78.3 384 96L384 128L256 128L256 96C256 78.3 241.7 64 224 64zM96 288L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 288L96 288z" />
+                <path d="M224 64C206.3 64 192 78.3 192 96L192 128L160 128C124.7 128 96 156.7 96 192L96 240L544 240L544 192C544 156.7 515.3 128 480 128L448 128L448 96C448 78.3 433.7 64 416 64C398.3 64 384 78.3 384 96L384 128L256 128L256 96C256 78.3 241.7 64 224 64zM96 288L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 288L96 288z"/>
               </svg>
-              <span class="slide-header__date">17.07.25</span>
+              <span class="slide-header__date">{{ news.created_at|date:"d.m.y" }}</span>
             </div>
           </div>
           <div class="slide-text">
-            <p class="slide-text__content">13 iyul kuni Toshkentda Van Universal Motors (VUM) kompaniyasi tashabbusi
-              bilan O'zbekiston bo'ylab faoliyat yuritayotgan dilerlik markazlari vakillari ishtirokida yirik
-              konferensiya bo'lib o'tdi.</p>
+            <p class="slide-text__content">{{ news.desc }}</p>
           </div>
           <div class="slide-image">
-            <img src="{% static 'images/news/9.jpg' %}" alt="Conference">
+            {% if news.preview_image %}
+              <img src="{{ news.preview_image.url }}" alt="{{ news.title }}">
+            {% else %}
+              <img src="{% static 'images/news/placeholder.jpg' %}" alt="{{ news.title }}">
+            {% endif %}
           </div>
         </a>
       </div>
-
-      <!-- Card 2 -->
-      <div class="mxd-card">
-        <a href="{% url 'new_detail' new_id=2 %}" class="slide-content" style="text-decoration: none; color: inherit;">
-          <div class="slide-header-row">
-            <div class="slide-header__wrapper">
-              <div class="slide-avatar">
-                <img src="{% static 'images/icon/_iiii176.png' %}" alt="VUM Logo" class="avatar-image">
-              </div>
-              <div class="slide-header">
-                <h3 class="slide-header__title">Van Universal Motors (VUM) va FAW Jiefang ShHT doirasida sanoat
-                  kooperatsiyasi bo'yicha memorandum imzoladi</h3>
-              </div>
-            </div>
-            <div class="slide-header__meta">
-              <svg class="slide-header__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                <path
-                  d="M224 64C206.3 64 192 78.3 192 96L192 128L160 128C124.7 128 96 156.7 96 192L96 240L544 240L544 192C544 156.7 515.3 128 480 128L448 128L448 96C448 78.3 433.7 64 416 64C398.3 64 384 78.3 384 96L384 128L256 128L256 96C256 78.3 241.7 64 224 64zM96 288L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 288L96 288z" />
-              </svg>
-              <span class="slide-header__date">12.04.25</span>
-            </div>
-          </div>
-          <div class="slide-text">
-            <p class="slide-text__content">10 aprel kuni Tyantszin Binxayda XHT sanoat hamkorligi konferensiyasi bo'lib
-              o'tdi. Asosiy voqea: Van Universal Motors va FAW Jiefang Group o'rtasida ishlab chiqarishni
-              mahalliylashtirish bo'yicha memorandum imzolandi.</p>
-          </div>
-          <div class="slide-image">
-            <img src="{% static 'images/news/5.jpg' %}" alt="Memorandum">
-          </div>
-        </a>
+      {% empty %}
+      <!-- Empty State -->
+      <div class="mxd-card" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+        <p style="font-size: 18px; color: #888;">
+          {% if LANGUAGE_CODE == 'uz' %}
+            Hozircha yangiliklar yo'q
+          {% elif LANGUAGE_CODE == 'ru' %}
+            Пока нет новостей
+          {% else %}
+            No news yet
+          {% endif %}
+        </p>
       </div>
-
-      <!-- Card 3 -->
-      <div class="mxd-card">
-        <a href="{% url 'new_detail' new_id=3 %}" class="slide-content" style="text-decoration: none; color: inherit;">
-          <div class="slide-header-row">
-            <div class="slide-header__wrapper">
-              <div class="slide-avatar">
-                <img src="{% static 'images/icon/_iiii176.png' %}" alt="VUM Logo" class="avatar-image">
-              </div>
-              <div class="slide-header">
-                <h3 class="slide-header__title">VAN UNIVERSAL MOTORS va ASSET LEASING AND FINANCE: Foydali lizing –
-                  ishonchli yechim!</h3>
-              </div>
-            </div>
-            <div class="slide-header__meta">
-              <svg class="slide-header__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                <path
-                  d="M224 64C206.3 64 192 78.3 192 96L192 128L160 128C124.7 128 96 156.7 96 192L96 240L544 240L544 192C544 156.7 515.3 128 480 128L448 128L448 96C448 78.3 433.7 64 416 64C398.3 64 384 78.3 384 96L384 128L256 128L256 96C256 78.3 241.7 64 224 64zM96 288L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 288L96 288z" />
-              </svg>
-              <span class="slide-header__date">11.03.25</span>
-            </div>
-          </div>
-          <div class="slide-text">
-            <p class="slide-text__content">VAN UNIVERSAL MOTORS – O'zbekistonda FAW yuk va maxsus avtomobillarining
-              rasmiy ishlab chiqaruvchisi, ASSET LEASING AND FINANCE bilan hamkorlik o'rnatdi!</p>
-          </div>
-          <div class="slide-image">
-            <img src="{% static 'images/news/2.jpg' %}" alt="Leasing">
-          </div>
-        </a>
-      </div>
-
-      <!-- Card 4 -->
-      <div class="mxd-card">
-        <a href="{% url 'new_detail' new_id=4 %}" class="slide-content" style="text-decoration: none; color: inherit;">
-          <div class="slide-header-row">
-            <div class="slide-header__wrapper">
-              <div class="slide-avatar">
-                <img src="{% static 'images/icon/_iiii176.png' %}" alt="VUM Logo" class="avatar-image">
-              </div>
-              <div class="slide-header">
-                <h3 class="slide-header__title">VAN UNIVERSAL MOTORS va Mikro Leasing: ishonchli hamkorlik, foydali
-                  yechimlar!</h3>
-              </div>
-            </div>
-            <div class="slide-header__meta">
-              <svg class="slide-header__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                <path
-                  d="M224 64C206.3 64 192 78.3 192 96L192 128L160 128C124.7 128 96 156.7 96 192L96 240L544 240L544 192C544 156.7 515.3 128 480 128L448 128L448 96C448 78.3 433.7 64 416 64C398.3 64 384 78.3 384 96L384 128L256 128L256 96C256 78.3 241.7 64 224 64zM96 288L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 288L96 288z" />
-              </svg>
-              <span class="slide-header__date">11.03.25</span>
-            </div>
-          </div>
-          <div class="slide-text">
-            <p class="slide-text__content">Foydali lizing shartlarida FAW yuk avtomobillari va maxsus texnikasini xarid
-              qiling! VAN UNIVERSAL MOTORS – O'zbekistonda FAW yuk va maxsus avtomobillarining rasmiy ishlab
-              chiqaruvchisi.</p>
-          </div>
-          <div class="slide-image">
-            <img src="{% static 'images/news/3.jpg' %}" alt="Mikro Leasing">
-          </div>
-        </a>
-      </div>
-
-      <!-- Card 5 -->
-      <div class="mxd-card">
-        <a href="{% url 'new_detail' new_id=5 %}" class="slide-content" style="text-decoration: none; color: inherit;">
-          <div class="slide-header-row">
-            <div class="slide-header__wrapper">
-              <div class="slide-avatar">
-                <img src="{% static 'images/icon/_iiii176.png' %}" alt="VUM Logo" class="avatar-image">
-              </div>
-              <div class="slide-header">
-                <h3 class="slide-header__title">VAN UNIVERSAL MOTORS va Hamkorbank: yangi hamkorlik – yangi
-                  imkoniyatlar!</h3>
-              </div>
-            </div>
-            <div class="slide-header__meta">
-              <svg class="slide-header__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                <path
-                  d="M224 64C206.3 64 192 78.3 192 96L192 128L160 128C124.7 128 96 156.7 96 192L96 240L544 240L544 192C544 156.7 515.3 128 480 128L448 128L448 96C448 78.3 433.7 64 416 64C398.3 64 384 78.3 384 96L384 128L256 128L256 96C256 78.3 241.7 64 224 64zM96 288L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 288L96 288z" />
-              </svg>
-              <span class="slide-header__date">11.03.25</span>
-            </div>
-          </div>
-          <div class="slide-text">
-            <p class="slide-text__content">Endi sizda FAW yuk avtomobillari va maxsus texnikani boshlang'ich to'lovsiz,
-              imtiyozli foiz stavkalari bo'yicha yoki halol islomiy lizing asosida xarid qilish imkoniyati mavjud.</p>
-          </div>
-          <div class="slide-image">
-            <img src="{% static 'images/news/4.jpg' %}" alt="Hamkorbank">
-          </div>
-        </a>
-      </div>
-
-      <!-- Card 6 -->
-      <div class="mxd-card">
-        <a href="{% url 'new_detail' new_id=6 %}" class="slide-content" style="text-decoration: none; color: inherit;">
-          <div class="slide-header-row">
-            <div class="slide-header__wrapper">
-              <div class="slide-avatar">
-                <img src="{% static 'images/icon/_iiii176.png' %}" alt="VUM Logo" class="avatar-image">
-              </div>
-              <div class="slide-header">
-                <h3 class="slide-header__title">Chelik kuzovli FAW Tiger V avtovuroni — Biznesingiz uchun maksimal
-                  universallik!</h3>
-              </div>
-            </div>
-            <div class="slide-header__meta">
-              <svg class="slide-header__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                <path
-                  d="M224 64C206.3 64 192 78.3 192 96L192 128L160 128C124.7 128 96 156.7 96 192L96 240L544 240L544 192C544 156.7 515.3 128 480 128L448 128L448 96C448 78.3 433.7 64 416 64C398.3 64 384 78.3 384 96L384 128L256 128L256 96C256 78.3 241.7 64 224 64zM96 288L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 288L96 288z" />
-              </svg>
-              <span class="slide-header__date">15.11.24</span>
-            </div>
-          </div>
-          <div class="slide-text">
-            <p class="slide-text__content">Chelik kuzovli FAW Tiger V avtovuroni — ishonchlilik, sig'imdorlik va
-              xavfsizlikni qadrlaydigan tadbirkorlar tanlovi.</p>
-          </div>
-          <div class="slide-image">
-            <img src="{% static 'images/news/8.jpg' %}" alt="Avtovuron">
-          </div>
-        </a>
-      </div>
-
-      <!-- Card 7 -->
-      <div class="mxd-card">
-        <a href="{% url 'new_detail' new_id=7 %}" class="slide-content" style="text-decoration: none; color: inherit;">
-          <div class="slide-header-row">
-            <div class="slide-header__wrapper">
-              <div class="slide-avatar">
-                <img src="{% static 'images/icon/_iiii176.png' %}" alt="VUM Logo" class="avatar-image">
-              </div>
-              <div class="slide-header">
-                <h3 class="slide-header__title">FAW TIGER V avtovagonlariga 20 million so'mgacha chegirma!</h3>
-              </div>
-            </div>
-            <div class="slide-header__meta">
-              <svg class="slide-header__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                <path
-                  d="M224 64C206.3 64 192 78.3 192 96L192 128L160 128C124.7 128 96 156.7 96 192L96 240L544 240L544 192C544 156.7 515.3 128 480 128L448 128L448 96C448 78.3 433.7 64 416 64C398.3 64 384 78.3 384 96L384 128L256 128L256 96C256 78.3 241.7 64 224 64zM96 288L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 288L96 288z" />
-              </svg>
-              <span class="slide-header__date">08.11.24</span>
-            </div>
-          </div>
-          <div class="slide-text">
-            <p class="slide-text__content">30-noyabrgacha sizda FAW TIGER V avtovagonini 20 million so'mgacha foyda
-              bilan xarid qilish imkoniyati mavjud.</p>
-          </div>
-          <div class="slide-image">
-            <img src="{% static 'images/news/7.jpg' %}" alt="Tiger V">
-          </div>
-        </a>
-      </div>
-
-      <!-- Card 8 -->
-      <div class="mxd-card">
-        <a href="{% url 'new_detail' new_id=8 %}" class="slide-content" style="text-decoration: none; color: inherit;">
-          <div class="slide-header-row">
-            <div class="slide-header__wrapper">
-              <div class="slide-avatar">
-                <img src="{% static 'images/icon/_iiii176.png' %}" alt="VUM Logo" class="avatar-image">
-              </div>
-              <div class="slide-header">
-                <h3 class="slide-header__title">Ishonchli FAW Tiger V samosvali — qurilish maydonchangizdagi ishonchli
-                  hamkor!</h3>
-              </div>
-            </div>
-            <div class="slide-header__meta">
-              <svg class="slide-header__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                <path
-                  d="M224 64C206.3 64 192 78.3 192 96L192 128L160 128C124.7 128 96 156.7 96 192L96 240L544 240L544 192C544 156.7 515.3 128 480 128L448 128L448 96C448 78.3 433.7 64 416 64C398.3 64 384 78.3 384 96L384 128L256 128L256 96C256 78.3 241.7 64 224 64zM96 288L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 288L96 288z" />
-              </svg>
-              <span class="slide-header__date">15.11.24</span>
-            </div>
-          </div>
-          <div class="slide-text">
-            <p class="slide-text__content">FAW Tiger V samosvali — bu qurilish va xo'jalik ishlari uchun mustahkam hamda
-              yuqori unumdor texnika talab qiladigan vazifalarga ideal yechimdir.</p>
-          </div>
-          <div class="slide-image">
-            <img src="{% static 'images/news/6.jpg' %}" alt="Samosval">
-          </div>
-        </a>
-      </div>
+      {% endfor %}
 
     </div>
   </div>
@@ -407,17 +213,15 @@
   </div>
   <!-- Pagination Block End -->
 
-  <!-- Футер (начало) -->
+  <!-- Footer -->
   {% include 'main/includes/footer.html' %}
-  <!-- Футер (конец) -->
 
-  <!-- Кнопка «вверх» (начало) -->
+  <!-- To Top Button -->
   <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
     <i class="ph ph-arrow-up"></i>
   </a>
-  <!-- Кнопка «вверх» (конец) -->
 
-  <!-- Load Scripts Start -->
+  <!-- Scripts -->
   <script src="{% static 'js/libs.min.js' %}"></script>
   <script src="{% static 'js/app.js' %}"></script>
   <script src="{% static 'js/faw.js' %}"></script>
@@ -426,8 +230,8 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // ========== PASSIVE LISTENERS ==========
-      document.addEventListener('touchstart', () => { }, { passive: true });
-      document.addEventListener('wheel', () => { }, { passive: true });
+      document.addEventListener('touchstart', () => {}, { passive: true });
+      document.addEventListener('wheel', () => {}, { passive: true });
 
       // ========== КОНФИГУРАЦИЯ ==========
       const CONFIG = {
@@ -516,7 +320,7 @@
         button.className = `mxd-blog-pagination__item blog-pagination-control ${type} btn btn-anim btn-line-small btn-bright anim-no-delay ${slideClass}`;
         button.dataset.page = type;
         button.setAttribute('role', 'button');
-        button.setAttribute('aria-label', `${type === 'prev' ? 'Предыдущая' : 'Следующая'} страница`);
+        button.setAttribute('aria-label', `${type === 'prev' ? 'Ortga' : 'Oldinga'}`);
 
         button.innerHTML = iconAfter
           ? `<span class="btn-caption">${text}</span><i class="ph ${icon}"></i>`
@@ -545,7 +349,7 @@
         button.dataset.page = pageNumber;
         button.innerHTML = `<span class="btn-caption">${pageNumber}</span>`;
         button.setAttribute('role', 'button');
-        button.setAttribute('aria-label', `Страница ${pageNumber}`);
+        button.setAttribute('aria-label', `Sahifa ${pageNumber}`);
 
         if (pageNumber === currentPage) {
           button.classList.add('active');
@@ -699,5 +503,4 @@
   </script>
 
 </body>
-
 </html>

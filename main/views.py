@@ -10,6 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from .models import (
     News, ContactForm, JobApplication, Vacancy, Product,
     Dealer, DealerService, BecomeADealerPage, BecomeADealerApplication
@@ -23,7 +24,12 @@ from .serializers import (
 
 # === FRONTEND views === 
 def index(request):
-    return render(request, 'main/index.html')
+    # Получить 8 последних активных новостей для слайдера
+    news_list = News.objects.filter(is_active=True).select_related('author').order_by('-order', '-created_at')[:8]
+    
+    return render(request, 'main/index.html', {
+        'news_list': news_list
+    })
 
 def about(request):
     return render(request, 'main/about.html')
@@ -50,7 +56,12 @@ def lizing(request):
     return render(request, 'main/lizing.html')
 
 def news(request):
-    return render(request, 'main/news.html')
+    """Страница со всеми новостями"""
+    news_list = News.objects.filter(is_active=True).select_related('author').order_by('-order', '-created_at')
+    
+    return render(request, 'main/news.html', {
+        'news_list': news_list
+    })
 
 def dealers(request):
     return render(request, 'main/dealers.html')
@@ -66,8 +77,36 @@ def jobs(request):
     
     return render(request, 'main/jobs.html', {'vacancies': vacancies})
 
-def new_detail(request, new_id):
-    return render(request, 'main/news_detail.html', {'new_id': new_id})
+
+def news_detail(request, slug):
+    """Детальная страница новости"""
+    news = get_object_or_404(News.objects.prefetch_related('blocks'), slug=slug, is_active=True)
+    
+    # Хлебные крошки на 3 языках
+    lang = request.LANGUAGE_CODE
+    breadcrumbs = {
+        'uz': {
+            'home': 'Bosh sahifa',
+            'news': 'VUM yangiliklar',
+            'current': news.title_uz if hasattr(news, 'title_uz') else news.title
+        },
+        'ru': {
+            'home': 'Главная',
+            'news': 'Новости VUM',
+            'current': news.title_ru if hasattr(news, 'title_ru') else news.title
+        },
+        'en': {
+            'home': 'Home',
+            'news': 'VUM News',
+            'current': news.title_en if hasattr(news, 'title_en') else news.title
+        }
+    }
+    
+    return render(request, 'main/news_detail.html', {
+        'news': news,
+        'blocks': news.blocks.all(),
+        'breadcrumbs': breadcrumbs.get(lang, breadcrumbs['uz'])
+    })
 
 
 def set_language_get(request):

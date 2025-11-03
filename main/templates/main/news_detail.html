@@ -73,16 +73,18 @@
   <div class="mxd-block loading-wrap"></div>
 
   <!-- Хлебные крошки -->
-  <div class="mxd-section-filter pre-grid">
-    <div class="mxd-section-filter__inner animate-card-3">
-      <div class="mxd-grid-item-1">
-        <div class="section-filter">
-          <div aria-label="breadcrumb">
-            <ol class="breadcrumb-ol">
-              <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
-              <li><a href="{% url 'news' %}">VUM yangiliklar</a></li>
-              <li class="active"><a href="{% url 'new_detail' new_id=new_id %}">Ishonchli hamkor</a></li>
-            </ol>
+  <div class="mxd-block">
+    <div class="mxd-section-filter pre-grid">
+      <div class="mxd-section-filter__inner animate-card-3">
+        <div class="mxd-grid-item-1">
+          <div class="section-filter">
+            <div aria-label="breadcrumb">
+              <ol class="breadcrumb-ol">
+                <li><a href="{% url 'home' %}">{{ breadcrumbs.home }}</a></li>
+                <li><a href="{% url 'news' %}">{{ breadcrumbs.news }}</a></li>
+                <li class="active"><a href="{% url 'news_detail' news.slug %}">{{ breadcrumbs.current }}</a></li>
+              </ol>
+            </div>
           </div>
         </div>
       </div>
@@ -92,8 +94,7 @@
   <!-- Title after video start -->
   <div class="title-after-video">
     <div class="faw-history-title fade-in">
-      <h2 class="reveal-type anim-uni-in-up">Ishonchli hamkor – barqaror kelajak: VUM kompaniyasining dilerlik
-        konferensiyasi bo'lib o'tdi</h2>
+      <h1 class="reveal-type anim-uni-in-up">{{ news.title }}</h1>
     </div>
     <div class="mxd-block"></div>
   </div>
@@ -191,7 +192,8 @@
         <p class="mxd-manifest reveal-type anim-uni-in-up">
           <strong>Konferensiyada muhim strategik yo'nalishlar muhokama qilindi</strong>
           <br><br>
-          Tadbir doirasida VUM rahbariyati tomonidan kompaniyaning 2025–2026 yillardagi rivojlanish strategiyasi, dilerlik
+          Tadbir doirasida VUM rahbariyati tomonidan kompaniyaning 2025–2026 yillardagi rivojlanish strategiyasi,
+          dilerlik
           markazlariga beriladigan qo'llab-quvvatlovlar, hududiy marketing yondashuvlari va servis xizmatlarini
           takomillashtirish borasidagi rejalar taqdim etildi.
           <br><br>
@@ -207,7 +209,8 @@
           <br><br>
           <strong>Hamkorlik – asosiy qadriyat</strong>
           <br><br>
-          Tadbirda ishtirok etgan dilerlik vakillari VUM tomonidan taqdim etilayotgan texnikalar, marketing yondashuvlari
+          Tadbirda ishtirok etgan dilerlik vakillari VUM tomonidan taqdim etilayotgan texnikalar, marketing
+          yondashuvlari
           va mijozlarga xizmat ko'rsatish tizimini takomillashtirish bo'yicha qo'llab-quvvatlovni ijobiy baholab, savdo
           samaradorligini oshirishga qaratilgan fikr-mulohazalarini bildirdi.
           <br><br>
@@ -328,7 +331,7 @@
             }
           });
         });
-        
+
         observer.observe(video, { attributes: true });
         video.removeAttribute('data-parallax');
       }

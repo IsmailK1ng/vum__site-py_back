@@ -72,6 +72,13 @@
     background: #ffffff;
     line-height: normal !important;
     padding: 2px 15px 5px 10px;
+    width: 94%;
+    min-height: 27px;
+}
+
+/* ========== СКРЫТЬ ИКОНКИ У МЕНЕДЖЕРОВ В ЗАЯВКАХ НА ДИЛЕРСТВО ========== */
+#changelist-form .field-manager .related-widget-wrapper-link {
+    display: none !important;
 }
 
 .select2-container--admin-autocomplete .select2-selection--single .select2-selection__clear {

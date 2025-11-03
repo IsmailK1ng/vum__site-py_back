@@ -1,0 +1,34 @@
+{% load static %}
+<!-- Компонент карточки новости (переиспользуемый) -->
+<div class="swiper-slide mxd-demo-swiper__slide">
+  <a href="{% url 'news_detail' news.slug %}" class="slide-content">
+    <!-- Аватарка и заголовок -->
+    <div class="slide-header-row">
+      <div class="slide-avatar">
+        {% if news.author_photo %}
+          <img src="{{ news.author_photo.url }}" alt="{{ news.author.username }}" class="avatar-image">
+        {% else %}
+          <img src="{% static 'images/avatars/default.jpg' %}" alt="Автор" class="avatar-image">
+        {% endif %}
+      </div>
+      <div class="slide-header">
+        <h3 class="slide-header__title">{{ news.title }}</h3>
+      </div>
+    </div>
+
+    <!-- Краткое описание -->
+    <div class="slide-text">
+      <p class="slide-text__content">{{ news.desc }}</p>
+      <span class="date">{{ news.created_at|date:"d.m.Y" }}</span>
+    </div>
+
+    <!-- Фото -->
+    <div class="slide-image">
+      {% if news.preview_image %}
+        <img src="{{ news.preview_image.url }}" alt="{{ news.title }}">
+      {% else %}
+        <img src="{% static 'images/news/placeholder.jpg' %}" alt="{{ news.title }}">
+      {% endif %}
+    </div>
+  </a>
+</div>

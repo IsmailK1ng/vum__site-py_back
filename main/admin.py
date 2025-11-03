@@ -95,24 +95,75 @@ class NewsBlockInline(TranslationTabularInline):
 
 @admin.register(News)
 class NewsAdmin(ContentAdminMixin, VersionAdmin, TabbedTranslationAdmin):
-    list_display = ('title', 'author', 'preview_image_tag', 'created_at')
-    readonly_fields = ('preview_image_tag', 'author_photo_tag')
-    search_fields = ('title', 'author__username')
-    list_filter = ('created_at',)
-    ordering = ('-created_at',)
+    list_display = ['preview_image_tag', 'title', 'author', 'is_active', 'order', 'created_at', 'action_buttons']
+    list_editable = ['is_active', 'order']
+    list_filter = ['is_active', 'created_at']
+    search_fields = ['title', 'desc']
+    readonly_fields = ['preview_image_tag', 'author_photo_tag', 'slug', 'updated_at']
+    prepopulated_fields = {}  
     inlines = [NewsBlockInline]
+    history_latest_first = True
+    
+    fieldsets = (
+        (' Основная информация', {
+            'fields': ('title', 'slug', 'created_at', 'is_active', 'order'),
+            'description': 'Slug генерируется автоматически из заголовка'
+        }),
+        ('Карточка новости (превью)', {
+            'fields': ('desc', 'preview_image', 'preview_image_tag'),
+            'description': 'Краткое описание и фото для карточки в списке новостей'
+        }),
+        ('Автор', {
+            'fields': ('author', 'author_photo', 'author_photo_tag')
+        }),
+        ('Детальный контент', {
+            'description': 'Используйте блоки ниже для создания полной статьи (YouTube видео, фото, текст)',
+            'fields': ()
+        }),
+        ('Техническая информация', {
+            'fields': ('updated_at',),
+            'classes': ('collapse',)
+        }),
+    )
 
     def preview_image_tag(self, obj):
         if obj.preview_image:
-            return format_html('<img src="{}" width="100" style="border-radius:8px;">', obj.preview_image.url)
+            return format_html(
+                '<img src="{}" width="100" style="border-radius:8px;"/>',
+                obj.preview_image.url
+            )
         return "—"
     preview_image_tag.short_description = "Превью"
 
     def author_photo_tag(self, obj):
         if obj.author_photo:
-            return format_html('<img src="{}" width="50" style="border-radius:50%;">', obj.author_photo.url)
+            return format_html(
+                '<img src="{}" width="50" style="border-radius:50%;">',
+                obj.author_photo.url
+            )
         return "—"
     author_photo_tag.short_description = "Фото автора"
+    
+    def action_buttons(self, obj):
+        return format_html('''
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <a href="{}" title="Редактировать" style="display: inline-block;">
+                    <img src="/static/media/icon-adminpanel/pencil.png" width="24" height="24" style="object-fit: contain; cursor: pointer;">
+                </a>
+                <a href="/news/{}/" title="Просмотр на сайте" target="_blank" style="display: inline-block;">
+                    <img src="/static/media/icon-adminpanel/eyes.png" width="24" height="24" style="object-fit: contain; cursor: pointer;">
+                </a>
+                <a href="{}" title="Удалить" onclick="return confirm('Удалить новость {}?')" style="display: inline-block;">
+                    <img src="/static/media/icon-adminpanel/recycle-bin.png" width="24" height="24" style="object-fit: contain; cursor: pointer;">
+                </a>
+            </div>
+        ''',
+            f'/admin/main/news/{obj.id}/change/',
+            obj.slug,
+            f'/admin/main/news/{obj.id}/delete/',
+            obj.title
+        )
+    action_buttons.short_description = "Действия"
 
 
 # ============ ЗАЯВКИ ============
@@ -487,8 +538,24 @@ class BecomeADealerPageAdmin(ContentAdminMixin, TabbedTranslationAdmin):
 
 # ============ ЗАЯВКИ НА ДИЛЕРСТВО ============
 
+class BecomeADealerApplicationForm(forms.ModelForm):
+    class Meta:
+        model = BecomeADealerApplication
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'manager' in self.fields:
+            self.fields['manager'].widget.can_add_related = False
+            self.fields['manager'].widget.can_change_related = False
+            self.fields['manager'].widget.can_delete_related = False
+            self.fields['manager'].widget.can_view_related = False
+
+
 @admin.register(BecomeADealerApplication)
 class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
+    form = BecomeADealerApplicationForm  
+    
     list_display = [
         'dealer_badge', 'name', 'company_name', 'phone', 'region', 
         'experience_years', 'status', 'priority', 'manager', 'created_at', 'action_buttons'  
@@ -519,7 +586,6 @@ class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
         )
     dealer_badge.short_description = "Тип"
     
-    # ← ДОБАВИТЬ ИКОНКИ ДЕЙСТВИЙ
     def action_buttons(self, obj):
         return format_html('''
             <div style="display: flex; gap: 8px; align-items: center;">
@@ -534,20 +600,11 @@ class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
                 </a>
             </div>
         ''',
-            f'/admin/main/becomeadealer application/{obj.id}/change/',
-            f'/admin/main/becomeadealer application/{obj.id}/delete/',
+            f'/admin/main/becomeadealerapplication/{obj.id}/change/',
+            f'/admin/main/becomeadealerapplication/{obj.id}/delete/',
             obj.name
         )
     action_buttons.short_description = "Действия"
-    
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        formfield = super().formfield_for_foreignkey(db_field, request, **kwargs)
-        if db_field.name == "manager":
-            formfield.widget.can_add_related = False
-            formfield.widget.can_change_related = False
-            formfield.widget.can_delete_related = False
-            formfield.widget.can_view_related = False
-        return formfield
     
     def export_to_excel(self, request, queryset):
         wb = openpyxl.Workbook()
@@ -586,7 +643,7 @@ class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
         wb.save(response)
         return response
     
-    export_to_excel.short_description = 'Экспорт в Excel'  
+    export_to_excel.short_description = 'Экспорт в Excel'
 
 # ============ ПРОДУКТЫ ============
 
