@@ -139,11 +139,13 @@ class CustomReversionMixin:
 
 # ============ НОВОСТИ ============
 
-class NewsBlockInline(TranslationTabularInline):
+class NewsBlockInline(TranslationStackedInline): 
     model = NewsBlock
     extra = 1
-    fields = ('block_type', 'title', 'text', 'image', 'youtube_url', 'video_file', 'order', 'image_tag')
-    readonly_fields = ('image_tag',)
+    fields = ('block_type', 'title', 'text', 'image', 'youtube_url', 'video_file', 'order')
+
+    class Media:
+        js = ('js/news_block_dynamic.js',)  # ← JS для скрытия полей
 
     def image_tag(self, obj):
         if obj.image:
@@ -163,6 +165,7 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
     inlines = [NewsBlockInline]
     history_latest_first = True
     
+    # ← ИСПРАВЛЕННЫЙ ПОРЯДОК FIELDSETS
     fieldsets = (
         ('Основная информация', {
             'fields': ('title', 'slug', 'created_at', 'is_active', 'order'),
@@ -170,6 +173,7 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
         ('Карточка новости', {
             'fields': ('desc', 'preview_image', 'preview_image_tag'),
         }),
+        # ← УБРАЛИ "Блоки новостей" отсюда (они уже в inlines)
         ('Автор', {
             'fields': ('author', 'author_photo', 'author_photo_tag')
         }),
@@ -178,6 +182,10 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
             'classes': ('collapse',)
         }),
     )
+    
+    # ← ДОБАВИТЬ КАСТОМНЫЙ JS ДЛЯ ДИНАМИЧЕСКИХ ПОЛЕЙ
+    class Media:
+        js = ('js/admin/news_block_dynamic.js',)
 
     def preview_image_tag(self, obj):
         if obj.preview_image:
@@ -206,7 +214,6 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
             </div>
         ''', f'/admin/main/news/{obj.id}/change/', obj.slug, f'/admin/main/news/{obj.id}/delete/')
     action_buttons.short_description = "Действия"
-
 
 # ============ ЗАЯВКИ ============
 
@@ -327,7 +334,7 @@ class VacancyAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
         count = obj.get_applications_count()
         if count > 0:
             return format_html(
-                '<a href="/admin/main/jobapplication/?vacancy__id__exact={}" style="color:#007bff;font-weight:bold;">📋 {} Заявок</a>',
+                '<a href="/admin/main/jobapplication/?vacancy__id__exact={}" style="color:#007bff;font-weight:bold;"> {} Заявок</a>',
                 obj.id, count
             )
         return '0 заявок'
@@ -352,7 +359,7 @@ class JobApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
     
     def resume_link(self, obj):
         if obj.resume:
-            return format_html('<a href="{}" target="_blank" style="color:#007bff;font-weight:bold;">📄 Скачать</a>', obj.resume.url)
+            return format_html('<a href="{}" target="_blank" style="color:#007bff;font-weight:bold;"> Скачать</a>', obj.resume.url)
         return "—"
     resume_link.short_description = 'Резюме'
     
@@ -366,14 +373,14 @@ class JobApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
             file_ext = obj.resume.name.split('.')[-1].lower()
             if file_ext in ['jpg', 'jpeg', 'png']:
                 return format_html('<img src="{}" width="300" style="border-radius:8px;">', obj.resume.url)
-            return format_html('<p style="color:#888;">📄 {}</p>', obj.resume.name)
+            return format_html('<p style="color:#888;"> {}</p>', obj.resume.name)
         return "—"
     resume_preview.short_description = 'Превью'
     
     def is_processed_badge(self, obj):
         if obj.is_processed:
-            return format_html('<span style="color:green;font-weight:bold;">✅ Рассмотрено</span>')
-        return format_html('<span style="color:orange;font-weight:bold;">⏳ Новая</span>')
+            return format_html('<span style="color:green;font-weight:bold;"> Рассмотрено</span>')
+        return format_html('<span style="color:orange;font-weight:bold;"> Новая</span>')
     is_processed_badge.short_description = 'Статус'
 
 
@@ -411,7 +418,7 @@ class DealerServiceAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, 
     
     def action_buttons(self, obj):
         is_base = obj.slug in ['sotuv', 'servis', 'ehtiyot-qismlar']
-        delete_btn = '<span style="opacity: 0.2;">🔒</span>' if is_base else f'<a href="/admin/main/dealerservice/{obj.id}/delete/" onclick="return confirm(\'Удалить?\')"><img src="/static/media/icon-adminpanel/recycle-bin.png" width="24" height="24"></a>'
+        delete_btn = '<span style="opacity: 0.2;"></span>' if is_base else f'<a href="/admin/main/dealerservice/{obj.id}/delete/" onclick="return confirm(\'Удалить?\')"><img src="/static/media/icon-adminpanel/recycle-bin.png" width="24" height="24"></a>'
         
         return format_html('''
             <div style="display: flex; gap: 8px;">
@@ -533,7 +540,7 @@ class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
     )
     
     def dealer_badge(self, obj):
-        return format_html('<span style="background:#000;color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;">🤝 ДИЛЕРСТВО</span>')
+        return format_html('<span style="background:#000;color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;">ДИЛЕРСТВО</span>')
     dealer_badge.short_description = "Тип"
     
     def action_buttons(self, obj):

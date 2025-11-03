@@ -94,6 +94,15 @@
   <!-- Dynamic Content Blocks -->
   {% for block in blocks %}
 
+  <!-- Заголовок H3 (если есть) для ЛЮБОГО типа блока -->
+  {% if block.title %}
+  <div class="reveal-type anim-uni-in-up">
+    <div class="faw-history-title fade-in">
+      <h3>{{ block.title }}</h3>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- YouTube Video Block -->
   {% if block.block_type == 'youtube' and block.youtube_url %}
   <div class="mxd-section padding-grid-pre-pinned">
@@ -126,17 +135,21 @@
   </div>
   {% endif %}
 
-  <!-- Text Block -->
-  {% if block.block_type == 'text' and block.text %}
-  <!-- Если есть заголовок — показываем H3 -->
-  {% if block.title %}
-  <div class="reveal-type anim-uni-in-up">
-    <div class="faw-history-title fade-in">
-      <h3>{{ block.title }}</h3>
+  <!-- Image Block -->
+  {% if block.block_type == 'image' and block.image %}
+  <div class="mxd-section padding-pre-title">
+    <div class="mxd-container">
+      <div class="mxd-divider">
+        <div class="mxd-divider__image parallax-img">
+          <img src="{{ block.image.url }}" alt="{{ block.title|default:'Фото' }}">
+        </div>
+      </div>
     </div>
   </div>
   {% endif %}
 
+  <!-- Text Block -->
+  {% if block.block_type == 'text' and block.text %}
   <div class="mxd-hero-00__bottom">
     <div class="hero-00-manifest loading__fade">
       <p class="mxd-manifest reveal-type anim-uni-in-up">
