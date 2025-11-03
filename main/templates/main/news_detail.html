@@ -4,56 +4,50 @@
 
 <head>
   <meta charset="UTF-8">
+  <title>{{ news.title }} | VUM News</title>
 
-  <!-- Page Title -->
-  <title>Ishonchli hamkor – barqaror kelajak: VUM kompaniyasining dilerlik konferensiyasi bo'lib o'tdi</title>
+  <meta name="description" content="{{ news.desc }}">
+  <meta name="keywords" content="FAW Trucks, VUM, {{ news.title }}">
+  <meta name="author" content="VUM">
 
-  <!-- Meta Tags -->
-  <meta name="description" content="Faw Trucks в Узбекистане">
-  <meta name="keywords" content="Faw Trucks в Узбекистане">
-  <meta name="author" content="mix_design">
-
-  <!-- Viewport Meta-->
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <!-- Template Favicon & Icons Start -->
+  <!-- Favicons -->
   <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
   <link rel="apple-touch-icon" href="{% static 'images/icon/_iiiiapple.png' %}" />
   <link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/icon/_iiii176.png' %}" />
   <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/icon/_iiii1156.png' %}" />
   <link rel="apple-touch-startup-image" href="{% static 'images/icon/_iiii1.png' %}" />
-  <!-- Template Favicon & Icons End -->
 
-  <!-- Facebook Metadata Start -->
+  <!-- Open Graph -->
   <meta property="og:image:height" content="1200">
   <meta property="og:image:width" content="1200">
-  <meta property="og:title" content="Faw Trucks в Узбекистане">
-  <meta property="og:description" content="Faw Trucks в Узбекистане">
-  <meta property="og:url" content="https://mixdesign.dev/themeforest/rayo">
-  <meta property="og:image" content="https://mixdesign.dev/themeforest/rayo/img/og-image.jpg">
-  <!-- Facebook Metadata End -->
+  <meta property="og:title" content="{{ news.title }}">
+  <meta property="og:description" content="{{ news.desc }}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  {% if news.preview_image %}
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ news.preview_image.url }}">
+  {% endif %}
 
-  <!-- Template Styles Start -->
+  <!-- Styles -->
   <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'css/breadcrumbs.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'css/single-news-page.css' %}">
-  <!-- Template Styles End -->
 
-  <!-- Custom Browser Color Start -->
+  <!-- Browser Color -->
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
   <meta name="msapplication-navbutton-color" content="#161616">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <!-- Custom Browser Color End -->
 </head>
 
 <body>
-  <!-- Loader Start -->
+  <!-- Loader -->
   <div id="loader" style="display: none;" class="loader">
     <div class="loader__wrapper">
       <div class="loader__content">
@@ -63,16 +57,14 @@
       </div>
     </div>
   </div>
-  <!-- Loader End -->
 
-  <!-- Меню и шапка (начало) -->
+  <!-- Header -->
   {% include 'main/includes/header.html' %}
-  <!-- Меню и шапка (конец) -->
 
-  <!-- Page Content Start -->
+  <!-- Page Content -->
   <div class="mxd-block loading-wrap"></div>
 
-  <!-- Хлебные крошки -->
+  <!-- Breadcrumbs -->
   <div class="mxd-block">
     <div class="mxd-section-filter pre-grid">
       <div class="mxd-section-filter__inner animate-card-3">
@@ -91,224 +83,80 @@
     </div>
   </div>
 
-  <!-- Title after video start -->
+  <!-- Main Title -->
   <div class="title-after-video">
     <div class="faw-history-title fade-in">
-      <h1 class="reveal-type anim-uni-in-up">{{ news.title }}</h1>
+      <h2 class="reveal-type anim-uni-in-up">{{ news.title }}</h2>
     </div>
     <div class="mxd-block"></div>
   </div>
 
-  <!-- Video banner start -->
+  <!-- Dynamic Content Blocks -->
+  {% for block in blocks %}
+
+  <!-- YouTube Video Block -->
+  {% if block.block_type == 'youtube' and block.youtube_url %}
   <div class="mxd-section padding-grid-pre-pinned">
     <div class="mxd-container">
       <div class="mxd-divider" id="parallax-divider">
         <div class="mxd-divider__video">
-          <iframe class="video parallax-video"
-            src="https://www.youtube.com/embed/zrksaVA8RXA?si=K6QyWlfnYgxG_ErG&autoplay=1&mute=1&loop=1&playlist=zrksaVA8RXA"
-            title="YouTube video player" frameborder="0"
+          <iframe class="video parallax-video" src="{{ block.youtube_url }}" title="YouTube video player"
+            frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-parallax="true"></iframe>
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-parallax="true">
+          </iframe>
         </div>
       </div>
     </div>
   </div>
-  <!-- Video banner end -->
+  {% endif %}
 
-  <!-- Intro content start -->
+  <!-- Video File Block -->
+  {% if block.block_type == 'video' and block.video_file %}
+  <div class="mxd-section padding-grid-pre-pinned">
+    <div class="mxd-container">
+      <div class="mxd-divider">
+        <div class="mxd-divider__video">
+          <video class="video" controls preload="auto">
+            <source src="{{ block.video_file.url }}" type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Text Block -->
+  {% if block.block_type == 'text' and block.text %}
+  <!-- Если есть заголовок — показываем H3 -->
+  {% if block.title %}
+  <div class="reveal-type anim-uni-in-up">
+    <div class="faw-history-title fade-in">
+      <h3>{{ block.title }}</h3>
+    </div>
+  </div>
+  {% endif %}
+
   <div class="mxd-hero-00__bottom">
     <div class="hero-00-manifest loading__fade">
       <p class="mxd-manifest reveal-type anim-uni-in-up">
-        13 iyul kuni Toshkentda Van Universal Motors (VUM) kompaniyasi tashabbusi bilan O'zbekiston bo'ylab faoliyat
-        yuritayotgan dilerlik markazlari vakillari ishtirokida yirik konferensiya bo'lib o'tdi. Tadbir "Ishonchli hamkor
-        — barqaror kelajak" shiori ostida o'tkazildi.
-        <br><br>
-        Mazkur uchrashuvning asosiy maqsadi — dilerlar bilan hamkorlikni mustahkamlash va biznesni rivojlantirish
-        bo'ldi. Shuningdek, ushbu tadbirda O'zbekiston yuk mashinalari bozori uchun yangilik — gaz va benzin
-        yoqilg'isida harakatlanuvchi mutlaqo yangi avlod yuk mashinasi FAW Tiger VH modeli taqdimoti o'tkazildi.
+        {{ block.text|linebreaksbr }}
       </p>
     </div>
   </div>
+  {% endif %}
 
-  <!-- Image 1 -->
-  <div class="mxd-section padding-pre-title">
-    <div class="mxd-container">
-      <div class="mxd-divider">
-        <div class="mxd-divider__image parallax-img">
-          <img src="{% static 'images/news-img/1.jpg' %}" alt="">
-        </div>
-      </div>
-    </div>
-  </div>
+  {% endfor %}
 
-  <!-- Content block 1 -->
-  <div class="reveal-type anim-uni-in-up">
-    <div class="faw-history-title fade-in">
-      <h3>VUM – ishonchli hamkorlik sari intilayotgan yetakchi kompaniyalardan biri</h3>
-    </div>
-    <div class="mxd-hero-00__bottom">
-      <div class="hero-00-manifest loading__fade">
-        <p class="mxd-manifest reveal-type anim-uni-in-up">
-          Van Universal Motors — O'zbekistonda yuk avtomobillari savdosi, servis xizmatlari va dilerlik tarmog'i
-          yo'nalishida faoliyat yuritayotgan, bozorda yetakchi o'ringa ega bo'lish sari qat'iy intilayotgan
-          kompaniyalardan biridir.
-          <br><br>
-          Kompaniya FAW Tiger yuk mashinalarini O'zbekistonda ishlab chiqarish va ularga xizmat ko'rsatish tizimini
-          shakllantirgan bo'lib, hozirda mamlakat bo'ylab 20 dan ortiq dilerlik markazlari bilan faol hamkorlik olib
-          bormoqda.
-          <br><br>
-          2025 yilning birinchi yarmi yakuniga ko'ra, kompaniya o'z faoliyatida bir qancha muhim natijalarga erishdi.
-          Jumladan:dilerlar soni 7 tadan 23 taga yetdi — bu texnikalarning hududlarga yetkazilishi va servis
-          xizmatlarining qulay tashkil etilishi uchun katta imkoniyat yaratdi.
-          <br><br>
-          Shu davr ichida Van Universal Motors'ga bo'lgan ishonch yirik tashkilotlar tomonidan ham ortdi. Transport
-          vazirligi huzuridagi Avtomobil yo'llari qo'mitasi tarkibidagi tashkilotlar, "Navoiy KMK" AJ, Davlat xavfsizlik
-          xizmati, shuningdek, Korzinka, Safia kabi xususiy kompaniyalar VUM bilan barqaror hamkorlikni yo'lga qo'ydi.
-          Bu ko'rsatkichlar — VUM'ning bozorga bergan real qiymati va sheriklar bilan qurayotgan mustahkam
-          munosabatlaridan dalolat beradi.
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Image 2 -->
-  <div class="mxd-section padding-pre-title">
-    <div class="mxd-container">
-      <div class="mxd-divider">
-        <div class="mxd-divider__image parallax-img">
-          <img src="{% static 'images/news-img/2.JPG' %}" alt="">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Content block 2 -->
-  <div class="reveal-type anim-uni-in-up">
-    <div class="faw-history-title fade-in">
-      <h3>Konferensiyada muhim strategik yo'nalishlar muhokama qilindi</h3>
-    </div>
-    <div class="mxd-hero-00__bottom">
-      <div class="hero-00-manifest loading__fade">
-        <p class="mxd-manifest reveal-type anim-uni-in-up">
-          <strong>Konferensiyada muhim strategik yo'nalishlar muhokama qilindi</strong>
-          <br><br>
-          Tadbir doirasida VUM rahbariyati tomonidan kompaniyaning 2025–2026 yillardagi rivojlanish strategiyasi,
-          dilerlik
-          markazlariga beriladigan qo'llab-quvvatlovlar, hududiy marketing yondashuvlari va servis xizmatlarini
-          takomillashtirish borasidagi rejalar taqdim etildi.
-          <br><br>
-          Muhokama qilingan asosiy yo'nalishlar quyidagilardan iborat bo'ldi:
-          <br><br>
-          • Bozor segmentlari uchun moslashtirilgan FAW modellari;
-          <br><br>
-          • Dilerlar uchun markazlashgan servis nazorati;
-          <br><br>
-          • Har bir hudud uchun alohida marketing strategiyasi;
-          <br><br>
-          • Brend imijini kuchaytirish va diler ishonchini oshirish choralari.
-          <br><br>
-          <strong>Hamkorlik – asosiy qadriyat</strong>
-          <br><br>
-          Tadbirda ishtirok etgan dilerlik vakillari VUM tomonidan taqdim etilayotgan texnikalar, marketing
-          yondashuvlari
-          va mijozlarga xizmat ko'rsatish tizimini takomillashtirish bo'yicha qo'llab-quvvatlovni ijobiy baholab, savdo
-          samaradorligini oshirishga qaratilgan fikr-mulohazalarini bildirdi.
-          <br><br>
-          "Biz uchun har bir diler — kompaniyamizning yuzidir. Ular orqali biz mijozlarga yaqinlashamiz, ularning
-          ehtiyojlarini tushunamiz va barqaror yechimlar taklif qilamiz", dedi VUM bosh direktori G'asanov Ravshan
-          Rustam o'g'li o'z nutqida.
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Image 3 -->
-  <div class="mxd-section padding-pre-title">
-    <div class="mxd-container">
-      <div class="mxd-divider">
-        <div class="mxd-divider__image parallax-img">
-          <img src="{% static 'images/news-img/3.jpg' %}" alt="">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Content block 3 -->
-  <div class="reveal-type anim-uni-in-up">
-    <div class="faw-history-title fade-in">
-      <h3>FAW Tiger VH – O'zbekistonda zavod sharoitida ishlab chiqarilgan ilk gaz-benzinli yuk mashinasi</h3>
-    </div>
-    <div class="mxd-hero-00__bottom">
-      <div class="hero-00-manifest loading__fade">
-        <p class="mxd-manifest reveal-type anim-uni-in-up">
-          Tadbir doirasida yangi texnikaning taqdimoti ham bo'lib o'tdi — bu FAW Tiger VH modeli bo'lib, u gaz (metan)
-          va benzin yoqilg'isida harakatlana oladigan ikki yonilg'ili dvigatelga ega yuk mashinasidir.
-          <br><br>
-          Mazkur model — O'zbekistonda zavod sharoitida gaz va benzin tizimi bilan ishlab chiqarilgan ilk eksklyuziv
-          texnikalardan biri hisoblanadi. Bu yechim nafaqat iqtisodiy jihatdan foydali, balki ekologik xavfsizlik nuqtai
-          nazaridan ham muhim ahamiyatga ega.
-          <br><br>
-          • Asosiy afzalliklar:
-          <br><br>
-          • To'liq og'irligi – 8 000 kg
-          <br><br>
-          • Yoqilg'i bakanlari – 345 (200+145) litr metan + 15 litr benzin
-          <br><br>
-          • YUNNEI dvigateli – 130 o.k.
-          <br><br>
-          • Shaanxi MT/8 uzatma qutisi
-          <br><br>
-          • 360 lik kamera, monitor, multirul, pnevmouro'rindiq, salon uchun yorqin jigarrang rangdagi charmli dizayn,
-          yon oynalardagi isitish tizimi va hokazo.
-          <br><br>
-          FAW Tiger VH texnikasi dilerlar tomonidan katta qiziqish bilan kutib olindi va konferensiya ishtirokchilari
-          ushbu model, shubhasiz, xalqimiz uchun ayni ehtiyojga javob beruvchi, ommabop va foydali yechim bo'lishini
-          ta'kidladi.
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Image 4 -->
-  <div class="mxd-section padding-pre-title">
-    <div class="mxd-container">
-      <div class="mxd-divider">
-        <div class="mxd-divider__image parallax-img">
-          <img src="{% static 'images/news-img/4.jpg' %}" alt="">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Content block 4 -->
-  <div class="reveal-type anim-uni-in-up">
-    <div class="faw-history-title fade-in">
-      <h3>Yakuniy natija – yagona maqsad sari birlashuv</h3>
-    </div>
-    <div class="mxd-hero-00__bottom">
-      <div class="hero-00-manifest loading__fade">
-        <p class="mxd-manifest reveal-type anim-uni-in-up">
-          Van Universal Motors dilerlik tarmog'i bilan birgalikda yuk avtomobillari bozorida ishonchli hamkor va
-          barqaror ishlab chiqaruvchi sifatida o'z mavqeyini mustahkamlashni davom ettirmoqda.
-          <br><br>
-          Kompaniya kelajakni dilerlar bilan birga qurmoqda. Agar siz ham ishonchli hamkorlikka tayyor bo'lsangiz — biz
-          bilan bog'laning.
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Футер (начало) -->
+  <!-- Footer -->
   {% include 'main/includes/footer.html' %}
-  <!-- Футер (конец) -->
 
-  <!-- To Top Button Start -->
+  <!-- To Top Button -->
   <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
     <i class="ph ph-arrow-up"></i>
   </a>
-  <!-- To Top Button End -->
 
-  <!-- Load Scripts Start -->
+  <!-- Scripts -->
   <script src="{% static 'js/libs.min.js' %}"></script>
   <script src="{% static 'js/app.js' %}"></script>
   <script src="{% static 'js/faw.js' %}"></script>

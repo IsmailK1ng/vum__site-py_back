@@ -1,0 +1,241 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+.recovery-header {
+    background: linear-gradient(306deg, #000000, #002b9b, #1e57eb);
+    color: white;
+    padding: 30px;
+    border-radius: 10px 10px 0 0;
+}
+
+.recovery-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+}
+
+.recovery-header p {
+    margin: 10px 0 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.recovery-content {
+    padding: 30px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 0 0 10px 10px;
+}
+
+.version-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.version-table thead {
+    background: linear-gradient(306deg, #000000, #002b9b, #1e57eb);
+}
+
+.version-table th {
+    color: white;
+    padding: 15px 20px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.version-table td {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+}
+
+.version-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.version-table tbody tr:hover {
+    background: #f8f9fa;
+    transform: translateX(2px);
+}
+
+.version-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.version-preview {
+    width: 100px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.no-preview {
+    width: 100px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 28px;
+}
+
+.restore-btn {
+    background: linear-gradient(306deg, #000000, #002b9b, #1e57eb);
+    color: white !important;
+    padding: 10px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.restore-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 43, 155, 0.4);
+    color: white !important;
+}
+
+.version-title {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+    display: block;
+}
+
+.version-date {
+    color: #6c757d;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: #6c757d;
+}
+
+.empty-state-icon {
+    font-size: 72px;
+    margin-bottom: 24px;
+    opacity: 0.3;
+}
+
+.empty-state h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.back-btn {
+    background: #6c757d;
+    color: white !important;
+    padding: 10px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+.back-btn:hover {
+    background: #5a6268;
+    transform: translateX(-4px);
+    color: white !important;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="margin: 20px;">
+    <div class="recovery-header">
+        <h1>Восстановление удалённых объектов</h1>
+        <p>Выберите версию для восстановления из списка ниже. Все данные объекта будут полностью восстановлены.</p>
+    </div>
+
+    <div class="recovery-content">
+        {% if version_list %}
+        <table class="version-table">
+            <thead>
+                <tr>
+                    <th style="width: 180px;">Дата удаления</th>
+                    <th>Объект</th>
+                    <th style="width: 140px; text-align: center;">Превью</th>
+                    <th style="width: 160px; text-align: center;">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in version_list %}
+                <tr>
+                    <td>
+                        <span class="version-date">
+                            {{ item.date|date:"d.m.Y H:i" }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="version-title">
+                            {{ item.object_repr|default:"Без названия" }}
+                        </span>
+                    </td>
+                    <td style="text-align: center;">
+                        {% if item.preview_url %}
+                            <img src="{{ item.preview_url }}" class="version-preview" alt="Превью">
+                        {% else %}
+                            <div class="no-preview"></div>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center;">
+                        <a href="{% url 'admin:'|add:opts.app_label|add:'_'|add:opts.model_name|add:'_recover' item.version.pk %}" 
+                           class="restore-btn"
+                           onclick="return confirm('Восстановить объект: {{ item.object_repr }}?')">
+                            ↻ Восстановить
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon"></div>
+            <h2>Нет удалённых объектов</h2>
+            <p>Все объекты на месте! Удалённых записей для восстановления не найдено.</p>
+        </div>
+        {% endif %}
+
+        <a href="{% url 'admin:'|add:opts.app_label|add:'_'|add:opts.model_name|add:'_changelist' %}" class="back-btn">
+            ← Вернуться к списку
+        </a>
+    </div>
+</div>
+{% endblock %}

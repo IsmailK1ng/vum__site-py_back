@@ -58,12 +58,12 @@ class News(models.Model):
         ordering = ['-order', '-created_at']
 
     def __str__(self):
-        return self.title
+        # ✅ Улучшенный вывод для истории версий
+        return f"{self.created_at.strftime('%d.%m.%Y')} — {self.title[:50]}"
     
     def save(self, *args, **kwargs):
         """Автогенерация slug из title при сохранении"""
         if not self.slug:
-            # Попробовать взять title на узбекском, если нет - на любом языке
             title_for_slug = (
                 getattr(self, 'title_uz', None) or 
                 getattr(self, 'title_ru', None) or 
@@ -71,12 +71,10 @@ class News(models.Model):
                 "novost"
             )
             
-            # Транслитерация
             base_slug = slugify(unidecode(title_for_slug))
             slug = base_slug
             counter = 1
             
-            # Проверка уникальности
             while News.objects.filter(slug=slug).exclude(pk=self.pk).exists():
                 slug = f"{base_slug}-{counter}"
                 counter += 1
@@ -102,6 +100,15 @@ class NewsBlock(models.Model):
         verbose_name="Новость"
     )
     block_type = models.CharField("Тип блока", max_length=10, choices=BLOCK_TYPES)
+    
+    title = models.CharField(
+        "Заголовок (необязательно)", 
+        max_length=500, 
+        blank=True, 
+        null=True,
+        help_text="Заголовок H3 перед текстовым блоком"
+    )
+    
     text = models.TextField("Текст", blank=True, null=True)
     image = models.ImageField("Фото", upload_to="news/images/", blank=True, null=True)
     youtube_url = models.URLField("YouTube ссылка", blank=True, null=True)
@@ -114,7 +121,11 @@ class NewsBlock(models.Model):
         verbose_name_plural = "Блоки новостей"
 
     def __str__(self):
-        return f"{self.news.title} — {self.block_type}"
+        # ✅ Улучшенный вывод
+        type_display = self.get_block_type_display()
+        if self.title:
+            return f"{self.news.title[:30]} — {type_display}: {self.title[:30]}"
+        return f"{self.news.title[:30]} — {type_display}"
 
 
 # ========== 02. КОНТЕНТ - ПРОДУКТЫ ==========
@@ -168,7 +179,8 @@ class Product(models.Model):
         ordering = ['order', 'title']
 
     def __str__(self):
-        return self.title
+        # ✅ Улучшенный вывод для истории версий
+        return f"{self.get_category_display()} — {self.title}"
 
 
 class ProductParameter(models.Model):
@@ -365,6 +377,7 @@ class Dealer(models.Model):
         ordering = ['order', 'city', 'name']
     
     def __str__(self):
+        # ✅ Улучшенный вывод для истории версий
         return f"{self.name} ({self.city})"
 
 
@@ -448,7 +461,9 @@ class Vacancy(models.Model):
         ordering = ['order', '-created_at']
 
     def __str__(self):
-        return self.title
+        # ✅ Улучшенный вывод для истории версий
+        status = "✅ Активна" if self.is_active else "❌ Неактивна"
+        return f"{self.title} — {status}"
     
     def get_applications_count(self):
         return self.applications.count()
