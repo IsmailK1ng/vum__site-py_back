@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+     'ckeditor',
     
     # Third party
     'rest_framework',
@@ -290,3 +291,24 @@ LANGUAGE_COOKIE_DOMAIN = None
 LANGUAGE_COOKIE_SECURE = not DEBUG
 LANGUAGE_COOKIE_HTTPONLY = False
 LANGUAGE_COOKIE_SAMESITE = 'Lax'
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList'],
+            ['Link', 'Unlink'],
+            ['RemoveFormat', 'Source']
+        ],
+        'height': 300,
+        'width': '100%',
+        'removePlugins': 'elementspath',  # ← ДОБАВЬ
+        'resize_enabled': False,  # ← ДОБАВЬ
+        'forcePasteAsPlainText': False,  # ← ВАЖНО!
+        'allowedContent': True,  # ← РАЗРЕШАЕМ ВСЕ ТЕГИ
+        'extraAllowedContent': 'ul li ol strong p',  # ← ЯВНО РАЗРЕШАЕМ
+    },
+}
+
+CKEDITOR_UPLOAD_PATH = "uploads/"

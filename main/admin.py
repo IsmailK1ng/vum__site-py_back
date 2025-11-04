@@ -139,19 +139,18 @@ class CustomReversionMixin:
 
 # ============ НОВОСТИ ============
 
+
 class NewsBlockInline(TranslationStackedInline): 
     model = NewsBlock
     extra = 1
     fields = ('block_type', 'title', 'text', 'image', 'youtube_url', 'video_file', 'order')
 
     class Media:
-        js = ('js/news_block_dynamic.js',)  # ← JS для скрытия полей
-
-    def image_tag(self, obj):
-        if obj.image:
-            return format_html('<img src="{}" width="100" style="border-radius:8px;">', obj.image.url)
-        return "—"
-    image_tag.short_description = "Превью"
+        js = ('js/admin/news_block_dynamic.js',) 
+        css = {
+            'all': ('css/news_block_custom.css',)  
+            
+        }
 
 
 @admin.register(News)
@@ -165,7 +164,6 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
     inlines = [NewsBlockInline]
     history_latest_first = True
     
-    # ← ИСПРАВЛЕННЫЙ ПОРЯДОК FIELDSETS
     fieldsets = (
         ('Основная информация', {
             'fields': ('title', 'slug', 'created_at', 'is_active', 'order'),
@@ -173,7 +171,6 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
         ('Карточка новости', {
             'fields': ('desc', 'preview_image', 'preview_image_tag'),
         }),
-        # ← УБРАЛИ "Блоки новостей" отсюда (они уже в inlines)
         ('Автор', {
             'fields': ('author', 'author_photo', 'author_photo_tag')
         }),
@@ -182,10 +179,6 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
             'classes': ('collapse',)
         }),
     )
-    
-    # ← ДОБАВИТЬ КАСТОМНЫЙ JS ДЛЯ ДИНАМИЧЕСКИХ ПОЛЕЙ
-    class Media:
-        js = ('js/admin/news_block_dynamic.js',)
 
     def preview_image_tag(self, obj):
         if obj.preview_image:
@@ -214,7 +207,7 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
             </div>
         ''', f'/admin/main/news/{obj.id}/change/', obj.slug, f'/admin/main/news/{obj.id}/delete/')
     action_buttons.short_description = "Действия"
-
+    
 # ============ ЗАЯВКИ ============
 
 @admin.register(ContactForm)

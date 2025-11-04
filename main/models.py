@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 from unidecode import unidecode
-
+from ckeditor.fields import RichTextField  
 
 # ========== ОБЩИЕ CHOICES ==========
 
@@ -109,7 +109,7 @@ class NewsBlock(models.Model):
         help_text="Заголовок H3 перед текстовым блоком"
     )
     
-    text = models.TextField("Текст", blank=True, null=True)
+    text = RichTextField("Текст", blank=True, null=True, config_name='default')
     image = models.ImageField("Фото", upload_to="news/images/", blank=True, null=True)
     youtube_url = models.URLField("YouTube ссылка", blank=True, null=True)
     video_file = models.FileField("Видео файл", upload_to="news/videos/", blank=True, null=True)

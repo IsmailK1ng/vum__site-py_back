@@ -1,0 +1,62 @@
+/* ========== УБИРАЕМ "Новый Блок новости" + uz/ru/en ========== */
+/* Скрываем весь заголовок блока (h3) с селектором языков */
+.inline-related h3 {
+    display: none !important;
+}
+
+/* Скрываем вкладки языков на уровне всего inline-блока (НЕ внутри полей!) */
+.inline-related > .language-tabs,
+.inline-related > .suit-include > .language-tabs,
+.inline-related > ul[class*="suit"],
+.inline-related > div[class*="language"]:first-child {
+    display: none !important;
+}
+
+/* ========== СКРЫВАЕМ uz/ru/en ДЛЯ НЕНУЖНЫХ ПОЛЕЙ ========== */
+
+/* Скрываем вкладки языков для Фото */
+.inline-related .field-image .language-tabs,
+.inline-related .field-image ul[class*="suit"],
+.inline-related .field-image div[class*="language"] {
+    display: none !important;
+}
+
+/* Скрываем вкладки для YouTube */
+.inline-related .field-youtube_url .language-tabs,
+.inline-related .field-youtube_url ul[class*="suit"],
+.inline-related .field-youtube_url div[class*="language"] {
+    display: none !important;
+}
+
+/* Скрываем вкладки для Видео */
+.inline-related .field-video_file .language-tabs,
+.inline-related .field-video_file ul[class*="suit"],
+.inline-related .field-video_file div[class*="language"] {
+    display: none !important;
+}
+
+/* Скрываем вкладки для Порядка */
+.inline-related .field-order .language-tabs,
+.inline-related .field-order ul[class*="suit"] {
+    display: none !important;
+}
+
+/* Скрываем вкладки для Типа блока */
+.inline-related .field-block_type .language-tabs,
+.inline-related .field-block_type ul[class*="suit"] {
+    display: none !important;
+}
+
+/* ========== СТИЛИ БЛОКОВ ========== */
+.inline-related {
+    margin: 20px 0;
+    padding: 20px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: #f9f9f9;
+}
+
+.inline-related:hover {
+    background: #fff;
+    border-color: #4CAF50;
+}

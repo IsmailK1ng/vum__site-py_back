@@ -15,7 +15,7 @@ class NewsTranslationOptions(TranslationOptions):
 
 @register(NewsBlock)
 class NewsBlockTranslationOptions(TranslationOptions):
-    fields = ('text',)
+    fields = ('title', 'text')  # ← ДОБАВИЛИ 'title'
 
 
 # ========== ВАКАНСИИ ==========

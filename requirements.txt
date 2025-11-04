@@ -25,6 +25,15 @@ Deprecated==1.2.14
 Django==5.2.7
 django-jazzmin==3.0.1
 django-modeltranslation==0.19.17
+djangorestframework
+drf-spectacular
+django-nested-admin
+django-cors-headers
+django-reversion
+psycopg[binary]
+Unidecode
+openpyxl
+Pillow
 frozenlist==1.4.1
 greenlet==3.1.1
 h11==0.14.0

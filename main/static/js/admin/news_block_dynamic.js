@@ -13,65 +13,124 @@
         console.log('✅ jQuery готов');
 
         function toggleFieldsByBlockType() {
-            console.log('🔄 Применяем toggleFieldsByBlockType');
+            console.log('🔄 Скрываем/показываем поля');
             
-            $('.inline-related').each(function() {
-                var $inline = $(this);
-                var $blockTypeSelect = $inline.find('select[id$="-block_type"]');
+            $('.inline-related:not(.empty-form)').each(function(idx) {
+                var $block = $(this);
+                var $typeSelect = $block.find('select[name$="-block_type"]');
                 
-                if ($blockTypeSelect.length === 0) return;
+                if ($typeSelect.length === 0) return;
                 
-                var blockType = $blockTypeSelect.val();
-                console.log('Тип блока:', blockType);
+                var blockType = $typeSelect.val();
+                console.log('Блок', idx, '→', blockType || '(не выбран)');
                 
-                // Находим поля (для всех языков)
-                var $titleFields = $inline.find('.field-title_uz, .field-title_ru, .field-title_en');
-                var $textFields = $inline.find('.field-text_uz, .field-text_ru, .field-text_en');
-                var $imageField = $inline.find('.field-image');
-                var $youtubeField = $inline.find('.field-youtube_url');
-                var $videoField = $inline.find('.field-video_file');
+                // Находим .ui-tabs контейнеры
+                var $titleTabs = $block.find('.ui-tabs').filter(function() {
+                    return $(this).find('[id*="title"]').length > 0;
+                });
                 
-                // Скрываем все поля контента
-                $titleFields.hide();
-                $textFields.hide();
+                var $textTabs = $block.find('.ui-tabs').filter(function() {
+                    return $(this).find('[id*="text"]').length > 0 && 
+                           $(this).find('[id*="title"]').length === 0;
+                });
+                
+                // Находим обычные поля (без вкладок)
+                var $imageField = $block.find('.form-group').filter(function() {
+                    return $(this).attr('class').includes('field-image');
+                });
+                
+                var $youtubeField = $block.find('.form-group').filter(function() {
+                    return $(this).attr('class').includes('field-youtube');
+                });
+                
+                var $videoField = $block.find('.form-group').filter(function() {
+                    return $(this).attr('class').includes('field-video');
+                });
+                
+                console.log('  Найдено:', {
+                    title: $titleTabs.length,
+                    text: $textTabs.length,
+                    image: $imageField.length,
+                    youtube: $youtubeField.length,
+                    video: $videoField.length
+                });
+                
+                // СКРЫВАЕМ ВСЁ
+                $titleTabs.hide();
+                $textTabs.hide();
                 $imageField.hide();
                 $youtubeField.hide();
                 $videoField.hide();
                 
-                // Показываем нужные в зависимости от типа
-                if (blockType === 'text') {
-                    $titleFields.show();
-                    $textFields.show();
-                    console.log('  → Показываем: title, text');
-                } else if (blockType === 'image') {
-                    $titleFields.show();
-                    $imageField.show();
-                    console.log('  → Показываем: title, image');
-                } else if (blockType === 'youtube') {
-                    $titleFields.show();
-                    $youtubeField.show();
-                    console.log('  → Показываем: title, youtube');
-                } else if (blockType === 'video') {
-                    $titleFields.show();
-                    $videoField.show();
-                    console.log('  → Показываем: title, video');
-                } else {
-                    console.log('  → Тип не выбран, скрываем всё');
+                // ПОКАЗЫВАЕМ нужное
+                switch(blockType) {
+                    case 'text':
+                        $titleTabs.show();
+                        $textTabs.show();
+                        console.log('  ✅ Показали: заголовок + текст');
+                        break;
+                    case 'image':
+                        $titleTabs.show();
+                        $imageField.show();
+                        console.log('  ✅ Показали: заголовок + фото');
+                        break;
+                    case 'youtube':
+                        $titleTabs.show();
+                        $youtubeField.show();
+                        console.log('  ✅ Показали: заголовок + YouTube');
+                        break;
+                    case 'video':
+                        $titleTabs.show();
+                        $videoField.show();
+                        console.log('  ✅ Показали: заголовок + видео');
+                        break;
+                    default:
+                        console.log('  ℹ️ Тип не выбран — всё скрыто');
                 }
             });
         }
         
+        // ✅ ИСПРАВЛЕНИЕ 1: Запускаем НЕМЕДЛЕННО при загрузке и после каждого добавления
         $(document).ready(function() {
-            setTimeout(toggleFieldsByBlockType, 300);
+            toggleFieldsByBlockType();  // Без задержки!
+            setTimeout(toggleFieldsByBlockType, 100);  // Дополнительно через 100ms
+            setTimeout(toggleFieldsByBlockType, 500);  // И через 500ms для Django
         });
         
-        $(document).on('change', 'select[id$="-block_type"]', function() {
+        // ✅ ИСПРАВЛЕНИЕ 2: Срабатывает сразу при изменении селекта
+        $(document).on('change', 'select[name$="-block_type"]', function() {
+            console.log('🔄 Селект изменён');
             toggleFieldsByBlockType();
         });
         
+        // При добавлении нового блока
         $(document).on('formset:added', function() {
-            setTimeout(toggleFieldsByBlockType, 200);
+            toggleFieldsByBlockType();
+            setTimeout(toggleFieldsByBlockType, 100);
+            setTimeout(toggleFieldsByBlockType, 300);
         });
+        
+        
+        var observer = new MutationObserver(function(mutations) {
+            var shouldUpdate = false;
+            mutations.forEach(function(mutation) {
+                if (mutation.addedNodes.length > 0) {
+                    shouldUpdate = true;
+                }
+            });
+            if (shouldUpdate) {
+                setTimeout(toggleFieldsByBlockType, 100);
+            }
+        });
+        
+        // Следим за контейнером инлайнов
+        var inlineContainer = document.querySelector('.inline-group');
+        if (inlineContainer) {
+            observer.observe(inlineContainer, {
+                childList: true,
+                subtree: true
+            });
+        }
     }
 
     if (document.readyState === 'loading') {

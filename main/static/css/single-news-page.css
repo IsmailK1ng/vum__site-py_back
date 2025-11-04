@@ -2,11 +2,8 @@
    БАЗОВЫЕ СТИЛИ DIVIDER
    ========================================== */
 .mxd-divider {
-  position: relative;
-  border-radius: 20px;
-  overflow: hidden;
-  height: 900px;
-  margin-top: 100px;
+  height: 700px;
+  margin-top: 50px;
 }
 
 .mxd-divider__video,
@@ -100,10 +97,69 @@
 .hero-00-manifest .mxd-manifest {
   font-size: 3rem;
   max-width: 100%;
-  margin: 0px 180px 0px 180px;
+  margin: 30px 180px 0px 180px;
   text-align: justify;
   line-height: 1.6;
   color: #000;
+}
+
+/* ✅ СТИЛИ ДЛЯ КОНТЕНТА ИЗ CKEDITOR */
+.hero-00-manifest .mxd-manifest p {
+  font-size: 3rem;
+  line-height: 1.6;
+  margin-bottom: 1.5em;
+  color: #000;
+}
+
+.hero-00-manifest .mxd-manifest p:last-child {
+  margin-bottom: 0;
+}
+
+.hero-00-manifest .mxd-manifest ul,
+.hero-00-manifest .mxd-manifest ol {
+  font-size: 3rem;
+  line-height: 1.6;
+  margin: 1.5em 0;
+  padding-left: 2em;
+  text-align: left;
+  list-style-position: outside !important;
+}
+
+.hero-00-manifest .mxd-manifest ul {
+  list-style-type: disc !important;
+}
+
+.hero-00-manifest .mxd-manifest ol {
+  list-style-type: decimal !important;
+}
+
+.hero-00-manifest .mxd-manifest li {
+  font-size: 3rem;
+  line-height: 1.6;
+  margin-bottom: 0.8em;
+  color: #000;
+  display: list-item !important;
+}
+
+.hero-00-manifest .mxd-manifest strong,
+.hero-00-manifest .mxd-manifest b {
+  font-weight: 700;
+  color: #000;
+}
+
+.hero-00-manifest .mxd-manifest em,
+.hero-00-manifest .mxd-manifest i {
+  font-style: italic;
+}
+
+.hero-00-manifest .mxd-manifest a {
+  color: #0066cc;
+  text-decoration: underline;
+  transition: color 0.3s;
+}
+
+.hero-00-manifest .mxd-manifest a:hover {
+  color: #004499;
 }
 
 /* ==========================================
@@ -148,7 +204,11 @@
     margin: 0 2rem -30px 2rem;
   }
 
-  .hero-00-manifest .mxd-manifest {
+  .hero-00-manifest .mxd-manifest,
+  .hero-00-manifest .mxd-manifest p,
+  .hero-00-manifest .mxd-manifest ul,
+  .hero-00-manifest .mxd-manifest ol,
+  .hero-00-manifest .mxd-manifest li {
     font-size: 3.2rem;
   }
 }
@@ -165,7 +225,7 @@
   }
 
   .faw-history-title h2 {
-    font-size: 5.5rem;
+    font-size: 4.5rem;
     padding: 30px 40px 0 40px;
   }
 
@@ -175,8 +235,15 @@
   }
 
   .hero-00-manifest .mxd-manifest {
-    font-size: 2.8rem;
     margin: 20px 120px 80px 120px;
+  }
+
+  .hero-00-manifest .mxd-manifest,
+  .hero-00-manifest .mxd-manifest p,
+  .hero-00-manifest .mxd-manifest ul,
+  .hero-00-manifest .mxd-manifest ol,
+  .hero-00-manifest .mxd-manifest li {
+    font-size: 2.8rem;
   }
 
   .mxd-divider__video .parallax-video {
@@ -206,8 +273,15 @@
   }
 
   .hero-00-manifest .mxd-manifest {
-    font-size: 2.5rem;
     margin: 20px 80px 60px 80px;
+  }
+
+  .hero-00-manifest .mxd-manifest,
+  .hero-00-manifest .mxd-manifest p,
+  .hero-00-manifest .mxd-manifest ul,
+  .hero-00-manifest .mxd-manifest ol,
+  .hero-00-manifest .mxd-manifest li {
+    font-size: 2.5rem;
   }
 
   .mxd-divider__video .parallax-video {
@@ -218,24 +292,13 @@
 /* ========================================== 
    УБИРАЕМ BORDER-RADIUS ДЛЯ УСТРОЙСТВ ≤ 1024px
    ========================================== */
-
-/* Tablet Large (769px - 1024px) */
 @media (max-width: 1024px) {
-  .mxd-divider {
-    border-radius: 0 !important;
-  }
-
+  .mxd-divider,
   .mxd-divider__video,
-  .mxd-divider__image {
-    border-radius: 0 !important;
-  }
-
+  .mxd-divider__image,
   .mxd-divider__video iframe,
   .mxd-divider__video video,
-  .mxd-divider__image img {
-    border-radius: 0 !important;
-  }
-
+  .mxd-divider__image img,
   .mxd-divider__video .parallax-video {
     border-radius: 0 !important;
   }
@@ -263,13 +326,21 @@
   }
 
   .hero-00-manifest .mxd-manifest {
-    font-size: 2.2rem;
     margin: 20px 50px 50px 50px;
+  }
+
+  .hero-00-manifest .mxd-manifest,
+  .hero-00-manifest .mxd-manifest p,
+  .hero-00-manifest .mxd-manifest ul,
+  .hero-00-manifest .mxd-manifest ol,
+  .hero-00-manifest .mxd-manifest li {
+    font-size: 2.2rem;
   }
 
   .mxd-divider__video .parallax-video {
     height: 543px !important;
   }
+
   .mxd-section.padding-grid-pre-pinned {
     padding-bottom: 0;
     margin-bottom: 0rem;
@@ -281,7 +352,6 @@
   .mxd-divider {
     height: 405px;
     margin-top: 0px;
-    border-radius: 0;
   }
 
   .mxd-container {
@@ -304,9 +374,16 @@
   }
 
   .hero-00-manifest .mxd-manifest {
-    font-size: 2rem;
     margin: 20px 30px 40px 30px;
     text-align: left;
+  }
+
+  .hero-00-manifest .mxd-manifest,
+  .hero-00-manifest .mxd-manifest p,
+  .hero-00-manifest .mxd-manifest ul,
+  .hero-00-manifest .mxd-manifest ol,
+  .hero-00-manifest .mxd-manifest li {
+    font-size: 2rem;
   }
 
   .mxd-divider__video .parallax-video {
@@ -336,9 +413,16 @@
   }
 
   .hero-00-manifest .mxd-manifest {
-    font-size: 1.8rem;
     margin: 15px 20px 30px 20px;
     text-align: left;
+  }
+
+  .hero-00-manifest .mxd-manifest,
+  .hero-00-manifest .mxd-manifest p,
+  .hero-00-manifest .mxd-manifest ul,
+  .hero-00-manifest .mxd-manifest ol,
+  .hero-00-manifest .mxd-manifest li {
+    font-size: 1.8rem;
   }
 
   .mxd-divider__video .parallax-video {
@@ -368,16 +452,23 @@
   }
 
   .hero-00-manifest .mxd-manifest {
-    font-size: 1.6rem;
     margin: 0px 15px 0px 15px;
     text-align: left;
+  }
+
+  .hero-00-manifest .mxd-manifest,
+  .hero-00-manifest .mxd-manifest p,
+  .hero-00-manifest .mxd-manifest ul,
+  .hero-00-manifest .mxd-manifest ol,
+  .hero-00-manifest .mxd-manifest li {
+    font-size: 1.6rem;
   }
 
   .mxd-divider__video .parallax-video {
     height: 200px !important;
   }
 
-  mxd-section.padding-pre-title {
+  .mxd-section.padding-pre-title {
     padding-bottom: 0;
     margin-bottom: 0rem;
   }

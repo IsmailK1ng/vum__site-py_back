@@ -151,10 +151,10 @@
   <!-- Text Block -->
   {% if block.block_type == 'text' and block.text %}
   <div class="mxd-hero-00__bottom">
-    <div class="hero-00-manifest loading__fade">
-      <p class="mxd-manifest reveal-type anim-uni-in-up">
-        {{ block.text|linebreaksbr }}
-      </p>
+    <div class="hero-00-manifest">
+      <div class="mxd-manifest reveal-type anim-uni-in-up">
+        {{ block.text|safe }}
+      </div>
     </div>
   </div>
   {% endif %}
