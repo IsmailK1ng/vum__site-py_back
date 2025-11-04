@@ -6,7 +6,6 @@
     }
     
     $(document).ready(function() {        
-   
         initIconSelectors();
         
         $(document).on('click', '.add-row a', function() {

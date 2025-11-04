@@ -23,7 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-     'ckeditor',
+    'ckeditor',
     
     # Third party
     'rest_framework',
@@ -33,8 +33,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'reversion',
     
-    'main',
-    'kg',
+    # Приложения проектов
+    'main',  # FAW Uzbekistan
+    'kg',    # FAW Kyrgyzstan
 ]
 
 # ============ REST FRAMEWORK ============
@@ -88,7 +89,7 @@ JAZZMIN_SETTINGS = {
     "show_ui_builder": False,
     "custom_css": "css/custom_admin.css",
     "language_chooser": False,
-    "show_language_switcher": False,  # ← ДОБАВЛЕНО
+    "show_language_switcher": False,
     
     "topmenu_links": [
         {"name": "Сайт UZ", "url": "https://faw.uz", "new_window": True},
@@ -115,6 +116,8 @@ JAZZMIN_SETTINGS = {
         "kg": "fas fa-mountain",
         "kg.KGVehicle": "fas fa-truck",
         "kg.KGFeedback": "fas fa-comment-dots",
+        "kg.KGHeroSlide": "fas fa-images",
+        "kg.IconTemplate": "fas fa-icons",
     },
     
     "order_with_respect_to": [
@@ -142,7 +145,6 @@ JAZZMIN_SETTINGS = {
     "usermenu_links": [
         {"model": "auth.user"}
     ],
-    "show_ui_builder": False,
 }
 
 JAZZMIN_UI_TWEAKS = {
@@ -157,7 +159,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'myproject.middleware.ForceRussianMiddleware',  # ← ДОБАВЛЕНО
+    'myproject.middleware.ForceRussianMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -223,14 +225,14 @@ TIME_ZONE = config('TIME_ZONE', default='Asia/Tashkent')
 # ============ СТАТИЧЕСКИЕ ФАЙЛЫ ============
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'main/static'),
-    os.path.join(BASE_DIR, 'kg/static'),   
+    BASE_DIR / 'main' / 'static',
+    BASE_DIR / 'kg' / 'static',   
 ]
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -292,6 +294,8 @@ LANGUAGE_COOKIE_SECURE = not DEBUG
 LANGUAGE_COOKIE_HTTPONLY = False
 LANGUAGE_COOKIE_SAMESITE = 'Lax'
 
+# ============ CKEDITOR ============
+
 CKEDITOR_CONFIGS = {
     'default': {
         'toolbar': 'Custom',
@@ -303,12 +307,66 @@ CKEDITOR_CONFIGS = {
         ],
         'height': 300,
         'width': '100%',
-        'removePlugins': 'elementspath',  # ← ДОБАВЬ
-        'resize_enabled': False,  # ← ДОБАВЬ
-        'forcePasteAsPlainText': False,  # ← ВАЖНО!
-        'allowedContent': True,  # ← РАЗРЕШАЕМ ВСЕ ТЕГИ
-        'extraAllowedContent': 'ul li ol strong p',  # ← ЯВНО РАЗРЕШАЕМ
+        'removePlugins': 'elementspath',
+        'resize_enabled': False,
+        'forcePasteAsPlainText': False,
+        'allowedContent': True,
+        'extraAllowedContent': 'ul li ol strong p',
     },
 }
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
+
+# ============ ЛОГИРОВАНИЕ ============
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'logs' / 'errors.log',
+            'maxBytes': 1024 * 1024 * 10,  # 10MB
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
+
+# Создать директорию для логов
+os.makedirs(BASE_DIR / 'logs', exist_ok=True)
+
+
+SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']

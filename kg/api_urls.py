@@ -18,4 +18,4 @@ urlpatterns = [
     path('stats/', kg_stats_dashboard, name='kg-stats'),
 ]
 
-urlpatterns += router.urls  
+urlpatterns += router.urls
