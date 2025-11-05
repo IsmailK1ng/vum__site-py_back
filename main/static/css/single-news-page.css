@@ -97,13 +97,13 @@
 .hero-00-manifest .mxd-manifest {
   font-size: 3rem;
   max-width: 100%;
-  margin: 30px 180px 0px 180px;
+  margin: 0px 180px 0px 180px;
   text-align: justify;
   line-height: 1.6;
   color: #000;
 }
 
-/* ✅ СТИЛИ ДЛЯ КОНТЕНТА ИЗ CKEDITOR */
+
 .hero-00-manifest .mxd-manifest p {
   font-size: 3rem;
   line-height: 1.6;
@@ -119,8 +119,7 @@
 .hero-00-manifest .mxd-manifest ol {
   font-size: 3rem;
   line-height: 1.6;
-  margin: 1.5em 0;
-  padding-left: 2em;
+
   text-align: left;
   list-style-position: outside !important;
 }
@@ -192,7 +191,7 @@
 @media (min-width: 1600px) {
   .faw-history-title {
     margin-top: 3rem;
-    margin-bottom: 4rem;
+    margin-bottom: 3rem;
   }
 
   .faw-history-title h2 {

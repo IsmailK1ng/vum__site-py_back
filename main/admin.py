@@ -411,7 +411,7 @@ class DealerServiceAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, 
     
     def action_buttons(self, obj):
         is_base = obj.slug in ['sotuv', 'servis', 'ehtiyot-qismlar']
-        delete_btn = '<span style="opacity: 0.2;"></span>' if is_base else f'<a href="/admin/main/dealerservice/{obj.id}/delete/" onclick="return confirm(\'Удалить?\')"><img src="/static/media/icon-adminpanel/recycle-bin.png" width="24" height="24"></a>'
+        delete_btn = '🔐' if is_base else f'<a href="/admin/main/dealerservice/{obj.id}/delete/" onclick="return confirm(\'Удалить?\')"><img src="/static/media/icon-adminpanel/recycle-bin.png" width="24" height="24"></a>'
         
         return format_html('''
             <div style="display: flex; gap: 8px;">

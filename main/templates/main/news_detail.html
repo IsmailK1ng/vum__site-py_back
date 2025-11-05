@@ -94,15 +94,6 @@
   <!-- Dynamic Content Blocks -->
   {% for block in blocks %}
 
-  <!-- Заголовок H3 (если есть) для ЛЮБОГО типа блока -->
-  {% if block.title %}
-  <div class="reveal-type anim-uni-in-up">
-    <div class="faw-history-title fade-in">
-      <h3>{{ block.title }}</h3>
-    </div>
-  </div>
-  {% endif %}
-
   <!-- YouTube Video Block -->
   {% if block.block_type == 'youtube' and block.youtube_url %}
   <div class="mxd-section padding-grid-pre-pinned">
@@ -148,11 +139,16 @@
   </div>
   {% endif %}
 
-  <!-- Text Block -->
+  <!-- Text Block (с заголовком внутри) -->
   {% if block.block_type == 'text' and block.text %}
   <div class="mxd-hero-00__bottom">
     <div class="hero-00-manifest">
       <div class="mxd-manifest reveal-type anim-uni-in-up">
+        {% if block.title %}
+        <div class="faw-history-title fade-in">
+          <h3>{{ block.title }}</h3>
+        </div>
+        {% endif %}
         {{ block.text|safe }}
       </div>
     </div>
