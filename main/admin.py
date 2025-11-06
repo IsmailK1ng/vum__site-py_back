@@ -24,31 +24,53 @@ admin.site.index_title = "Управление сайтами FAW"
 
 # ============ БАЗОВЫЕ МИКСИНЫ ============
 
+
 class ContentAdminMixin:
     """Миксин для контент-админов"""
     def has_module_permission(self, request):
         if request.user.is_superuser:
             return True
-        return request.user.groups.filter(
-            name__in=['Главные админы', 'Контент-админы']
-        ).exists()
+        
+        # Проверяем группы
+        if request.user.groups.filter(
+            name__in=['Главные админы', 'Контент-админы', 'Контент UZ', 'Контент UZ+KG']
+        ).exists():
+            return True
+        
+        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНЫЕ ПРАВА (любое право на просмотр контента)
+        content_models = [
+            'news', 'product', 'vacancy', 'dealer', 'dealerservice', 
+            'featureicon', 'becomeadealerpage'
+        ]
+        for model in content_models:
+            if request.user.has_perm(f'main.view_{model}'):
+                return True
+        
+        return False
     
     def has_change_permission(self, request, obj=None):
         if request.user.is_superuser:
             return True
-        return request.user.groups.filter(
-            name__in=['Главные админы', 'Контент-админы']
-        ).exists()
+        
+        if request.user.groups.filter(
+            name__in=['Главные админы', 'Контент-админы', 'Контент UZ', 'Контент UZ+KG']
+        ).exists():
+            return True
+        
+        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНОЕ ПРАВО на изменение ЭТОЙ модели
+        model_name = self.model._meta.model_name
+        return request.user.has_perm(f'main.change_{model_name}')
     
     def has_delete_permission(self, request, obj=None):
         if request.user.is_superuser:
             return True
+        
         if request.user.groups.filter(name='Главные админы').exists():
             return True
         
+        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНОЕ ПРАВО на удаление
         model_name = self.model._meta.model_name
-        perm = f'main.delete_{model_name}'
-        return request.user.has_perm(perm)
+        return request.user.has_perm(f'main.delete_{model_name}')
 
 
 class LeadManagerMixin:
@@ -56,22 +78,34 @@ class LeadManagerMixin:
     def has_module_permission(self, request):
         if request.user.is_superuser:
             return True
-        return request.user.groups.filter(
-            name__in=['Главные админы', 'Лид-менеджеры']
-        ).exists()
+        
+        # Проверяем группы
+        if request.user.groups.filter(
+            name__in=['Главные админы', 'Лид-менеджеры', 'Лиды UZ', 'Лиды UZ+KG']
+        ).exists():
+            return True
+        
+        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНЫЕ ПРАВА (любое право на просмотр заявок)
+        lead_models = ['contactform', 'jobapplication', 'becomeadealerapplication']
+        for model in lead_models:
+            if request.user.has_perm(f'main.view_{model}'):
+                return True
+        
+        return False
     
     def has_add_permission(self, request):
-        return False
+        return False  # Заявки создаются только с фронта
     
     def has_delete_permission(self, request, obj=None):
         if request.user.is_superuser:
             return True
+        
         if request.user.groups.filter(name='Главные админы').exists():
             return True
         
+        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНОЕ ПРАВО на удаление
         model_name = self.model._meta.model_name
-        perm = f'main.delete_{model_name}'
-        return request.user.has_perm(perm)
+        return request.user.has_perm(f'main.delete_{model_name}')
 
 
 class CustomReversionMixin:

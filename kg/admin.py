@@ -19,7 +19,83 @@ from .models import (
 )
 from .forms import VehicleCardSpecForm
 
+# ============================================
+# БАЗОВЫЕ МИКСИНЫ ДЛЯ ПРАВ ДОСТУПА
+# ============================================
 
+class ContentAdminMixin:
+    """Миксин для контент-админов KG"""
+    def has_module_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        
+        # Проверяем группы
+        if request.user.groups.filter(
+            name__in=['Главные админы', 'Контент KG', 'Контент UZ+KG']
+        ).exists():
+            return True
+        
+        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНЫЕ ПРАВА (любое право на просмотр контента KG)
+        kg_models = ['kgvehicle', 'kgheroslide', 'icontemplate']
+        for model in kg_models:
+            if request.user.has_perm(f'kg.view_{model}'):
+                return True
+        
+        return False
+    
+    def has_change_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        
+        if request.user.groups.filter(
+            name__in=['Главные админы', 'Контент KG', 'Контент UZ+KG']
+        ).exists():
+            return True
+        
+        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНОЕ ПРАВО
+        model_name = self.model._meta.model_name
+        return request.user.has_perm(f'kg.change_{model_name}')
+    
+    def has_delete_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        
+        if request.user.groups.filter(name='Главные админы').exists():
+            return True
+        
+        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНОЕ ПРАВО
+        model_name = self.model._meta.model_name
+        return request.user.has_perm(f'kg.delete_{model_name}')
+
+
+class LeadManagerMixin:
+    """Миксин для лид-менеджеров KG"""
+    def has_module_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        
+        # Проверяем группы
+        if request.user.groups.filter(
+            name__in=['Главные админы', 'Лиды KG', 'Лиды UZ+KG']
+        ).exists():
+            return True
+        
+        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНЫЕ ПРАВА
+        return request.user.has_perm('kg.view_kgfeedback')
+    
+    def has_add_permission(self, request):
+        return False  # Заявки создаются только с фронта
+    
+    def has_delete_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        
+        if request.user.groups.filter(name='Главные админы').exists():
+            return True
+        
+        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНОЕ ПРАВО
+        return request.user.has_perm('kg.delete_kgfeedback')
+    
 # ============================================
 # INLINE: ХАРАКТЕРИСТИКИ ДЛЯ КАТАЛОГА
 # ============================================
@@ -105,7 +181,7 @@ class KGVehicleImageInline(admin.TabularInline):
 # ============================================
 
 @admin.register(KGVehicle)
-class KGVehicleAdmin(admin.ModelAdmin):
+class KGVehicleAdmin(ContentAdminMixin, admin.ModelAdmin): 
     list_display = ('mini_thumb', 'title_display', 'category_badge', 'is_active', 'created_at', 'action_buttons')
     list_editable = ('is_active',)
     list_filter = ('category', 'is_active', 'created_at')
@@ -229,7 +305,7 @@ class KGVehicleAdmin(admin.ModelAdmin):
 # ============================================
 
 @admin.register(KGHeroSlide)
-class KGHeroSlideAdmin(admin.ModelAdmin):
+class KGHeroSlideAdmin(ContentAdminMixin, admin.ModelAdmin): 
     list_display = ('order', 'vehicle_display', 'is_active', 'created_at')
     list_display_links = ('vehicle_display',)
     list_editable = ('is_active', 'order')
@@ -271,7 +347,7 @@ class KGHeroSlideAdmin(admin.ModelAdmin):
 # ============================================
 
 @admin.register(KGFeedback)
-class KGFeedbackAdmin(admin.ModelAdmin):
+class KGFeedbackAdmin(LeadManagerMixin, admin.ModelAdmin):  
     list_display = ['name', 'phone', 'region', 'vehicle_display', 'priority', 'status', 'manager', 'created_at', 'action_buttons']
     list_editable = ['priority', 'status', 'manager']
     list_filter = ['status', 'priority', 'region', 'created_at']
@@ -297,7 +373,7 @@ class KGFeedbackAdmin(admin.ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.groups.filter(name='Главные админы').exists():
             extra_context['stats_button_html'] = format_html(
                 '<div style="margin-bottom: 20px;">'
                 '<a href="/admin/kg/stats/" target="_blank" style="'
@@ -393,7 +469,7 @@ class KGFeedbackAdmin(admin.ModelAdmin):
 # ============================================
 
 @admin.register(IconTemplate)
-class IconTemplateAdmin(admin.ModelAdmin):
+class IconTemplateAdmin(ContentAdminMixin, admin.ModelAdmin):  
     list_display = ('icon_preview', 'name', 'order')  
     list_editable = ('order',)
     fields = ('name', 'icon', 'icon_preview', 'order')
