@@ -42,7 +42,7 @@ class ProductsManager {
         title: 'Shassilar',
         breadcrumb: 'Shassilar',
         slogan: 'Ishonchli asos',
-        hero_image: 'images/categories/chassis-hero.jpg'
+        hero_image: 'images/categories/chassis-hero.png'
       },
       'tiger_v': {
         title: 'Tiger V',

@@ -1,11 +1,28 @@
 {% extends "admin/change_list.html" %}
+{% load i18n static %}
 
-{% block content %}
-    {% if stats_button_html %}
-        <div style="margin: 15px 0;">
-            {{ stats_button_html|safe }}
-        </div>
-    {% endif %}
-    
+{% block object-tools-items %}
     {{ block.super }}
+    
+    {% if show_recover_button %}
+    <li>
+        <a href="recover/" style="
+            background: linear-gradient(306deg, #dc3545, #c82333);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(220, 53, 69, 0.5)';"
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(220, 53, 69, 0.3)';">
+            🗑️ Восстановить удалённые ({{ deleted_count }})
+        </a>
+    </li>
+    {% endif %}
 {% endblock %}

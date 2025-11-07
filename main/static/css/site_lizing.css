@@ -601,7 +601,7 @@ body.modal-open {
     animation: slideIn 0.3s ease;
     position: relative;
     min-height: 110vh;
-    /* ВРЕМЕННО добавьте это для теста */
+
 }
 
 .modal-header {
@@ -618,7 +618,7 @@ body.modal-open {
 
 .modal-body {
     padding: 30px;
-    /* Убираем все overflow и flex свойства */
+
 }
 
 .modal-title {
@@ -648,7 +648,7 @@ body.modal-open {
     background-color: #f0f0f0;
 }
 
-/* Стили для содержимого модального окна */
+
 .calculation-summary {
     background: #f8f9fa;
     border-radius: 8px;

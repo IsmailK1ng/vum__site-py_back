@@ -5,9 +5,11 @@ from django.utils.safestring import mark_safe
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from django.conf import settings
+from django.urls import path  
 from datetime import datetime
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
+from reversion.admin import VersionAdmin
 
 from .models import (
     KGVehicle, 
@@ -95,7 +97,93 @@ class LeadManagerMixin:
         
         # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНОЕ ПРАВО
         return request.user.has_perm('kg.delete_kgfeedback')
+
+class CustomReversionMixin:
+    """Миксин для кастомного шаблона восстановления"""
     
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                'recover/',
+                self.admin_site.admin_view(self.custom_recover_list_view),
+                name=f'{self.model._meta.app_label}_{self.model._meta.model_name}_recoverlist'
+            ),
+            path(
+                'recover/<int:version_id>/',
+                self.admin_site.admin_view(self.recover_view),
+                name=f'{self.model._meta.app_label}_{self.model._meta.model_name}_recover'
+            ),
+        ]
+        return custom_urls + urls
+    
+    def custom_recover_list_view(self, request):
+        from reversion.models import Version
+        from django.conf import settings
+        
+        opts = self.model._meta
+        deleted_versions = Version.objects.get_deleted(self.model)
+        
+        seen_objects = {}
+        version_list_with_preview = []
+        
+        for version in deleted_versions.order_by('-revision__date_created'):
+            obj_repr = version.object_repr
+            if obj_repr not in seen_objects:
+                seen_objects[obj_repr] = True
+                
+                preview_url = None
+                try:
+                    field_dict = version.field_dict
+                    for field_name in ['preview_image', 'main_image', 'card_image', 'logo']:
+                        if field_name in field_dict and field_dict[field_name]:
+                            preview_url = f"{settings.MEDIA_URL}{field_dict[field_name]}"
+                            break
+                except Exception:
+                    pass
+                
+                version_list_with_preview.append({
+                    'version': version,
+                    'preview_url': preview_url,
+                    'object_repr': obj_repr,
+                    'date': version.revision.date_created
+                })
+        
+        context = {
+            **self.admin_site.each_context(request),
+            'opts': opts,
+            'version_list': version_list_with_preview,
+            'title': f'Восстановление: {opts.verbose_name_plural}',
+            'has_view_permission': self.has_view_permission(request),
+        }
+        
+        return render(request, 'admin/reversion/recover_list.html', context)
+    
+    def recover_view(self, request, version_id):
+        from reversion.models import Version
+        from django.contrib import messages
+        from django.shortcuts import redirect
+        
+        opts = self.model._meta
+        
+        try:
+            version = Version.objects.get(pk=version_id)
+            
+            if version.content_type.model_class() != self.model:
+                raise Version.DoesNotExist
+            
+            version.revision.revert()
+            
+            messages.success(request, f'✅ Объект "{version.object_repr}" успешно восстановлен!')
+            return redirect(f'admin:{opts.app_label}_{opts.model_name}_changelist')
+            
+        except Version.DoesNotExist:
+            messages.error(request, '❌ Версия не найдена или уже восстановлена')
+            return redirect(f'admin:{opts.app_label}_{opts.model_name}_recoverlist')
+        except Exception as e:
+            messages.error(request, f'❌ Ошибка восстановления: {str(e)}')
+            return redirect(f'admin:{opts.app_label}_{opts.model_name}_recoverlist')
+
 # ============================================
 # INLINE: ХАРАКТЕРИСТИКИ ДЛЯ КАТАЛОГА
 # ============================================
@@ -181,7 +269,8 @@ class KGVehicleImageInline(admin.TabularInline):
 # ============================================
 
 @admin.register(KGVehicle)
-class KGVehicleAdmin(ContentAdminMixin, admin.ModelAdmin): 
+class KGVehicleAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, admin.ModelAdmin):  
+    history_latest_first = True 
     list_display = ('mini_thumb', 'title_display', 'category_badge', 'is_active', 'created_at', 'action_buttons')
     list_editable = ('is_active',)
     list_filter = ('category', 'is_active', 'created_at')
@@ -299,13 +388,23 @@ class KGVehicleAdmin(ContentAdminMixin, admin.ModelAdmin):
         self.message_user(request, f'Деактивировано: {updated}')
     deactivate_vehicles.short_description = 'Деактивировать'
 
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        from reversion.models import Version
+        deleted_count = Version.objects.get_deleted(self.model).count()
+        if deleted_count > 0:
+            extra_context['show_recover_button'] = True
+            extra_context['deleted_count'] = deleted_count
+        return super().changelist_view(request, extra_context)
+
 
 # ============================================
 # ADMIN: HERO-СЛАЙДЫ
 # ============================================
 
 @admin.register(KGHeroSlide)
-class KGHeroSlideAdmin(ContentAdminMixin, admin.ModelAdmin): 
+class KGHeroSlideAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, admin.ModelAdmin):  
+    history_latest_first = True 
     list_display = ('order', 'vehicle_display', 'is_active', 'created_at')
     list_display_links = ('vehicle_display',)
     list_editable = ('is_active', 'order')
@@ -340,6 +439,15 @@ class KGHeroSlideAdmin(ContentAdminMixin, admin.ModelAdmin):
             )
         return "—"
     vehicle_preview.short_description = "Превью"
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        from reversion.models import Version
+        deleted_count = Version.objects.get_deleted(self.model).count()
+        if deleted_count > 0:
+            extra_context['show_recover_button'] = True
+            extra_context['deleted_count'] = deleted_count
+        return super().changelist_view(request, extra_context)
 
 
 # ============================================

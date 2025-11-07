@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.shortcuts import render
-from django.urls import path
+from django.urls import path  
 from django import forms
 from modeltranslation.admin import TranslationTabularInline, TranslationStackedInline, TabbedTranslationAdmin
 from reversion.admin import VersionAdmin
@@ -119,6 +119,11 @@ class CustomReversionMixin:
                 self.admin_site.admin_view(self.custom_recover_list_view),
                 name=f'{self.model._meta.app_label}_{self.model._meta.model_name}_recoverlist'
             ),
+            path(
+                'recover/<int:version_id>/', 
+                self.admin_site.admin_view(self.recover_view),  
+                name=f'{self.model._meta.app_label}_{self.model._meta.model_name}_recover'
+            ),
         ]
         return custom_urls + urls
     
@@ -130,7 +135,6 @@ class CustomReversionMixin:
         opts = self.model._meta
         deleted_versions = Version.objects.get_deleted(self.model)
         
-        # Группируем по объектам и берем последнюю версию каждого
         seen_objects = {}
         version_list_with_preview = []
         
@@ -139,21 +143,16 @@ class CustomReversionMixin:
             if obj_repr not in seen_objects:
                 seen_objects[obj_repr] = True
                 
-                # Безопасное получение превью
                 preview_url = None
                 try:
                     field_dict = version.field_dict
-                    
-                    # Попробуем найти изображение (порядок важен!)
                     for field_name in ['preview_image', 'main_image', 'card_image', 'logo']:
                         if field_name in field_dict and field_dict[field_name]:
                             preview_url = f"{settings.MEDIA_URL}{field_dict[field_name]}"
                             break
-                except Exception as e:
-                    # Если не удалось получить field_dict - просто пропускаем превью
+                except Exception:
                     pass
                 
-                # Добавляем версию с превью в список
                 version_list_with_preview.append({
                     'version': version,
                     'preview_url': preview_url,
@@ -170,6 +169,31 @@ class CustomReversionMixin:
         }
         
         return render(request, 'admin/reversion/recover_list.html', context)
+    
+    def recover_view(self, request, version_id):
+        from reversion.models import Version
+        from django.contrib import messages
+        from django.shortcuts import redirect
+        
+        opts = self.model._meta
+        
+        try:
+            version = Version.objects.get(pk=version_id)
+            
+            if version.content_type.model_class() != self.model:
+                raise Version.DoesNotExist
+            
+            version.revision.revert()
+            
+            messages.success(request, f'✅ Объект "{version.object_repr}" успешно восстановлен!')
+            return redirect(f'admin:{opts.app_label}_{opts.model_name}_changelist')
+            
+        except Version.DoesNotExist:
+            messages.error(request, '❌ Версия не найдена или уже восстановлена')
+            return redirect(f'admin:{opts.app_label}_{opts.model_name}_recoverlist')
+        except Exception as e:
+            messages.error(request, f'❌ Ошибка восстановления: {str(e)}')
+            return redirect(f'admin:{opts.app_label}_{opts.model_name}_recoverlist')
 
 # ============ НОВОСТИ ============
 
@@ -241,6 +265,15 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
             </div>
         ''', f'/admin/main/news/{obj.id}/change/', obj.slug, f'/admin/main/news/{obj.id}/delete/')
     action_buttons.short_description = "Действия"
+    
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        from reversion.models import Version
+        deleted_count = Version.objects.get_deleted(self.model).count()
+        if deleted_count > 0:
+            extra_context['show_recover_button'] = True
+            extra_context['deleted_count'] = deleted_count
+        return super().changelist_view(request, extra_context)
     
 # ============ ЗАЯВКИ ============
 
@@ -367,6 +400,15 @@ class VacancyAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
         return '0 заявок'
     applications_count.short_description = 'Заявки'
 
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        from reversion.models import Version
+        deleted_count = Version.objects.get_deleted(self.model).count()
+        if deleted_count > 0:
+            extra_context['show_recover_button'] = True
+            extra_context['deleted_count'] = deleted_count
+        return super().changelist_view(request, extra_context)
+
 
 @admin.register(JobApplication)
 class JobApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
@@ -456,6 +498,15 @@ class DealerServiceAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, 
         ''', f'/admin/main/dealerservice/{obj.id}/change/', delete_btn)
     action_buttons.short_description = "Действия"
 
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        from reversion.models import Version
+        deleted_count = Version.objects.get_deleted(self.model).count()
+        if deleted_count > 0:
+            extra_context['show_recover_button'] = True
+            extra_context['deleted_count'] = deleted_count
+        return super().changelist_view(request, extra_context)
+
 
 @admin.register(Dealer)
 class DealerAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
@@ -504,6 +555,14 @@ class DealerAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedT
         ''', f'/admin/main/dealer/{obj.id}/change/', f'/admin/main/dealer/{obj.id}/delete/')
     action_buttons.short_description = "Действия"
 
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        from reversion.models import Version
+        deleted_count = Version.objects.get_deleted(self.model).count()
+        if deleted_count > 0:
+            extra_context['show_recover_button'] = True
+            extra_context['deleted_count'] = deleted_count
+        return super().changelist_view(request, extra_context)
 
 # ============ СТРАНИЦА "СТАТЬ ДИЛЕРОМ" ============
 
@@ -670,3 +729,12 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
                                img.url)
         return "—"
     thumbnail.short_description = "Фото"
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        from reversion.models import Version
+        deleted_count = Version.objects.get_deleted(self.model).count()
+        if deleted_count > 0:
+            extra_context['show_recover_button'] = True
+            extra_context['deleted_count'] = deleted_count
+        return super().changelist_view(request, extra_context)

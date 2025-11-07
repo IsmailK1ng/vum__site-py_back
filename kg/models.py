@@ -239,40 +239,56 @@ class VehicleCardSpec(models.Model):
     
     def save(self, *args, **kwargs):
         if self.value_ru:
-            if not self.value_ky or self.value_ky.strip() == '':
-                self.value_ky = self.auto_translate(self.value_ru, 'ky')
-            
-            if not self.value_en or self.value_en.strip() == '':
-                self.value_en = self.auto_translate(self.value_ru, 'en')
+            # Всегда пересоздаем переводы из value_ru
+            self.value_ky = self.auto_translate(self.value_ru, 'ky')
+            self.value_en = self.auto_translate(self.value_ru, 'en')
         
         super().save(*args, **kwargs)
     
-    def auto_translate(self, text, lang):
-        translations = {
-            'Дизель': {'ky': 'Дизель', 'en': 'Diesel'},
-            'Бензин': {'ky': 'Бензин', 'en': 'Gasoline'},
-            'ГАЗ + Бензин': {'ky': 'Газ + Бензин', 'en': 'GAS + Gasoline'},
-            'кг': {'ky': 'кг', 'en': 'kg'},
-            'л.с.': {'ky': 'а.к.', 'en': 'hp'},
-            'а.к.': {'ky': 'а.к.', 'en': 'hp'},
-            'м²': {'ky': 'м²', 'en': 'm²'},
-            'м³': {'ky': 'м³', 'en': 'm³'},
-            'л': {'ky': 'л', 'en': 'L'},
-            'Климат-контроль': {'ky': 'Климат-башкаргыч', 'en': 'Climate control'},
-            'Кондиционер': {'ky': 'Кондиционер', 'en': 'Air conditioning'},
-            '4x2': {'ky': '4x2', 'en': '4x2'},
-            '4×2': {'ky': '4×2', 'en': '4×2'},
-        }
+def auto_translate(self, text, lang):
+    """Автоперевод с очисткой битых символов"""
+    
+    # Очистка битых символов
+    text = text.strip()
+    text = text.replace('L', 'л')  #
+    text = text.replace('кLимат', 'Климат')
+    text = text.replace(',', '')  
+    
+    translations = {
+        'Дизель': {'ky': 'Дизель', 'en': 'Diesel'},
+        'Бензин': {'ky': 'Бензин', 'en': 'Gasoline'},
+        'ГАЗ + Бензин': {'ky': 'Газ + Бензин', 'en': 'GAS + Gasoline'},
         
-        if text in translations:
-            return translations[text].get(lang, text)
+        'кг': {'ky': 'кг', 'en': 'kg'},
+        'л.с.': {'ky': 'а.к.', 'en': 'hp'},
+        'л.с': {'ky': 'а.к.', 'en': 'hp'},
+        'л. с.': {'ky': 'а.к.', 'en': 'hp'},
+        'а.к.': {'ky': 'а.к.', 'en': 'hp'},
         
-        result = text
-        for ru_term, trans in translations.items():
-            if ru_term in text:
-                result = result.replace(ru_term, trans.get(lang, ru_term))
+        'м²': {'ky': 'м²', 'en': 'm²'},
+        'м³': {'ky': 'м³', 'en': 'm³'},
+        'л': {'ky': 'л', 'en': 'L'},
         
-        return result
+        'Климат-контроль': {'ky': 'Климат-башкаргыч', 'en': 'Climate control'},
+        'климат-контроль': {'ky': 'климат-башкаргыч', 'en': 'climate control'},
+        'Кондиционер': {'ky': 'Кондиционер', 'en': 'Air conditioning'},
+        
+        '4x2': {'ky': '4x2', 'en': '4x2'},
+        '4×2': {'ky': '4×2', 'en': '4×2'},
+        '4х2': {'ky': '4х2', 'en': '4×2'},
+    }
+    
+    # Прямое совпадение
+    if text in translations:
+        return translations[text].get(lang, text)
+    
+    # Замена внутри текста
+    result = text
+    for ru_term, trans in translations.items():
+        if ru_term in result:
+            result = result.replace(ru_term, trans.get(lang, ru_term))
+    
+    return result
 
 
 class IconTemplate(models.Model):
@@ -329,18 +345,18 @@ class KGFeedback(models.Model):
         blank=True, 
         on_delete=models.SET_NULL, 
         related_name='kg_feedbacks',
-        verbose_name='Менеджер'  # ← Добавьте
+        verbose_name='Менеджер'  
     )
 
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name='Дата создания'  # ← Добавьте
+        verbose_name='Дата создания' 
     )
 
     admin_comment = models.TextField(
         blank=True, 
         null=True,
-        verbose_name='Комментарий администратора'  # ← Добавьте
+        verbose_name='Комментарий администратора'  
     )
 
     class Meta:
