@@ -4,12 +4,59 @@
 
 class ProductsManager {
   constructor() {
-    this.apiUrl = '/api/uz/products/';
+    // API endpoint - проверьте правильный путь
+    this.apiUrl = '/api/uz/products/'; 
     this.currentCategory = null;
     this.currentPage = 1;
     this.cardsPerPage = 6;
     this.allProducts = [];
     this.filteredProducts = [];
+    
+    // Полная информация о категориях с картинками и слоганами
+    this.categoryData = {
+      'shatakchi': {
+        title: 'Shatakchi mashinalar',
+        breadcrumb: 'Shatakchi mashinalar',
+        slogan: 'Kuchli va ishonchli tortuvchilar',
+        hero_image: 'images/categories/tractor-hero.png' // Укажите правильный путь
+      },
+      'samosval': {
+        title: 'Samosvallar',
+        breadcrumb: 'Samosvallar',
+        slogan: 'Qurilish uchun eng yaxshi yechim',
+        hero_image: 'images/categories/dump-truck-hero.png'
+      },
+      'maxsus': {
+        title: 'Maxsus texnika',
+        breadcrumb: 'Maxsus texnika',
+        slogan: 'Har qanday vazifa uchun',
+        hero_image: 'images/categories/special-hero.png'
+      },
+      'furgon': {
+        title: 'Avtofurgonlar',
+        breadcrumb: 'Avtofurgonlar',
+        slogan: 'Yuk tashish uchun ideal',
+        hero_image: 'images/categories/avtofurgon-hero.png'
+      },
+      'shassi': {
+        title: 'Shassilar',
+        breadcrumb: 'Shassilar',
+        slogan: 'Ishonchli asos',
+        hero_image: 'images/categories/chassis-hero.jpg'
+      },
+      'tiger_v': {
+        title: 'Tiger V',
+        breadcrumb: 'Tiger V',
+        slogan: 'Kuchli va zamonaviy pikap',
+        hero_image: 'images/categories/tiger-v-hero.png'
+      },
+      'tiger_vr': {
+        title: 'Tiger VR',
+        breadcrumb: 'Tiger VR',
+        slogan: 'Premium sinf pikap',
+        hero_image: 'images/categories/tiger-vr-hero.png'
+      }
+    };
     
     this.init();
   }
@@ -19,11 +66,64 @@ class ProductsManager {
     const urlParams = new URLSearchParams(window.location.search);
     this.currentCategory = urlParams.get('category');
     
+    // Обновляем все элементы страницы
+    this.updatePageContent();
+    
     // Загружаем продукты
     await this.loadProducts();
     
     // Инициализируем поиск
     this.initSearch();
+  }
+
+  updatePageContent() {
+    if (!this.currentCategory) {
+      console.log('No category specified');
+      return;
+    }
+    
+    const categoryInfo = this.categoryData[this.currentCategory];
+    if (!categoryInfo) {
+      console.error('Unknown category:', this.currentCategory);
+      return;
+    }
+    
+    console.log('Updating page for category:', this.currentCategory, categoryInfo);
+    
+    // 1. Обновляем главный заголовок
+    const titleElement = document.querySelector('.models_title');
+    if (titleElement) {
+      titleElement.textContent = categoryInfo.title;
+      console.log('✓ Title updated');
+    }
+    
+    // 2. Обновляем слоган
+    const sloganElement = document.querySelector('.hero-05-title__item:not(.title-item-image)');
+    if (sloganElement) {
+      sloganElement.textContent = categoryInfo.slogan;
+      console.log('✓ Slogan updated');
+    }
+    
+    // 3. Обновляем hero изображение
+    const heroImage = document.querySelector('.mxd-hero-06__img img');
+    if (heroImage) {
+      // Используем полный путь через static
+      const staticPath = `/static/${categoryInfo.hero_image}`;
+      heroImage.src = staticPath;
+      heroImage.alt = categoryInfo.title;
+      console.log('✓ Hero image updated:', staticPath);
+    }
+    
+    // 4. Обновляем хлебные крошки
+    const breadcrumbActive = document.querySelector('.breadcrumb-ol .active a');
+    if (breadcrumbActive) {
+      breadcrumbActive.textContent = categoryInfo.breadcrumb;
+      console.log('✓ Breadcrumb updated');
+    }
+    
+    // 5. Обновляем title страницы
+    document.title = `${categoryInfo.title} - FAW Trucks`;
+    console.log('✓ Page title updated');
   }
 
   async loadProducts() {
@@ -36,11 +136,25 @@ class ProductsManager {
         url += `?category=${this.currentCategory}`;
       }
       
-      const response = await fetch(url);
-      const data = await response.json();
+      console.log('Loading products from:', url);
       
-      this.allProducts = data.results || [];
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Products loaded:', data);
+      
+      // Поддержка разных форматов ответа
+      this.allProducts = data.results || data.products || data || [];
       this.filteredProducts = [...this.allProducts];
+      
+      if (this.allProducts.length === 0) {
+        this.showNoResults();
+        return;
+      }
       
       this.renderCards();
       this.createPagination();
@@ -48,13 +162,16 @@ class ProductsManager {
       
     } catch (error) {
       console.error('Ошибка загрузки:', error);
-      this.showError();
+      this.showError(error.message);
     }
   }
 
   renderCards() {
     const container = document.querySelector('.faw-truck-card-container');
-    if (!container) return;
+    if (!container) {
+      console.error('Container .faw-truck-card-container not found');
+      return;
+    }
     
     container.innerHTML = '';
     
@@ -63,38 +180,52 @@ class ProductsManager {
     const cardsToShow = this.filteredProducts.slice(start, end);
     
     if (cardsToShow.length === 0) {
-      container.innerHTML = '<div class="no-results"><p>Mahsulotlar topilmadi</p></div>';
+      this.showNoResults();
       return;
     }
     
     cardsToShow.forEach(product => {
       const cardHTML = this.createCardHTML(product);
-      container.insertAdjacentHTML('beforeend', cardHTML);
+      const wrapper = document.createElement('div');
+      wrapper.className = 'col-12 col-xl-4 mxd-grid-item animate-card-3';
+      wrapper.innerHTML = cardHTML;
+      container.appendChild(wrapper);
     });
   }
 
   createCardHTML(product) {
-    const specsHTML = product.card_specs
-      .sort((a, b) => a.order - b.order)
-      .map(spec => `
-        <div class="spec-item">
-          <img class="spec-icon" src="${spec.icon.icon_url}" alt="${spec.icon.name}">
-          <span class="spec-value">${spec.value}</span>
-        </div>
-      `).join('');
+    // Проверяем наличие спецификаций
+    let specsHTML = '';
+    if (product.card_specs && Array.isArray(product.card_specs)) {
+      specsHTML = product.card_specs
+        .sort((a, b) => (a.order || 0) - (b.order || 0))
+        .map(spec => {
+          const iconUrl = spec.icon?.icon_url || spec.icon_url || '';
+          const iconName = spec.icon?.name || spec.name || '';
+          return `
+            <div class="spec-item">
+              ${iconUrl ? `<img class="spec-icon" src="${iconUrl}" alt="${iconName}">` : ''}
+              <span class="spec-value">${spec.value || ''}</span>
+            </div>
+          `;
+        }).join('');
+    }
+
+    // Формируем URL изображения
+    const imageUrl = product.image_url || product.image || product.main_image || '';
+    const productSlug = product.slug || '';
+    const productTitle = product.title || product.name || 'Продукт';
 
     return `
       <div class="faw-truck-card">
         <div class="truck-image-container">
-          <img src="${product.image_url}" alt="${product.title}" class="truck-image">
+          ${imageUrl ? `<img src="${imageUrl}" alt="${productTitle}" class="truck-image">` : ''}
         </div>
         <div class="truck-info">
-          <h3 class="truck-title">${product.title}</h3>
-          <div class="truck-specs">
-            ${specsHTML}
-          </div>
+          <h3 class="truck-title">${productTitle}</h3>
+          ${specsHTML ? `<div class="truck-specs">${specsHTML}</div>` : ''}
           <div class="truck-cta">
-            <a href="/products/${product.slug}/" class="btn-details">Batafsil o'qish</a>
+            <a href="/products/${productSlug}/" class="btn-details">Batafsil o'qish</a>
           </div>
         </div>
       </div>
@@ -201,9 +332,10 @@ class ProductsManager {
       if (query === '') {
         this.filteredProducts = [...this.allProducts];
       } else {
-        this.filteredProducts = this.allProducts.filter(product => 
-          product.title.toLowerCase().includes(query)
-        );
+        this.filteredProducts = this.allProducts.filter(product => {
+          const title = (product.title || product.name || '').toLowerCase();
+          return title.includes(query);
+        });
       }
       
       this.currentPage = 1;
@@ -213,7 +345,14 @@ class ProductsManager {
   }
 
   scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const header = document.getElementById('header');
+    const headerHeight = header ? header.offsetHeight : 0;
+    const offset = 25;
+    
+    window.scrollTo({ 
+      top: Math.max(0, headerHeight + offset), 
+      behavior: 'smooth' 
+    });
   }
 
   showLoader() {
@@ -228,10 +367,24 @@ class ProductsManager {
     if (loader) loader.remove();
   }
 
-  showError() {
+  showNoResults() {
     const container = document.querySelector('.faw-truck-card-container');
     if (container) {
-      container.innerHTML = '<div class="error-message"><p>Xatolik yuz berdi. Keyinroq urinib ko\'ring.</p></div>';
+      container.innerHTML = '<div class="no-results"><p>Mahsulotlar topilmadi</p></div>';
+    }
+    const pagination = document.getElementById('pagination');
+    if (pagination) pagination.innerHTML = '';
+  }
+
+  showError(message) {
+    const container = document.querySelector('.faw-truck-card-container');
+    if (container) {
+      container.innerHTML = `
+        <div class="error-message">
+          <p>Xatolik yuz berdi: ${message}</p>
+          <p>Keyinroq urinib ko'ring yoki sahifani yangilang.</p>
+        </div>
+      `;
     }
   }
 }
