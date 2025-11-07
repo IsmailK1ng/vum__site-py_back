@@ -21,8 +21,11 @@ urlpatterns = [
     path('nested_admin/', include('nested_admin.urls')),
     
     path('', include('main.urls')),
-    path('api/', include('main.api_urls')),
-    path('api/kg/', include('kg.api_urls')),
+    
+    path('api/kg/', include('kg.api_urls')),  
+     
+    path('api/', include('main.api_urls')),   
+
     
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

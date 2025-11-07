@@ -9,20 +9,21 @@
 
   <title>
     {% if LANGUAGE_CODE == 'uz' %}
-      VUM Yangiliklar | FAW Trucks Uzbekistan
+    VUM Yangiliklar | FAW Trucks Uzbekistan
     {% elif LANGUAGE_CODE == 'ru' %}
-      Новости VUM | FAW Trucks Uzbekistan
+    Новости VUM | FAW Trucks Uzbekistan
     {% else %}
-      VUM News | FAW Trucks Uzbekistan
+    VUM News | FAW Trucks Uzbekistan
     {% endif %}
   </title>
 
   <!-- Meta Tags -->
-  <meta name="description" content="{% if LANGUAGE_CODE == 'uz' %}VUM kompaniyasining so'nggi yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Последние новости компании VUM{% else %}Latest news from VUM company{% endif %}">
-  
+  <meta name="description"
+    content="{% if LANGUAGE_CODE == 'uz' %}VUM kompaniyasining so'nggi yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Последние новости компании VUM{% else %}Latest news from VUM company{% endif %}">
+
   <!-- Favicons -->
   <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
-  
+
   <!-- Styles -->
   <link rel="stylesheet" href="{% static 'css/loaders/loader.css' %}">
   <link rel="stylesheet" href="{% static 'css/plugins.css' %}">
@@ -68,22 +69,22 @@
                 <li>
                   <a href="{% url 'home' %}">
                     {% if LANGUAGE_CODE == 'uz' %}
-                      Bosh sahifa
+                    Bosh sahifa
                     {% elif LANGUAGE_CODE == 'ru' %}
-                      Главная
+                    Главная
                     {% else %}
-                      Home
+                    Home
                     {% endif %}
                   </a>
                 </li>
                 <li class="active">
                   <a href="{% url 'news' %}">
                     {% if LANGUAGE_CODE == 'uz' %}
-                      VUM yangiliklar
+                    VUM yangiliklar
                     {% elif LANGUAGE_CODE == 'ru' %}
-                      Новости VUM
+                    Новости VUM
                     {% else %}
-                      VUM News
+                    VUM News
                     {% endif %}
                   </a>
                 </li>
@@ -100,11 +101,11 @@
   <div class="mxd-hero-07__top">
     <h1 class="mxd-hero-07__title">
       {% if LANGUAGE_CODE == 'uz' %}
-        VUM. Yangiliklar.
+      VUM. Yangiliklar.
       {% elif LANGUAGE_CODE == 'ru' %}
-        VUM. Новости.
+      VUM. Новости.
       {% else %}
-        VUM. News.
+      VUM. News.
       {% endif %}
     </h1>
     <div class="mxd-hero-07__marquee loading__item">
@@ -115,7 +116,8 @@
             <p class="marquee__text">VUM</p>
             <div class="marquee__image">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="currentColor">
-                <path fill="currentColor" d="M78.4,38.4c0,0-11.8,0-15.8,0c-1.6,0-4.8-0.2-7.1-0.8c-2.3-0.6-4.3-0.8-6.3-2.4c-2-1.2-3.5-3.2-4.7-4.8 c-1.2-1.6-1.6-3.6-2-5.5c-0.3-1.5-0.7-4.3-0.8-5.9c-0.2-4.3,0-17.4,0-17.4C41.8,0.8,41,0,40.2,0s-1.6,0.8-1.6,1.6c0,0,0,13.1,0,17.4 c0,1.6-0.6,4.3-0.8,5.9c-0.3,2-0.8,4-2,5.5c-1.2,2-2.8,3.6-4.7,4.8s-4,1.8-6.3,2.4c-1.9,0.5-4.7,0.6-6.7,0.8c-3.9,0.4-16.6,0-16.6,0 C0.8,38.4,0,39.2,0,40c0,0.8,0.8,1.6,1.6,1.6c0,0,12.2,0,16.6,0c1.6,0,4.8,0.3,6.7,0.8c2.3,0.6,4.3,0.8,6.3,2.4 c1.6,1.2,3.2,2.8,4.3,4.4c1.2,2,2.1,3.9,2.4,6.3c0.2,1.7,0.7,4.7,0.8,6.7c0.2,4,0,16.2,0,16.2c0,0.8,0.8,1.6,1.6,1.6 s1.6-0.8,1.6-1.6c0,0,0-12.3,0-16.2c0-1.6,0.5-5.1,0.8-6.7c0.5-2.3,0.8-4.4,2.4-6.3c1.2-1.6,2.8-3.2,4.3-4.4c2-1.2,3.9-2,6.3-2.4 c1.8-0.3,5.1-0.7,7.1-0.8c3.5-0.2,15.8,0,15.8,0c0.8,0,1.6-0.8,1.6-1.6C80,39.2,79.2,38.4,78.4,38.4C78.4,38.4,78.4,38.4,78.4,38.4z"/>
+                <path fill="currentColor"
+                  d="M78.4,38.4c0,0-11.8,0-15.8,0c-1.6,0-4.8-0.2-7.1-0.8c-2.3-0.6-4.3-0.8-6.3-2.4c-2-1.2-3.5-3.2-4.7-4.8 c-1.2-1.6-1.6-3.6-2-5.5c-0.3-1.5-0.7-4.3-0.8-5.9c-0.2-4.3,0-17.4,0-17.4C41.8,0.8,41,0,40.2,0s-1.6,0.8-1.6,1.6c0,0,0,13.1,0,17.4 c0,1.6-0.6,4.3-0.8,5.9c-0.3,2-0.8,4-2,5.5c-1.2,2-2.8,3.6-4.7,4.8s-4,1.8-6.3,2.4c-1.9,0.5-4.7,0.6-6.7,0.8c-3.9,0.4-16.6,0-16.6,0 C0.8,38.4,0,39.2,0,40c0,0.8,0.8,1.6,1.6,1.6c0,0,12.2,0,16.6,0c1.6,0,4.8,0.3,6.7,0.8c2.3,0.6,4.3,0.8,6.3,2.4 c1.6,1.2,3.2,2.8,4.3,4.4c1.2,2,2.1,3.9,2.4,6.3c0.2,1.7,0.7,4.7,0.8,6.7c0.2,4,0,16.2,0,16.2c0,0.8,0.8,1.6,1.6,1.6 s1.6-0.8,1.6-1.6c0,0,0-12.3,0-16.2c0-1.6,0.5-5.1,0.8-6.7c0.5-2.3,0.8-4.4,2.4-6.3c1.2-1.6,2.8-3.2,4.3-4.4c2-1.2,3.9-2,6.3-2.4 c1.8-0.3,5.1-0.7,7.1-0.8c3.5-0.2,15.8,0,15.8,0c0.8,0,1.6-0.8,1.6-1.6C80,39.2,79.2,38.4,78.4,38.4C78.4,38.4,78.4,38.4,78.4,38.4z" />
               </svg>
             </div>
           </div>
@@ -123,16 +125,17 @@
           <div class="marquee__item one-line item-regular text">
             <p class="marquee__text">
               {% if LANGUAGE_CODE == 'uz' %}
-                Yangiliklar
+              Yangiliklar
               {% elif LANGUAGE_CODE == 'ru' %}
-                Новости
+              Новости
               {% else %}
-                News
+              News
               {% endif %}
             </p>
             <div class="marquee__image">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="currentColor">
-                <path fill="currentColor" d="M78.4,38.4c0,0-11.8,0-15.8,0c-1.6,0-4.8-0.2-7.1-0.8c-2.3-0.6-4.3-0.8-6.3-2.4c-2-1.2-3.5-3.2-4.7-4.8 c-1.2-1.6-1.6-3.6-2-5.5c-0.3-1.5-0.7-4.3-0.8-5.9c-0.2-4.3,0-17.4,0-17.4C41.8,0.8,41,0,40.2,0s-1.6,0.8-1.6,1.6c0,0,0,13.1,0,17.4 c0,1.6-0.6,4.3-0.8,5.9c-0.3,2-0.8,4-2,5.5c-1.2,2-2.8,3.6-4.7,4.8s-4,1.8-6.3,2.4c-1.9,0.5-4.7,0.6-6.7,0.8c-3.9,0.4-16.6,0-16.6,0 C0.8,38.4,0,39.2,0,40c0,0.8,0.8,1.6,1.6,1.6c0,0,12.2,0,16.6,0c1.6,0,4.8,0.3,6.7,0.8c2.3,0.6,4.3,0.8,6.3,2.4 c1.6,1.2,3.2,2.8,4.3,4.4c1.2,2,2.1,3.9,2.4,6.3c0.2,1.7,0.7,4.7,0.8,6.7c0.2,4,0,16.2,0,16.2c0,0.8,0.8,1.6,1.6,1.6 s1.6-0.8,1.6-1.6c0,0,0-12.3,0-16.2c0-1.6,0.5-5.1,0.8-6.7c0.5-2.3,0.8-4.4,2.4-6.3c1.2-1.6,2.8-3.2,4.3-4.4c2-1.2,3.9-2,6.3-2.4 c1.8-0.3,5.1-0.7,7.1-0.8c3.5-0.2,15.8,0,15.8,0c0.8,0,1.6-0.8,1.6-1.6C80,39.2,79.2,38.4,78.4,38.4C78.4,38.4,78.4,38.4,78.4,38.4z"/>
+                <path fill="currentColor"
+                  d="M78.4,38.4c0,0-11.8,0-15.8,0c-1.6,0-4.8-0.2-7.1-0.8c-2.3-0.6-4.3-0.8-6.3-2.4c-2-1.2-3.5-3.2-4.7-4.8 c-1.2-1.6-1.6-3.6-2-5.5c-0.3-1.5-0.7-4.3-0.8-5.9c-0.2-4.3,0-17.4,0-17.4C41.8,0.8,41,0,40.2,0s-1.6,0.8-1.6,1.6c0,0,0,13.1,0,17.4 c0,1.6-0.6,4.3-0.8,5.9c-0.3,2-0.8,4-2,5.5c-1.2,2-2.8,3.6-4.7,4.8s-4,1.8-6.3,2.4c-1.9,0.5-4.7,0.6-6.7,0.8c-3.9,0.4-16.6,0-16.6,0 C0.8,38.4,0,39.2,0,40c0,0.8,0.8,1.6,1.6,1.6c0,0,12.2,0,16.6,0c1.6,0,4.8,0.3,6.7,0.8c2.3,0.6,4.3,0.8,6.3,2.4 c1.6,1.2,3.2,2.8,4.3,4.4c1.2,2,2.1,3.9,2.4,6.3c0.2,1.7,0.7,4.7,0.8,6.7c0.2,4,0,16.2,0,16.2c0,0.8,0.8,1.6,1.6,1.6 s1.6-0.8,1.6-1.6c0,0,0-12.3,0-16.2c0-1.6,0.5-5.1,0.8-6.7c0.5-2.3,0.8-4.4,2.4-6.3c1.2-1.6,2.8-3.2,4.3-4.4c2-1.2,3.9-2,6.3-2.4 c1.8-0.3,5.1-0.7,7.1-0.8c3.5-0.2,15.8,0,15.8,0c0.8,0,1.6-0.8,1.6-1.6C80,39.2,79.2,38.4,78.4,38.4C78.4,38.4,78.4,38.4,78.4,38.4z" />
               </svg>
             </div>
           </div>
@@ -145,18 +148,19 @@
   <!-- News Cards Grid Start -->
   <div class="mxd-block">
     <div class="mxd-card-grid mxd-grid-item anim-uni-in-up" id="card-grid">
-      
+
       {% for news in news_list %}
       <!-- Card -->
       <div class="mxd-card">
-        <a href="{% url 'news_detail' news.slug %}" class="slide-content" style="text-decoration: none; color: inherit;">
+        <a href="{% url 'news_detail' news.slug %}" class="slide-content"
+          style="text-decoration: none; color: inherit;">
           <div class="slide-header-row">
             <div class="slide-header__wrapper">
               <div class="slide-avatar">
                 {% if news.author_photo %}
-                  <img src="{{ news.author_photo.url }}" alt="{{ news.author.username }}" class="avatar-image">
+                <img src="{{ news.author_photo.url }}" alt="{{ news.author.username }}" class="avatar-image">
                 {% else %}
-                  <img src="{% static 'images/icon/_iiii176.png' %}" alt="VUM Logo" class="avatar-image">
+                <img src="{% static 'images/icon/_iiii176.png' %}" alt="VUM Logo" class="avatar-image">
                 {% endif %}
               </div>
               <div class="slide-header">
@@ -165,7 +169,8 @@
             </div>
             <div class="slide-header__meta">
               <svg class="slide-header__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                <path d="M224 64C206.3 64 192 78.3 192 96L192 128L160 128C124.7 128 96 156.7 96 192L96 240L544 240L544 192C544 156.7 515.3 128 480 128L448 128L448 96C448 78.3 433.7 64 416 64C398.3 64 384 78.3 384 96L384 128L256 128L256 96C256 78.3 241.7 64 224 64zM96 288L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 288L96 288z"/>
+                <path
+                  d="M224 64C206.3 64 192 78.3 192 96L192 128L160 128C124.7 128 96 156.7 96 192L96 240L544 240L544 192C544 156.7 515.3 128 480 128L448 128L448 96C448 78.3 433.7 64 416 64C398.3 64 384 78.3 384 96L384 128L256 128L256 96C256 78.3 241.7 64 224 64zM96 288L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 288L96 288z" />
               </svg>
               <span class="slide-header__date">{{ news.created_at|date:"d.m.y" }}</span>
             </div>
@@ -175,9 +180,9 @@
           </div>
           <div class="slide-image">
             {% if news.preview_image %}
-              <img src="{{ news.preview_image.url }}" alt="{{ news.title }}">
+            <img src="{{ news.preview_image.url }}" alt="{{ news.title }}">
             {% else %}
-              <img src="{% static 'images/news/placeholder.jpg' %}" alt="{{ news.title }}">
+            <img src="{% static 'images/news/placeholder.jpg' %}" alt="{{ news.title }}">
             {% endif %}
           </div>
         </a>
@@ -187,11 +192,11 @@
       <div class="mxd-card" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
         <p style="font-size: 18px; color: #888;">
           {% if LANGUAGE_CODE == 'uz' %}
-            Hozircha yangiliklar yo'q
+          Hozircha yangiliklar yo'q
           {% elif LANGUAGE_CODE == 'ru' %}
-            Пока нет новостей
+          Пока нет новостей
           {% else %}
-            No news yet
+          No news yet
           {% endif %}
         </p>
       </div>
@@ -230,8 +235,8 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // ========== PASSIVE LISTENERS ==========
-      document.addEventListener('touchstart', () => {}, { passive: true });
-      document.addEventListener('wheel', () => {}, { passive: true });
+      document.addEventListener('touchstart', () => { }, { passive: true });
+      document.addEventListener('wheel', () => { }, { passive: true });
 
       // ========== КОНФИГУРАЦИЯ ==========
       const CONFIG = {
@@ -240,6 +245,10 @@
         SCROLL_OFFSET: 100,
         MARQUEE_DURATION: 60
       };
+
+      // ========== ПЕРЕВОДЫ ДЛЯ ПАГИНАЦИИ ==========
+      const prevText = '{{ LANGUAGE_CODE }}' === 'uz' ? 'Ortga' : ('{{ LANGUAGE_CODE }}' === 'ru' ? 'Назад' : 'Previous');
+      const nextText = '{{ LANGUAGE_CODE }}' === 'uz' ? 'Oldinga' : ('{{ LANGUAGE_CODE }}' === 'ru' ? 'Вперёд' : 'Next');
 
       // ========== ПОЛУЧЕНИЕ ЭЛЕМЕНТОВ ==========
       const elements = {
@@ -320,7 +329,7 @@
         button.className = `mxd-blog-pagination__item blog-pagination-control ${type} btn btn-anim btn-line-small btn-bright anim-no-delay ${slideClass}`;
         button.dataset.page = type;
         button.setAttribute('role', 'button');
-        button.setAttribute('aria-label', `${type === 'prev' ? 'Ortga' : 'Oldinga'}`);
+        button.setAttribute('aria-label', text);
 
         button.innerHTML = iconAfter
           ? `<span class="btn-caption">${text}</span><i class="ph ${icon}"></i>`
@@ -370,7 +379,7 @@
         elements.pagination.innerHTML = '';
 
         // Кнопка "Назад"
-        const prevButton = createNavigationButton('prev', 'Ortga', 'ph-arrow-left', 'slide-left');
+        const prevButton = createNavigationButton('prev', prevText, 'ph-arrow-left', 'slide-left');
         elements.pagination.appendChild(prevButton);
 
         // Кнопки страниц
@@ -380,7 +389,7 @@
         }
 
         // Кнопка "Вперёд"
-        const nextButton = createNavigationButton('next', 'Oldinga', 'ph-arrow-right', 'slide-right', true);
+        const nextButton = createNavigationButton('next', nextText, 'ph-arrow-right', 'slide-right', true);
         elements.pagination.appendChild(nextButton);
 
         // Анимация текста кнопок
@@ -503,4 +512,5 @@
   </script>
 
 </body>
+
 </html>
