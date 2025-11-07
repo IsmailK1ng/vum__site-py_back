@@ -53,7 +53,7 @@ REST_FRAMEWORK = {
 
 # ============ ЯЗЫКОВЫЕ НАСТРОЙКИ ============
 
-LANGUAGE_CODE = 'ru'
+LANGUAGE_CODE = 'uz'
 
 USE_I18N = True
 USE_L10N = True
@@ -156,18 +156,17 @@ JAZZMIN_UI_TWEAKS = {
 # ============ MIDDLEWARE ============
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
-    'myproject.middleware.ForceRussianMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'myproject.middleware.RefreshUserPermissionsMiddleware',  
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'reversion.middleware.RevisionMiddleware',
+'django.middleware.security.SecurityMiddleware',
+'django.contrib.sessions.middleware.SessionMiddleware',
+#'myproject.middleware.ForceRussianMiddleware',  # Removed to prevent forcing Russian; re-enable if needed for specific conditions
+'corsheaders.middleware.CorsMiddleware',
+'django.middleware.common.CommonMiddleware',
+'django.middleware.csrf.CsrfViewMiddleware',
+'django.contrib.auth.middleware.AuthenticationMiddleware',
+'myproject.middleware.RefreshUserPermissionsMiddleware',
+'django.contrib.messages.middleware.MessageMiddleware',
+'django.middleware.clickjacking.XFrameOptionsMiddleware',
+'reversion.middleware.RevisionMiddleware',
 ]
 
 ROOT_URLCONF = 'myproject.urls'

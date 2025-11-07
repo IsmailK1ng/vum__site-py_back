@@ -33,61 +33,61 @@
             <ul class="desktop-menu">
                 <li class="desktop-menu__item active">
                     <a href="{% url 'home' %}" class="desktop-menu__link">
-                        {% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}
+                        {% if LANGUAGE_CODE == 'ru' %}Главная{% elif LANGUAGE_CODE == 'en' %}Home{% else %}Bosh sahifa{% endif %}
                     </a>
                 </li>
                 <li class="desktop-menu__item">
                     <a href="{% url 'dealers' %}" class="desktop-menu__link">
-                        {% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}
+                        {% if LANGUAGE_CODE == 'ru' %}Дилеры{% elif LANGUAGE_CODE == 'en' %}Dealers{% else %}Dilerlar{% endif %}
                         <span class="desktop-menu__arrow">▼</span>
                     </a>
                     <ul class="desktop-submenu">
                         <li class="desktop-submenu__item">
                             <a href="{% url 'dealers' %}" class="desktop-submenu__link">
-                                {% if LANGUAGE_CODE == 'uz' %}Diler topish{% elif LANGUAGE_CODE == 'ru' %}Найти дилера{% else %}Find dealer{% endif %}
+                                {% if LANGUAGE_CODE == 'ru' %}Найти дилера{% elif LANGUAGE_CODE == 'en' %}Find dealer{% else %}Diler topish{% endif %}
                             </a>
                         </li>
                         <li class="desktop-submenu__item">
                             <a href="{% url 'become_a_dealer' %}" class="desktop-submenu__link">
-                                {% if LANGUAGE_CODE == 'uz' %}Diler bo'lish{% elif LANGUAGE_CODE == 'ru' %}Стать дилером{% else %}Become dealer{% endif %}
+                                {% if LANGUAGE_CODE == 'ru' %}Стать дилером{% elif LANGUAGE_CODE == 'en' %}Become dealer{% else %}Diler bo'lish{% endif %}
                             </a>
                         </li>
                     </ul>
                 </li>
                 <li class="desktop-menu__item">
                     <a href="{% url 'news' %}" class="desktop-menu__link">
-                        {% if LANGUAGE_CODE == 'uz' %}Kompaniya yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Новости компании{% else %}Company news{% endif %}
+                        {% if LANGUAGE_CODE == 'ru' %}Новости компании{% elif LANGUAGE_CODE == 'en' %}Company news{% else %}Kompaniya yangiliklari{% endif %}
                     </a>
                 </li>
                 <li class="desktop-menu__item">
                     <a href="javascript:void(0)" class="desktop-menu__link">
-                        {% if LANGUAGE_CODE == 'uz' %}Modellar{% elif LANGUAGE_CODE == 'ru' %}Модели{% else %}Models{% endif %}
+                        {% if LANGUAGE_CODE == 'ru' %}Модели{% elif LANGUAGE_CODE == 'en' %}Models{% else %}Modellar{% endif %}
                         <span class="desktop-menu__arrow">▼</span>
                     </a>
                     <ul class="desktop-submenu">
                         <li class="desktop-submenu__item">
                             <a href="{% url 'products' %}?category=shatakchi" class="desktop-submenu__link">
-                                {% if LANGUAGE_CODE == 'uz' %}Shatakchi mashinalar{% elif LANGUAGE_CODE == 'ru' %}Седельные тягачи{% else %}Truck tractors{% endif %}
+                                {% if LANGUAGE_CODE == 'ru' %}Седельные тягачи{% elif LANGUAGE_CODE == 'en' %}Truck tractors{% else %}Shatakchi mashinalar{% endif %}
                             </a>
                         </li>
                         <li class="desktop-submenu__item">
                             <a href="{% url 'products' %}?category=samosval" class="desktop-submenu__link">
-                                {% if LANGUAGE_CODE == 'uz' %}Samosvallar{% elif LANGUAGE_CODE == 'ru' %}Самосвалы{% else %}Dump trucks{% endif %}
+                                {% if LANGUAGE_CODE == 'ru' %}Самосвалы{% elif LANGUAGE_CODE == 'en' %}Dump trucks{% else %}Samosvallar{% endif %}
                             </a>
                         </li>
                         <li class="desktop-submenu__item">
                             <a href="{% url 'products' %}?category=maxsus" class="desktop-submenu__link">
-                                {% if LANGUAGE_CODE == 'uz' %}Maxsus texnika{% elif LANGUAGE_CODE == 'ru' %}Спецтехника{% else %}Special equipment{% endif %}
+                                {% if LANGUAGE_CODE == 'ru' %}Спецтехника{% elif LANGUAGE_CODE == 'en' %}Special equipment{% else %}Maxsus texnika{% endif %}
                             </a>
                         </li>
                         <li class="desktop-submenu__item">
                             <a href="{% url 'products' %}?category=furgon" class="desktop-submenu__link">
-                                {% if LANGUAGE_CODE == 'uz' %}Avtofurgonlar{% elif LANGUAGE_CODE == 'ru' %}Фургоны{% else %}Vans{% endif %}
+                                {% if LANGUAGE_CODE == 'ru' %}Фургоны{% elif LANGUAGE_CODE == 'en' %}Vans{% else %}Avtofurgonlar{% endif %}
                             </a>
                         </li>
                         <li class="desktop-submenu__item">
                             <a href="{% url 'products' %}?category=shassi" class="desktop-submenu__link">
-                                {% if LANGUAGE_CODE == 'uz' %}Shassilar{% elif LANGUAGE_CODE == 'ru' %}Шасси{% else %}Chassis{% endif %}
+                                {% if LANGUAGE_CODE == 'ru' %}Шасси{% elif LANGUAGE_CODE == 'en' %}Chassis{% else %}Shassilar{% endif %}
                             </a>
                         </li>
                         <li class="desktop-submenu__item">
@@ -100,27 +100,27 @@
                 </li>
                 <li class="desktop-menu__item">
                     <a href="{% url 'about' %}" class="desktop-menu__link">
-                        {% if LANGUAGE_CODE == 'uz' %}Kompaniya haqida{% elif LANGUAGE_CODE == 'ru' %}О компании{% else %}About{% endif %}
+                        {% if LANGUAGE_CODE == 'ru' %}О компании{% elif LANGUAGE_CODE == 'en' %}About{% else %}Kompaniya haqida{% endif %}
                     </a>
                 </li>
                 <li class="desktop-menu__item">
                     <a href="{% url 'lizing' %}" class="desktop-menu__link">
-                        {% if LANGUAGE_CODE == 'uz' %}Lizing{% elif LANGUAGE_CODE == 'ru' %}Лизинг{% else %}Leasing{% endif %}
+                        {% if LANGUAGE_CODE == 'ru' %}Лизинг{% elif LANGUAGE_CODE == 'en' %}Leasing{% else %}Lizing{% endif %}
                     </a>
                 </li>
                 <li class="desktop-menu__item">
                     <a href="{% url 'services' %}" class="desktop-menu__link">
-                        {% if LANGUAGE_CODE == 'uz' %}Servis{% elif LANGUAGE_CODE == 'ru' %}Сервис{% else %}Service{% endif %}
+                        {% if LANGUAGE_CODE == 'ru' %}Сервис{% elif LANGUAGE_CODE == 'en' %}Service{% else %}Servis{% endif %}
                     </a>
                 </li>
                 <li class="desktop-menu__item">
                     <a href="{% url 'contact' %}" class="desktop-menu__link">
-                        {% if LANGUAGE_CODE == 'uz' %}Bog'lanish{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %}
+                        {% if LANGUAGE_CODE == 'ru' %}Контакты{% elif LANGUAGE_CODE == 'en' %}Contacts{% else %}Bog'lanish{% endif %}
                     </a>
                 </li>
                 <li class="desktop-menu__item">
                     <a href="{% url 'jobs' %}" class="desktop-menu__link">
-                        {% if LANGUAGE_CODE == 'uz' %}Vakansiya{% elif LANGUAGE_CODE == 'ru' %}Вакансии{% else %}Jobs{% endif %}
+                        {% if LANGUAGE_CODE == 'ru' %}Вакансии{% elif LANGUAGE_CODE == 'en' %}Jobs{% else %}Vakansiya{% endif %}
                     </a>
                 </li>
             </ul>
@@ -134,7 +134,7 @@
                 <input type="hidden" name="language" value="" id="language-input">
                 <div class="language-switcher">
                     <span class="language-current">
-                        {% if LANGUAGE_CODE == 'uz' %}UZ{% elif LANGUAGE_CODE == 'ru' %}RU{% elif LANGUAGE_CODE == 'en' %}EN{% else %}UZ{% endif %}
+                        {% if LANGUAGE_CODE == 'ru' %}RU{% elif LANGUAGE_CODE == 'en' %}EN{% else %}UZ{% endif %}
                     </span>
                     <span class="language-arrow">▼</span>
                     <div class="language-dropdown">
@@ -172,7 +172,7 @@
                     <div class="mxd-menu__left">
                         <p class="mxd-menu__caption menu-fade-in">
                             🚚 FAW Trucks Uzbekistan<br>
-                            {% if LANGUAGE_CODE == 'uz' %}Ishonchli transport yechimlari{% elif LANGUAGE_CODE == 'ru' %}Надежные транспортные решения{% else %}Reliable transport solutions{% endif %}
+                            {% if LANGUAGE_CODE == 'ru' %}Надежные транспортные решения{% elif LANGUAGE_CODE == 'en' %}Reliable transport solutions{% else %}Ishonchli transport yechimlari{% endif %}
                         </p>
                         <div class="main-menu">
                             <nav class="main-menu__content">
@@ -180,7 +180,7 @@
                                     <li class="main-menu__item">
                                         <a class="main-menu__link btn btn-anim" href="{% url 'home' %}">
                                             <span class="btn-caption">
-                                                {% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}
+                                                {% if LANGUAGE_CODE == 'ru' %}Главная{% elif LANGUAGE_CODE == 'en' %}Home{% else %}Bosh sahifa{% endif %}
                                             </span>
                                         </a>
                                     </li>
@@ -188,7 +188,7 @@
                                         <div class="main-menu__toggle">
                                             <span class="main-menu__link btn btn-anim">
                                                 <span class="btn-caption">
-                                                    {% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}
+                                                    {% if LANGUAGE_CODE == 'ru' %}Дилеры{% elif LANGUAGE_CODE == 'en' %}Dealers{% else %}Dilerlar{% endif %}
                                                 </span>
                                             </span>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" version="1.1" viewBox="0 0 20 20">
@@ -198,12 +198,12 @@
                                         <ul class="submenu">
                                             <li class="submenu__item">
                                                 <a href="{% url 'dealers' %}">
-                                                    {% if LANGUAGE_CODE == 'uz' %}Diler topish{% elif LANGUAGE_CODE == 'ru' %}Найти дилера{% else %}Find dealer{% endif %}
+                                                    {% if LANGUAGE_CODE == 'ru' %}Найти дилера{% elif LANGUAGE_CODE == 'en' %}Find dealer{% else %}Diler topish{% endif %}
                                                 </a>
                                             </li>
                                             <li class="submenu__item">
                                                 <a href="{% url 'become_a_dealer' %}">
-                                                    {% if LANGUAGE_CODE == 'uz' %}Diler bo'lish{% elif LANGUAGE_CODE == 'ru' %}Стать дилером{% else %}Become dealer{% endif %}
+                                                    {% if LANGUAGE_CODE == 'ru' %}Стать дилером{% elif LANGUAGE_CODE == 'en' %}Become dealer{% else %}Diler bo'lish{% endif %}
                                                 </a>
                                             </li>
                                         </ul>
@@ -211,21 +211,21 @@
                                     <li class="main-menu__item">
                                         <a class="main-menu__link btn btn-anim" href="{% url 'news' %}">
                                             <span class="btn-caption">
-                                                {% if LANGUAGE_CODE == 'uz' %}Kompaniya yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Новости компании{% else %}Company news{% endif %}
+                                                {% if LANGUAGE_CODE == 'ru' %}Новости компании{% elif LANGUAGE_CODE == 'en' %}Company news{% else %}Kompaniya yangiliklari{% endif %}
                                             </span>
                                         </a>
                                     </li>
                                     <li class="main-menu__item">
                                         <a class="main-menu__link btn btn-anim" href="{% url 'about' %}">
                                             <span class="btn-caption">
-                                                {% if LANGUAGE_CODE == 'uz' %}Kompaniya haqida{% elif LANGUAGE_CODE == 'ru' %}О компании{% else %}About{% endif %}
+                                                {% if LANGUAGE_CODE == 'ru' %}О компании{% elif LANGUAGE_CODE == 'en' %}About{% else %}Kompaniya haqida{% endif %}
                                             </span>
                                         </a>
                                     </li>
                                     <li class="main-menu__item">
                                         <a class="main-menu__link btn btn-anim" href="{% url 'contact' %}">
                                             <span class="btn-caption">
-                                                {% if LANGUAGE_CODE == 'uz' %}Bog'lanish{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %}
+                                                {% if LANGUAGE_CODE == 'ru' %}Контакты{% elif LANGUAGE_CODE == 'en' %}Contacts{% else %}Bog'lanish{% endif %}
                                             </span>
                                         </a>
                                     </li>
