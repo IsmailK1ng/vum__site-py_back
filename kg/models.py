@@ -250,6 +250,9 @@ class VehicleCardSpec(models.Model):
             'Дизель': {'ky': 'Дизель', 'en': 'Diesel'},
             'Бензин': {'ky': 'Бензин', 'en': 'Gasoline'},
             'ГАЗ + Бензин': {'ky': 'Газ + Бензин', 'en': 'GAS + Gasoline'},
+            'ГАЗ  Бензин': {'ky': 'Газ  Бензин', 'en': 'GAS  Gasoline'},
+            'Бензин + Газ': {'ky': 'Бензин + Газ', 'en': 'Gasoline + GAS '},
+            'Бензин  Газ': {'ky': 'Бензин  Газ', 'en': 'Gasoline  GAS '},
             
             'кг': {'ky': 'кг', 'en': 'kg'},
             'л.с.': {'ky': 'а.к.', 'en': 'hp'},
@@ -261,8 +264,9 @@ class VehicleCardSpec(models.Model):
             'м³': {'ky': 'м³', 'en': 'm³'},
             'л': {'ky': 'л', 'en': 'L'},
             
-            'Климат-контроль': {'ky': 'Климат-башкаргыч', 'en': 'Climate control'},
-            'климат-контроль': {'ky': 'климат-башкаргыч', 'en': 'climate control'},
+            'Климат-контроль': {'ky': 'Климат-башкаргыч', 'en': 'climate-control'},
+            'климат-контроль': {'ky': 'климат-башкаргыч', 'en': 'climate-control'},
+            'Климат-Контроль': {'ky': 'Климат-башкаргыч', 'en': 'climate-control'},
             'Кондиционер': {'ky': 'Кондиционер', 'en': 'Air conditioning'},
             
             '4x2': {'ky': '4x2', 'en': '4x2'},
