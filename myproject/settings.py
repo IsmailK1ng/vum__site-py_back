@@ -92,7 +92,7 @@ JAZZMIN_SETTINGS = {
     "show_language_switcher": False,
     
     "topmenu_links": [
-        {"name": "Сайт UZ", "url": "https://faw.uz", "new_window": True},
+        {"name": "Сайт UZ", "url": "https://new.faw.uz", "new_window": True},
         {"name": "Сайт KG", "url": "https://faw.kg", "new_window": True},
     ],
     
