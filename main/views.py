@@ -83,7 +83,7 @@ def news_detail(request, slug):
     news = get_object_or_404(News.objects.prefetch_related('blocks'), slug=slug, is_active=True)
     
     # Хлебные крошки на 3 языках
-    lang = request.LANGUAGE_CODE
+    language = getattr(request, 'LANGUAGE_CODE', 'uz')
     breadcrumbs = {
         'uz': {
             'home': 'Bosh sahifa',
@@ -105,7 +105,7 @@ def news_detail(request, slug):
     return render(request, 'main/news_detail.html', {
         'news': news,
         'blocks': news.blocks.all(),
-        'breadcrumbs': breadcrumbs.get(lang, breadcrumbs['uz'])
+        'breadcrumbs': breadcrumbs.get(language, breadcrumbs['uz'])
     })
 
 
