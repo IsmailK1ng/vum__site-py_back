@@ -190,7 +190,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             })
         
         # Преобразуем в список с правильным порядком категорий
-        category_order = ['main', 'engine', 'weight', 'transmission', 'brakes', 'comfort']
+        category_order = ['main', 'engine', 'weight', 'transmission', 'brakes', 'comfort', 'superstructure', 'cabin', 'additional']
         result = []
         for cat in category_order:
             if cat in grouped:
