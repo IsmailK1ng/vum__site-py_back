@@ -1,6 +1,6 @@
 /* ===== CSS ПЕРЕМЕННЫЕ ===== */
 :root {
-    --card-gap: 30px;
+    --card-gap: 15px;
     --card-border-width: 8px;
     --card-border-radius: 8px;
     --avatar-size: 48px;
@@ -187,10 +187,9 @@
 
 .slide-header__wrapper {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
     width: 100%;
-    height: 68px;
     flex-shrink: 0;
 }
 
@@ -221,14 +220,8 @@
 }
 
 .slide-header__title {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    display: contents;
+    text-wrap: auto;
     overflow: hidden;
     text-overflow: ellipsis;
     height: 61px;
