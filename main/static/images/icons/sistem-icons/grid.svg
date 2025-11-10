@@ -1,9 +1,0 @@
-<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-	<title>grid</title>
-	<defs>
-		<image  width="320" height="320" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFAAQMAAAD3XjfpAAAAAXNSR0IB2cksfwAAAAZQTFRFAAAA////pdmf3QAAAAJ0Uk5TAP9bkSK1AAAA6ElEQVR4nO3ZvQ3CQAyG4TMgQQcbkE1gMxgNNiEbQAcS6Djyg3J2CheJFMTrwlE+PU2uSPGdhN0pdOe1qB4mlRBDPlJtk8r8qaLzPi2byvKuorJIy6ayvqrotknLprK9qOixSsumoj6v+Wyb+uHhqKI4S8umfqhPtj7xnhQIBI4I5fsaO1ClQCAQCAQCgUAgEDhBmE8LVQoEAkeCw7eFwzea7jLVXc+6C193hWzOtv7bmVT8NbdzgEAg8O8g94Wf4b4QCAT2wl/oAIBAIBAIBAKBQCCwD+bTQpUCgcCRIPeF1ZRFmNh94RsNtcZmu+p5ngAAAABJRU5ErkJggg=="/>
-	</defs>
-	<style>
-	</style>
-	<use id="Background" href="#img1" x="96" y="96"/>
-</svg>

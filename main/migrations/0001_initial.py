@@ -329,7 +329,7 @@ class Migration(migrations.Migration):
             name='ProductParameter',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('category', models.CharField(choices=[('main', 'Основные параметры'), ('engine', 'Двигатель'), ('weight', 'Весовые параметры'), ('transmission', 'Трансмиссия'), ('brakes', 'Система тормозов и шин'), ('comfort', 'Удобства')], max_length=50, verbose_name='Категория')),
+                ('category', models.CharField(choices=[('main', 'Основные параметры'), ('engine', 'Двигатель'), ('weight', 'Весовые параметры'), ('transmission', 'Трансмиссия'), ('brakes', 'Система тормозов и шин'), ('comfort', 'Удобства'), ('superstructure', 'Надстройка'), ('cabin', 'Кабина')], max_length=50, verbose_name='Категория')),
                 ('text', models.CharField(max_length=500, verbose_name='Параметр')),
                 ('text_uz', models.CharField(max_length=500, null=True, verbose_name='Параметр')),
                 ('text_ru', models.CharField(max_length=500, null=True, verbose_name='Параметр')),

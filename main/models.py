@@ -192,6 +192,8 @@ class ProductParameter(models.Model):
         ('transmission', 'Трансмиссия'),
         ('brakes', 'Система тормозов и шин'),
         ('comfort', 'Удобства'),
+        ('superstructure', 'Надстройка'),
+        ('cabin', 'Кабина'),
     ]
     
     product = models.ForeignKey(
