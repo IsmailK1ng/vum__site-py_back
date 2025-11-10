@@ -31,18 +31,28 @@ class KGVehicleImageSerializer(serializers.ModelSerializer):
 # СЕРИАЛИЗАТОР: ХАРАКТЕРИСТИКИ ДЛЯ КАТАЛОГА
 # ============================================
 
+# serializers.py
 class VehicleCardSpecSerializer(serializers.ModelSerializer):
-    """Сериализатор для характеристик карточки"""
     icon = serializers.SerializerMethodField()
     value = serializers.SerializerMethodField()
     
     def get_icon(self, obj):
         if obj.icon:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.icon.url)  
             return obj.icon.url
         return None
     
     def get_value(self, obj):
         lang = self.context.get('lang', 'ru')
+        
+
+        if lang == 'ky' and not obj.value_ky and obj.value_ru:
+            return obj.auto_translate(obj.value_ru, 'ky')
+        elif lang == 'en' and not obj.value_en and obj.value_ru:
+            return obj.auto_translate(obj.value_ru, 'en')
+        
         return obj.get_value(lang)
     
     class Meta:
