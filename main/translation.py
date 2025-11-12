@@ -15,7 +15,7 @@ class NewsTranslationOptions(TranslationOptions):
 
 @register(NewsBlock)
 class NewsBlockTranslationOptions(TranslationOptions):
-    fields = ('title', 'text')  # ← ДОБАВИЛИ 'title'
+    fields = ('title', 'text')
 
 
 # ========== ВАКАНСИИ ==========
@@ -47,7 +47,13 @@ class VacancyIdealCandidateTranslationOptions(TranslationOptions):
 # ========== ПРОДУКТЫ ==========
 @register(Product)
 class ProductTranslationOptions(TranslationOptions):
-    fields = ('title',)
+    fields = (
+        'title',
+        # Поля для слайдера
+        'slider_price',
+        'slider_power',
+        'slider_fuel_consumption',
+    )
 
 
 @register(ProductFeature)

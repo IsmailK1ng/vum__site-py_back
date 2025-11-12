@@ -145,6 +145,7 @@ class FeatureIcon(models.Model):
         return self.name
 
 
+
 class Product(models.Model):
     """Грузовики FAW"""
     CATEGORY_CHOICES = [
@@ -157,6 +158,7 @@ class Product(models.Model):
         ('tiger_vr', 'Tiger VR'),
     ]
     
+    # Основные поля
     title = models.CharField("Название модели", max_length=255)
     slug = models.SlugField("URL", max_length=255, unique=True)
     category = models.CharField("Категория", max_length=50, choices=CATEGORY_CHOICES)
@@ -167,8 +169,55 @@ class Product(models.Model):
         blank=True, 
         null=True
     )
+    
+    # ========== НОВЫЕ ПОЛЯ ДЛЯ СЛАЙДЕРА ==========
+    slider_image = models.ImageField(
+        "Изображение для слайдера",
+        upload_to="products/slider/",
+        blank=True,
+        null=True,
+        help_text="Рекомендуемый размер: 420x210px. Если не указано, используется main_image"
+    )
+    slider_year = models.CharField(
+        "Год для слайдера",
+        max_length=4,
+        default="2025",
+        help_text="Отображается в слайдере"
+    )
+    slider_price = models.CharField(
+        "Цена для слайдера",
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Например: '434 000 000 sum'"
+    )
+    slider_power = models.CharField(
+        "Мощность для слайдера",
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="Например: '185 o.k.'"
+    )
+    slider_fuel_consumption = models.CharField(
+        "Расход топлива для слайдера",
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="Например: '17 L/100km'"
+    )
+    slider_order = models.PositiveIntegerField(
+        "Порядок в слайдере",
+        default=0,
+        help_text="Чем больше число, тем раньше появится в слайдере"
+    )
+    # ========================================
+    
     is_active = models.BooleanField("Активен", default=True)
-    is_featured = models.BooleanField("Показывать на главной", default=False)
+    is_featured = models.BooleanField(
+        "Показывать на главной", 
+        default=False,
+        help_text="Продукт будет добавлен в главный слайдер"
+    )
     order = models.PositiveIntegerField("Порядок", default=0)
     created_at = models.DateTimeField("Дата создания", auto_now_add=True)
     updated_at = models.DateTimeField("Дата обновления", auto_now=True)
@@ -179,10 +228,19 @@ class Product(models.Model):
         ordering = ['order', 'title']
 
     def __str__(self):
-        # ✅ Улучшенный вывод для истории версий
         return f"{self.get_category_display()} — {self.title}"
-
-
+    
+    def get_slider_data(self):
+        """Возвращает данные для слайдера в формате JSON"""
+        return {
+            'year': self.slider_year,
+            'title': self.title,
+            'price': self.slider_price or 'Запросить цену',
+            'power': self.slider_power or '—',
+            'mpg': self.slider_fuel_consumption or '—',
+            'image': (self.slider_image or self.main_image).url if (self.slider_image or self.main_image) else None,
+            'link': f'/products/{self.slug}/',
+        }
 class ProductParameter(models.Model):
     """Параметры грузовика"""
     CATEGORY_CHOICES = [

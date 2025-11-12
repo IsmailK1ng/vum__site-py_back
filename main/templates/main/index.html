@@ -237,10 +237,21 @@
     <!-- Секция — превью блога (конец) -->
 
     <!-- Секция — слайдер FAW (начало) -->
+    <!-- Скрытый элемент с данными слайдера из Django -->
+    <script id="slider-data" type="application/json">
+    {{ slider_products|safe }}
+    </script>
+
+    <!-- ========== DEBUG INFO (удалить в продакшене) ========== -->
+    {% if featured_count > 0 %}
+    <!-- ✅ Загружено {{ featured_count }} слайдов из базы данных -->
+    {% else %}
+    <!-- ⚠️ Нет продуктов для слайдера, используются fallback слайды -->
+    {% endif %}
+
+    <!-- Секция — слайдер FAW (начало) -->
     <div class="mxd-section overflow-hidden" style="margin-top: 6.3rem;">
       <div class="mxd-container">
-
-        <!-- Блок — изображение слайдера (начало) -->
         <div class="mxd-block">
           <div class="faw-bg">
             <img src="{% static 'images/slider-foto_img/bg-slider.jpg' %}" alt="FAW Slider Background"
@@ -259,10 +270,9 @@
             <div class="faw-slider-info" id="slider-info"></div>
           </div>
         </div>
-        <!-- Блок — изображение слайдера (конец) -->
-
       </div>
     </div>
+    <!-- Блок — изображение слайдера (конец) -->
     <!-- Секция — слайдер FAW (конец) -->
     <!-- Секция — контактная форма (начало) -->
     <div class="mxd-section" id="faw-main-contact-form">

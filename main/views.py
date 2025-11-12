@@ -21,15 +21,61 @@ from .serializers import (
     DealerSerializer, DealerServiceSerializer, 
     BecomeADealerPageSerializer, BecomeADealerApplicationSerializer
 )
+import json
 
 # === FRONTEND views === 
 def index(request):
-    # Получить 8 последних активных новостей для слайдера
-    news_list = News.objects.filter(is_active=True).select_related('author').order_by('-order', '-created_at')[:8]
+    """Главная страница с динамическим слайдером"""
     
-    return render(request, 'main/index.html', {
-        'news_list': news_list
-    })
+    # Получаем текущий язык
+    from django.utils.translation import get_language
+    current_lang = get_language()
+    
+    # Получить 8 последних активных новостей для слайдера
+    news_list = News.objects.filter(
+        is_active=True
+    ).select_related('author').order_by('-order', '-created_at')[:8]
+    
+    # Получаем продукты для главного слайдера
+    featured_products = Product.objects.filter(
+        is_active=True,
+        is_featured=True
+    ).order_by('-slider_order', '-created_at')[:10]  # Максимум 10 слайдов
+    
+    # Формируем данные для слайдера с учетом языка
+    slider_data = []
+    for product in featured_products:
+        # Получаем переведенные поля
+        title = getattr(product, f'title_{current_lang}', None) or product.title
+        price = getattr(product, f'slider_price_{current_lang}', None) or product.slider_price or 'Narx so\'rang'
+        power = getattr(product, f'slider_power_{current_lang}', None) or product.slider_power or '—'
+        fuel = getattr(product, f'slider_fuel_consumption_{current_lang}', None) or product.slider_fuel_consumption or '—'
+        
+        slider_item = {
+            'year': product.slider_year,
+            'title': title,
+            'price': price,
+            'power': power,
+            'mpg': fuel,
+            'image': None,
+            'link': f'/products/{product.slug}/',
+        }
+        
+        # Приоритет изображений: slider_image > main_image
+        if product.slider_image:
+            slider_item['image'] = product.slider_image.url
+        elif product.main_image:
+            slider_item['image'] = product.main_image.url
+        
+        slider_data.append(slider_item)
+    
+    context = {
+        'news_list': news_list,
+        'slider_products': json.dumps(slider_data, ensure_ascii=False),
+        'featured_count': len(slider_data),  # Для отладки
+    }
+    
+    return render(request, 'main/index.html', context)
 
 def about(request):
     return render(request, 'main/about.html')

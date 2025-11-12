@@ -707,16 +707,31 @@ class ProductGalleryInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
-    list_display = ['thumbnail', 'title', 'category', 'is_active', 'is_featured', 'order']
+    list_display = ['thumbnail', 'title', 'category', 'is_active', 'is_featured', 'slider_order', 'order']
     list_filter = ['category', 'is_active', 'is_featured']
     search_fields = ['title', 'slug']
-    list_editable = ['is_active', 'is_featured', 'order']
+    list_editable = ['is_active', 'is_featured', 'slider_order', 'order']
     prepopulated_fields = {'slug': ('title',)}
     history_latest_first = True
+    actions = ['add_to_slider', 'remove_from_slider']
     
     fieldsets = (
         ('Основная информация', {
-            'fields': (('title', 'slug'), ('category', 'order'), ('is_active', 'is_featured'), ('main_image', 'card_image'))
+            'fields': (
+                ('title', 'slug'), 
+                ('category', 'order'), 
+                ('is_active', 'is_featured'), 
+                ('main_image', 'card_image')
+            )
+        }),
+        ('⭐ Настройки главного слайдера', {
+            'classes': ('collapse',),
+            'fields': (
+                'slider_image',
+                ('slider_year', 'slider_order'),
+                'slider_price',
+                ('slider_power', 'slider_fuel_consumption'),
+            ),
         }),
     )
     
@@ -725,10 +740,30 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
     def thumbnail(self, obj):
         img = obj.card_image or obj.main_image
         if img:
-            return format_html('<img src="{}" width="80" height="50" style="object-fit:cover;border-radius:4px;"/>',
-                               img.url)
+            return format_html(
+                '<img src="{}" width="80" height="50" style="object-fit:cover;border-radius:4px;"/>',
+                img.url
+            )
         return "—"
     thumbnail.short_description = "Фото"
+    
+    def add_to_slider(self, request, queryset):
+        """Добавить выбранные продукты в слайдер"""
+        updated = queryset.update(is_featured=True)
+        self.message_user(
+            request, 
+            f'✅ {updated} продуктов добавлено в главный слайдер'
+        )
+    add_to_slider.short_description = '⭐ Добавить в главный слайдер'
+    
+    def remove_from_slider(self, request, queryset):
+        """Убрать выбранные продукты из слайдера"""
+        updated = queryset.update(is_featured=False)
+        self.message_user(
+            request, 
+            f'❌ {updated} продуктов убрано из слайдера'
+        )
+    remove_from_slider.short_description = '❌ Убрать из слайдера'
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
@@ -737,4 +772,10 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
         if deleted_count > 0:
             extra_context['show_recover_button'] = True
             extra_context['deleted_count'] = deleted_count
+        
+        # Добавляем информацию о слайдере
+        featured_count = Product.objects.filter(is_featured=True, is_active=True).count()
+        extra_context['featured_count'] = featured_count
+        extra_context['show_slider_info'] = True
+        
         return super().changelist_view(request, extra_context)

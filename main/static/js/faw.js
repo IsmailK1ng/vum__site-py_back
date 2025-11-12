@@ -51,35 +51,70 @@ function initFAWCounters() {
 // FAW Image Slider Functionality
 // --------------------------------------------- //
 
-const slides = [
-  {
-    year: "2025",
-    title: "FAW Tiger V 4x2",
-    price: "434 000 000 sum",
-    power: "185 o.k.",
-    mpg: "17 L/100km",
-    image: "/static/images/slider-foto_img/1.png",
-    cta: [{ type: "main", label: "Batafsil", link: "#" }]
-  },
-  {
-    year: "2025",
-    title: "FAW Tiger V цельнометаллический",
-    price: "419 104 000 sum",
-    power: "185 o.k.",
-    mpg: "17,1 L/100km",
-    image: "/static/images/slider-foto_img/2.png",
-    cta: [{ type: "main", label: "Batafsil", link: "#" }]
-  },
-  {
-    year: "2025",
-    title: "FAW Tiger V Pro",
-    price: "480 000 000 sum",
-    power: "195 o.k.",
-    mpg: "16,8 L/100km",
-    image: "/static/images/slider-foto_img/3.png",
-    cta: [{ type: "main", label: "Batafsil", link: "#" }]
+// Slides are loaded dynamically from Django (via a DOM element with id="slider-data").
+// If no data is provided, a fallback static list will be used.
+let slides = [];
+
+function initializeSlidesFromDjango() {
+  const sliderDataElement = document.getElementById('slider-data');
+
+  if (sliderDataElement && sliderDataElement.textContent && sliderDataElement.textContent.trim()) {
+    try {
+      const djangoSlides = JSON.parse(sliderDataElement.textContent);
+
+      if (Array.isArray(djangoSlides) && djangoSlides.length > 0) {
+        slides = djangoSlides.map(slide => ({
+          year: slide.year || "2025",
+          title: slide.title || "FAW Truck",
+          price: slide.price || "Narx so'rang",
+          power: slide.power || "—",
+          mpg: slide.mpg || "—",
+          image: slide.image || null,
+          cta: [{ type: "main", label: "Batafsil", link: slide.link || "#" }]
+        }));
+
+        console.log(`✅ Loaded ${slides.length} slides from Django`);
+        return true;
+      }
+    } catch (error) {
+      console.error('❌ Error parsing slider data:', error);
+    }
   }
-];
+
+  // Fallback: используем дефолтные слайды, если Django данных нет
+  slides = [
+    {
+      year: "2025",
+      title: "FAW Tiger V 4x2",
+      price: "434 000 000 sum",
+      power: "185 o.k.",
+      mpg: "17 L/100km",
+      image: "/static/images/slider-foto_img/1.png",
+      cta: [{ type: "main", label: "Batafsil", link: "#" }]
+    },
+    {
+      year: "2025",
+      title: "FAW Tiger V цельнометаллический",
+      price: "419 104 000 sum",
+      power: "185 o.k.",
+      mpg: "17,1 L/100km",
+      image: "/static/images/slider-foto_img/2.png",
+      cta: [{ type: "main", label: "Batafsil", link: "#" }]
+    },
+    {
+      year: "2025",
+      title: "FAW Tiger V Pro",
+      price: "480 000 000 sum",
+      power: "195 o.k.",
+      mpg: "16,8 L/100km",
+      image: "/static/images/slider-foto_img/3.png",
+      cta: [{ type: "main", label: "Batafsil", link: "#" }]
+    }
+  ];
+
+  console.warn('⚠️ Using fallback slides (no Django data found)');
+  return false;
+}
 
 function getPlaceholderSVG(title, size = "large") {
   const dimensions = size === "large" ? { w: 420, h: 210, fs: 28 } : { w: 210, h: 105, fs: 14 };
@@ -285,6 +320,14 @@ function updateArrows() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+  // Попытка загрузить слайды из Django (<div id="slider-data">[...]</div>)
+  initializeSlidesFromDjango();
+
+  if (!slides || slides.length === 0) {
+    console.error('❌ No slides available for slider');
+    return;
+  }
+
   const sliderTrack = document.getElementById('slider-track');
   const sliderInfo = document.getElementById('slider-info');
   const slideLeft = document.getElementById('slide-left');
