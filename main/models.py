@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 from django.utils.text import slugify
 from unidecode import unidecode
 from ckeditor.fields import RichTextField  
+from django.utils import timezone
+from datetime import timedelta
+
 
 # ========== ОБЩИЕ CHOICES ==========
 
@@ -462,7 +465,41 @@ class ContactForm(models.Model):
         verbose_name='Менеджер'
     )
     admin_comment = models.TextField("Комментарий", blank=True, null=True)
-
+    
+    amocrm_status = models.CharField(
+        "Статус amoCRM",
+        max_length=20,
+        choices=[
+            ('pending', 'Ожидает отправки'),
+            ('sent', 'Успешно отправлено'),
+            ('failed', 'Ошибка отправки'),
+        ],
+        default='pending',
+        db_index=True,
+        help_text="Статус отправки в amoCRM"
+    )
+    
+    amocrm_lead_id = models.CharField(
+        "ID лида в amoCRM",
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="ID лида после успешной отправки"
+    )
+    
+    amocrm_sent_at = models.DateTimeField(
+        "Дата отправки в amoCRM",
+        blank=True,
+        null=True
+    )
+    
+    amocrm_error = models.TextField(
+        "Ошибка amoCRM",
+        blank=True,
+        null=True,
+        help_text="Текст последней ошибки при отправке"
+    )
+    
     class Meta:
         verbose_name = "Заявки - Общая заявка"
         verbose_name_plural = "Заявки - Общие заявки"
@@ -619,3 +656,52 @@ class JobApplication(models.Model):
     def get_file_size(self):
         """Размер файла резюме в MB"""
         return round(self.resume.size / (1024 * 1024), 2) if self.resume else 0
+
+# ========== amoCRM ТОКЕНЫ ==========
+
+
+class AmoCRMToken(models.Model):
+    """Хранение токенов доступа к amoCRM API"""
+    access_token = models.TextField("Access Token")
+    refresh_token = models.TextField("Refresh Token")
+    expires_at = models.DateTimeField("Истекает")
+    updated_at = models.DateTimeField("Последнее обновление", auto_now=True)
+    
+    class Meta:
+        verbose_name = "amoCRM Токен"
+        verbose_name_plural = "amoCRM Токены"
+    
+    def __str__(self):
+        from django.utils import timezone
+        if self.expires_at and self.expires_at > timezone.now():
+            return f"✅ Токен валиден до {self.expires_at.strftime('%d.%m.%Y %H:%M')}"
+        else:
+            return f"❌ Токен истёк или не настроен"
+    
+    def save(self, *args, **kwargs):
+        # Всегда только 1 запись в таблице
+        self.pk = 1
+        super().save(*args, **kwargs)
+    
+    @classmethod
+    def get_instance(cls):
+        """Получить единственный экземпляр токена"""
+        # Если объект не существует, создаём с пустыми значениями
+        obj, created = cls.objects.get_or_create(
+            pk=1,
+            defaults={
+                'access_token': '',
+                'refresh_token': '',
+                'expires_at': timezone.now()
+            }
+        )
+        return obj
+    
+    def is_expired(self):
+        """Проверка: токен истёк или скоро истечёт?"""
+        
+        if not self.access_token or not self.refresh_token:
+            return True
+        
+        # Обновляем за 1 час до истечения
+        return timezone.now() + timedelta(hours=1) >= self.expires_at

@@ -279,19 +279,146 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
 
 @admin.register(ContactForm)
 class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
-    list_display = ['name', 'phone', 'region', 'priority', 'status', 'manager', 'created_at', 'action_buttons']
+    list_display = [
+        'name', 'phone', 'region', 
+        'priority', 'status', 
+        'amocrm_badge', 
+        'manager', 'created_at', 
+        'action_buttons'
+    ]
     list_editable = ['priority', 'status', 'manager']
-    list_filter = ['status', 'priority', 'region', 'created_at']
-    search_fields = ['name', 'phone']
-    readonly_fields = ['created_at']
+    list_filter = [
+        'status', 
+        'amocrm_status', 
+        'priority', 
+        'region', 
+        'created_at'
+    ]
+    search_fields = ['name', 'phone', 'amocrm_lead_id'] 
+    readonly_fields = [
+        'created_at', 
+        'amocrm_sent_at',   
+        'amocrm_lead_link'  
+    ]
     autocomplete_fields = ['manager']
     date_hierarchy = 'created_at'
     actions = ['export_to_excel']
 
     fieldsets = (
-        ('Информация о клиенте', {'fields': ('name', 'phone', 'region', 'message', 'created_at')}),
-        ('Управление', {'fields': ('status', 'priority', 'manager', 'admin_comment')}),
+        ('Информация о клиенте', {
+            'fields': ('name', 'phone', 'region', 'message', 'created_at')
+        }),
+        ('Управление', {
+            'fields': ('status', 'priority', 'manager', 'admin_comment')
+        }),
+        ('amoCRM', {  
+            'fields': (
+                'amocrm_status', 
+                'amocrm_lead_link',  
+                'amocrm_sent_at', 
+                'amocrm_error'
+            ),
+            'classes': ('collapse',) 
+        }),
     )
+    
+    # ========== НОВЫЕ МЕТОДЫ ==========
+    
+    def amocrm_badge(self, obj):
+        """Бейдж со статусом amoCRM"""
+        if obj.amocrm_status == 'sent':
+            return format_html(
+                '<span style="background:#28a745;color:white;padding:4px 8px;border-radius:4px;font-weight:600;">✅ Отправлено</span>'
+            )
+        elif obj.amocrm_status == 'failed':
+            return format_html(
+                '<span style="background:#dc3545;color:white;padding:4px 8px;border-radius:4px;font-weight:600;" title="{}">❌ Ошибка</span>',
+                obj.amocrm_error[:100] if obj.amocrm_error else 'Неизвестная ошибка'
+            )
+        else:  # pending
+            return format_html(
+                '<span style="background:#ffc107;color:#000;padding:4px 8px;border-radius:4px;font-weight:600;">⏳ Ожидает</span>'
+            )
+    
+    amocrm_badge.short_description = "amoCRM"
+    amocrm_badge.admin_order_field = 'amocrm_status' 
+    
+    def amocrm_lead_link(self, obj):
+        """Ссылка на лид в amoCRM"""
+        if obj.amocrm_lead_id:
+            url = f"https://fawtrucks.amocrm.ru/leads/detail/{obj.amocrm_lead_id}"
+            return format_html(
+                '<a href="{}" target="_blank" style="color:#007bff;font-weight:600;">🔗 Открыть в amoCRM (ID: {})</a>',
+                url, obj.amocrm_lead_id
+            )
+        return "—"
+    
+    amocrm_lead_link.short_description = "Ссылка на лид"
+    
+    # ========== ОБНОВЛЁННЫЙ ЭКСПОРТ В EXCEL ==========
+    
+    def export_to_excel(self, request, queryset):
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment
+        from datetime import datetime
+        from django.http import HttpResponse
+        
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Заявки FAW UZ"
+        
+        # Заголовки (добавили колонки amoCRM)
+        headers = [
+            '№', 'ФИО', 'Телефон', 'Регион', 'Сообщение', 
+            'Статус', 'Приоритет', 'Менеджер', 'Дата',
+            'amoCRM Статус', 'amoCRM ID', 'amoCRM Дата', 'amoCRM Ошибка'  
+        ]
+        ws.append(headers)
+        
+        # Стиль заголовков
+        header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
+        header_font = Font(bold=True, color='FFFFFF')
+        
+        for cell in ws[1]:
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+        
+        # Данные
+        for idx, contact in enumerate(queryset, start=1):
+            ws.append([
+                idx,
+                contact.name,
+                contact.phone,
+                contact.get_region_display(),
+                contact.message[:100] if contact.message else '-',
+                contact.get_status_display(),
+                contact.get_priority_display(),
+                contact.manager.username if contact.manager else '-',
+                contact.created_at.strftime('%d.%m.%Y %H:%M'),
+                # amoCRM поля
+                contact.get_amocrm_status_display(),
+                contact.amocrm_lead_id or '-',
+                contact.amocrm_sent_at.strftime('%d.%m.%Y %H:%M') if contact.amocrm_sent_at else '-',
+                contact.amocrm_error[:100] if contact.amocrm_error else '-'
+            ])
+        
+        # Автоширина колонок
+        for column in ws.columns:
+            max_length = max(len(str(cell.value)) for cell in column)
+            ws.column_dimensions[column[0].column_letter].width = min(max_length + 2, 50)
+        
+        # Ответ
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="faw_uz_contacts_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+        wb.save(response)
+        return response
+    
+    export_to_excel.short_description = 'Экспорт в Excel (с amoCRM)'
+    
+    # ========== ОСТАЛЬНЫЕ МЕТОДЫ БЕЗ ИЗМЕНЕНИЙ ==========
     
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         formfield = super().formfield_for_foreignkey(db_field, request, **kwargs)
@@ -310,42 +437,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
             </div>
         ''', f'/admin/main/contactform/{obj.id}/change/', f'/admin/main/contactform/{obj.id}/delete/')
     action_buttons.short_description = "Действия"
-
-    def export_to_excel(self, request, queryset):
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.title = "Заявки FAW UZ"
-        headers = ['№', 'ФИО', 'Телефон', 'Регион', 'Сообщение', 'Статус', 'Приоритет', 'Менеджер', 'Дата']
-        ws.append(headers)
-        
-        from openpyxl.styles import Font, PatternFill, Alignment
-        header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
-        header_font = Font(bold=True, color='FFFFFF')
-        
-        for cell in ws[1]:
-            cell.fill = header_fill
-            cell.font = header_font
-            cell.alignment = Alignment(horizontal='center', vertical='center')
-        
-        for idx, contact in enumerate(queryset, start=1):
-            ws.append([
-                idx, contact.name, contact.phone, contact.get_region_display(),
-                contact.message[:100] if contact.message else '-',
-                contact.get_status_display(), contact.get_priority_display(),
-                contact.manager.username if contact.manager else '-',
-                contact.created_at.strftime('%d.%m.%Y %H:%M')
-            ])
-        
-        for column in ws.columns:
-            max_length = max(len(str(cell.value)) for cell in column)
-            ws.column_dimensions[column[0].column_letter].width = min(max_length + 2, 50)
-        
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = f'attachment; filename="faw_uz_contacts_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
-        wb.save(response)
-        return response
-    
-    export_to_excel.short_description = 'Экспорт в Excel'
 
 
 # ============ ВАКАНСИИ ============

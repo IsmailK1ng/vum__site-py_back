@@ -194,7 +194,7 @@ class ContactFormViewSet(viewsets.ModelViewSet):
     serializer_class = ContactFormSerializer
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['status', 'priority', 'region']
+    filterset_fields = ['status', 'priority', 'region', 'amocrm_status'] 
     search_fields = ['name', 'phone']
     ordering_fields = ['created_at', 'priority']
     
@@ -206,25 +206,40 @@ class ContactFormViewSet(viewsets.ModelViewSet):
         return queryset
     
     def create(self, request, *args, **kwargs):
-        """
-        Создание заявки с обработкой ошибок
-        """
+        import logging
+        logger = logging.getLogger('amocrm')
+        
         try:
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
+            
+            contact_form = serializer.save()
+            
+            logger.info(f"📝 Новая заявка #{contact_form.id} от {contact_form.name}")
+            
+            # ← ЭТОТ БЛОК ДОЛЖЕН БЫТЬ!
+            try:
+                from main.services.amocrm import send_contact_form_to_amocrm
+                
+                amocrm_result = send_contact_form_to_amocrm(contact_form)
+                
+                if amocrm_result['success']:
+                    logger.info(f"✅ Заявка #{contact_form.id} отправлена в amoCRM")
+                else:
+                    logger.warning(f"⚠️ Заявка #{contact_form.id} НЕ отправлена")
+                    
+            except Exception as amocrm_error:
+                logger.error(f"❌ Ошибка amoCRM: {str(amocrm_error)}", exc_info=True)
+            # ← КОНЕЦ БЛОКА
             
             return Response({
                 'success': True,
-                'message': 'Ваша заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.',
-                'data': serializer.data
+                'message': '...'
             }, status=status.HTTP_201_CREATED)
             
         except Exception as e:
-            # Логируем ошибку
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.error(f"ContactForm creation error: {str(e)}", exc_info=True)
+            # Критическая ошибка (валидация, БД и т.д.)
+            logger.error(f"❌ Критическая ошибка создания заявки: {str(e)}", exc_info=True)
             
             return Response({
                 'success': False,
@@ -240,13 +255,22 @@ class ContactFormViewSet(viewsets.ModelViewSet):
         in_process = ContactForm.objects.filter(status='in_process').count()
         done = ContactForm.objects.filter(status='done').count()
         
+        # Добавили статистику по amoCRM
+        amocrm_sent = ContactForm.objects.filter(amocrm_status='sent').count()
+        amocrm_failed = ContactForm.objects.filter(amocrm_status='failed').count()
+        amocrm_pending = ContactForm.objects.filter(amocrm_status='pending').count()
+        
         return Response({
             'total': total,
             'new': new,
             'in_process': in_process,
-            'done': done
+            'done': done,
+            'amocrm': {
+                'sent': amocrm_sent,
+                'failed': amocrm_failed,
+                'pending': amocrm_pending
+            }
         })
-
 
 class JobApplicationViewSet(viewsets.ModelViewSet):
     """API endpoint для приема заявок на вакансии"""

@@ -378,3 +378,20 @@ os.makedirs(BASE_DIR / 'logs', exist_ok=True)
 
 
 SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']
+
+# ========== amoCRM настройки ==========
+AMOCRM_SUBDOMAIN = config('AMOCRM_SUBDOMAIN', default='fawtrucks')
+AMOCRM_CLIENT_ID = config('AMOCRM_CLIENT_ID')
+AMOCRM_CLIENT_SECRET = config('AMOCRM_CLIENT_SECRET')
+AMOCRM_REDIRECT_URI = config('AMOCRM_REDIRECT_URI', default='https://new.faw.uz')
+
+AMOCRM_PIPELINE_ID = config('AMOCRM_PIPELINE_ID', default='5811904', cast=int)
+AMOCRM_STATUS_ID = config('AMOCRM_STATUS_ID', default='75769098', cast=int)
+
+# ID кастомных полей
+AMOCRM_FIELD_REGION = config('AMOCRM_FIELD_REGION', default='3027829', cast=int)
+AMOCRM_FIELD_PRODUCT = config('AMOCRM_FIELD_PRODUCT', default='2194355', cast=int)
+AMOCRM_FIELD_FORMNAME = config('AMOCRM_FIELD_FORMNAME', default='2194359', cast=int)
+AMOCRM_FIELD_FORMID = config('AMOCRM_FIELD_FORMID', default='2194361', cast=int)
+AMOCRM_FIELD_REFERER = config('AMOCRM_FIELD_REFERER', default='3022633', cast=int)
+AMOCRM_FIELD_UTM = config('AMOCRM_FIELD_UTM', default='3024889', cast=int)
