@@ -350,14 +350,24 @@ LOGGING = {
             'formatter': 'verbose',
         },
         'console': {
-            'level': 'INFO',
+            'level': 'ERROR', 
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
+        },
+  
+        'amocrm_file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'logs' / 'amocrm.log', 
+            'maxBytes': 1024 * 1024 * 10,
+            'backupCount': 5,
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
         },
     },
     'root': {
         'handlers': ['console'],
-        'level': 'INFO',
+        'level': 'ERROR',  
     },
     'loggers': {
         'django': {
@@ -368,6 +378,12 @@ LOGGING = {
         'django.request': {
             'handlers': ['file'],
             'level': 'ERROR',
+            'propagate': False,
+        },
+     
+        'amocrm': {
+            'handlers': ['amocrm_file', 'console'],  
+            'level': 'INFO',  
             'propagate': False,
         },
     },

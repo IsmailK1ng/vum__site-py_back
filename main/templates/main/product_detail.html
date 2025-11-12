@@ -251,6 +251,8 @@
                 <input type="hidden" name="admin_email" value="info@fawtrucks.uz">
                 <input type="hidden" name="form_subject" value="FAW Contact Form Message">
 
+                <input type="hidden" name="product" id="product-field" value="">
+
                 <div class="faw-form__group">
                     <input type="text" name="Name" class="faw-form__input" placeholder="Ismingiz*" required>
                 </div>
@@ -323,9 +325,6 @@
     <script src="{% static 'js/product_detail.js' %}"></script>
 
     <script>
-        // Глобальная переменная для хранения названия продукта
-        window.currentProductTitle = '';
-
         // Форма контакта
         let isSubmitting = false;
 
@@ -348,11 +347,34 @@
             }
             const statusText = statusBlock.querySelector('.faw-form__status-text') || statusBlock;
 
+            // ← ФУНКЦИЯ СБОРА UTM
+            function getUTMData() {
+                const params = new URLSearchParams(window.location.search);
+                const utm = {
+                    utm_source: params.get('utm_source'),
+                    utm_medium: params.get('utm_medium'),
+                    utm_campaign: params.get('utm_campaign'),
+                    utm_content: params.get('utm_content'),
+                    utm_term: params.get('utm_term')
+                };
+
+                // Убираем пустые значения
+                Object.keys(utm).forEach(key => {
+                    if (!utm[key]) delete utm[key];
+                });
+
+                return Object.keys(utm).length > 0 ? JSON.stringify(utm) : null;
+            }
+
             function openModal() {
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
 
-                // ✅ АВТОМАТИЧЕСКИ ПОДСТАВЛЯЕМ НАЗВАНИЕ МОДЕЛИ
+                const productField = document.getElementById('product-field');
+                if (window.currentProductTitle && productField) {
+                    productField.value = window.currentProductTitle;
+                }
+
                 if (window.currentProductTitle && messageTextarea) {
                     messageTextarea.value = `Men ${window.currentProductTitle} modeliga qiziqaman.\n\nQo'shimcha savollar: `;
                     messageTextarea.focus();
@@ -407,11 +429,15 @@
                     return;
                 }
 
+                // ← СОБИРАЕМ ВСЕ ДАННЫЕ (включая UTM и Referer)
                 const formData = {
                     name: contactForm.Name.value,
                     region: contactForm.Region.value,
                     phone: phoneInput.value,
+                    product: document.getElementById('product-field').value,
                     message: contactForm.Message.value,
+                    referer: document.referrer || window.location.href,  // ← REFERER
+                    utm_data: getUTMData()  // ← UTM
                 };
 
                 try {

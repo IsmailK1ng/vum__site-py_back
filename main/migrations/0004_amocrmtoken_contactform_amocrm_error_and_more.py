@@ -10,6 +10,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # ========== СОЗДАНИЕ МОДЕЛИ AmoCRMToken ==========
         migrations.CreateModel(
             name="AmoCRMToken",
             fields=[
@@ -37,14 +38,60 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "amoCRM Токены",
             },
         ),
+        
+        # ========== ДОБАВЛЕНИЕ ПОЛЯ product ==========
         migrations.AddField(
             model_name="contactform",
-            name="amocrm_error",
+            name="product",
+            field=models.CharField(
+                blank=True,
+                max_length=200,
+                null=True,
+                verbose_name="Модель техники",
+                help_text="Какую модель автомобиля интересует клиента"
+            ),
+        ),
+        
+        # ========== ДОБАВЛЕНИЕ ПОЛЯ referer ==========
+        migrations.AddField(
+            model_name="contactform",
+            name="referer",
+            field=models.URLField(
+                blank=True,
+                max_length=500,
+                null=True,
+                verbose_name="Referer (откуда пришёл)",
+                help_text="URL страницы, с которой отправлена заявка"
+            ),
+        ),
+        
+        # ========== ДОБАВЛЕНИЕ ПОЛЯ utm_data ==========
+        migrations.AddField(
+            model_name="contactform",
+            name="utm_data",
             field=models.TextField(
                 blank=True,
-                help_text="Текст последней ошибки при отправке",
                 null=True,
-                verbose_name="Ошибка amoCRM",
+                verbose_name="UTM метки",
+                help_text="UTM метки в JSON формате"
+            ),
+        ),
+        
+        # ========== ПОЛЯ amoCRM ==========
+        migrations.AddField(
+            model_name="contactform",
+            name="amocrm_status",
+            field=models.CharField(
+                choices=[
+                    ("pending", "Ожидает отправки"),
+                    ("sent", "Успешно отправлено"),
+                    ("failed", "Ошибка отправки"),
+                ],
+                db_index=True,
+                default="pending",
+                help_text="Статус отправки в amoCRM",
+                max_length=20,
+                verbose_name="Статус amoCRM",
             ),
         ),
         migrations.AddField(
@@ -67,18 +114,12 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="contactform",
-            name="amocrm_status",
-            field=models.CharField(
-                choices=[
-                    ("pending", "Ожидает отправки"),
-                    ("sent", "Успешно отправлено"),
-                    ("failed", "Ошибка отправки"),
-                ],
-                db_index=True,
-                default="pending",
-                help_text="Статус отправки в amoCRM",
-                max_length=20,
-                verbose_name="Статус amoCRM",
+            name="amocrm_error",
+            field=models.TextField(
+                blank=True,
+                help_text="Текст последней ошибки при отправке",
+                null=True,
+                verbose_name="Ошибка amoCRM",
             ),
         ),
     ]

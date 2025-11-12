@@ -2,17 +2,19 @@
  * FAW Product Detail - Загрузка детальной информации о продукте
  */
 
+/**
+ * FAW Product Detail - Production Version
+ */
+
 class ProductDetail {
     constructor() {
         this.productId = null;
         this.apiUrl = '/api/uz/products/';
         this.product = null;
-
         this.init();
     }
 
     async init() {
-        // Получаем slug из URL
         const pathParts = window.location.pathname.split('/').filter(p => p);
         const slug = pathParts[pathParts.length - 1];
 
@@ -27,7 +29,6 @@ class ProductDetail {
     async loadProduct(slug) {
         try {
             this.showLoader();
-
             const response = await fetch(`${this.apiUrl}${slug}/`);
 
             if (!response.ok) {
@@ -41,35 +42,23 @@ class ProductDetail {
             this.hideLoader();
 
         } catch (error) {
-            console.error('Ошибка загрузки:', error);
             this.showError('Mahsulot yuklanmadi. Qayta urinib ko\'ring.');
         }
     }
 
     renderProduct() {
-        // 1. Заголовок и категория
         document.querySelector('.models_title').textContent = this.product.title;
-
-        // ✅ СОХРАНЯЕМ НАЗВАНИЕ ПРОДУКТА В ГЛОБАЛЬНУЮ ПЕРЕМЕННУЮ
         window.currentProductTitle = this.product.title;
 
-        // 2. Главное изображение
         const heroImg = document.querySelector('.mxd-hero-06__car-image');
         if (heroImg && this.product.main_image_url) {
             heroImg.src = this.product.main_image_url;
             heroImg.alt = this.product.title;
         }
 
-        // 3. 8 характеристик с иконками
         this.renderFeatures();
-
-        // 4. Параметры (accordion)
         this.renderSpecifications();
-
-        // 5. Галерея
         this.renderGallery();
-
-        // 6. Обновляем хлебные крошки
         this.updateBreadcrumbs();
     }
 
@@ -77,10 +66,8 @@ class ProductDetail {
         const featuresContainer = document.querySelector('.car-specs-grid');
         if (!featuresContainer || !this.product.features) return;
 
-        // Очищаем контейнер
         featuresContainer.innerHTML = '';
 
-        // Сортируем по order и берем первые 8
         const features = this.product.features
             .sort((a, b) => a.order - b.order)
             .slice(0, 8);
@@ -103,38 +90,28 @@ class ProductDetail {
         const specsContainer = document.querySelector('.acardeon-cards_block');
         if (!specsContainer) return;
 
-        // Очищаем контейнер
         specsContainer.innerHTML = '';
 
-        // Проверяем, есть ли параметры
         if (!this.product.spec_groups || this.product.spec_groups.length === 0) {
             specsContainer.innerHTML = '<p style="padding: 20px; text-align: center; color: #888;">Parametrlar hali qo\'shilmagan</p>';
             return;
         }
 
-        // Отображаем группы параметров (БЕЗ сортировки, порядок уже правильный из API)
         this.product.spec_groups.forEach((group, index) => {
-            // Пропускаем пустые группы
-            if (!group.parameters || group.parameters.length === 0) {
-                return;
-            }
+            if (!group.parameters || group.parameters.length === 0) return;
 
-            const isOpen = index === 0; // Первая группа открыта
+            const isOpen = index === 0;
             const groupHTML = this.createAccordionCard(group, index, isOpen);
             specsContainer.insertAdjacentHTML('beforeend', groupHTML);
         });
 
-        // Если после фильтрации нет групп
         if (specsContainer.innerHTML === '') {
             specsContainer.innerHTML = '<p style="padding: 20px; text-align: center; color: #888;">Parametrlar hali qo\'shilmagan</p>';
         }
     }
 
     createAccordionCard(group, index, isOpen) {
-        // Дополнительная проверка на всякий случай
-        if (!group.parameters || group.parameters.length === 0) {
-            return '';
-        }
+        if (!group.parameters || group.parameters.length === 0) return '';
 
         const parameters = group.parameters
             .sort((a, b) => a.order - b.order)
@@ -154,17 +131,15 @@ class ProductDetail {
                 </ul>
             </div>
         </div>
-    `;
+        `;
     }
 
     renderGallery() {
         const galleryContainer = document.querySelector('.swiper-wrapper');
         if (!galleryContainer || !this.product.gallery) return;
 
-        // Очищаем контейнер
         galleryContainer.innerHTML = '';
 
-        // Сортируем по order
         const images = this.product.gallery.sort((a, b) => a.order - b.order);
 
         if (images.length === 0) {
@@ -175,73 +150,25 @@ class ProductDetail {
             });
         }
 
-        // ✅ КРИТИЧНО: Ждём загрузки ВСЕХ изображений
         const allImages = galleryContainer.querySelectorAll('img');
-
         if (allImages.length === 0) {
-            console.warn('No images found in gallery');
             this.initSwiper();
             return;
         }
 
-        console.log(`Waiting for ${allImages.length} images to load...`);
-
-        // Используем Promise.all для ожидания всех изображений
         const imagePromises = Array.from(allImages).map(img => {
             return new Promise((resolve) => {
                 if (img.complete && img.naturalHeight !== 0) {
-                    console.log('✅ Image already loaded:', img.src);
                     resolve();
                 } else {
-                    img.addEventListener('load', () => {
-                        console.log('✅ Image loaded:', img.src);
-                        resolve();
-                    });
-                    img.addEventListener('error', () => {
-                        console.error('❌ Image failed to load:', img.src);
-                        resolve(); // Resolve anyway to not block
-                    });
+                    img.addEventListener('load', resolve);
+                    img.addEventListener('error', resolve);
                 }
             });
         });
 
         Promise.all(imagePromises).then(() => {
-            console.log('🎉 All images loaded! Initializing Swiper...');
-            // Даём небольшую задержку для стабильности DOM
-            setTimeout(() => {
-                this.initSwiper();
-            }, 200);
-        });
-    }
-
-    // Фоллбэк метод ожидания загрузки изображений
-    waitForImages(container) {
-        return new Promise((resolve) => {
-            const images = container.querySelectorAll('img');
-            if (images.length === 0) {
-                resolve();
-                return;
-            }
-
-            let loadedCount = 0;
-            const totalImages = images.length;
-
-            const checkComplete = () => {
-                loadedCount++;
-                if (loadedCount === totalImages) {
-                    // Дополнительная задержка для стабильности
-                    setTimeout(resolve, 100);
-                }
-            };
-
-            images.forEach(img => {
-                if (img.complete && img.naturalHeight !== 0) {
-                    checkComplete();
-                } else {
-                    img.addEventListener('load', checkComplete);
-                    img.addEventListener('error', checkComplete);
-                }
-            });
+            setTimeout(() => this.initSwiper(), 200);
         });
     }
 
@@ -254,28 +181,21 @@ class ProductDetail {
                 </div>
             </div>
         </div>
-    `;
+        `;
         container.insertAdjacentHTML('beforeend', slideHTML);
     }
 
     initSwiper() {
-        if (typeof Swiper === 'undefined') {
-            console.error('Swiper не загружен');
-            return;
-        }
+        if (typeof Swiper === 'undefined') return;
 
-        // ✅ Уничтожаем предыдущий инстанс
         const existingSwiper = document.querySelector('.mxd-demo-swiper')?.swiper;
         if (existingSwiper) {
             existingSwiper.destroy(true, true);
         }
 
-        // ✅ Считаем реальные слайды
         const realSlides = document.querySelectorAll('.swiper-wrapper .swiper-slide').length;
-        console.log('📊 Количество слайдов:', realSlides);
-
-        // ✅ Дублируем слайды если нужно для стабильного loop
         const minSlidesForLoop = 6;
+
         if (realSlides > 0 && realSlides < minSlidesForLoop) {
             const wrapper = document.querySelector('.swiper-wrapper');
             const slides = Array.from(wrapper.children);
@@ -285,89 +205,49 @@ class ProductDetail {
                     wrapper.appendChild(slide.cloneNode(true));
                 });
             }
-            console.log('🔄 Слайды продублированы:', wrapper.children.length);
         }
 
         setTimeout(() => {
             const swiper = new Swiper('.mxd-demo-swiper', {
-                // Breakpoints
                 breakpoints: {
-                    320: {
-                        slidesPerView: 1,
-                        spaceBetween: 20,
-                    },
-                    768: {
-                        slidesPerView: 2,
-                        spaceBetween: 30,
-                    },
-                    1024: {
-                        slidesPerView: 3,
-                        spaceBetween: 30,
-                    },
+                    320: { slidesPerView: 1, spaceBetween: 20 },
+                    768: { slidesPerView: 2, spaceBetween: 30 },
+                    1024: { slidesPerView: 3, spaceBetween: 30 },
                 },
-
-                // ✅ ВСЕГДА loop
                 loop: true,
                 loopAdditionalSlides: 2,
-
-                // ✅ ВАЖНО: centeredSlides для правильного фокуса!
                 centeredSlides: true,
-
                 initialSlide: 0,
                 speed: 600,
                 grabCursor: true,
                 slidesPerGroup: 1,
-
-                // ✅ parallax false
                 parallax: false,
-
-                // Autoplay выключен
                 autoplay: false,
-
-                keyboard: {
-                    enabled: true,
-                    onlyInViewport: true
-                },
-
+                keyboard: { enabled: true, onlyInViewport: true },
                 navigation: {
                     nextEl: '.swiper-button-next',
                     prevEl: '.swiper-button-prev',
                 },
-
-                // Observers для динамического контента
                 observer: true,
                 observeParents: true,
                 observeSlideChildren: true,
-
                 watchOverflow: true,
                 watchSlidesProgress: true,
                 preventInteractionOnTransition: true,
-
-                // ✅ КРИТИЧНО для правильной работы loop
                 loopPreventsSlide: false,
-                loopedSlides: null, // auto-calculate
-
+                loopedSlides: null,
                 on: {
                     init: function () {
-                        console.log('✅ Swiper initialized, total slides:', this.slides.length);
-
-                        // ✅ Двойное обновление для стабильности
                         setTimeout(() => {
                             this.update();
-                            console.log('🔄 First update done');
-
-                            // ✅ Переход на первый слайд
                             if (this.params.loop) {
                                 this.slideToLoop(0, 0, false);
                             } else {
                                 this.slideTo(0, 0, false);
                             }
-
                             this.update();
-                            console.log('🔄 Second update done, active:', this.realIndex);
                         }, 150);
 
-                        // ✅ Autoplay запуск
                         setTimeout(() => {
                             this.params.autoplay = {
                                 delay: 4000,
@@ -375,26 +255,16 @@ class ProductDetail {
                                 pauseOnMouseEnter: true,
                             };
                             this.autoplay.start();
-                            console.log('▶️ Autoplay started');
                         }, 1000);
-                    },
-
-                    slideChange: function () {
-                        console.log('→ Slide changed to:', this.realIndex);
                     },
                 }
             });
 
             window.gallerySwiper = swiper;
-            console.log('🎯 Swiper ready!');
-        }, 400); // Увеличенная задержка для стабильности
+        }, 400);
     }
 
     updateBreadcrumbs() {
-        console.log('🔗 Updating breadcrumbs for:', this.product.title);
-        console.log('📦 Product data:', this.product); // ✅ Проверим что приходит
-
-        // ✅ Маппинг категорий (на всякий случай)
         const categoryNames = {
             'shatakchi': 'Shatakchi mashinalar',
             'samosval': 'Samosvallar',
@@ -405,39 +275,25 @@ class ProductDetail {
             'tiger_vr': 'Tiger VR'
         };
 
-        // Находим все ссылки в breadcrumb
         const breadcrumbLinks = document.querySelectorAll('.breadcrumb-ol li a');
-        console.log('Found breadcrumb links:', breadcrumbLinks.length);
+        if (breadcrumbLinks.length < 3) return;
 
-        if (breadcrumbLinks.length < 3) {
-            console.warn('Not enough breadcrumb links found');
-            return;
-        }
-
-        // Обновляем последнюю крошку (название продукта)
         const productLink = breadcrumbLinks[2];
         if (productLink) {
             productLink.textContent = this.product.title;
             productLink.href = 'javascript:void(0)';
-            console.log('✅ Product name updated:', this.product.title);
         }
 
-        // Обновляем вторую крошку (категория)
         const categoryLink = breadcrumbLinks[1];
         if (categoryLink) {
-            // ✅ Проверяем все возможные варианты
             const categoryName = this.product.category_display ||
                 categoryNames[this.product.category] ||
                 'Modellar';
 
             categoryLink.textContent = categoryName;
             categoryLink.href = `/#models`;
-            console.log('✅ Category updated:', categoryName);
-            console.log('   - category_display:', this.product.category_display);
-            console.log('   - category code:', this.product.category);
         }
 
-        // Обновляем title страницы
         document.title = `${this.product.title} - FAW Trucks`;
     }
 
@@ -451,9 +307,7 @@ class ProductDetail {
 
     hideLoader() {
         const loader = document.getElementById('product-loader');
-        if (loader) {
-            loader.remove();
-        }
+        if (loader) loader.remove();
     }
 
     showError(message) {
@@ -477,7 +331,6 @@ class ProductDetail {
     }
 }
 
-// Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
     new ProductDetail();
 });

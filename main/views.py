@@ -22,6 +22,7 @@ from .serializers import (
     BecomeADealerPageSerializer, BecomeADealerApplicationSerializer
 )
 import json
+import logging
 
 # === FRONTEND views === 
 def index(request):
@@ -205,6 +206,8 @@ class ContactFormViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(status=status_filter)
         return queryset
     
+
+
     def create(self, request, *args, **kwargs):
         import logging
         logger = logging.getLogger('amocrm')
@@ -215,36 +218,34 @@ class ContactFormViewSet(viewsets.ModelViewSet):
             
             contact_form = serializer.save()
             
-            logger.info(f"📝 Новая заявка #{contact_form.id} от {contact_form.name}")
-            
-            # ← ЭТОТ БЛОК ДОЛЖЕН БЫТЬ!
+            # ✅ ПРАВИЛЬНАЯ ОБРАБОТКА ОШИБОК
             try:
                 from main.services.amocrm import send_contact_form_to_amocrm
                 
-                amocrm_result = send_contact_form_to_amocrm(contact_form)
+                result = send_contact_form_to_amocrm(contact_form)
                 
-                if amocrm_result['success']:
-                    logger.info(f"✅ Заявка #{contact_form.id} отправлена в amoCRM")
+                if result['success']:
+                    logger.info(f"✅ Лид #{contact_form.id} отправлен в amoCRM. Lead ID: {result['lead_id']}")
                 else:
-                    logger.warning(f"⚠️ Заявка #{contact_form.id} НЕ отправлена")
+                    logger.warning(f"⚠️ Лид #{contact_form.id} НЕ отправлен: {result['error']}")
                     
             except Exception as amocrm_error:
-                logger.error(f"❌ Ошибка amoCRM: {str(amocrm_error)}", exc_info=True)
-            # ← КОНЕЦ БЛОКА
+                # ✅ ЛОГИРУЕМ КРИТИЧЕСКИЕ ОШИБКИ
+                logger.error(
+                    f"❌ Критическая ошибка amoCRM для лида #{contact_form.id}: {str(amocrm_error)}",
+                    exc_info=True  # ← Полный стектрейс в логах
+                )
             
             return Response({
                 'success': True,
-                'message': '...'
+                'message': 'Xabar yuborildi!'
             }, status=status.HTTP_201_CREATED)
             
         except Exception as e:
-            # Критическая ошибка (валидация, БД и т.д.)
-            logger.error(f"❌ Критическая ошибка создания заявки: {str(e)}", exc_info=True)
-            
+            logger.error(f"❌ Ошибка создания заявки: {str(e)}", exc_info=True)
             return Response({
                 'success': False,
-                'message': 'Произошла ошибка при отправке заявки. Попробуйте позже.',
-                'error': str(e)
+                'message': 'Xatolik yuz berdi. Qayta urinib ko\'ring.'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     @action(detail=False, methods=['get'])

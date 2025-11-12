@@ -97,6 +97,12 @@ bash
 Копировать код
 python manage.py makemigrations
 python manage.py migrate
+
+bash
+python manage.py save_amocrm_tokens
+       "access_token": "НОВЫЙ_ACCESS_TOKEN",
+       "refresh_token": "НОВЫЙ_REFRESH_TOKEN"
+       
 5️⃣ Создать суперпользователя
 bash
 Копировать код

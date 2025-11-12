@@ -87,21 +87,17 @@ class ProductsManager {
       console.error('Unknown category:', this.currentCategory);
       return;
     }
-    
-    console.log('Updating page for category:', this.currentCategory, categoryInfo);
-    
+      
     // 1. Обновляем главный заголовок
     const titleElement = document.querySelector('.models_title');
     if (titleElement) {
       titleElement.textContent = categoryInfo.title;
-      console.log('✓ Title updated');
     }
     
     // 2. Обновляем слоган
     const sloganElement = document.querySelector('.hero-05-title__item:not(.title-item-image)');
     if (sloganElement) {
       sloganElement.textContent = categoryInfo.slogan;
-      console.log('✓ Slogan updated');
     }
     
     // 3. Обновляем hero изображение
@@ -111,19 +107,16 @@ class ProductsManager {
       const staticPath = `/static/${categoryInfo.hero_image}`;
       heroImage.src = staticPath;
       heroImage.alt = categoryInfo.title;
-      console.log('✓ Hero image updated:', staticPath);
     }
     
     // 4. Обновляем хлебные крошки
     const breadcrumbActive = document.querySelector('.breadcrumb-ol .active a');
     if (breadcrumbActive) {
       breadcrumbActive.textContent = categoryInfo.breadcrumb;
-      console.log('✓ Breadcrumb updated');
     }
     
     // 5. Обновляем title страницы
     document.title = `${categoryInfo.title} - FAW Trucks`;
-    console.log('✓ Page title updated');
   }
 
   async loadProducts() {
@@ -136,8 +129,6 @@ class ProductsManager {
         url += `?category=${this.currentCategory}`;
       }
       
-      console.log('Loading products from:', url);
-      
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -145,7 +136,6 @@ class ProductsManager {
       }
       
       const data = await response.json();
-      console.log('Products loaded:', data);
       
       // Поддержка разных форматов ответа
       this.allProducts = data.results || data.products || data || [];

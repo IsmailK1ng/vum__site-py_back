@@ -17,7 +17,6 @@ class NewsSerializer(serializers.ModelSerializer):
 
 
 class ContactFormSerializer(serializers.ModelSerializer):
-    """Сериализатор для заявок (обновленный с функционалом из KG)"""
     manager_name = serializers.CharField(source='manager.username', read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     priority_display = serializers.CharField(source='get_priority_display', read_only=True)
@@ -26,14 +25,17 @@ class ContactFormSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactForm
         fields = [
-            'id', 'name', 'phone', 'region', 'region_display', 'message',
+            'id', 'name', 'phone', 'region', 'region_display', 
+            'product', 
+            'referer',  
+            'utm_data',  
+            'message',
             'status', 'status_display', 'priority', 'priority_display',
             'manager', 'manager_name', 'admin_comment', 'created_at'
         ]
         read_only_fields = ['id', 'created_at', 'status_display', 'priority_display', 'region_display']
     
     def create(self, validated_data):
-        # Используем setdefault вместо прямого присваивания
         validated_data.setdefault('status', 'new')
         validated_data.setdefault('priority', 'medium')
         return super().create(validated_data)

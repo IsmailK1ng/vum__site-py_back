@@ -31,7 +31,9 @@ class AmoCRMClient:
         url = f"{self.base_url}/leads/complex"
         
         try:
-            logger.info(f"🚀 Отправка лида в amoCRM: {lead_data.get('name', 'Без имени')}")
+            # ✅ МИНИМАЛЬНОЕ ЛОГИРОВАНИЕ (только название лида)
+            lead_name = lead_data.get('name', 'Без имени')
+            logger.info(f"🚀 Отправка лида в amoCRM: {lead_name}")
             
             response = requests.post(
                 url,
@@ -40,23 +42,11 @@ class AmoCRMClient:
                 timeout=10
             )
             
-            # Логируем запрос для отладки
-            logger.debug(f"Request URL: {url}")
-            logger.debug(f"Request Headers: {self.headers}")
-            logger.debug(f"Request Data: {[lead_data]}")
-            logger.debug(f"Response Status: {response.status_code}")
-            logger.debug(f"Response Body: {response.text}")
-            
-            response.raise_for_status()  # Вызовет ошибку если 4xx/5xx
-            
+            response.raise_for_status()
             result = response.json()
-            
-            # ← ОТЛАДКА: Показываем что вернулось
-            logger.info(f"📦 Ответ от amoCRM (type: {type(result).__name__})")
             
             # Извлекаем ID созданного лида
             if isinstance(result, list):
-                # Если amoCRM вернул массив (старая версия API?)
                 if len(result) > 0:
                     first_item = result[0]
                     if '_embedded' in first_item:
@@ -64,18 +54,17 @@ class AmoCRMClient:
                     elif 'id' in first_item:
                         lead_id = first_item['id']
                     else:
-                        raise ValueError(f"Не найден ID лида в ответе: {first_item}")
+                        raise ValueError("Lead ID not found in response")
                 else:
-                    raise ValueError("amoCRM вернул пустой массив")
+                    raise ValueError("Empty response from amoCRM")
                     
             elif isinstance(result, dict):
-                # Правильный формат (объект с _embedded)
                 if '_embedded' in result and 'leads' in result['_embedded']:
                     lead_id = result['_embedded']['leads'][0]['id']
                 else:
-                    raise ValueError(f"Не найден _embedded.leads в ответе: {result}")
+                    raise ValueError("Lead ID not found in response")
             else:
-                raise ValueError(f"Неожиданный тип ответа: {type(result)}")
+                raise ValueError(f"Unexpected response type: {type(result)}")
             
             logger.info(f"✅ Лид успешно создан. ID: {lead_id}")
             
@@ -113,7 +102,6 @@ class AmoCRMClient:
             
         except (KeyError, IndexError, ValueError) as e:
             logger.error(f"❌ Ошибка парсинга ответа: {str(e)}")
-            logger.error(f"Полный ответ: {response.text}")
             return {
                 'success': False,
                 'lead_id': None,
@@ -129,7 +117,9 @@ class AmoCRMClient:
             if 'validation-errors' in error_data:
                 errors = error_data['validation-errors'][0].get('errors', [])
                 if errors:
-                    return f"{errors[0].get('code', 'unknown')}: {errors[0].get('detail', 'Unknown error')}"
+                    code = errors[0].get('code', 'unknown')
+                    detail = errors[0].get('detail', 'Unknown error')
+                    return f"{code}: {detail}"
             
             # Общая ошибка
             if 'detail' in error_data:
@@ -142,3 +132,34 @@ class AmoCRMClient:
             
         except Exception:
             return response.text[:200]
+    
+    def get_custom_fields(self, entity_type='leads'):
+        """
+        Получить список кастомных полей
+        
+        Args:
+            entity_type (str): Тип сущности ('leads', 'contacts', 'companies')
+            
+        Returns:
+            list: Список полей с их ID и названиями
+        """
+        url = f"{self.base_url}/{entity_type}/custom_fields"
+        
+        try:
+            response = requests.get(
+                url,
+                headers=self.headers,
+                timeout=10
+            )
+            response.raise_for_status()
+            
+            result = response.json()
+            
+            if '_embedded' in result and 'custom_fields' in result['_embedded']:
+                return result['_embedded']['custom_fields']
+            
+            return []
+            
+        except Exception as e:
+            logger.error(f"❌ Ошибка получения полей: {str(e)}")
+            return []

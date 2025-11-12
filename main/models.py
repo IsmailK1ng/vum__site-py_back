@@ -452,8 +452,34 @@ class ContactForm(models.Model):
     name = models.CharField("Имя", max_length=255)
     region = models.CharField("Регион", max_length=100, choices=REGION_CHOICES)
     phone = models.CharField("Телефон", max_length=50)
+    
+    product = models.CharField(
+        "Модель техники", 
+        max_length=200, 
+        blank=True, 
+        null=True,
+        help_text="Какую модель автомобиля интересует клиента"
+    )
+    
     message = models.TextField("Сообщение")
+    
+    referer = models.URLField(
+        "Referer (откуда пришёл)",
+        max_length=500,
+        blank=True,
+        null=True,
+        help_text="URL страницы, с которой отправлена заявка"
+    )
+    
+    utm_data = models.TextField(
+        "UTM метки",
+        blank=True,
+        null=True,
+        help_text="UTM метки в JSON формате"
+    )
+    
     created_at = models.DateTimeField("Дата", auto_now_add=True)
+    message = models.TextField("Сообщение")
     status = models.CharField("Статус", max_length=20, choices=STATUS_CHOICES, default='new')
     priority = models.CharField("Приоритет", max_length=10, choices=PRIORITY_CHOICES, default='medium')
     manager = models.ForeignKey(
@@ -466,6 +492,7 @@ class ContactForm(models.Model):
     )
     admin_comment = models.TextField("Комментарий", blank=True, null=True)
     
+    # Поля amoCRM (уже есть ниже)
     amocrm_status = models.CharField(
         "Статус amoCRM",
         max_length=20,
@@ -686,13 +713,12 @@ class AmoCRMToken(models.Model):
     @classmethod
     def get_instance(cls):
         """Получить единственный экземпляр токена"""
-        # Если объект не существует, создаём с пустыми значениями
         obj, created = cls.objects.get_or_create(
             pk=1,
             defaults={
                 'access_token': '',
                 'refresh_token': '',
-                'expires_at': timezone.now()
+                'expires_at': timezone.now() - timedelta(days=1)  # ← В ПРОШЛОМ!
             }
         )
         return obj
