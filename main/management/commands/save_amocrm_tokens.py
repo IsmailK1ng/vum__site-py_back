@@ -10,7 +10,7 @@ class Command(BaseCommand):
     help = 'Сохранить токены amoCRM из Postman в БД'
 
     def handle(self, *args, **options):
-        self.stdout.write("📝 Введите токены из Postman:\n")
+        self.stdout.write("📝 Введите токены:\n")
         
         access_token = input("Access Token: ").strip()
         refresh_token = input("Refresh Token: ").strip()

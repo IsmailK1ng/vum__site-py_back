@@ -1,0 +1,190 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<style>
+    .logs-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .logs-title {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 30px;
+        color: #333;
+    }
+
+    .log-section {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+
+    .log-section__header {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        padding: 15px 20px;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .log-section__content {
+        padding: 20px;
+        max-height: 500px;
+        overflow-y: auto;
+        background: #f8f9fa;
+    }
+
+    .log-line {
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        line-height: 1.6;
+        padding: 8px 12px;
+        margin-bottom: 4px;
+        background: #fff;
+        border-left: 3px solid #dc3545;
+        border-radius: 4px;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+    }
+
+    .log-line:hover {
+        background: #fff3cd;
+    }
+
+    .log-empty {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+        font-size: 16px;
+    }
+
+    .log-actions {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .log-btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none !important;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .log-btn--back {
+        background: linear-gradient(135deg, #1a4dd3, #000f35);
+        color: white !important;
+    }
+
+    .log-btn--back:hover {
+        background: linear-gradient(135deg, #0056b3, #004085);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+
+    .log-btn--refresh {
+        background: linear-gradient(135deg, #28a745, #218838);
+        color: white !important;
+    }
+
+    .log-btn--refresh:hover {
+        background: linear-gradient(135deg, #218838, #1e7e34);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    .log-stats {
+        background: linear-gradient(135deg, #031b58 0%, #1a4dd3 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .log-stats__item {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 15px;
+        border-radius: 6px;
+    }
+
+    .log-stats__label {
+        font-size: 14px;
+        opacity: 0.9;
+        margin-bottom: 5px;
+    }
+
+    .log-stats__value {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    @media (max-width: 768px) {
+        .logs-container {
+            padding: 15px;
+        }
+
+        .log-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .log-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="logs-container">
+    <h1 class="logs-title">Логи ошибок amoCRM</h1>
+
+    <div class="log-stats">
+        <div class="log-stats__item">
+            <div class="log-stats__label">Ошибок в amocrm.log:</div>
+            <div class="log-stats__value">{{ amocrm_logs|length }}</div>
+        </div>
+        <div class="log-stats__item">
+            <div class="log-stats__label">Ошибок в errors.log:</div>
+            <div class="log-stats__value">{{ errors_logs|length }}</div>
+        </div>
+    </div>
+
+    <div class="log-actions">
+        <a href="/admin/main/amocrmtoken/" class="log-btn log-btn--back">Вернуться к токенам</a>
+        <a href="/admin/main/amocrmtoken/logs/" class="log-btn log-btn--refresh">Обновить логи</a>
+    </div>
+
+    <div class="log-section">
+        <div class="log-section__header">logs/amocrm.log (последние 100 ошибок)</div>
+        <div class="log-section__content">
+            {% if amocrm_logs %}
+            {% for line in amocrm_logs %}
+            <div class="log-line">{{ line }}</div>
+            {% endfor %}
+            {% else %}
+            <div class="log-empty">Ошибок не найдено</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="log-section">
+        <div class="log-section__header">logs/errors.log (последние 50 строк с упоминанием amoCRM)</div>
+        <div class="log-section__content">
+            {% if errors_logs %}
+            {% for line in errors_logs %}
+            <div class="log-line">{{ line }}</div>
+            {% endfor %}
+            {% else %}
+            <div class="log-empty">Ошибок с amoCRM не найдено</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

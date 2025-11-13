@@ -6,16 +6,21 @@ from django import forms
 from modeltranslation.admin import TranslationTabularInline, TranslationStackedInline, TabbedTranslationAdmin
 from reversion.admin import VersionAdmin
 from reversion.models import Version
+from datetime import datetime
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from main.models import AmoCRMToken
+from main.services.amocrm.token_manager import TokenManager
 from .models import (
     News, NewsBlock, ContactForm, Vacancy, 
     VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
     JobApplication, FeatureIcon, Product, ProductParameter, ProductFeature, 
     ProductCardSpec, ProductGallery, DealerService, Dealer,
-    BecomeADealerPage, DealerRequirement, BecomeADealerApplication
+    BecomeADealerPage, DealerRequirement, BecomeADealerApplication,
 )
 import openpyxl
-from datetime import datetime
-from django.http import HttpResponse
+
 
 admin.site.site_header = "Панель управления VUM"
 admin.site.site_title = "VUM Admin"
@@ -106,11 +111,32 @@ class LeadManagerMixin:
         # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНОЕ ПРАВО на удаление
         model_name = self.model._meta.model_name
         return request.user.has_perm(f'main.delete_{model_name}')
-
+        
+class AmoCRMAdminMixin:
+    """Миксин для управления amoCRM"""
+    def has_module_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        
+        if request.user.groups.filter(name='Главные админы').exists():
+            return True
+        
+        return False
+    
+    def has_view_permission(self, request, obj=None):
+        return self.has_module_permission(request)
+    
+    def has_change_permission(self, request, obj=None):
+        return self.has_module_permission(request)
+    
+    def has_add_permission(self, request):
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 class CustomReversionMixin:
     """Миксин для кастомного шаблона восстановления"""
-    
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -302,7 +328,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     ]
     autocomplete_fields = ['manager']
     date_hierarchy = 'created_at'
-    actions = ['export_to_excel']
+    actions = ['export_to_excel', 'retry_failed_leads']
 
     fieldsets = (
         ('Информация о клиенте', {
@@ -322,40 +348,81 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         }),
     )
     
-    # ========== НОВЫЕ МЕТОДЫ ==========
+    class Media:
+        css = {
+            'all': ('css/amocrm_modal.css',)
+        }
+        js = ('js/amocrm_modal.js',)
     
     def amocrm_badge(self, obj):
         """Бейдж со статусом amoCRM"""
         if obj.amocrm_status == 'sent':
             return format_html(
-                '<span style="background:#28a745;color:white;padding:4px 8px;border-radius:4px;font-weight:600;">✅ Отправлено</span>'
+                '<span style="background:#28a745;color:white;padding:4px 8px;border-radius:4px;font-weight:600;">Отправлено</span>'
             )
         elif obj.amocrm_status == 'failed':
+            error_text = obj.amocrm_error if obj.amocrm_error else 'Неизвестная ошибка'
+            # Экранируем кавычки
+            error_text = error_text.replace('"', '&quot;').replace("'", '&#39;')
             return format_html(
-                '<span style="background:#dc3545;color:white;padding:4px 8px;border-radius:4px;font-weight:600;" title="{}">❌ Ошибка</span>',
-                obj.amocrm_error[:100] if obj.amocrm_error else 'Неизвестная ошибка'
+                '<span class="amocrm-error-badge" data-error="{}" style="background:#dc3545;color:white;padding:4px 8px;border-radius:4px;font-weight:600;cursor:pointer;">Ошибка</span>',
+                error_text
             )
         else:  # pending
             return format_html(
-                '<span style="background:#ffc107;color:#000;padding:4px 8px;border-radius:4px;font-weight:600;">⏳ Ожидает</span>'
+                '<span style="background:#ffc107;color:#000;padding:4px 8px;border-radius:4px;font-weight:600;">Ожидает</span>'
             )
     
     amocrm_badge.short_description = "amoCRM"
-    amocrm_badge.admin_order_field = 'amocrm_status' 
+    amocrm_badge.admin_order_field = 'amocrm_status'
     
     def amocrm_lead_link(self, obj):
         """Ссылка на лид в amoCRM"""
         if obj.amocrm_lead_id:
             url = f"https://fawtrucks.amocrm.ru/leads/detail/{obj.amocrm_lead_id}"
             return format_html(
-                '<a href="{}" target="_blank" style="color:#007bff;font-weight:600;">🔗 Открыть в amoCRM (ID: {})</a>',
+                '<a href="{}" target="_blank" style="color:#007bff;font-weight:600;">Открыть в amoCRM (ID: {})</a>',
                 url, obj.amocrm_lead_id
             )
         return "—"
     
     amocrm_lead_link.short_description = "Ссылка на лид"
     
-    # ========== ОБНОВЛЁННЫЙ ЭКСПОРТ В EXCEL ==========
+    def retry_failed_leads(self, request, queryset):
+        """Повторная отправка ошибочных лидов"""
+        failed_leads = queryset.filter(amocrm_status='failed')
+        
+        if not failed_leads.exists():
+            self.message_user(request, 'Нет ошибочных заявок для повторной отправки', level=messages.WARNING)
+            return
+        
+        success_count = 0
+        fail_count = 0
+        
+        for lead in failed_leads:
+            try:
+                from main.services.amocrm.lead_sender import LeadSender
+                # Сбрасываем статус перед повторной отправкой
+                lead.amocrm_status = 'pending'
+                lead.amocrm_error = None
+                lead.save()
+                
+                LeadSender.send_lead(lead)
+                lead.refresh_from_db()
+                
+                if lead.amocrm_status == 'sent':
+                    success_count += 1
+                else:
+                    fail_count += 1
+            except Exception:
+                fail_count += 1
+        
+        if success_count > 0:
+            self.message_user(request, f'Успешно отправлено: {success_count}', level=messages.SUCCESS)
+        if fail_count > 0:
+            self.message_user(request, f'Ошибка отправки: {fail_count}', level=messages.ERROR)
+    
+    retry_failed_leads.short_description = 'Повторно отправить ошибочные заявки'
     
     def export_to_excel(self, request, queryset):
         import openpyxl
@@ -367,7 +434,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         ws = wb.active
         ws.title = "Заявки FAW UZ"
         
-        # Заголовки (добавили колонки amoCRM)
         headers = [
             '№', 'ФИО', 'Телефон', 'Регион', 'Сообщение', 
             'Статус', 'Приоритет', 'Менеджер', 'Дата',
@@ -375,7 +441,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         ]
         ws.append(headers)
         
-        # Стиль заголовков
         header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
         header_font = Font(bold=True, color='FFFFFF')
         
@@ -384,7 +449,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
             cell.font = header_font
             cell.alignment = Alignment(horizontal='center', vertical='center')
         
-        # Данные
         for idx, contact in enumerate(queryset, start=1):
             ws.append([
                 idx,
@@ -396,19 +460,16 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
                 contact.get_priority_display(),
                 contact.manager.username if contact.manager else '-',
                 contact.created_at.strftime('%d.%m.%Y %H:%M'),
-                # amoCRM поля
                 contact.get_amocrm_status_display(),
                 contact.amocrm_lead_id or '-',
                 contact.amocrm_sent_at.strftime('%d.%m.%Y %H:%M') if contact.amocrm_sent_at else '-',
                 contact.amocrm_error[:100] if contact.amocrm_error else '-'
             ])
         
-        # Автоширина колонок
         for column in ws.columns:
             max_length = max(len(str(cell.value)) for cell in column)
             ws.column_dimensions[column[0].column_letter].width = min(max_length + 2, 50)
         
-        # Ответ
         response = HttpResponse(
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
@@ -417,6 +478,24 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         return response
     
     export_to_excel.short_description = 'Экспорт в Excel (с amoCRM)'
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        formfield = super().formfield_for_foreignkey(db_field, request, **kwargs)
+        if db_field.name == "manager":
+            formfield.widget.can_add_related = False
+            formfield.widget.can_change_related = False
+            formfield.widget.can_delete_related = False
+            formfield.widget.can_view_related = False
+        return formfield
+    
+    def action_buttons(self, obj):
+        return format_html('''
+            <div style="display: flex; gap: 10px;">
+                <a href="{}" style="color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: orange;">✏️</a>
+                <a href="{}" onclick="return confirm('Удалить?')" style="color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: red;">🗑</a>
+            </div>
+        ''', f'/admin/main/contactform/{obj.id}/change/', f'/admin/main/contactform/{obj.id}/delete/')
+    action_buttons.short_description = "Действия"
     
     # ========== ОСТАЛЬНЫЕ МЕТОДЫ БЕЗ ИЗМЕНЕНИЙ ==========
     
@@ -870,3 +949,193 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
         extra_context['show_slider_info'] = True
         
         return super().changelist_view(request, extra_context)
+
+@admin.register(AmoCRMToken)
+class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
+    list_display = ['token_status', 'expires_display', 'time_left_display', 'action_buttons']
+    
+    # ========== ОТОБРАЖЕНИЕ ==========
+    def token_status(self, obj):
+        """Статус токена"""
+        from django.utils import timezone
+        
+        if not obj.access_token:
+            return format_html(
+                '<span style="background:#dc3545;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">Не настроен</span>'
+            )
+        
+        if obj.is_expired():
+            return format_html(
+                '<span style="background:#ffc107;color:#000;padding:6px 12px;border-radius:6px;font-weight:600;">Истекает скоро</span>'
+            )
+        
+        return format_html(
+            '<span style="background:#28a745;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">Валиден</span>'
+        )
+    
+    token_status.short_description = "Статус"
+    
+    def expires_display(self, obj):
+        """Дата истечения"""
+        if obj.expires_at:
+            return obj.expires_at.strftime('%d.%m.%Y %H:%M')
+        return "—"
+    
+    expires_display.short_description = "Истекает"
+    
+    def time_left_display(self, obj):
+        """Оставшееся время"""
+        from django.utils import timezone
+        
+        if not obj.expires_at:
+            return "—"
+        
+        time_left = obj.expires_at - timezone.now()
+        
+        if time_left.total_seconds() < 0:
+            return format_html('<span style="color:#dc3545;font-weight:600;">Истёк</span>')
+        
+        days = time_left.days
+        hours = int(time_left.seconds / 3600)
+        minutes = int((time_left.seconds % 3600) / 60)
+        
+        if time_left.total_seconds() < 3600:
+            color = '#dc3545'
+        elif time_left.total_seconds() < 7200:
+            color = '#ffc107'
+        else:
+            color = '#28a745'
+        
+        if days > 0:
+            text = f"{days} дн. {hours} ч."
+        elif hours > 0:
+            text = f"{hours} ч. {minutes} мин."
+        else:
+            text = f"{minutes} мин."
+        
+        return format_html('<span style="color:{};font-weight:600;">{}</span>', color, text)
+    
+    time_left_display.short_description = "Осталось"
+    
+    def action_buttons(self, obj):
+        """Кнопки действий"""
+        return format_html('''
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <a href="/admin/main/amocrmtoken/refresh/" 
+                   class="button" 
+                   style="background:#007bff;color:white;padding:6px 12px;border-radius:4px;text-decoration:none;white-space:nowrap;">
+                    Обновить токен
+                </a>
+                <a href="/admin/main/amocrmtoken/logs/" 
+                   class="button" 
+                   style="background:#dc3545;color:white;padding:6px 12px;border-radius:4px;text-decoration:none;white-space:nowrap;">
+                    Логи ошибок
+                </a>
+                <a href="/admin/main/amocrmtoken/instructions/" 
+                   class="button" 
+                   style="background:#6c757d;color:white;padding:6px 12px;border-radius:4px;text-decoration:none;white-space:nowrap;">
+                    Инструкция
+                </a>
+            </div>
+        ''')
+    
+    action_buttons.short_description = "Действия"
+    
+    # ========== МАРШРУТЫ ==========
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        custom_urls = [
+            path('refresh/', self.admin_site.admin_view(self.refresh_token_view), name='amocrm_refresh'),
+            path('logs/', self.admin_site.admin_view(self.logs_view), name='amocrm_logs'),
+            path('instructions/', self.admin_site.admin_view(self.instructions_view), name='amocrm_instructions'),
+        ]
+        return custom_urls + urls
+    
+    # ========== ОБРАБОТЧИКИ ==========
+    def refresh_token_view(self, request):
+        """Обновить токен вручную"""
+        try:
+            token_obj = AmoCRMToken.get_instance()
+            
+            if not token_obj.refresh_token:
+                messages.error(request, 'Refresh token не найден. Настройте токены заново.')
+                return redirect('/admin/main/amocrmtoken/')
+            
+            TokenManager.refresh_token(token_obj)
+            messages.success(request, f'Токен успешно обновлён. Истекает: {token_obj.expires_at.strftime("%d.%m.%Y %H:%M")}')
+            
+        except Exception as e:
+            messages.error(request, f'Ошибка обновления: {str(e)}')
+        
+        return redirect('/admin/main/amocrmtoken/')
+    
+    def logs_view(self, request):
+        """Показать логи ошибок amoCRM"""
+        import os
+        from django.conf import settings
+        
+        amocrm_log_path = os.path.join(settings.BASE_DIR, 'logs', 'amocrm.log')
+        errors_log_path = os.path.join(settings.BASE_DIR, 'logs', 'errors.log')
+        
+        amocrm_logs = []
+        errors_logs = []
+        
+        if os.path.exists(amocrm_log_path):
+            try:
+                with open(amocrm_log_path, 'r', encoding='utf-8') as f:
+                    lines = f.readlines()
+                    amocrm_logs = [line.strip() for line in lines if 'ERROR' in line or 'CRITICAL' in line][-100:]
+            except Exception as e:
+                amocrm_logs = [f"Ошибка чтения amocrm.log: {str(e)}"]
+        
+        if os.path.exists(errors_log_path):
+            try:
+                with open(errors_log_path, 'r', encoding='utf-8') as f:
+                    lines = f.readlines()
+                    errors_logs = [line.strip() for line in lines if 'amocrm' in line.lower() or 'amoCRM' in line][-50:]
+            except Exception as e:
+                errors_logs = [f"Ошибка чтения errors.log: {str(e)}"]
+        
+        context = {
+            **self.admin_site.each_context(request),
+            'title': 'Логи ошибок amoCRM',
+            'amocrm_logs': amocrm_logs,
+            'errors_logs': errors_logs,
+        }
+        return render(request, 'main/amocrm_logs.html', context)
+    
+    def instructions_view(self, request):
+        """Показать инструкцию"""
+        from django.utils import timezone
+        
+        token_obj = AmoCRMToken.get_instance()
+        time_left_text = None
+        
+        if token_obj.expires_at:
+            time_left = token_obj.expires_at - timezone.now()
+            
+            if time_left.total_seconds() < 0:
+                time_left_text = "Токен истёк"
+            else:
+                days = time_left.days
+                hours = int(time_left.seconds / 3600)
+                minutes = int((time_left.seconds % 3600) / 60)
+                
+                parts = []
+                if days > 0:
+                    parts.append(f"{days} дн.")
+                if hours > 0:
+                    parts.append(f"{hours} ч.")
+                if minutes > 0:
+                    parts.append(f"{minutes} мин.")
+                
+                time_left_text = " ".join(parts) if parts else "Менее минуты"
+        
+        context = {
+            **self.admin_site.each_context(request),
+            'title': 'Инструкция: Обновление токенов amoCRM',
+            'token': token_obj,
+            'time_left_text': time_left_text,
+        }
+        return render(request, 'main/amocrm_instructions.html', context)
