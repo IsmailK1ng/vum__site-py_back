@@ -4173,7 +4173,6 @@ body[data-theme="dark"] .btn-rotating .btn-rotating__text text {
 
 form {
   position: relative;
-  width: 100%;
 }
 form input, form textarea {
   position: relative;

@@ -238,17 +238,7 @@
 
     <!-- Секция — слайдер FAW (начало) -->
     <!-- Скрытый элемент с данными слайдера из Django -->
-    <script id="slider-data" type="application/json">
-    {{ slider_products|safe }}
-    </script>
-
-    <!-- ========== DEBUG INFO (удалить в продакшене) ========== -->
-    {% if featured_count > 0 %}
-    <!-- ✅ Загружено {{ featured_count }} слайдов из базы данных -->
-    {% else %}
-    <!-- ⚠️ Нет продуктов для слайдера, используются fallback слайды -->
-    {% endif %}
-
+    <div id="slider-data" style="display: none;">{{ slider_products|safe }}</div>
     <!-- Секция — слайдер FAW (начало) -->
     <div class="mxd-section overflow-hidden" style="margin-top: 6.3rem;">
       <div class="mxd-container">

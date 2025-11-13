@@ -13,7 +13,15 @@
             font-family: var(--_font-default);
         }
 
-        h1, h2, h3, h4, h5, h6, a, .mxd-logo__text, .btn-caption {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        a,
+        .mxd-logo__text,
+        .btn-caption {
             font-family: var(--_font-accent);
         }
     </style>
@@ -129,7 +137,8 @@
         <!-- Элементы управления -->
         <div class="mxd-header__controls loading__fade">
             <!-- Переключатель языка -->
-            <form action="{% url 'set_language' %}" method="post" class="language-switcher-form" style="display: inline;">
+            <form action="{% url 'set_language' %}" method="post" class="language-switcher-form"
+                style="display: inline;">
                 {% csrf_token %}
                 <input type="hidden" name="language" value="" id="language-input">
                 <div class="language-switcher">
@@ -138,17 +147,22 @@
                     </span>
                     <span class="language-arrow">▼</span>
                     <div class="language-dropdown">
-                        <a href="#" class="language-option {% if LANGUAGE_CODE == 'uz' %}active{% endif %}" data-lang="uz" onclick="switchLanguage('uz'); return false;">O'zbek</a>
-                        <a href="#" class="language-option {% if LANGUAGE_CODE == 'ru' %}active{% endif %}" data-lang="ru" onclick="switchLanguage('ru'); return false;">Русский</a>
-                        <a href="#" class="language-option {% if LANGUAGE_CODE == 'en' %}active{% endif %}" data-lang="en" onclick="switchLanguage('en'); return false;">English</a>
+                        <a href="#" class="language-option {% if LANGUAGE_CODE == 'uz' %}active{% endif %}"
+                            data-lang="uz" onclick="switchLanguage('uz'); return false;">O'zbek</a>
+                        <a href="#" class="language-option {% if LANGUAGE_CODE == 'ru' %}active{% endif %}"
+                            data-lang="ru" onclick="switchLanguage('ru'); return false;">Русский</a>
+                        <a href="#" class="language-option {% if LANGUAGE_CODE == 'en' %}active{% endif %}"
+                            data-lang="en" onclick="switchLanguage('en'); return false;">English</a>
                     </div>
                 </div>
             </form>
 
-            <button id="color-switcher" class="mxd-color-switcher" type="button" role="switch" aria-label="light/dark mode" aria-checked="true"></button>
+            <button id="color-switcher" class="mxd-color-switcher" type="button" role="switch"
+                aria-label="light/dark mode" aria-checked="true"></button>
 
             {% if request.resolver_match.url_name == 'home' %}
-            <a class="btn btn-anim btn-default btn-mobile-icon btn-outline slide-right-up" style="gap: 0;" href="#faw-main-contact-form" aria-label="Перейти к форме связи">
+            <a class="btn btn-anim btn-default btn-mobile-icon btn-outline slide-right-up" style="gap: 0;"
+                href="#faw-main-contact-form" aria-label="Перейти к форме связи">
                 <span class="btn-caption"></span>
                 <i class="ph-bold ph-arrow-up-right"></i>
             </a>
@@ -171,14 +185,14 @@
                 <div class="mxd-menu__inner">
                     <div class="mxd-menu__left">
                         <p class="mxd-menu__caption menu-fade-in">
-                            🚚 FAW Trucks Uzbekistan<br>
+                            FAW Trucks Uzbekistan<br>
                             {% if LANGUAGE_CODE == 'ru' %}Надежные транспортные решения{% elif LANGUAGE_CODE == 'en' %}Reliable transport solutions{% else %}Ishonchli transport yechimlari{% endif %}
                         </p>
                         <div class="main-menu">
                             <nav class="main-menu__content">
                                 <ul id="main-menu" class="main-menu__accordion">
                                     <li class="main-menu__item">
-                                        <a class="main-menu__link btn btn-anim" href="{% url 'home' %}">
+                                        <a class="main-menu__link btn" href="{% url 'home' %}">
                                             <span class="btn-caption">
                                                 {% if LANGUAGE_CODE == 'ru' %}Главная{% elif LANGUAGE_CODE == 'en' %}Home{% else %}Bosh sahifa{% endif %}
                                             </span>
@@ -186,14 +200,12 @@
                                     </li>
                                     <li class="main-menu__item">
                                         <div class="main-menu__toggle">
-                                            <span class="main-menu__link btn btn-anim">
+                                            <span class="main-menu__link btn">
                                                 <span class="btn-caption">
                                                     {% if LANGUAGE_CODE == 'ru' %}Дилеры{% elif LANGUAGE_CODE == 'en' %}Dealers{% else %}Dilerlar{% endif %}
                                                 </span>
+                                                <span class="main-menu__arrow" style="font-size: 20px;">▼</span>
                                             </span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" version="1.1" viewBox="0 0 20 20">
-                                                <path d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0-1.2,0-1.7.2H.4c-.2,0-.4.2-.4.4s.2.4.4.4h4.1c.4,0,1.7.2,1.7.2.6,0,1.1.2,1.6.6.4.3.8.7,1.1,1.1.3.5.5,1,.6,1.6,0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4h0Z" />
-                                            </svg>
                                         </div>
                                         <ul class="submenu">
                                             <li class="submenu__item">
@@ -209,21 +221,62 @@
                                         </ul>
                                     </li>
                                     <li class="main-menu__item">
-                                        <a class="main-menu__link btn btn-anim" href="{% url 'news' %}">
+                                        <div class="main-menu__toggle">
+                                            <span class="main-menu__link">
+                                                {% if LANGUAGE_CODE == 'ru' %}Модели{% elif LANGUAGE_CODE == 'en' %}Models{% else %}Modellar{% endif %}
+                                                <span class="main-menu__arrow" style="font-size: 15px;">▼</span>
+                                            </span>
+                                        </div>
+                                        <ul class="submenu">
+                                            <li class="submenu__item">
+                                                <a href="{% url 'products' %}?category=shatakchi" class="submenu__link">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Седельные тягачи{% elif LANGUAGE_CODE == 'en' %}Truck tractors{% else %}Shatakchi mashinalar{% endif %}
+                                                </a>
+                                            </li>
+                                            <li class="submenu__item">
+                                                <a href="{% url 'products' %}?category=samosval" class="desktop-submenu__link">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Самосвалы{% elif LANGUAGE_CODE == 'en' %}Dump trucks{% else %}Samosvallar{% endif %}
+                                                </a>
+                                            </li>
+                                            <li class="submenu__item">
+                                                <a href="{% url 'products' %}?category=maxsus" class="desktop-submenu__link">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Спецтехника{% elif LANGUAGE_CODE == 'en' %}Special equipment{% else %}Maxsus texnika{% endif %}
+                                                </a>
+                                            </li>
+                                            <li class="submenu__item">
+                                                <a href="{% url 'products' %}?category=furgon" class="desktop-submenu__link">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Фургоны{% elif LANGUAGE_CODE == 'en' %}Vans{% else %}Avtofurgonlar{% endif %}
+                                                </a>
+                                            </li>
+                                            <li class="submenu__item">
+                                                <a href="{% url 'products' %}?category=shassi" class="desktop-submenu__link">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Шасси{% elif LANGUAGE_CODE == 'en' %}Chassis{% else %}Shassilar{% endif %}
+                                                </a>
+                                            </li>
+                                            <li class="submenu__item">
+                                                <a href="{% url 'products' %}?category=tiger_v" class="desktop-submenu__link">Tiger V</a>
+                                            </li>
+                                            <li class="submenu__item">
+                                                <a href="{% url 'products' %}?category=tiger_vr" class="desktop-submenu__link">Tiger VR</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="main-menu__item">
+                                        <a class="main-menu__link btn" href="{% url 'news' %}">
                                             <span class="btn-caption">
                                                 {% if LANGUAGE_CODE == 'ru' %}Новости компании{% elif LANGUAGE_CODE == 'en' %}Company news{% else %}Kompaniya yangiliklari{% endif %}
                                             </span>
                                         </a>
                                     </li>
                                     <li class="main-menu__item">
-                                        <a class="main-menu__link btn btn-anim" href="{% url 'about' %}">
+                                        <a class="main-menu__link btn" href="{% url 'about' %}">
                                             <span class="btn-caption">
                                                 {% if LANGUAGE_CODE == 'ru' %}О компании{% elif LANGUAGE_CODE == 'en' %}About{% else %}Kompaniya haqida{% endif %}
                                             </span>
                                         </a>
                                     </li>
                                     <li class="main-menu__item">
-                                        <a class="main-menu__link btn btn-anim" href="{% url 'contact' %}">
+                                        <a class="main-menu__link btn" href="{% url 'contact' %}">
                                             <span class="btn-caption">
                                                 {% if LANGUAGE_CODE == 'ru' %}Контакты{% elif LANGUAGE_CODE == 'en' %}Contacts{% else %}Bog'lanish{% endif %}
                                             </span>
@@ -236,7 +289,6 @@
                     <div class="mxd-menu__data menu-fade-in">
                         <p class="t-xsmall">
                             FAW Trucks Uzbekistan
-                            <i class="ph-fill ph-heart t-additional"></i>
                         </p>
                         <p class="t-xsmall">
                             <i class="ph ph-copyright"></i>
@@ -249,11 +301,12 @@
     </nav>
 
     <script>
-    function switchLanguage(lang) {
-        console.log('Switching to language:', lang);
-        document.getElementById('language-input').value = lang;
-        document.querySelector('.language-switcher-form').submit();
-    }
+        function switchLanguage(lang) {
+            console.log('Switching to language:', lang);
+            document.getElementById('language-input').value = lang;
+            document.querySelector('.language-switcher-form').submit();
+        }
     </script>
 </body>
+
 </html>

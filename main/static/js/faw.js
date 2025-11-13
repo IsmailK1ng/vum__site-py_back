@@ -56,32 +56,69 @@ function initFAWCounters() {
 let slides = [];
 
 function initializeSlidesFromDjango() {
+  
   const sliderDataElement = document.getElementById('slider-data');
 
-  if (sliderDataElement && sliderDataElement.textContent && sliderDataElement.textContent.trim()) {
-    try {
-      const djangoSlides = JSON.parse(sliderDataElement.textContent);
-
-      if (Array.isArray(djangoSlides) && djangoSlides.length > 0) {
-        slides = djangoSlides.map(slide => ({
-          year: slide.year || "2025",
-          title: slide.title || "FAW Truck",
-          price: slide.price || "Narx so'rang",
-          power: slide.power || "—",
-          mpg: slide.mpg || "—",
-          image: slide.image || null,
-          cta: [{ type: "main", label: "Batafsil", link: slide.link || "#" }]
-        }));
-
-        console.log(`✅ Loaded ${slides.length} slides from Django`);
-        return true;
-      }
-    } catch (error) {
-      console.error('❌ Error parsing slider data:', error);
-    }
+  if (!sliderDataElement) {
+    loadFallbackSlides();
+    return false;
   }
 
-  // Fallback: используем дефолтные слайды, если Django данных нет
+
+  // Получаем содержимое в зависимости от типа элемента
+  let content = '';
+  
+  if (sliderDataElement.tagName === 'SCRIPT') {
+    // Если это <script type="application/json">
+    content = sliderDataElement.textContent || sliderDataElement.innerHTML;
+  } else {
+    // Если это <div> или другой элемент
+    content = sliderDataElement.textContent;
+  }
+
+  // Убираем лишние пробелы и переносы строк
+  content = content.trim();
+
+
+  if (!content) {
+    loadFallbackSlides();
+    return false;
+  }
+
+  try {
+    const djangoSlides = JSON.parse(content);
+
+    if (!Array.isArray(djangoSlides)) {
+      loadFallbackSlides();
+      return false;
+    }
+
+    if (djangoSlides.length === 0) {
+      loadFallbackSlides();
+      return false;
+    }
+
+    slides = djangoSlides.map(slide => ({
+      year: slide.year || "2025",
+      title: slide.title || "FAW Truck",
+      price: slide.price || "Narx so'rang",
+      power: slide.power || "—",
+      mpg: slide.mpg || "—",
+      image: slide.image || null,
+      cta: [{ type: "main", label: "Batafsil", link: slide.link || "#" }]
+    }));
+
+    return true;
+
+  } catch (error) {
+    loadFallbackSlides();
+    return false;
+  }
+}
+
+function loadFallbackSlides() {
+  console.warn('⚠️ Using fallback slides (no Django data found)');
+  
   slides = [
     {
       year: "2025",
@@ -111,11 +148,9 @@ function initializeSlidesFromDjango() {
       cta: [{ type: "main", label: "Batafsil", link: "#" }]
     }
   ];
-
-  console.warn('⚠️ Using fallback slides (no Django data found)');
-  return false;
+  
+  console.log('📊 Fallback slides loaded:', slides.length);
 }
-
 function getPlaceholderSVG(title, size = "large") {
   const dimensions = size === "large" ? { w: 420, h: 210, fs: 28 } : { w: 210, h: 105, fs: 14 };
   return `<svg width="${dimensions.w}" height="${dimensions.h}" viewBox="0 0 ${dimensions.w} ${dimensions.h}" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -522,12 +557,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (header) {
       const savedTheme = getTheme();
       setTheme(savedTheme);
-      console.log('Theme initialized from localStorage:', savedTheme);
 
       header.classList.remove('transparent', 'mxd-header');
       header.classList.add('solid');
 
-      console.log('Header found and initialized with adaptive theme');
 
       updateHeaderTheme();
 
@@ -560,14 +593,10 @@ document.addEventListener('DOMContentLoaded', function () {
           const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
           setTheme(newTheme);
           setTimeout(updateHeaderTheme, 50);
-          console.log('Theme switched to:', newTheme);
         });
-        console.log('Theme switcher button found and connected');
       }
 
-      console.log('Fixed header scroll listener, resize listener and theme observer added');
     } else {
-      console.log('Header not found yet, will retry...');
       setTimeout(initHeader, 100);
     }
   }
@@ -688,15 +717,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (phoneInputs.length === 0) return;
 
-    console.log(`Found ${phoneInputs.length} phone input(s), initializing masks...`);
 
     phoneInputs.forEach((phoneInput, index) => {
       if (phoneInput.dataset.phoneMaskInitialized) return;
-      console.log(`Initializing phone mask for input #${index + 1}:`, phoneInput.id || phoneInput.name);
       initPhoneMask(phoneInput);
     });
 
-    console.log('Universal phone mask initialized for all phone inputs');
   }
 
   // Инициализация только один раз при загрузке
@@ -718,11 +744,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const dealerForm = document.getElementById('becomeADealerForm');
 
     if (!dealerForm) {
-      console.log('Dealer form not found on this page');
       return;
     }
 
-    console.log('Dealer form found, initializing...');
 
     dealerForm.addEventListener('submit', async function (e) {
       e.preventDefault();
@@ -774,7 +798,6 @@ document.addEventListener('DOMContentLoaded', function () {
           this.reset();
           if (phoneInput) phoneInput.value = '+998 ';
 
-          console.log('Dealer application submitted successfully');
         } else {
           throw new Error(data.message || 'Xatolik yuz berdi');
         }

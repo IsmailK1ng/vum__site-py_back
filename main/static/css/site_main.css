@@ -1204,6 +1204,7 @@ body[data-theme="dark"] .mxd-logo {
     font-size: 14px;
     font-weight: 500;
     color: var(--mxd-color-text);
+    height: 100%;
 }
 
 .language-switcher:hover {
