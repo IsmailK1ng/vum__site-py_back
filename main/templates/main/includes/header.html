@@ -1,33 +1,4 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE }}">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAW Trucks</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400;600;700&family=Funnel+Sans:wght@400;600;700&display=swap');
-
-        html {
-            font-family: var(--_font-default);
-        }
-
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6,
-        a,
-        .mxd-logo__text,
-        .btn-caption {
-            font-family: var(--_font-accent);
-        }
-    </style>
-</head>
-
-<body>
     <nav id="header" class="mxd-nav__wrap" data-lenis-prevent="">
         <!-- Логотип -->
         <div class="mxd-header__logo loading__fade">
@@ -74,11 +45,6 @@
                     </a>
                     <ul class="desktop-submenu">
                         <li class="desktop-submenu__item">
-                            <a href="{% url 'products' %}?category=shatakchi" class="desktop-submenu__link">
-                                {% if LANGUAGE_CODE == 'ru' %}Седельные тягачи{% elif LANGUAGE_CODE == 'en' %}Truck tractors{% else %}Shatakchi mashinalar{% endif %}
-                            </a>
-                        </li>
-                        <li class="desktop-submenu__item">
                             <a href="{% url 'products' %}?category=samosval" class="desktop-submenu__link">
                                 {% if LANGUAGE_CODE == 'ru' %}Самосвалы{% elif LANGUAGE_CODE == 'en' %}Dump trucks{% else %}Samosvallar{% endif %}
                             </a>
@@ -100,6 +66,11 @@
                         </li>
                         <li class="desktop-submenu__item">
                             <a href="{% url 'products' %}?category=tiger_v" class="desktop-submenu__link">Tiger V</a>
+                        </li>
+                        <li class="desktop-submenu__item">
+                            <a href="{% url 'products' %}?category=tiger_vh" class="desktop-submenu__link">
+                                {% if LANGUAGE_CODE == 'ru' %}Tiger VH{% elif LANGUAGE_CODE == 'en' %}Tiger VH{% else %}Tiger VH{% endif %}
+                            </a>
                         </li>
                         <li class="desktop-submenu__item">
                             <a href="{% url 'products' %}?category=tiger_vr" class="desktop-submenu__link">Tiger VR</a>
@@ -229,11 +200,6 @@
                                         </div>
                                         <ul class="submenu">
                                             <li class="submenu__item">
-                                                <a href="{% url 'products' %}?category=shatakchi" class="submenu__link">
-                                                    {% if LANGUAGE_CODE == 'ru' %}Седельные тягачи{% elif LANGUAGE_CODE == 'en' %}Truck tractors{% else %}Shatakchi mashinalar{% endif %}
-                                                </a>
-                                            </li>
-                                            <li class="submenu__item">
                                                 <a href="{% url 'products' %}?category=samosval" class="desktop-submenu__link">
                                                     {% if LANGUAGE_CODE == 'ru' %}Самосвалы{% elif LANGUAGE_CODE == 'en' %}Dump trucks{% else %}Samosvallar{% endif %}
                                                 </a>
@@ -255,6 +221,11 @@
                                             </li>
                                             <li class="submenu__item">
                                                 <a href="{% url 'products' %}?category=tiger_v" class="desktop-submenu__link">Tiger V</a>
+                                            </li>
+                                            <li class="submenu__item">
+                                                <a href="{% url 'products' %}?category=tiger_vh" class="submenu__link">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Tiger VH{% elif LANGUAGE_CODE == 'en' %}Tiger VH{% else %}Tiger VH{% endif %}
+                                                </a>
                                             </li>
                                             <li class="submenu__item">
                                                 <a href="{% url 'products' %}?category=tiger_vr" class="desktop-submenu__link">Tiger VR</a>
@@ -307,6 +278,3 @@
             document.querySelector('.language-switcher-form').submit();
         }
     </script>
-</body>
-
-</html>

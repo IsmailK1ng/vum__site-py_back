@@ -207,31 +207,27 @@ class ContactFormViewSet(viewsets.ModelViewSet):
         return queryset
     
     def create(self, request, *args, **kwargs):
-        import logging
-        logger = logging.getLogger('amocrm')
-        
         try:
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             
             contact_form = serializer.save()
             
+            # Отправка в amoCRM
             try:
                 from main.services.amocrm.lead_sender import LeadSender
-                
                 LeadSender.send_lead(contact_form)
                 contact_form.refresh_from_db()
                 
+                # Если отправка успешна
                 if contact_form.amocrm_status == 'sent':
-                    logger.info(f"✅ Лид #{contact_form.id} отправлен в amoCRM. Lead ID: {contact_form.amocrm_lead_id}")
+                    logger.info(f"✅ Лид #{contact_form.id} успешно отправлен в amoCRM (ID: {contact_form.amocrm_lead_id})")
                 else:
-                    logger.warning(f"⚠️ Лид #{contact_form.id} НЕ отправлен: {contact_form.amocrm_error}")
+                    logger.warning(f"⚠️  Лид #{contact_form.id} не отправлен: {contact_form.amocrm_error}")
                     
             except Exception as amocrm_error:
-                logger.error(
-                    f"❌ Критическая ошибка amoCRM для лида #{contact_form.id}: {str(amocrm_error)}",
-                    exc_info=True
-                )
+                # Логируем ошибку, но НЕ прерываем ответ пользователю
+                logger.error(f"❌ Ошибка отправки в amoCRM для лида #{contact_form.id}: {str(amocrm_error)}")
             
             return Response({
                 'success': True,
@@ -239,10 +235,10 @@ class ContactFormViewSet(viewsets.ModelViewSet):
             }, status=status.HTTP_201_CREATED)
             
         except Exception as e:
-            logger.error(f"❌ Ошибка создания заявки: {str(e)}", exc_info=True)
+            logger.error(f"❌ Ошибка создания ContactForm: {str(e)}")
             return Response({
                 'success': False,
-                'message': 'Xatolik yuz berdi. Qayta urinib ko\'ring.'
+                'message': 'Xatolik yuz berdi.'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     @action(detail=False, methods=['get'])
@@ -348,19 +344,9 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
 # ========== СТРАНИЦЫ С КАТЕГОРИЯМИ ==========
 def products(request):
     """Страница со списком продуктов по категориям"""
-    category = request.GET.get('category', 'shatakchi')
+    category = request.GET.get('category', 'tiger_vh')
     
     CATEGORY_DATA = {
-        'shatakchi': {
-            'title': 'Shatakchi mashinalar',
-            'title_ru': 'Седельные тягачи',
-            'title_en': 'Truck Tractors',
-            'slogan': 'Yarim tirkamani tortib olish uchun egarli-tirkovchi moslama bilan jihozlangan g\'ildirakli shatakchi',
-            'slogan_ru': 'Колесный тягач с седельно-сцепным устройством для буксировки полуприцепа',
-            'slogan_en': 'Wheel tractor with fifth wheel coupling for towing semi-trailers',
-            'hero_image': 'images/slider-foto_img/3.png',
-            'breadcrumb': 'Shatakchi mashinalar'
-        },
         'samosval': {
             'title': 'Samosvallar',
             'title_ru': 'Самосвалы',
@@ -421,9 +407,19 @@ def products(request):
             'hero_image': 'images/slider-foto_img/5.png',
             'breadcrumb': 'FAW Tiger VR'
         },
+        'tiger_vh': {
+            'title': 'FAW Tiger VH',
+            'title_ru': 'FAW Tiger VH',
+            'title_en': 'FAW Tiger VH',
+            'slogan': 'Ikki yoqilg\'ida harakatlanuvchi texnika',
+            'slogan_ru': 'Техника, работающая на двух видах топлива',
+            'slogan_en': 'Equipment operating on two types of fuel',
+            'hero_image': 'images/vh_models.png',
+            'breadcrumb': 'FAW Tiger VH'
+        },
     }
     
-    category_info = CATEGORY_DATA.get(category, CATEGORY_DATA['shatakchi'])
+    category_info = CATEGORY_DATA.get(category, CATEGORY_DATA['tiger_vh'])
     
     return render(request, 'main/products.html', {
         'category': category,

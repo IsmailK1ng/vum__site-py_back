@@ -229,7 +229,7 @@
     min-width: 350px;
     width: 100%;
     height: 100%;
-    background: #fff;
+    background: transparent;
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -308,6 +308,7 @@
     margin-bottom: 10px;
     fill: #fff;
     opacity: 1;
+    filter: brightness(0) invert(1);
 }
 
 .spec-value {
@@ -594,7 +595,7 @@ body[data-theme="dark"] .hero-05-title__item {
 
     .faw-truck-card {
         min-width: unset;
-        margin: 10px;
+        margin: 10px auto;
         max-width: 300px;
         width: 100%;
         height: auto;

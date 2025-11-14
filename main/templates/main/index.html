@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
 
 <head>
   <meta charset="UTF-8">
@@ -34,6 +34,38 @@
   <meta property="og:image" content="https://mixdesign.dev/themeforest/rayo/img/og-image.jpg">
   <!-- Мета для Facebook (конец) -->
 
+  <!-- Google Tag Manager Xurshid 1 chi kod -->
+  <script>(function (w, d, s, l, i) {
+      w[l] = w[l] || []; w[l].push({
+        'gtm.start':
+          new Date().getTime(), event: 'gtm.js'
+      }); var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-M33GWKMW');</script>
+  <!-- End Google Tag Manager Xurshid 1 chi kod-->
+
+  <!-- Meta Pixel Code Xurshid 2 chi kod-->
+  <script>
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return; n = f.fbq = function () {
+        n.callMethod ?
+          n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+      };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+      n.queue = []; t = b.createElement(e); t.async = !0;
+      t.src = v; s = b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t, s)
+    }(window, document, 'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2271244510044933');
+    fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  
+      src="https://www.facebook.com/tr?id=2271244510044933&ev=PageView&noscript=1" /></noscript>
+  <!-- End Meta Pixel Code  Xurshid 2 chi kod-->
+
   <!-- Подключение стилей (начало) -->
   <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
@@ -52,6 +84,13 @@
 </head>
 
 <body>
+
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
+      style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+
   {% include 'main/includes/header.html' %}
   <!-- Контент страницы (начало) -->
   <main id="mxd-page-content" class="mxd-page-content">
@@ -65,7 +104,7 @@
               <div class="mxd-hero-06__video">
                 <video class="video" preload="auto" autoplay="autoplay" loop="loop" muted="muted"
                   poster="https://dummyimage.com/1920x1080/5d5d5d/838383">
-                  <source type="video/mp4" src="{% static 'videos/2-variant.mp4' %}">
+                  <source type="video/mp4" src="{% static 'videos/1-variant.mp4' %}">
                   <!-- <source type="video/mp4" src="faw_site-video/1-variant.mp4"> -->
                 </video>
                 <div class="hero-06-video__cover"></div>
@@ -73,9 +112,10 @@
               <div class="mxd-hero-06__data">
                 <div class="mxd-hero-06__headline">
                   <div class="hero-06-headline__descr">
-                    <p class="loading__item text">Vum — bu muhandislik tafakkuri va
-                      sharq falsafasining metaldagi aksidir. Har bir FAW avtomobili orqali yuqori
-                      texnologiyalar, mukammallikka intilish va ming yillik tarixga ega Osiyo madaniyati uyg'unlashadi.
+                    <p class="loading__item text">Van Universal Motors (VUM) — O‘zbekistonda FAW tijorat texnikasining
+                      rasmiy
+                      ishlab chiqaruvchisi bo‘lib, kompaniya Andijon shahridagi o‘z zavodi va butun
+                      respublikani qamrab olgan dilerlik tarmog‘iga ega.
                     </p>
                     <div class="hero-06-headline__btn loading__item">
                       <a href="#0" class="btn-rotating btn-rotating-blur-outline ver-04 permanent-desktop">
@@ -147,15 +187,14 @@
               <div class="row g-0">
                 <div class="col-12 col-xl-12 mxd-grid-item no-margin">
                   <div class="mxd-section-title__hrtitle">
-                    <h2 class="reveal-type anim-uni-in-up">Bizning Mashinalar</h2>
+                    <h2 class="reveal-type anim-uni-in-up">Bizning texnikalar</h2>
                   </div>
                 </div>
                 <div class="col-12 col-xl-8 mxd-grid-item no-margin">
                   <div class="mxd-section-title__hrdescr">
-                    <p class="anim-uni-in-up">Vum — kuch va ishonch timsoli.
-                      Yo'llar uni tanlaydi, u yo'ldan qo'rqmaydi.
-                      Har bir burilish — yangi imkoniyat,
-                      Vum bilan hayot doim oldinga intiladi.
+                    <p class="anim-uni-in-up">VUM tomonidan ishlab chiqariladigan FAW modellarida ishonchlilik, sifat va
+                      qulaylik birlashtirilgan. Har bir texnika biznesingiz ehtiyojiga mos keladigan darajada funksional
+                      va samarali.
                     </p>
                   </div>
                 </div>
@@ -182,23 +221,23 @@
                 <div class="col-12 col-xl-4 mxd-blog-preview__item mxd-grid-item animate-card-3">
                   <a class="mxd-blog-preview__media" href="javascript:void(0)">
                     <div class="mxd-blog-preview__image blog-preview-image-1 parallax-img-small">
-                      <img class="parallax-img-small" src="{% static 'images/faw-truck_1.png' %}"
-                        alt="Blog Preview Image">
+                      <img class="parallax-img-small" src="{% static 'images/Models/V.jpg' %}" alt="Blog Preview Image">
                     </div>
                     <div class="mxd-blog-preview__tags">
                       <span class="tag tag-default tag-permanent">FAW</span>
                     </div>
                   </a>
                   <div class="mxd-blog-preview__data">
-                    <a class="anim-uni-in-up" href="javascript:void(0)">Ishonchli <span>avtofurgonlar</span> —
-                      yuklaringiz har doim manzilda</a>
+                    <a class="anim-uni-in-up" href="javascript:void(0)"><span> Tiger V</span> —
+                      Sinovdan o‘tgan. Ishonchli. Barqaror.
+                      (bozorda ishonch qozongan model)</a>
                   </div>
                 </div>
                 <!-- item -->
                 <div class="col-12 col-xl-4 mxd-blog-preview__item mxd-grid-item animate-card-3">
                   <a class="mxd-blog-preview__media" href="javascript:void(0)">
                     <div class="mxd-blog-preview__image blog-preview-image-2 parallax-img-small">
-                      <img class="parallax-img-small" src="{% static 'images/faw-truck_2.png' %}"
+                      <img class="parallax-img-small" src="{% static 'images/Models/VH.jpg' %}"
                         alt="Blog Preview Image">
                     </div>
                     <div class="mxd-blog-preview__tags">
@@ -206,15 +245,16 @@
                     </div>
                   </a>
                   <div class="mxd-blog-preview__data">
-                    <a class="anim-uni-in-up" href="javascript:void(0)"><span>Quvvatli va bardoshli</span> FAW
-                      furgonlari har qanday yo'lga tayyor</a>
+                    <a class="anim-uni-in-up" href="javascript:void(0)"><span>Tiger VH</span> — Gaz–dizel. Tejamkor.
+                      Kuchli.
+                      (ikki yoqilg‘ida harakatlanuvchi model)</a>
                   </div>
                 </div>
                 <!-- item -->
                 <div class="col-12 col-xl-4 mxd-blog-preview__item mxd-grid-item animate-card-3">
                   <a class="mxd-blog-preview__media" href="javascript:void(0)">
                     <div class="mxd-blog-preview__image blog-preview-image-3 parallax-img-small">
-                      <img class="parallax-img-small" src="{% static 'images/faw-truck_3.png' %}"
+                      <img class="parallax-img-small" src="{% static 'images/Models/VR.jpg' %}"
                         alt="Blog Preview Image">
                     </div>
                     <div class="mxd-blog-preview__tags">
@@ -222,8 +262,9 @@
                     </div>
                   </a>
                   <div class="mxd-blog-preview__data">
-                    <a class="anim-uni-in-up" href="javascript:void(0)"><span>Ko'p maqsadli shassilar</span> — sizning
-                      biznesingiz uchun mustahkam asos</a>
+                    <a class="anim-uni-in-up" href="javascript:void(0)"><span>Tiger VR</span> — sArzon xarajat. Yengil.
+                      Amaliy.
+                      (kichik segment, kam xarajatli, qulay model)</a>
                   </div>
                 </div>
               </div>
@@ -277,10 +318,10 @@
               <div class="col-12 col-md-6 mxd-grid-item animate-card-3 mt-0">
                 <div class="contact-info">
                   <div class="contact-info__content">
-                    <h2 class="contact-info__title anim-uni-in-up">Biz bilan bog'laning</h2>
+                    <h2 class="contact-info__title anim-uni-in-up">Biz bilan bog'lanish</h2>
                     <p class="contact-info__description anim-uni-in-up">
-                      Vum bo'yicha savollaringiz bormi? Bizning mutaxassislar sizga yordam berishga tayyor.
-                      Formani to'ldiring va biz tez orada siz bilan bog'lanamiz.
+                      Bizning mutaxassislarimiz transportni tanlashda sizga yordam beradi va qiziqtirgan masalalar
+                      bo‘yicha maslahat beradi.
                     </p>
 
                     <div class="contact-info__details">
@@ -310,7 +351,8 @@
                         </div>
                         <div class="contact-detail__content">
                           <h4 class="contact-detail__title">Manzil</h4>
-                          <p class="contact-detail__value">Toshkent shahri, Yakkasaroy tumani A. Qahxara ko‘chasi, 2A</p>
+                          <p class="contact-detail__value">Toshkent shahri, Yakkasaroy tumani A. Qahxara ko‘chasi, 2A
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -503,10 +545,9 @@
                   </div>
                   <div class="mxd-promo__text-section">
                     <span class="mxd-promo__caption reveal-type">
-                      FAW bu – ishonchli texnika. Har qanday iqlimda, har qanday yo'lda FAW o'zini ko'rsatadi.
-                      Buning ortida esa o'z ishini sidqidildan bajarayotgan kuchli va jips jamoamiz turibdi.
-                      Har bir mijoz biz uchun muhim, har bir yuk – mas'uliyat.
-                      FAW jamoasi – bu tajriba, halollik va xizmatga sadoqat!
+                      FAW – ishonchli texnika. Har qanday iqlimda, har qanday yo‘lda FAW o‘zini ko‘rsatadi. Buning
+                      ortida esa o‘z ishini sidqidildan bajarayotgan kuchli va jips jamoamiz turibdi. Har bir mijoz biz
+                      uchun muhim, har bir yuk – mas'uliyat. VUM jamoasi – tajriba, halollik va xizmatga sadoqat.
                     </span>
                   </div>
                 </div>
@@ -670,6 +711,15 @@
       });
 
       // === Отправка формы ===
+      function getUTMData() {
+        const params = new URLSearchParams(window.location.search);
+        const utm = {};
+        ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(key => {
+          if (params.has(key)) utm[key] = params.get(key);
+        });
+        return Object.keys(utm).length > 0 ? JSON.stringify(utm) : null;
+      }
+
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         if (isSubmitting) return;
@@ -677,16 +727,19 @@
 
         const phone = phoneInput.value.replace(/\D/g, "");
         if (phone.length !== 12) {
-          showStatus("❌ Iltimos, telefon raqamingizni to‘liq kiriting.", "error");
+          showStatus("❌ Iltimos, telefon raqamingizni to'liq kiriting.", "error");
           isSubmitting = false;
           return;
         }
 
+        // ✅ ДОБАВЛЯЕМ UTM И REFERER
         const formData = {
           name: form.name.value,
           region: form.region.value,
           phone: phoneInput.value,
           message: form.message.value,
+          referer: document.referrer || window.location.href,
+          utm_data: getUTMData()
         };
 
         try {
@@ -702,6 +755,10 @@
           const data = await response.json();
 
           if (response.ok) {
+            (window.dataLayer = window.dataLayer || []).push({
+              event: "lead_form_submitted"
+            });
+
             showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog‘lanamiz.", "success");
             form.reset();
           } else {

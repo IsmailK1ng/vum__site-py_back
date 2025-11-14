@@ -14,11 +14,11 @@ class ProductsManager {
     
     // Полная информация о категориях с картинками и слоганами
     this.categoryData = {
-      'shatakchi': {
-        title: 'Shatakchi mashinalar',
-        breadcrumb: 'Shatakchi mashinalar',
-        slogan: 'Kuchli va ishonchli tortuvchilar',
-        hero_image: 'images/categories/tractor-hero.png' // Укажите правильный путь
+      'tiger_vh': {
+        title: 'Tiger VH',
+        breadcrumb: 'Tiger VH',
+        slogan: 'Ikki yoqilg\'ida harakatlanuvchi texnika',
+        hero_image: 'images/categories/vh_models.png' // Укажите правильный путь
       },
       'samosval': {
         title: 'Samosvallar',

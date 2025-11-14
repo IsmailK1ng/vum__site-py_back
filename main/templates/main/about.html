@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
 
 <head>
   <meta charset="UTF-8">
@@ -52,7 +52,25 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <!-- Custom Browser Color End -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400;600;700&family=Funnel+Sans:wght@400;600;700&display=swap');
 
+    html {
+      font-family: var(--_font-default);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    a,
+    .mxd-logo__text,
+    .btn-caption {
+      font-family: var(--_font-accent);
+    }
+  </style>
 </head>
 
 <body>
@@ -1092,10 +1110,14 @@
                         </div>
                         <div class="col-12 mxd-grid-item no-margin">
                           <div class="mxd-section-title__descr">
-                            <p class="anim-uni-in-up">Van Universal Motors (VUM) — O‘zbekistonda yuk avtomobillari
-                              savdosi, servis xizmatlari va dilerlik tarmog‘ida faoliyat yuritayotgan kompaniya. Bugungi
-                              kunda VUM 20 dan ortiq dilerlik markazlari bilan hamkorlik qilib, FAW yuk avtomobillarini
-                              ishlab chiqarish va servis xizmatini yo‘lga qo‘ygan.</p>
+                            <p class="anim-uni-in-up">VUM avtomobil zavodi – bu zamonaviy ishlab chiqarish korxonasi
+                              bo‘lib, O‘zbekistonda FAW brendi ostida yuqori sifatli yuk avtomobillarini ishlab
+                              chiqarishga ixtisoslashgan.
+                              VUM zavodi Andijon shahrida joylashgan bo‘lib, Zavodning umumiy maydoni 14 750 m² bo‘lib,
+                              zamonaviy
+                              texnologik uskunalar bilan jihozlangan va yiliga 3000 dona
+                              yuk avtomobili ishlab chiqarish quvvatiga ega. Dastlab ishlab
+                              chiqarilayotgan model — FAW Tiger V seriyasidir.</p>
                           </div>
                         </div>
                       </div>
@@ -1114,15 +1136,17 @@
                       <div class="mxd-res-list__content">
                         <div class="mxd-res-list__data">
                           <div class="mxd-res-list__title">
-                            <h4 class="anim-uni-in-up">VUM Tashkil topgan</h4>
+                            <h4 class="anim-uni-in-up">VUM kompaniyasi</h4>
                           </div>
                           <div class="mxd-res-list__descr">
-                            <p class="anim-uni-in-up">Vum kompaniyasi 1 fevral 2018 yilda asos solingan.</p>
+                            <p class="anim-uni-in-up">VUM kompaniyasi 2018-yilda tashkil etilgan bo‘lib,
+                              2022-yilda China FAW Group Co., Ltd bilan rasmiy
+                              dilerlik shartnomasi imzolandi.</p>
                           </div>
                         </div>
-                        <div class="mxd-res-list__year">
+                        <!-- <div class="mxd-res-list__year">
                           <p class="anim-uni-in-up">1 fevral 2018</p>
-                        </div>
+                        </div> -->
                       </div>
                       <div class="mxd-res-list__divider anim-uni-in-up"></div>
                     </div>
@@ -1132,15 +1156,17 @@
                       <div class="mxd-res-list__content">
                         <div class="mxd-res-list__data">
                           <div class="mxd-res-list__title">
-                            <h4 class="anim-uni-in-up">VUM Tashkil topgan</h4>
+                            <h4 class="anim-uni-in-up">Andijon shahrida</h4>
                           </div>
                           <div class="mxd-res-list__descr">
-                            <p class="anim-uni-in-up">Vum kompaniyasi 1 fevral 2018 yilda asos solingan.</p>
+                            <p class="anim-uni-in-up">Andijon shahrida VUM tomonidan FAW zavodi
+                              qurilib, dastlab N2 toifasidagi yuk avtomobillari
+                              ishlab chiqarilishi yo‘lga qo‘yildi.</p>
                           </div>
                         </div>
-                        <div class="mxd-res-list__year">
+                        <!-- <div class="mxd-res-list__year">
                           <p class="anim-uni-in-up">1 fevral 2018</p>
-                        </div>
+                        </div> -->
                       </div>
                       <div class="mxd-res-list__divider anim-uni-in-up"></div>
                     </div>
@@ -1150,15 +1176,17 @@
                       <div class="mxd-res-list__content">
                         <div class="mxd-res-list__data">
                           <div class="mxd-res-list__title">
-                            <h4 class="anim-uni-in-up">VUM Tashkil topgan</h4>
+                            <h4 class="anim-uni-in-up">2024-yil yakunlariga ko‘ra</h4>
                           </div>
                           <div class="mxd-res-list__descr">
-                            <p class="anim-uni-in-up">Vum kompaniyasi 1 fevral 2018 yilda asos solingan.</p>
+                            <p class="anim-uni-in-up">2024-yil yakunlariga ko‘ra,
+                              “FAW Trucks”
+                              markasidagi 1000 ga yaqin texnika sotildi.</p>
                           </div>
                         </div>
-                        <div class="mxd-res-list__year">
+                        <!-- <div class="mxd-res-list__year">
                           <p class="anim-uni-in-up">1 fevral 2018</p>
-                        </div>
+                        </div> -->
                       </div>
                       <div class="mxd-res-list__divider anim-uni-in-up"></div>
                     </div>

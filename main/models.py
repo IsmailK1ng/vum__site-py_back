@@ -152,12 +152,12 @@ class FeatureIcon(models.Model):
 class Product(models.Model):
     """Грузовики FAW"""
     CATEGORY_CHOICES = [
-        ('shatakchi', 'Shatakchi mashinalar'),
         ('samosval', 'Samosvallar'),
         ('maxsus', 'Maxsus texnika'),
         ('furgon', 'Avtofurgonlar'),
         ('shassi', 'Shassilar'),
         ('tiger_v', 'Tiger V'),
+        ('tiger_vh', 'Tiger VH'),
         ('tiger_vr', 'Tiger VR'),
     ]
     

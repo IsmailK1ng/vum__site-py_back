@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
 
 <head>
   <meta charset="UTF-8">
@@ -39,7 +39,7 @@
   <meta name="msapplication-navbutton-color" content="#161616">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  
+
   <style>
     .loader-container {
       display: flex;
@@ -61,11 +61,9 @@
       color: #999;
       font-size: 18px;
     }
-  </style>
+    </style>
 </head>
-
 <body>
-
   <!-- Меню и шапка -->
   {% include 'main/includes/header.html' %}
 
@@ -198,11 +196,11 @@
     // Универсальный плавный скролл
     (function () {
       function getHeaderHeight() {
-        try { 
-          var h = document.getElementById('header'); 
-          return h ? h.offsetHeight || 0 : 0; 
-        } catch (e) { 
-          return 0; 
+        try {
+          var h = document.getElementById('header');
+          return h ? h.offsetHeight || 0 : 0;
+        } catch (e) {
+          return 0;
         }
       }
 
@@ -213,10 +211,10 @@
         var offset = 25;
         var rect = el.getBoundingClientRect();
         var targetY = Math.max(0, Math.round(window.pageYOffset + rect.top - headerH - offset));
-        try { 
-          window.scrollTo({ top: targetY, behavior: 'smooth' }); 
-        } catch (e) { 
-          window.scrollTo(0, targetY); 
+        try {
+          window.scrollTo({ top: targetY, behavior: 'smooth' });
+        } catch (e) {
+          window.scrollTo(0, targetY);
         }
       }
 
@@ -237,4 +235,5 @@
   </script>
 
 </body>
+
 </html>

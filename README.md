@@ -95,8 +95,14 @@ pip freeze > requirements.txt
 4️⃣ Применить миграции базы данных
 bash
 Копировать код
+### Миграции запуск применение и откат
 python manage.py makemigrations
 python manage.py migrate
+⏪ Откатить миграцию назад на 1 шаг
+python manage.py migrate app_name migration_name
+Пример:
+python manage.py migrate news 0002
+
 
 bash
 python manage.py save_amocrm_tokens

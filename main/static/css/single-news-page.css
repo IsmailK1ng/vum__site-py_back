@@ -2,7 +2,7 @@
    БАЗОВЫЕ СТИЛИ DIVIDER
    ========================================== */
 .mxd-divider {
-  height: 700px;
+  height: 850px;
   margin-top: 50px;
 }
 
@@ -16,6 +16,13 @@
   background-size: cover;
   overflow: hidden;
   border-radius: 20px;
+}
+
+.mxd-divider__image img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+  object-fit: cover;
 }
 
 .mxd-divider__video iframe,
@@ -107,6 +114,7 @@
 .hero-00-manifest .mxd-manifest p {
   font-size: 3rem;
   line-height: 1.6;
+  margin-top: 1.5em;
   margin-bottom: 1.5em;
   color: #000;
 }
@@ -119,9 +127,10 @@
 .hero-00-manifest .mxd-manifest ol {
   font-size: 3rem;
   line-height: 1.6;
-
   text-align: left;
+  margin: 0rem 0rem 1rem 3rem;
   list-style-position: outside !important;
+
 }
 
 .hero-00-manifest .mxd-manifest ul {
@@ -292,6 +301,7 @@
    УБИРАЕМ BORDER-RADIUS ДЛЯ УСТРОЙСТВ ≤ 1024px
    ========================================== */
 @media (max-width: 1024px) {
+
   .mxd-divider,
   .mxd-divider__video,
   .mxd-divider__image,

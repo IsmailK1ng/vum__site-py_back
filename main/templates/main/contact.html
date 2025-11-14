@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
 
 <head>
     <meta charset="UTF-8" />
@@ -415,6 +415,16 @@
             });
 
             // === Отправка формы ===
+            // ✅ ДОБАВЬ ПЕРЕД form.addEventListener
+            function getUTMData() {
+                const params = new URLSearchParams(window.location.search);
+                const utm = {};
+                ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(key => {
+                    if (params.has(key)) utm[key] = params.get(key);
+                });
+                return Object.keys(utm).length > 0 ? JSON.stringify(utm) : null;
+            }
+
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
                 if (isSubmitting) return;
@@ -427,11 +437,14 @@
                     return;
                 }
 
+                // ✅ С UTM И REFERER
                 const formData = {
                     name: form.name.value,
                     region: form.region.value,
                     phone: phoneInput.value,
                     message: form.message.value,
+                    referer: document.referrer || window.location.href,
+                    utm_data: getUTMData()
                 };
 
                 try {
@@ -447,7 +460,11 @@
                     const data = await response.json();
 
                     if (response.ok) {
-                        showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
+                        (window.dataLayer = window.dataLayer || []).push({
+                            event: "lead_form_submitted"
+                        });
+
+                        showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog‘lanamiz.", "success");
                         form.reset();
                     } else {
                         throw new Error(data.message || "Xatolik yuz berdi.");

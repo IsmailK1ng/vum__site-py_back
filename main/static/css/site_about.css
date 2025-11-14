@@ -284,7 +284,7 @@ p.t-140 {
   width: 100%;
   height: clamp(300px, 60vh, 580px);
   object-fit: cover;
-  border-radius: 25px 25px 0 0;
+  /* border-radius: 25px 25px 0 0; */
 }
 
 .modal-text {
@@ -302,11 +302,16 @@ p.t-140 {
 
 .close {
   position: absolute;
-  top: clamp(8px, 1.5vw, 10px);
-  right: clamp(15px, 2.5vw, 20px);
-  font-size: clamp(1.5rem, 2.5vw, 2rem);
-  color: #fff;
+  top: 0;
+  right: 0;
+  font-size: 35px;
+  color: #ffffff;
   cursor: pointer;
+  line-height: 40px;
+  width: 40px;
+  text-align: center;
+  background: #00000085;
+  border-radius: 50%;
   transition: color 0.3s;
   z-index: 100;
 }
@@ -619,7 +624,7 @@ p.t-140 {
   }
 
   .modal-content {
-    border-radius: 15px;
+    border-radius: 20px;
     height: 80vh;
     max-height: 600px;
   }

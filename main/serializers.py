@@ -36,10 +36,44 @@ class ContactFormSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'status_display', 'priority_display', 'region_display']
     
     def create(self, validated_data):
+        import json
+        from urllib.parse import urlparse, parse_qs
+        
         validated_data.setdefault('status', 'new')
         validated_data.setdefault('priority', 'medium')
+        
+        request = self.context.get('request')
+        
+        if request:
+            if not validated_data.get('referer'):
+                referer = request.META.get('HTTP_REFERER')
+                if referer:
+                    validated_data['referer'] = referer
+            
+            utm_from_body = validated_data.get('utm_data')
+            
+            if utm_from_body:
+                if isinstance(utm_from_body, str):
+                    pass
+                elif isinstance(utm_from_body, dict):
+                    validated_data['utm_data'] = json.dumps(utm_from_body, ensure_ascii=False)
+            else:
+                referer = validated_data.get('referer') or request.META.get('HTTP_REFERER')
+                
+                if referer:
+                    parsed = urlparse(referer)
+                    query_params = parse_qs(parsed.query)
+                    
+                    utm_params = {}
+                    for key in ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']:
+                        if key in query_params:
+                            utm_params[key] = query_params[key][0]
+                    
+                    if utm_params:
+                        validated_data['utm_data'] = json.dumps(utm_params, ensure_ascii=False)
+        
         return super().create(validated_data)
-
+    
 class JobApplicationSerializer(serializers.ModelSerializer):
     vacancy_title = serializers.CharField(source='vacancy.title', read_only=True)
     
