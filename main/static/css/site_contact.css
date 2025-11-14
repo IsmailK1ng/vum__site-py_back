@@ -39,7 +39,7 @@ h2 {
 
 .contact-info__container {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     gap: 20px;
     flex-wrap: wrap;
 }

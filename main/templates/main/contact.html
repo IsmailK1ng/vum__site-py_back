@@ -117,7 +117,7 @@
                                                     <div class="mxd-paragraph__lists-title">
                                                         <p
                                                             class="t-large t-bright t-caption anim-uni-in-up contact-fluid__txt">
-                                                            Toshkent
+                                                            VUM
                                                         </p>
                                                     </div>
                                                     <div class="contact-info__details">
@@ -128,8 +128,7 @@
                                                             <div class="contact-detail__content">
                                                                 <h4 class="contact-detail__title">Telefon</h4>
                                                                 <a href="tel:+998712345678"
-                                                                    class="contact-detail__value">+998 71
-                                                                    234-56-78</a>
+                                                                    class="contact-detail__value">+998 55 508 60 60</a>
                                                             </div>
                                                         </div>
 
@@ -140,7 +139,7 @@
                                                             <div class="contact-detail__content">
                                                                 <h4 class="contact-detail__title">Email</h4>
                                                                 <a href="mailto:info@fawtrucks.uz"
-                                                                    class="contact-detail__value">info@fawtrucks.uz</a>
+                                                                    class="contact-detail__value">info@faw.uz</a>
                                                             </div>
                                                         </div>
 
@@ -150,13 +149,15 @@
                                                             </div>
                                                             <div class="contact-detail__content">
                                                                 <h4 class="contact-detail__title">Manzil</h4>
-                                                                <p class="contact-detail__value">Toshkent shahar,
-                                                                    Yunusobod tumani</p>
+                                                                <p class="contact-detail__value">
+                                                                    Toshkent shahri, Yakkasaroy tumani
+                                                                    A. Qahxara ko‘chasi, 2A
+                                                                </p>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div
+                                                <!-- <div
                                                     class="col-12 col-md-6 col-xl-5 mxd-paragraph__lists-item  card_border">
                                                     <div class="mxd-paragraph__lists-title">
                                                         <p
@@ -199,7 +200,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </div> -->
                                             </div>
                                         </div>
                                     </div>
@@ -243,7 +244,7 @@
                                 <div class="mxd-block__content contact">
                                     <div class="mxd-block__inner-form loading__fade">
                                         <div class="form-container">
-                                            
+
                                             <!-- Сообщение о статусе (встроенное уведомление) -->
                                             <div class="form-status hidden">
                                                 <p class="form-status__text"></p>
@@ -252,39 +253,61 @@
                                             <!-- Contact Form Start -->
                                             <form class="form contact-form" id="contactForm">
                                                 {% csrf_token %}
-                                                
+
                                                 <div class="container-fluid p-0">
                                                     <div class="row gx-0">
-                                                        <div class="col-12 mxd-grid-item anim-uni-in-up contact-grid-item">
-                                                            <input type="text" name="name" placeholder="F.I.Sh*" required />
+                                                        <div
+                                                            class="col-12 mxd-grid-item anim-uni-in-up contact-grid-item">
+                                                            <input type="text" name="name" placeholder="F.I.Sh*"
+                                                                required />
                                                         </div>
-                                                        <div class="col-12 mxd-grid-item anim-uni-in-up contact-grid-item">
+                                                        <div
+                                                            class="col-12 mxd-grid-item anim-uni-in-up contact-grid-item">
                                                             <select name="region" required>
-                                                                <option value="" disabled selected>Viloyatni tanlang*</option>
+                                                                <option value="" disabled selected>Viloyatni tanlang*
+                                                                </option>
                                                                 <option value="Toshkent shahri">Toshkent shahri</option>
-                                                                <option value="Andijon viloyati">Andijon viloyati</option>
+                                                                <option value="Andijon viloyati">Andijon viloyati
+                                                                </option>
                                                                 <option value="Buxoro viloyati">Buxoro viloyati</option>
-                                                                <option value="Fargʻona viloyati">Fargʻona viloyati</option>
+                                                                <option value="Fargʻona viloyati">Fargʻona viloyati
+                                                                </option>
                                                                 <option value="Jizzax viloyati">Jizzax viloyati</option>
                                                                 <option value="Xorazm viloyati">Xorazm viloyati</option>
-                                                                <option value="Namangan viloyati">Namangan viloyati</option>
+                                                                <option value="Namangan viloyati">Namangan viloyati
+                                                                </option>
                                                                 <option value="Navoiy viloyati">Navoiy viloyati</option>
-                                                                <option value="Qashqadaryo viloyati">Qashqadaryo viloyati</option>
-                                                                <option value="Samarqand viloyati">Samarqand viloyati</option>
-                                                                <option value="Sirdaryo viloyati">Sirdaryo viloyati</option>
-                                                                <option value="Surxondaryo viloyati">Surxondaryo viloyati</option>
-                                                                <option value="Toshkent viloyati">Toshkent viloyati</option>
-                                                                <option value="Qoraqalpogʻiston Respublikasi">Qoraqalpogʻiston Respublikasi</option>
+                                                                <option value="Qashqadaryo viloyati">Qashqadaryo
+                                                                    viloyati</option>
+                                                                <option value="Samarqand viloyati">Samarqand viloyati
+                                                                </option>
+                                                                <option value="Sirdaryo viloyati">Sirdaryo viloyati
+                                                                </option>
+                                                                <option value="Surxondaryo viloyati">Surxondaryo
+                                                                    viloyati</option>
+                                                                <option value="Toshkent viloyati">Toshkent viloyati
+                                                                </option>
+                                                                <option value="Qoraqalpogʻiston Respublikasi">
+                                                                    Qoraqalpogʻiston Respublikasi</option>
                                                             </select>
                                                         </div>
-                                                        <div class="col-12 mxd-grid-item anim-uni-in-up contact-grid-item">
-                                                            <input type="tel" name="phone" placeholder="+998 (__) ___-__-__" id="phoneInput" pattern="[+]*[0-9\s\-\(\)]*" data-default="+998" required />
+                                                        <div
+                                                            class="col-12 mxd-grid-item anim-uni-in-up contact-grid-item">
+                                                            <input type="tel" name="phone"
+                                                                placeholder="+998 (__) ___-__-__" id="phoneInput"
+                                                                pattern="[+]*[0-9\s\-\(\)]*" data-default="+998"
+                                                                required />
                                                         </div>
-                                                        <div class="col-12 mxd-grid-item anim-uni-in-up contact-grid-item">
-                                                            <textarea name="message" placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*" required></textarea>
+                                                        <div
+                                                            class="col-12 mxd-grid-item anim-uni-in-up contact-grid-item">
+                                                            <textarea name="message"
+                                                                placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*"
+                                                                required></textarea>
                                                         </div>
                                                         <div class="col-12 mxd-grid-item anim-uni-in-up">
-                                                            <button class="btn btn-anim btn-default btn-large btn-opposite slide-right-up shimmer-btn" type="submit">
+                                                            <button
+                                                                class="btn btn-anim btn-default btn-large btn-opposite slide-right-up shimmer-btn"
+                                                                type="submit">
                                                                 <span class="btn-caption">Qongʻiroq kutaman</span>
                                                                 <span class="shimmer"></span>
                                                                 <i class="ph-bold ph-arrow-up-right"></i>

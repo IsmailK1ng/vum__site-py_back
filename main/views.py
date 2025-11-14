@@ -206,8 +206,6 @@ class ContactFormViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(status=status_filter)
         return queryset
     
-
-
     def create(self, request, *args, **kwargs):
         import logging
         logger = logging.getLogger('amocrm')
@@ -218,22 +216,21 @@ class ContactFormViewSet(viewsets.ModelViewSet):
             
             contact_form = serializer.save()
             
-            # ✅ ПРАВИЛЬНАЯ ОБРАБОТКА ОШИБОК
             try:
-                from main.services.amocrm import send_contact_form_to_amocrm
+                from main.services.amocrm.lead_sender import LeadSender
                 
-                result = send_contact_form_to_amocrm(contact_form)
+                LeadSender.send_lead(contact_form)
+                contact_form.refresh_from_db()
                 
-                if result['success']:
-                    logger.info(f"✅ Лид #{contact_form.id} отправлен в amoCRM. Lead ID: {result['lead_id']}")
+                if contact_form.amocrm_status == 'sent':
+                    logger.info(f"✅ Лид #{contact_form.id} отправлен в amoCRM. Lead ID: {contact_form.amocrm_lead_id}")
                 else:
-                    logger.warning(f"⚠️ Лид #{contact_form.id} НЕ отправлен: {result['error']}")
+                    logger.warning(f"⚠️ Лид #{contact_form.id} НЕ отправлен: {contact_form.amocrm_error}")
                     
             except Exception as amocrm_error:
-                # ✅ ЛОГИРУЕМ КРИТИЧЕСКИЕ ОШИБКИ
                 logger.error(
                     f"❌ Критическая ошибка amoCRM для лида #{contact_form.id}: {str(amocrm_error)}",
-                    exc_info=True  # ← Полный стектрейс в логах
+                    exc_info=True
                 )
             
             return Response({
@@ -256,7 +253,6 @@ class ContactFormViewSet(viewsets.ModelViewSet):
         in_process = ContactForm.objects.filter(status='in_process').count()
         done = ContactForm.objects.filter(status='done').count()
         
-        # Добавили статистику по amoCRM
         amocrm_sent = ContactForm.objects.filter(amocrm_status='sent').count()
         amocrm_failed = ContactForm.objects.filter(amocrm_status='failed').count()
         amocrm_pending = ContactForm.objects.filter(amocrm_status='pending').count()
