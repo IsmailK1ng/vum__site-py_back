@@ -2537,7 +2537,7 @@ body[data-theme="dark"] .btn-rotating .btn-rotating__text text {
   letter-spacing: 0.1rem;
 }
 .btn-rotating-blur-outline.ver-04 .btn-rotating__image {
-  width: 5rem;
+  width: 7rem;
 }
 @media only screen and (min-width: 1200px) {
   .btn-rotating-blur-outline.permanent-desktop {
