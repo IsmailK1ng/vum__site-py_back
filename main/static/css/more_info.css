@@ -157,6 +157,7 @@
     height: 32px;
     opacity: 0.8;
     flex-shrink: 0;
+    filter: brightness(0) invert(0);
 }
 
 .car-spec-content {
