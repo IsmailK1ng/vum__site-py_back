@@ -215,21 +215,18 @@ class ContactFormViewSet(viewsets.ModelViewSet):
             
             contact_form = serializer.save()
             
-            # Отправка в amoCRM
             try:
                 from main.services.amocrm.lead_sender import LeadSender
                 LeadSender.send_lead(contact_form)
                 contact_form.refresh_from_db()
                 
-                # Если отправка успешна
                 if contact_form.amocrm_status == 'sent':
-                    logger.info(f"✅ Лид #{contact_form.id} успешно отправлен в amoCRM (ID: {contact_form.amocrm_lead_id})")
+                    logger.info(f"Лид #{contact_form.id} успешно отправлен в amoCRM")
                 else:
-                    logger.warning(f"⚠️  Лид #{contact_form.id} не отправлен: {contact_form.amocrm_error}")
+                    logger.warning(f"Лид #{contact_form.id} не отправлен: {contact_form.amocrm_error}")
                     
             except Exception as amocrm_error:
-                # Логируем ошибку, но НЕ прерываем ответ пользователю
-                logger.error(f"❌ Ошибка отправки в amoCRM для лида #{contact_form.id}: {str(amocrm_error)}")
+                logger.error(f"Ошибка amoCRM для лида #{contact_form.id}: {str(amocrm_error)}")
             
             return Response({
                 'success': True,
@@ -237,7 +234,7 @@ class ContactFormViewSet(viewsets.ModelViewSet):
             }, status=status.HTTP_201_CREATED)
             
         except Exception as e:
-            logger.error(f"❌ Ошибка создания ContactForm: {str(e)}")
+            logger.error(f"Критическая ошибка создания формы: {str(e)}")
             return Response({
                 'success': False,
                 'message': 'Xatolik yuz berdi.'

@@ -498,18 +498,25 @@
 
                     const data = await response.json();
 
-                    if (response.ok) {
+                    // ✅ Проверяем и response.ok, и data.success
+                    if (response.ok && data.success) {
                         (window.dataLayer = window.dataLayer || []).push({
                             event: "lead_form_submitted"
                         });
 
-                        showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog‘lanamiz.", "success");
-                        form.reset();
+                        showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
+                        contactForm.reset();
+
+                        setTimeout(() => {
+                            closeModal();
+                            statusBlock.classList.add("hidden");
+                        }, 2000);
                     } else {
                         throw new Error(data.message || "Xatolik yuz berdi.");
                     }
-                } catch (error) {
-                    showStatus("❌ Xatolik yuz berdi. Qayta urinib ko'ring.", "error");
+                } catch (err) {
+                    console.error("Contact form submission error:", err);
+                    showStatus("❌ Xatolik yuz berdi. Iltimos, qayta urinib ko'ring.", "error");
                 } finally {
                     isSubmitting = false;
                 }
