@@ -21,8 +21,10 @@
   <meta name="description"
     content="{% if LANGUAGE_CODE == 'uz' %}VUM kompaniyasining so'nggi yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Последние новости компании VUM{% else %}Latest news from VUM company{% endif %}">
 
-  <!-- Favicons -->
-  <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
+<!-- Универсальный favicon -->
+<link rel="icon" href="{% static 'images/LOGO-VUM.png' %}" />
+<!-- Для Apple устройств -->
+<link rel="apple-touch-icon" href="{% static 'images/LOGO-VUM.png' %}">
 
   <!-- Styles -->
   <link rel="stylesheet" href="{% static 'css/loaders/loader.css' %}">
