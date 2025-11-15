@@ -483,7 +483,7 @@
                     product: productField?.value || '',
                     message: contactForm.Message.value,
                     referer: document.referrer || window.location.href,
-                    utm_data: window.getUTMData()
+                    utm_data: window.getUTMData() ? JSON.parse(window.getUTMData()) : null
                 };
 
                 try {
@@ -499,7 +499,7 @@
                     const data = await response.json();
 
                     // ✅ Проверяем и response.ok, и data.success
-                    if (response.ok && data.success) {
+                    if (response.ok) {
                         (window.dataLayer = window.dataLayer || []).push({
                             event: "lead_form_submitted"
                         });
