@@ -24,6 +24,8 @@ from .serializers import (
 import json
 import logging
 
+logger = logging.getLogger('amocrm')
+
 # === FRONTEND views === 
 def index(request):
     """Главная страница с динамическим слайдером"""
