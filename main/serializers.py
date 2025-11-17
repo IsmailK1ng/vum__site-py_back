@@ -100,28 +100,19 @@ class JobApplicationSerializer(serializers.ModelSerializer):
 # ========== СЕРИАЛИЗАТОРЫ ДЛЯ ПРОДУКТОВ ==========
 
 class FeatureIconSerializer(serializers.ModelSerializer):
-    """Сериализатор для иконок характеристик"""
     icon_url = serializers.SerializerMethodField()
-    name = serializers.SerializerMethodField()  # ← Добавляем перевод имени
-    
+    name = serializers.SerializerMethodField()
+
     class Meta:
         model = FeatureIcon
         fields = ['id', 'name', 'icon_url']
-    
+
     def get_name(self, obj):
-        """Возвращаем имя на нужном языке"""
-        request = self.context.get('request')
-        if request:
-            path = request.path
-            if '/uz/' in path:
-                return obj.name_uz or obj.name
-            elif '/en/' in path:
-                return obj.name_en or obj.name
-        return obj.name_ru or obj.name
-    
+        return obj.name   # ← фикс
+
     def get_icon_url(self, obj):
+        request = self.context.get('request')
         if obj.icon:
-            request = self.context.get('request')
             if request:
                 return request.build_absolute_uri(obj.icon.url)
             return obj.icon.url
