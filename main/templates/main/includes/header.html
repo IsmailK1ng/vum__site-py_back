@@ -134,7 +134,6 @@
             {% if request.resolver_match.url_name == 'home' %}
             <a class="btn btn-anim btn-default btn-mobile-icon btn-outline slide-right-up" style="gap: 0;"
                 href="#faw-main-contact-form" aria-label="Перейти к форме связи">
-                <span class="btn-caption"></span>
                 <i class="ph-bold ph-arrow-up-right"></i>
             </a>
             {% endif %}
@@ -272,9 +271,14 @@
     </nav>
 
     <script>
-        function switchLanguage(lang) {
-            console.log('Switching to language:', lang);
-            document.getElementById('language-input').value = lang;
-            document.querySelector('.language-switcher-form').submit();
-        }
+    function switchLanguage(lang) {
+        console.log('Switching to language:', lang);
+        document.getElementById('language-input').value = lang;
+        
+        // Сохраняем, что нужно перезагрузить контент после смены языка
+        sessionStorage.setItem('languageChanged', 'true');
+        
+        document.querySelector('.language-switcher-form').submit();
+    }
+
     </script>

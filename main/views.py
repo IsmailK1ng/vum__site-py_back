@@ -157,30 +157,29 @@ def news_detail(request, slug):
         'breadcrumbs': breadcrumbs.get(language, breadcrumbs['uz'])
     })
 
-
 def set_language_get(request):
-    """Переключение языка через GET или POST"""
-    from django.http import HttpResponseRedirect
+    """Переключение языка ТОЛЬКО для сайта"""
+    language = request.GET.get('language') or request.POST.get('language')
     
-    lang = request.GET.get("language") or request.POST.get("language")
-    
-    supported_languages = [code for code, name in settings.LANGUAGES]
-    
-    if lang and lang in supported_languages:
-        translation.activate(lang)
-        request.session[translation.LANGUAGE_SESSION_KEY] = lang
+    if language and language in ['uz', 'ru', 'en']:
+        # Сохраняем в сессию
+        request.session['_language'] = language
         
-        response = HttpResponseRedirect(request.META.get("HTTP_REFERER", "/"))
+        # Получаем URL откуда пришли
+        next_url = request.META.get('HTTP_REFERER', '/')
+        
+        response = redirect(next_url)
+        # Сохраняем в cookie
         response.set_cookie(
             settings.LANGUAGE_COOKIE_NAME,
-            lang,
-            max_age=settings.LANGUAGE_COOKIE_AGE,
+            language,
+            max_age=365*24*60*60,
             path='/',
+            samesite='Lax'
         )
         return response
     
-    return redirect(request.META.get("HTTP_REFERER", "/"))
-
+    return redirect('/')
 
 # === API ViewSets ===
 class NewsViewSet(viewsets.ModelViewSet):

@@ -17,10 +17,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-<!-- Универсальный favicon -->
-<link rel="icon" href="{% static 'images/LOGO-VUM.png' %}" />
-<!-- Для Apple устройств -->
-<link rel="apple-touch-icon" href="{% static 'images/LOGO-VUM.png' %}">
+  <!-- Универсальный favicon -->
+  <link rel="icon" href="{% static 'images/LOGO-VUM.png' %}" />
+  <!-- Для Apple устройств -->
+  <link rel="apple-touch-icon" href="{% static 'images/LOGO-VUM.png' %}">
 
   <!-- Мета для Facebook (начало) -->
   <meta property="og:image:height" content="1200">
@@ -59,7 +59,6 @@
     fbq('track', 'PageView');
   </script>
   <noscript><img height="1" width="1" style="display:none"
-  
       src="https://www.facebook.com/tr?id=2271244510044933&ev=PageView&noscript=1" /></noscript>
   <!-- End Meta Pixel Code  Xurshid 2 chi kod-->
 
@@ -78,6 +77,11 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <!-- Цвет браузера (конец) -->
+  <style>
+    #faw-main-contact-form {
+      padding-top: 120px;
+    }
+  </style>
 </head>
 
 <body>
@@ -109,8 +113,8 @@
               <div class="mxd-hero-06__data">
                 <div class="mxd-hero-06__headline">
                   <div class="hero-06-headline__descr">
-                    <p class="loading__item text">Van Universal Motors (VUM) — O‘zbekistonda FAW tijorat texnikasining
-                      rasmiy
+                    <p class="loading__item text">
+                      Van Universal Motors (VUM) — O‘zbekistonda FAW tijorat texnikasining rasmiy
                       ishlab chiqaruvchisi bo‘lib, kompaniya Andijon shahridagi o‘z zavodi va butun
                       respublikani qamrab olgan dilerlik tarmog‘iga ega.
                     </p>
@@ -133,7 +137,8 @@
                           </g>
                         </svg>
                         <!-- image -->
-                        <img class="btn-rotating__image" src="{% static 'images/logo/FAW-logo-big.png' %}" style="filter: brightness(0) invert(1);" alt="Object">
+                        <img class="btn-rotating__image" src="{% static 'images/logo/FAW-logo-big.png' %}"
+                          style="filter: brightness(0) invert(1);" alt="Object">
                       </a>
                     </div>
                   </div>
@@ -303,7 +308,7 @@
     <!-- Блок — изображение слайдера (конец) -->
     <!-- Секция — слайдер FAW (конец) -->
     <!-- Секция — контактная форма (начало) -->
-    <div class="mxd-section" id="faw-main-contact-form">
+    <div class="mxd-section">
       <div class="mxd-container mxd-form-container">
 
         <!-- НОВАЯ ФОРМА (шаблонный дизайн) -->
@@ -357,7 +362,7 @@
                 </div>
               </div>
               <!-- Right Column - Form with Template Design -->
-              <div class="col-12 col-md-6 mxd-grid-item">
+              <div class="col-12 col-md-6 mxd-grid-item" id="faw-main-contact-form">
                 <div class="mxd-block__content contact">
                   <div class="mxd-block__inner-form loading__fade">
                     <div class="form-container">
@@ -401,8 +406,7 @@
                             </div>
                             <div class="col-12 mxd-grid-item anim-uni-in-up">
                               <textarea name="message"
-                                placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*"
-                                required></textarea>
+                                placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*"></textarea>
                             </div>
                             <div class="col-12 mxd-grid-item anim-uni-in-up">
                               <button class="btn btn-anim btn-default btn-large btn-opposite slide-right-up shimmer-btn"
@@ -536,7 +540,8 @@
                 <div class="mxd-promo__layout">
                   <div class="mxd-promo__icon-section">
                     <span class="mxd-promo__icon">
-                      <img src="{% static 'images/logo/faw-logo.png' %}" style="filter: brightness(0) invert(1);" alt="FAW Icon">
+                      <img src="{% static 'images/logo/faw-logo.png' %}" style="filter: brightness(0) invert(1);"
+                        alt="FAW Icon">
                       <span class="mxd-promo__icon-tx reveal-type">FAW TRUCKS</span>
                     </span>
                   </div>
@@ -572,39 +577,6 @@
   <script src="{% static 'js/app.js' %}"></script>
   <!-- Счётчики FAW (инициализация) -->
   <script src="{% static 'js/faw.js' %}"></script>
-  <script>
-    // Универсальный плавный скролл, сразу учитывающий высоту фиксированного хедера
-    (function () {
-      function getHeaderHeight() {
-        try { var h = document.getElementById('header'); return h ? h.offsetHeight || 0 : 0; } catch (e) { return 0; }
-      }
-
-      function scrollToElementById(id) {
-        var el = document.getElementById(id);
-        if (!el) return;
-        var headerH = getHeaderHeight();
-        var offset = 18; // отступ под хедером
-        var rect = el.getBoundingClientRect();
-        var targetY = Math.max(0, Math.round(window.pageYOffset + rect.top - headerH - offset));
-        try { window.scrollTo({ top: targetY, behavior: 'smooth' }); }
-        catch (e) { window.scrollTo(0, targetY); }
-      }
-
-      // Делегирование: клики по ссылкам вида href="#id"
-      document.addEventListener('click', function (e) {
-        var a = e.target.closest && e.target.closest('a[href^="#"]');
-        if (!a) return;
-        var href = a.getAttribute('href');
-        if (!href || href === '#') return;
-        var id = href.slice(1);
-        if (!id) return;
-        if (document.getElementById(id)) {
-          e.preventDefault();
-          scrollToElementById(id);
-        }
-      }, false);
-    })();
-  </script>
   <!-- Мобильный фикс: надёжно отключаем инлайн-стили параллакса для маленьких экранов -->
   <script>
     (function () {

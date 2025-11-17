@@ -102,10 +102,22 @@ class JobApplicationSerializer(serializers.ModelSerializer):
 class FeatureIconSerializer(serializers.ModelSerializer):
     """Сериализатор для иконок характеристик"""
     icon_url = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()  # ← Добавляем перевод имени
     
     class Meta:
         model = FeatureIcon
         fields = ['id', 'name', 'icon_url']
+    
+    def get_name(self, obj):
+        """Возвращаем имя на нужном языке"""
+        request = self.context.get('request')
+        if request:
+            path = request.path
+            if '/uz/' in path:
+                return obj.name_uz or obj.name
+            elif '/en/' in path:
+                return obj.name_en or obj.name
+        return obj.name_ru or obj.name
     
     def get_icon_url(self, obj):
         if obj.icon:
@@ -115,15 +127,25 @@ class FeatureIconSerializer(serializers.ModelSerializer):
             return obj.icon.url
         return None
 
-
 class ProductCardSpecSerializer(serializers.ModelSerializer):
     """Сериализатор для 4 характеристик карточки"""
     icon = FeatureIconSerializer(read_only=True)
+    value = serializers.SerializerMethodField()  # ← Добавляем перевод value
     
     class Meta:
         model = ProductCardSpec
         fields = ['id', 'icon', 'value', 'order']
-
+    
+    def get_value(self, obj):
+        """Возвращаем value на нужном языке"""
+        request = self.context.get('request')
+        if request:
+            path = request.path
+            if '/uz/' in path:
+                return obj.value_uz or obj.value
+            elif '/en/' in path:
+                return obj.value_en or obj.value
+        return obj.value_ru or obj.value
 
 class ProductCardSerializer(serializers.ModelSerializer):
     """Сериализатор для карточек продуктов (список)"""
@@ -155,16 +177,28 @@ class ProductParameterSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ProductParameter
-        fields = ['id', 'category', 'category_display', 'text', 'order']
+        fields = ['id', 'category', 'category_name', 'text', 'order']
 
 
 class ProductFeatureSerializer(serializers.ModelSerializer):
     """Сериализатор для характеристик с иконками (8 шт)"""
     icon = FeatureIconSerializer(read_only=True)
+    name = serializers.SerializerMethodField()  # ← Добавляем перевод name
     
     class Meta:
         model = ProductFeature
         fields = ['id', 'icon', 'name', 'order']
+    
+    def get_name(self, obj):
+        """Возвращаем name на нужном языке"""
+        request = self.context.get('request')
+        if request:
+            path = request.path
+            if '/uz/' in path:
+                return obj.name_uz or obj.name
+            elif '/en/' in path:
+                return obj.name_en or obj.name
+        return obj.name_ru or obj.name
 
 
 class ProductGallerySerializer(serializers.ModelSerializer):
@@ -183,16 +217,16 @@ class ProductGallerySerializer(serializers.ModelSerializer):
             return obj.image.url
         return None
 
-
 class ProductDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для детальной страницы продукта"""
     card_specs = ProductCardSpecSerializer(many=True, read_only=True)
-    spec_groups = serializers.SerializerMethodField()  # ← Группируем параметры
+    spec_groups = serializers.SerializerMethodField()
     features = ProductFeatureSerializer(many=True, read_only=True)
     gallery = ProductGallerySerializer(many=True, read_only=True)
     main_image_url = serializers.SerializerMethodField()
     card_image_url = serializers.SerializerMethodField()
     category_display = serializers.CharField(source='get_category_display', read_only=True)
+    title = serializers.SerializerMethodField()  # ← Добавляем перевод названия
     
     class Meta:
         model = Product
@@ -203,15 +237,76 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'is_active', 'is_featured', 'order'
         ]
     
+    def get_title(self, obj):
+        """Возвращаем название продукта на нужном языке"""
+        request = self.context.get('request')
+        if request:
+            path = request.path
+            if '/uz/' in path:
+                return obj.title_uz or obj.title
+            elif '/en/' in path:
+                return obj.title_en or obj.title
+        return obj.title_ru or obj.title
+    
     def get_spec_groups(self, obj):
-        """Группируем параметры по категориям для фронтенда"""
+        """Группируем параметры по категориям с переводом"""
+        request = self.context.get('request')
+        language = 'ru'
+        
+        if request:
+            path = request.path
+            if '/uz/' in path:
+                language = 'uz'
+            elif '/ru/' in path:
+                language = 'ru'
+            elif '/en/' in path:
+                language = 'en'
+        
+        CATEGORY_TRANSLATIONS = {
+            'ru': {
+                'main': 'Основные параметры',
+                'engine': 'Двигатель',
+                'weight': 'Весовые параметры',
+                'transmission': 'Трансмиссия',
+                'brakes': 'Система тормозов и шин',
+                'comfort': 'Удобства',
+                'superstructure': 'Надстройка',
+                'cabin': 'Кабина',
+                'additional': 'Дополнительные параметры',
+            },
+            'uz': {
+                'main': 'Asosiy parametrlar',
+                'engine': 'Dvigatel',
+                'weight': 'Og\'irlik parametrlari',
+                'transmission': 'Transmissiya',
+                'brakes': 'Tormoz va shinalar tizimi',
+                'comfort': 'Qulayliklar',
+                'superstructure': 'Qo\'shimcha qurilma',
+                'cabin': 'Kabina',
+                'additional': 'Qo\'shimcha parametrlar',
+            },
+            'en': {
+                'main': 'Main Parameters',
+                'engine': 'Engine',
+                'weight': 'Weight Parameters',
+                'transmission': 'Transmission',
+                'brakes': 'Braking System and Tires',
+                'comfort': 'Comfort Features',
+                'superstructure': 'Superstructure',
+                'cabin': 'Cabin',
+                'additional': 'Additional Parameters',
+            }
+        }
+        
         parameters = obj.parameters.all().order_by('category', 'order')
         
-        # Группируем по категориям
         grouped = {}
         for param in parameters:
             category = param.category
-            category_display = param.get_category_display()
+            category_display = CATEGORY_TRANSLATIONS.get(language, {}).get(
+                category, 
+                param.get_category_display()
+            )
             
             if category not in grouped:
                 grouped[category] = {
@@ -219,13 +314,15 @@ class ProductDetailSerializer(serializers.ModelSerializer):
                     'parameters': []
                 }
             
+            # Получаем текст параметра на нужном языке
+            text_value = getattr(param, f'text_{language}', None) or param.text or ''
+            
             grouped[category]['parameters'].append({
                 'id': param.id,
-                'text': param.text,
+                'text': text_value,
                 'order': param.order
             })
         
-        # Преобразуем в список с правильным порядком категорий
         category_order = ['main', 'engine', 'weight', 'transmission', 'brakes', 'comfort', 'superstructure', 'cabin', 'additional']
         result = []
         for cat in category_order:
@@ -249,6 +346,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
                 return request.build_absolute_uri(obj.card_image.url)
             return obj.card_image.url
         return None
+    
 # Сериализаторы для дилеров
 
 class DealerServiceSerializer(serializers.ModelSerializer):

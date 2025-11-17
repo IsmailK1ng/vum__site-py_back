@@ -4,6 +4,7 @@ Django settings for myproject project.
 
 from pathlib import Path
 from decouple import config
+from django.utils.translation import gettext_lazy as _
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -60,10 +61,10 @@ USE_L10N = True
 USE_TZ = True
 
 LANGUAGES = [
-    ('uz', "O'zbek"),
-    ('ru', 'Русский'),
-    ('en', 'English'),
-    ('ky', 'Кыргызский'),
+    ('uz', _("O'zbek")),
+    ('ru', _("Русский")),
+    ('en', _("English")),
+    ('ky', _("Кыргызский")),
 ]
 
 MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz' 
@@ -156,17 +157,18 @@ JAZZMIN_UI_TWEAKS = {
 # ============ MIDDLEWARE ============
 
 MIDDLEWARE = [
-'django.middleware.security.SecurityMiddleware',
-'django.contrib.sessions.middleware.SessionMiddleware',
-#'myproject.middleware.ForceRussianMiddleware',  # Removed to prevent forcing Russian; re-enable if needed for specific conditions
-'corsheaders.middleware.CorsMiddleware',
-'django.middleware.common.CommonMiddleware',
-'django.middleware.csrf.CsrfViewMiddleware',
-'django.contrib.auth.middleware.AuthenticationMiddleware',
-'myproject.middleware.RefreshUserPermissionsMiddleware',
-'django.contrib.messages.middleware.MessageMiddleware',
-'django.middleware.clickjacking.XFrameOptionsMiddleware',
-'reversion.middleware.RevisionMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # ← Сначала стандартный
+    'myproject.middleware.ForceRussianMiddleware',  # ← Потом наш (перекрывает LocaleMiddleware)
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'myproject.middleware.RefreshUserPermissionsMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'reversion.middleware.RevisionMiddleware',
 ]
 
 ROOT_URLCONF = 'myproject.urls'
@@ -180,6 +182,7 @@ TEMPLATES = [
             BASE_DIR / 'templates',  
             BASE_DIR / 'main' / 'templates',
             BASE_DIR / 'kg' / 'templates',
+            BASE_DIR / 'locale',
         ],
         'APP_DIRS': True,  
         'OPTIONS': {

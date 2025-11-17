@@ -5,6 +5,7 @@ from unidecode import unidecode
 from ckeditor.fields import RichTextField  
 from django.utils import timezone
 from datetime import timedelta
+from django.utils.translation import gettext_lazy as _
 
 
 # ========== ОБЩИЕ CHOICES ==========
@@ -247,15 +248,15 @@ class Product(models.Model):
 class ProductParameter(models.Model):
     """Параметры грузовика"""
     CATEGORY_CHOICES = [
-        ('main', 'Основные параметры'),
-        ('engine', 'Двигатель'),
-        ('weight', 'Весовые параметры'),
-        ('transmission', 'Трансмиссия'),
-        ('brakes', 'Система тормозов и шин'),
-        ('comfort', 'Удобства'),
-        ('superstructure', 'Надстройка'),
-        ('cabin', 'Кабина'),
-        ('additional', 'Дополнительные параметры'),
+        ('main', _('Основные параметры')),
+        ('engine', _('Двигатель')),
+        ('weight', _('Весовые параметры')),
+        ('transmission', _('Трансмиссия')),
+        ('brakes', _('Система тормозов и шин')),
+        ('comfort', _('Удобства')),
+        ('superstructure', _('Надстройка')),
+        ('cabin', _('Кабина')),
+        ('additional', _('Дополнительные параметры')),
     ]
     
     product = models.ForeignKey(
