@@ -3,7 +3,7 @@ from .models import (
     News, NewsBlock, Vacancy, 
     VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
     Product, ProductFeature, ProductCardSpec, ProductParameter,
-    DealerService, Dealer, BecomeADealerPage, DealerRequirement
+    DealerService, Dealer, BecomeADealerPage, DealerRequirement, FeatureIcon,
 )
 
 
@@ -54,7 +54,6 @@ class ProductTranslationOptions(TranslationOptions):
         'slider_power',
         'slider_fuel_consumption',
     )
-
 
 @register(ProductFeature)
 class ProductFeatureTranslationOptions(TranslationOptions):

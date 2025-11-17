@@ -130,22 +130,10 @@ class FeatureIconSerializer(serializers.ModelSerializer):
 class ProductCardSpecSerializer(serializers.ModelSerializer):
     """Сериализатор для 4 характеристик карточки"""
     icon = FeatureIconSerializer(read_only=True)
-    value = serializers.SerializerMethodField()  # ← Добавляем перевод value
     
     class Meta:
         model = ProductCardSpec
         fields = ['id', 'icon', 'value', 'order']
-    
-    def get_value(self, obj):
-        """Возвращаем value на нужном языке"""
-        request = self.context.get('request')
-        if request:
-            path = request.path
-            if '/uz/' in path:
-                return obj.value_uz or obj.value
-            elif '/en/' in path:
-                return obj.value_en or obj.value
-        return obj.value_ru or obj.value
 
 class ProductCardSerializer(serializers.ModelSerializer):
     """Сериализатор для карточек продуктов (список)"""
