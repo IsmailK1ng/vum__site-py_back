@@ -319,7 +319,7 @@ class ProductsManager {
     cardsToShow.forEach(product => {
       const cardHTML = this.createCardHTML(product);
       const wrapper = document.createElement('div');
-      wrapper.className = 'col-12 col-xl-4 mxd-grid-item animate-card-3';
+      wrapper.className = 'product-card-wrapper';
       wrapper.innerHTML = cardHTML;
       container.appendChild(wrapper);
     });
