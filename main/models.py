@@ -486,7 +486,7 @@ class ContactForm(models.Model):
     )
     
     created_at = models.DateTimeField("Дата", auto_now_add=True)
-    message = models.TextField("Сообщение")
+    message = models.TextField("Сообщение", blank=True, default='')
     status = models.CharField("Статус", max_length=20, choices=STATUS_CHOICES, default='new')
     priority = models.CharField("Приоритет", max_length=10, choices=PRIORITY_CHOICES, default='medium')
     manager = models.ForeignKey(

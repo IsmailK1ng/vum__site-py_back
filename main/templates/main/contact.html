@@ -311,8 +311,7 @@
                                                         <div
                                                             class="col-12 mxd-grid-item anim-uni-in-up contact-grid-item">
                                                             <textarea name="message"
-                                                                placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*"
-                                                                ></textarea>
+                                                                placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*"></textarea>
                                                         </div>
                                                         <div class="col-12 mxd-grid-item anim-uni-in-up">
                                                             <button
@@ -402,7 +401,7 @@
     <script>
         // ============ ГЛОБАЛЬНЫЕ ФУНКЦИИ (ПРАВИЛЬНЫЙ ПОРЯДОК!) ============
 
-  
+
         window.getCookie = function (name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
@@ -501,7 +500,7 @@
                     name: form.name.value,
                     region: form.region.value,
                     phone: phoneInput.value,
-                    message: form.message.value,
+                    message: form.message.value || '',
                     referer: document.referrer || window.location.href,
                     utm_data: window.getUTMData(),
                     visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null

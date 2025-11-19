@@ -106,13 +106,11 @@
                                                     <h2 class="models_title">Yuklanmoqda...</h2>
                                                     <ul class="more_info-link">
                                                         <li>
-                                                            <a href="#parametrs">
-                                                                {% if LANGUAGE_CODE == 'ru' %}Параметры{% elif LANGUAGE_CODE == 'en' %}Parameters{% else %}Parametrlar{% endif %}
+                                                            <a href="#parametrs">{% if LANGUAGE_CODE == 'ru' %}Параметры{% elif LANGUAGE_CODE == 'en' %}Parameters{% else %}Parametrlar{% endif %}
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a href="#gallery">
-                                                                {% if LANGUAGE_CODE == 'ru' %}Галерея{% elif LANGUAGE_CODE == 'en' %}Gallery{% else %}Galereya{% endif %}
+                                                            <a href="#gallery">{% if LANGUAGE_CODE == 'ru' %}Галерея{% elif LANGUAGE_CODE == 'en' %}Gallery{% else %}Galereya{% endif %}
                                                             </a>
                                                         </li>
                                                     </ul>
@@ -134,7 +132,10 @@
                                                 </svg>
                                             </em>
                                             <em class="hero-05-title__item" style="font-size: 25px; max-width: 400px;">
-                                                {% if LANGUAGE_CODE == 'ru' %}Сообщите о любой проблеме на дорогах{% elif LANGUAGE_CODE == 'en' %}Report any problems on the roads{% else %}Har qanday yomon yo'l muammosi to'g'risida xabar bering{% endif %}
+                                                <ul class="more_info-link">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Сообщите о любой проблеме на дорогах{%
+                                                    elif LANGUAGE_CODE == 'en' %}Report any problems on the roads{% else
+                                                    %}Har qanday yomon yo'l muammosi to'g'risida xabar bering{% endif %}
                                             </em>
                                         </span>
                                         <a class="btn btn-anim btn-default btn-mobile-icon btn-outline slide-right-up mt-3"
@@ -306,8 +307,7 @@
 
                 <div class="faw-form__group">
                     <textarea name="Message" class="faw-form__textarea"
-                        placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*" rows="4"
-                        required></textarea>
+                        placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*" rows="4"></textarea>
                 </div>
 
                 <div class="faw-form__group">
@@ -497,12 +497,13 @@
                 }
 
                 const productField = document.getElementById('product-field');
+
                 const formData = {
                     name: contactForm.Name.value,
                     region: contactForm.Region.value,
                     phone: phoneInput.value,
                     product: productField?.value || '',
-                    message: contactForm.Message.value,
+                    message: contactForm.Message.value || '',
                     referer: document.referrer || window.location.href,
                     utm_data: window.getUTMData(),
                     visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null
