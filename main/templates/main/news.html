@@ -21,10 +21,10 @@
   <meta name="description"
     content="{% if LANGUAGE_CODE == 'uz' %}VUM kompaniyasining so'nggi yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Последние новости компании VUM{% else %}Latest news from VUM company{% endif %}">
 
-<!-- Универсальный favicon -->
-<link rel="icon" href="{% static 'images/LOGO-VUM.png' %}" />
-<!-- Для Apple устройств -->
-<link rel="apple-touch-icon" href="{% static 'images/LOGO-VUM.png' %}">
+  <!-- Универсальный favicon -->
+  <link rel="icon" href="{% static 'images/LOGO-VUM.png' %}" />
+  <!-- Для Apple устройств -->
+  <link rel="apple-touch-icon" href="{% static 'images/LOGO-VUM.png' %}">
 
   <!-- Styles -->
   <link rel="stylesheet" href="{% static 'css/loaders/loader.css' %}">
@@ -433,9 +433,8 @@
             return;
           }
 
-          // Анимация слева направо
-          const animation = gsap.to(marqueeContent, {
-            x: '33.333%',
+          // Анимация слева направо - БЕЗ РЕАКЦИИ НА СКРОЛЛ
+          gsap.to(marqueeContent, {
             duration: CONFIG.MARQUEE_DURATION,
             ease: 'none',
             repeat: -1,
@@ -443,20 +442,6 @@
               x: gsap.utils.unitize(x => parseFloat(x) % 33.333)
             }
           });
-
-          // Проверяем наличие ScrollTrigger
-          if (typeof ScrollTrigger !== 'undefined') {
-            // Ускорение при скролле
-            ScrollTrigger.create({
-              start: 0,
-              end: 'max',
-              onUpdate: (self) => {
-                const velocity = Math.abs(self.getVelocity());
-                const speed = gsap.utils.clamp(0.5, 2, 1 + velocity / 2000);
-                gsap.to(animation, { timeScale: speed, duration: 0.3 });
-              }
-            });
-          }
         });
       }
 

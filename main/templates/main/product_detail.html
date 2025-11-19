@@ -106,11 +106,15 @@
                                                     <h2 class="models_title">Yuklanmoqda...</h2>
                                                     <ul class="more_info-link">
                                                         <li>
-                                                            <a href="#parametrs">{% if LANGUAGE_CODE == 'ru' %}Параметры{% elif LANGUAGE_CODE == 'en' %}Parameters{% else %}Parametrlar{% endif %}
+                                                            <a href="#parametrs">{% if LANGUAGE_CODE == 'ru'
+                                                                %}Параметры{% elif LANGUAGE_CODE == 'en' %}Parameters{%
+                                                                else %}Parametrlar{% endif %}
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a href="#gallery">{% if LANGUAGE_CODE == 'ru' %}Галерея{% elif LANGUAGE_CODE == 'en' %}Gallery{% else %}Galereya{% endif %}
+                                                            <a href="#gallery">{% if LANGUAGE_CODE == 'ru' %}Галерея{%
+                                                                elif LANGUAGE_CODE == 'en' %}Gallery{% else %}Galereya{%
+                                                                endif %}
                                                             </a>
                                                         </li>
                                                     </ul>
@@ -387,7 +391,17 @@
             function setCookie(name, value, days) {
                 const expires = new Date();
                 expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-                document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/`;
+
+                // ✅ ИСПРАВЛЕНО: добавлены Secure и SameSite
+                let cookieString = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+
+                // На HTTPS добавляем Secure
+                if (location.protocol === 'https:') {
+                    cookieString += ';Secure';
+                }
+
+                document.cookie = cookieString;
+                console.log('🍪 [PRODUCT] Cookie установлен:', name, '=', value.substring(0, 50) + '...'); // ОТЛАДКА (потом удалить)
             }
 
             const params = new URLSearchParams(window.location.search);
@@ -399,10 +413,15 @@
                 }
             });
 
+            console.log('🔍 [PRODUCT] UTM из URL:', utm); // ОТЛАДКА (потом удалить)
+
             if (Object.keys(utm).length > 0) {
                 const utmString = JSON.stringify(utm);
                 sessionStorage.setItem('utm_data', utmString);
                 setCookie('utm_data', utmString, 30);
+                console.log('✅ [PRODUCT] UTM сохранены'); // ОТЛАДКА (потом удалить)
+            } else {
+                console.log('⚠️ [PRODUCT] UTM не найдены в URL'); // ОТЛАДКА (потом удалить)
             }
         })();
 
@@ -497,6 +516,8 @@
                 }
 
                 const productField = document.getElementById('product-field');
+                const utmData = window.getUTMData();
+                console.log('📊 [PRODUCT] UTM при отправке формы:', utmData); // ОТЛАДКА (потом удалить)
 
                 const formData = {
                     name: contactForm.Name.value,
@@ -505,9 +526,11 @@
                     product: productField?.value || '',
                     message: contactForm.Message.value || '',
                     referer: document.referrer || window.location.href,
-                    utm_data: window.getUTMData(),
+                    utm_data: utmData,
                     visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null
                 };
+
+                console.log('📤 [PRODUCT] Данные перед отправкой:', formData); // ОТЛАДКА (потом удалить)
 
                 try {
                     const response = await fetch("/api/uz/contact/", {
@@ -587,6 +610,7 @@
             });
         });
     </script>
+
 </body>
 
 </html>

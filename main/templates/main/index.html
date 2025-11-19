@@ -58,6 +58,7 @@
     fbq('init', '2271244510044933');
     fbq('track', 'PageView');
   </script>
+  
   <noscript><img height="1" width="1" style="display:none"
       src="https://www.facebook.com/tr?id=2271244510044933&ev=PageView&noscript=1" /></noscript>
   <!-- End Meta Pixel Code  Xurshid 2 chi kod-->
@@ -590,7 +591,7 @@
   <script src="{% static 'js/app.js' %}"></script>
   <!-- Счётчики FAW (инициализация) -->
   <script src="{% static 'js/faw.js' %}"></script>
-  <!-- Мобильный фикс: надёжно отключаем инлайн-стили параллакса для маленьких экранов -->
+
   <!-- Мобильный фикс: надёжно отключаем инлайн-стили параллакса для маленьких экранов -->
   <script>
     (function () {
@@ -737,10 +738,22 @@
 
     // ============ СОХРАНЕНИЕ UTM В COOKIE ============
     (function () {
+      'use strict';
+
       function setCookie(name, value, days) {
         const expires = new Date();
         expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-        document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/`;
+
+        // ✅ ИСПРАВЛЕНО: добавлены Secure и SameSite
+        let cookieString = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+
+        // На HTTPS добавляем Secure
+        if (location.protocol === 'https:') {
+          cookieString += ';Secure';
+        }
+
+        document.cookie = cookieString;
+        console.log('🍪 [INDEX] Cookie установлен:', name, '=', value.substring(0, 50) + '...'); // ОТЛАДКА (потом удалить)
       }
 
       const params = new URLSearchParams(window.location.search);
@@ -752,10 +765,15 @@
         }
       });
 
+      console.log('🔍 [INDEX] UTM из URL:', utm); // ОТЛАДКА (потом удалить)
+
       if (Object.keys(utm).length > 0) {
         const utmString = JSON.stringify(utm);
         sessionStorage.setItem('utm_data', utmString);
         setCookie('utm_data', utmString, 30);
+        console.log('✅ [INDEX] UTM сохранены'); // ОТЛАДКА (потом удалить)
+      } else {
+        console.log('⚠️ [INDEX] UTM не найдены в URL'); // ОТЛАДКА (потом удалить)
       }
     })();
 
@@ -796,15 +814,20 @@
           return;
         }
 
+        const utmData = window.getUTMData();
+        console.log('📊 [INDEX] UTM при отправке формы:', utmData); // ОТЛАДКА (потом удалить)
+
         const formData = {
           name: form.name.value,
           region: form.region.value,
           phone: phoneInput.value,
           message: form.message.value || '',
           referer: document.referrer || window.location.href,
-          utm_data: window.getUTMData(),
+          utm_data: utmData,
           visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null
         };
+
+        console.log('📤 [INDEX] Данные перед отправкой:', formData); // ОТЛАДКА (потом удалить)
 
         try {
           const response = await fetch("/api/uz/contact/", {
@@ -849,7 +872,6 @@
       }
     });
   </script>
-
   <!-- Load Scripts End -->
 
 </body>
