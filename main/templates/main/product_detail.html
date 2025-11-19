@@ -106,15 +106,29 @@
                                                     <h2 class="models_title">Yuklanmoqda...</h2>
                                                     <ul class="more_info-link">
                                                         <li>
-                                                            <a href="#parametrs">{% if LANGUAGE_CODE == 'ru'
-                                                                %}Параметры{% elif LANGUAGE_CODE == 'en' %}Parameters{%
-                                                                else %}Parametrlar{% endif %}
+                                                            <a href="#parametrs">
+                                                                {% if LANGUAGE_CODE == 'ru' %}
+                                                                    Параметры
+                                                                {% else %}
+                                                                    {% if LANGUAGE_CODE == 'en' %}
+                                                                        Parameters
+                                                                    {% else %}
+                                                                        Parametrlar
+                                                                    {% endif %}
+                                                                {% endif %}
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a href="#gallery">{% if LANGUAGE_CODE == 'ru' %}Галерея{%
-                                                                elif LANGUAGE_CODE == 'en' %}Gallery{% else %}Galereya{%
-                                                                endif %}
+                                                            <a href="#gallery">
+                                                                {% if LANGUAGE_CODE == 'ru' %}
+                                                                    Галерея
+                                                                {% else %}
+                                                                    {% if LANGUAGE_CODE == 'en' %}
+                                                                        Gallery
+                                                                    {% else %}
+                                                                        Galereya
+                                                                    {% endif %}
+                                                                {% endif %}
                                                             </a>
                                                         </li>
                                                     </ul>
@@ -401,7 +415,6 @@
                 }
 
                 document.cookie = cookieString;
-                console.log('🍪 [PRODUCT] Cookie установлен:', name, '=', value.substring(0, 50) + '...'); // ОТЛАДКА (потом удалить)
             }
 
             const params = new URLSearchParams(window.location.search);
@@ -413,15 +426,11 @@
                 }
             });
 
-            console.log('🔍 [PRODUCT] UTM из URL:', utm); // ОТЛАДКА (потом удалить)
-
             if (Object.keys(utm).length > 0) {
                 const utmString = JSON.stringify(utm);
                 sessionStorage.setItem('utm_data', utmString);
                 setCookie('utm_data', utmString, 30);
-                console.log('✅ [PRODUCT] UTM сохранены'); // ОТЛАДКА (потом удалить)
             } else {
-                console.log('⚠️ [PRODUCT] UTM не найдены в URL'); // ОТЛАДКА (потом удалить)
             }
         })();
 
@@ -517,7 +526,6 @@
 
                 const productField = document.getElementById('product-field');
                 const utmData = window.getUTMData();
-                console.log('📊 [PRODUCT] UTM при отправке формы:', utmData); // ОТЛАДКА (потом удалить)
 
                 const formData = {
                     name: contactForm.Name.value,
@@ -529,8 +537,6 @@
                     utm_data: utmData,
                     visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null
                 };
-
-                console.log('📤 [PRODUCT] Данные перед отправкой:', formData); // ОТЛАДКА (потом удалить)
 
                 try {
                     const response = await fetch("/api/uz/contact/", {

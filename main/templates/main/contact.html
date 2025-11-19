@@ -451,7 +451,6 @@
                 }
 
                 document.cookie = cookieString;
-                console.log('🍪 [CONTACT] Cookie установлен:', name, '=', value.substring(0, 50) + '...'); // ОТЛАДКА (потом удалить)
             }
 
             const params = new URLSearchParams(window.location.search);
@@ -463,15 +462,12 @@
                 }
             });
 
-            console.log('🔍 [CONTACT] UTM из URL:', utm); // ОТЛАДКА (потом удалить)
 
             if (Object.keys(utm).length > 0) {
                 const utmString = JSON.stringify(utm);
                 sessionStorage.setItem('utm_data', utmString);
                 setCookie('utm_data', utmString, 30);
-                console.log('✅ [CONTACT] UTM сохранены'); // ОТЛАДКА (потом удалить)
             } else {
-                console.log('⚠️ [CONTACT] UTM не найдены в URL'); // ОТЛАДКА (потом удалить)
             }
         })();
 
@@ -513,7 +509,6 @@
                 }
 
                 const utmData = window.getUTMData();
-                console.log('📊 [CONTACT] UTM при отправке формы:', utmData); // ОТЛАДКА (потом удалить)
 
                 const formData = {
                     name: form.name.value,
@@ -524,8 +519,6 @@
                     utm_data: utmData,
                     visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null
                 };
-
-                console.log('📤 [CONTACT] Данные перед отправкой:', formData); // ОТЛАДКА (потом удалить)
 
                 try {
                     const response = await fetch("/api/uz/contact/", {
