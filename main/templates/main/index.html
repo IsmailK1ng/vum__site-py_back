@@ -17,13 +17,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <!-- Фавикон и иконки (начало) -->
-  <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
-  <link rel="apple-touch-icon" href="{% static 'images/icon/_iiiiapple.png' %}" />
-  <link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/icon/_iiii176.png' %}" />
-  <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/icon/_iiii1156.png' %}" />
-  <link rel="apple-touch-startup-image" href="{% static 'images/icon/_iiii1.png' %}" />
-  <!-- Фавикон и иконки (конец) -->
+  <!-- Универсальный favicon -->
+  <link rel="icon" href="{% static 'images/LOGO-VUM.png' %}" />
+  <!-- Для Apple устройств -->
+  <link rel="apple-touch-icon" href="{% static 'images/LOGO-VUM.png' %}">
 
   <!-- Мета для Facebook (начало) -->
   <meta property="og:image:height" content="1200">
@@ -93,6 +90,11 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <!-- Цвет браузера (конец) -->
+  <style>
+    #faw-main-contact-form {
+      padding-top: 120px;
+    }
+  </style>
 </head>
 
 <body>
@@ -124,8 +126,8 @@
               <div class="mxd-hero-06__data">
                 <div class="mxd-hero-06__headline">
                   <div class="hero-06-headline__descr">
-                    <p class="loading__item text">Van Universal Motors (VUM) — O‘zbekistonda FAW tijorat texnikasining
-                      rasmiy
+                    <p class="loading__item text">
+                      Van Universal Motors (VUM) — O‘zbekistonda FAW tijorat texnikasining rasmiy
                       ishlab chiqaruvchisi bo‘lib, kompaniya Andijon shahridagi o‘z zavodi va butun
                       respublikani qamrab olgan dilerlik tarmog‘iga ega.
                     </p>
@@ -148,7 +150,8 @@
                           </g>
                         </svg>
                         <!-- image -->
-                        <img class="btn-rotating__image" src="{% static 'images/faw-logo.png' %}" alt="Object">
+                        <img class="btn-rotating__image" src="{% static 'images/logo/FAW-logo-big.png' %}"
+                          style="filter: brightness(0) invert(1);" alt="Object">
                       </a>
                     </div>
                   </div>
@@ -180,7 +183,7 @@
                 </g>
               </svg>
               <!-- image -->
-              <img class="btn-rotating__image" src="{% static 'images/faw-logo.png' %}" alt="Object">
+              <img class="btn-rotating__image" src="{% static 'images/logo/faw-logo.png' %}" alt="Object">
             </a>
           </div>
         </div>
@@ -318,7 +321,7 @@
     <!-- Блок — изображение слайдера (конец) -->
     <!-- Секция — слайдер FAW (конец) -->
     <!-- Секция — контактная форма (начало) -->
-    <div class="mxd-section" id="faw-main-contact-form">
+    <div class="mxd-section">
       <div class="mxd-container mxd-form-container">
 
         <!-- НОВАЯ ФОРМА (шаблонный дизайн) -->
@@ -372,7 +375,7 @@
                 </div>
               </div>
               <!-- Right Column - Form with Template Design -->
-              <div class="col-12 col-md-6 mxd-grid-item">
+              <div class="col-12 col-md-6 mxd-grid-item" id="faw-main-contact-form">
                 <div class="mxd-block__content contact">
                   <div class="mxd-block__inner-form loading__fade">
                     <div class="form-container">
@@ -416,8 +419,7 @@
                             </div>
                             <div class="col-12 mxd-grid-item anim-uni-in-up">
                               <textarea name="message"
-                                placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*"
-                                required></textarea>
+                                placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*"></textarea>
                             </div>
                             <div class="col-12 mxd-grid-item anim-uni-in-up">
                               <button class="btn btn-anim btn-default btn-large btn-opposite slide-right-up shimmer-btn"
@@ -551,7 +553,8 @@
                 <div class="mxd-promo__layout">
                   <div class="mxd-promo__icon-section">
                     <span class="mxd-promo__icon">
-                      <img src="{% static 'images/faw-logo.svg' %}" alt="FAW Icon">
+                      <img src="{% static 'images/logo/faw-logo.png' %}" style="filter: brightness(0) invert(1);"
+                        alt="FAW Icon">
                       <span class="mxd-promo__icon-tx reveal-type">FAW TRUCKS</span>
                     </span>
                   </div>
@@ -587,105 +590,8 @@
   <script src="{% static 'js/app.js' %}"></script>
   <!-- Счётчики FAW (инициализация) -->
   <script src="{% static 'js/faw.js' %}"></script>
+  <!-- Мобильный фикс: надёжно отключаем инлайн-стили параллакса для маленьких экранов -->
   <script>
-    // ============ ГЛОБАЛЬНЫЕ ФУНКЦИИ (СВЕРХУ!) ============
-    window.getCookie = function (name) {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) {
-        return decodeURIComponent(parts.pop().split(';').shift());
-      }
-      return null;
-    };
-
-    window.getUTMData = function () {
-      const params = new URLSearchParams(window.location.search);
-      const utm = {};
-
-      ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(key => {
-        if (params.has(key)) {
-          utm[key] = params.get(key);
-        }
-      });
-
-      if (Object.keys(utm).length > 0) {
-        return JSON.stringify(utm);
-      }
-
-      const savedSession = sessionStorage.getItem('utm_data');
-      if (savedSession) return savedSession;
-
-      const savedCookie = window.getCookie('utm_data');  // ← ИСПРАВЛЕНО
-      if (savedCookie) return savedCookie;
-
-      return null;
-    };
-
-    // ============ СОХРАНЕНИЕ UTM В COOKIE ============
-    (function () {
-      function setCookie(name, value, days) {
-        const expires = new Date();
-        expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-        document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/`;
-      }
-
-      const params = new URLSearchParams(window.location.search);
-      const utm = {};
-
-      ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(key => {
-        if (params.has(key)) {
-          utm[key] = params.get(key);
-        }
-      });
-
-      if (Object.keys(utm).length > 0) {
-        const utmString = JSON.stringify(utm);
-        sessionStorage.setItem('utm_data', utmString);
-        setCookie('utm_data', utmString, 30);
-      }
-    })();
-
-
-    // ============ ПЛАВНЫЙ СКРОЛЛ ============
-    (function () {
-      function getHeaderHeight() {
-        try {
-          var h = document.getElementById('header');
-          return h ? h.offsetHeight || 0 : 0;
-        } catch (e) {
-          return 0;
-        }
-      }
-
-      function scrollToElementById(id) {
-        var el = document.getElementById(id);
-        if (!el) return;
-        var headerH = getHeaderHeight();
-        var offset = 18;
-        var rect = el.getBoundingClientRect();
-        var targetY = Math.max(0, Math.round(window.pageYOffset + rect.top - headerH - offset));
-        try {
-          window.scrollTo({ top: targetY, behavior: 'smooth' });
-        } catch (e) {
-          window.scrollTo(0, targetY);
-        }
-      }
-
-      document.addEventListener('click', function (e) {
-        var a = e.target.closest && e.target.closest('a[href^="#"]');
-        if (!a) return;
-        var href = a.getAttribute('href');
-        if (!href || href === '#') return;
-        var id = href.slice(1);
-        if (!id) return;
-        if (document.getElementById(id)) {
-          e.preventDefault();
-          scrollToElementById(id);
-        }
-      }, false);
-    })();
-
-    // ============ МОБИЛЬНЫЙ ФИКС ПАРАЛЛАКСА ============
     (function () {
       var observer = null;
 

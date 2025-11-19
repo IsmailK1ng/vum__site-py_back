@@ -1,17 +1,32 @@
 /**
- * FAW Product Detail - Загрузка детальной информации о продукте
- */
-
-/**
- * FAW Product Detail - Production Version
+ * FAW Product Detail - Production Version with Full Translation Support
  */
 
 class ProductDetail {
     constructor() {
         this.productId = null;
-        this.apiUrl = '/api/uz/products/';
+        this.apiUrl = this.getApiUrl();
         this.product = null;
         this.init();
+    }
+
+    // Определяем API URL в зависимости от текущего языка
+    getApiUrl() {
+        // Получаем язык из Django
+        const lang = document.documentElement.lang || 
+                     window.LANGUAGE_CODE || 
+                     this.getCookie('django_language') || 
+                     'uz';
+        
+        return `/api/${lang}/products/`;
+    }
+
+    // Получаем cookie
+    getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
     }
 
     async init() {
@@ -42,12 +57,17 @@ class ProductDetail {
             this.hideLoader();
 
         } catch (error) {
+            console.error('Error loading product:', error);
             this.showError('Mahsulot yuklanmadi. Qayta urinib ko\'ring.');
         }
     }
 
     renderProduct() {
-        document.querySelector('.models_title').textContent = this.product.title;
+        // Название продукта (уже переведённое с API)
+        const titleElement = document.querySelector('.models_title');
+        if (titleElement) {
+            titleElement.textContent = this.product.title;
+        }
         window.currentProductTitle = this.product.title;
 
         const heroImg = document.querySelector('.mxd-hero-06__car-image');
@@ -331,6 +351,9 @@ class ProductDetail {
     }
 }
 
+// Инициализация
+let productDetailInstance = null;
+
 document.addEventListener('DOMContentLoaded', () => {
-    new ProductDetail();
+    productDetailInstance = new ProductDetail();
 });

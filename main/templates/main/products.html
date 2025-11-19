@@ -11,12 +11,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <!-- Фавикон и иконки -->
-  <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
-  <link rel="apple-touch-icon" href="{% static 'images/icon/_iiiiapple.png' %}" />
-  <link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/icon/_iiii176.png' %}" />
-  <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/icon/_iiii1156.png' %}" />
-  <link rel="apple-touch-startup-image" href="{% static 'images/icon/_iiii1.png' %}" />
+  <!-- Универсальный favicon -->
+  <link rel="icon" href="{% static 'images/LOGO-VUM.png' %}" />
+  <!-- Для Apple устройств -->
+  <link rel="apple-touch-icon" href="{% static 'images/LOGO-VUM.png' %}">
 
   <!-- Мета для Facebook -->
   <meta property="og:image:height" content="1200">
@@ -61,8 +59,9 @@
       color: #999;
       font-size: 18px;
     }
-    </style>
+  </style>
 </head>
+
 <body>
   <!-- Меню и шапка -->
   {% include 'main/includes/header.html' %}
@@ -83,7 +82,9 @@
                       <div class="col-12 col-xl-12 mxd-grid-item no-margin">
                         <div class="mxd-section-models__title">
                           <!-- JavaScript заменит это -->
-                          <h2 class="models_title">Modellar</h2>
+                          <h2 class="models_title">
+                            {% if LANGUAGE_CODE == 'ru' %}Модели{% elif LANGUAGE_CODE == 'en' %}Models{% else %}Modellar{% endif %}
+                          </h2>
                         </div>
                       </div>
                       <div class="col-12 col-xl-8 mxd-grid-item no-margin">
@@ -130,8 +131,12 @@
                   <!-- Хлебные крошки -->
                   <div aria-label="breadcrumb">
                     <ol class="breadcrumb-ol">
-                      <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
-                      <li><a href="javascript:void(0)">Modellar</a></li>
+                      <li><a href="{% url 'home' %}">
+                          {% if LANGUAGE_CODE == 'ru' %}Главная{% elif LANGUAGE_CODE == 'en' %}Home{% else %}Bosh sahifa{% endif %}
+                      </a></li>
+                      <li><a href="javascript:void(0)">
+                          {% if LANGUAGE_CODE == 'ru' %}Модели{% elif LANGUAGE_CODE == 'en' %}Models{% else %}Modellar{% endif %}
+                      </a></li>
                       <!-- JavaScript заменит это -->
                       <li class="active"><a href="javascript:void(0)">Kategoriya</a></li>
                     </ol>
@@ -154,10 +159,12 @@
         <div class="mxd-block">
           <div class="mxd-blog-preview">
             <div class="container-fluid p-0">
-              <div class="row g-0 card_block faw-truck-card-container">
+              <div class="g-0 card_block faw-truck-card-container">
                 <!-- Loader - JavaScript заменит на карточки -->
                 <div class="loader-container">
-                  <div class="loader">Yuklanmoqda...</div>
+                  <div class="loader">
+                    {% if LANGUAGE_CODE == 'ru' %}Загрузка...{% elif LANGUAGE_CODE == 'en' %}Loading...{% else %}Yuklanmoqda{% endif %}
+                  </div>
                 </div>
               </div>
             </div>

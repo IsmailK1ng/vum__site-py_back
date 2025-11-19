@@ -103,7 +103,10 @@ python manage.py migrate app_name migration_name
 Пример:
 python manage.py migrate news 0002
 
-python manage.py collectstatic --noinput
+🧹 Сбор статических файлов (collectstatic)
+Если проект деплоится на сервер и нужны статики:
+
+python manage.py collectstatic
 
 bash
 python manage.py save_amocrm_tokens

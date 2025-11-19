@@ -14,11 +14,10 @@
     <meta name="keywords" content="FAW Trucks, {% if LANGUAGE_CODE == 'uz' %}O'zbekiston, diler, yuk mashinalari{% elif LANGUAGE_CODE == 'ru' %}Узбекистан, дилер, грузовики{% else %}Uzbekistan, dealer, trucks{% endif %}" />
     <meta name="author" content="mix_design" />
 
-    <!-- Favicons -->
-    <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/icon/_iiiiapple.png' %}" />
-    <link rel="apple-touch-icon" sizes="76x76" href="{% static 'images/icon/_iiii176.png' %}" />
-    <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/icon/_iiii1156.png' %}" />
+<!-- Универсальный favicon -->
+<link rel="icon" href="{% static 'images/LOGO-VUM.png' %}" />
+<!-- Для Apple устройств -->
+<link rel="apple-touch-icon" href="{% static 'images/LOGO-VUM.png' %}">
 
     <!-- Open Graph -->
     <meta property="og:title" content="{{ page_data.title }} | FAW Trucks" />

@@ -1,64 +1,200 @@
 /**
- * FAW Products - Динамическая загрузка карточек
+ * FAW Products - Динамическая загрузка карточек с поддержкой переводов
  */
 
 class ProductsManager {
   constructor() {
-    // API endpoint - проверьте правильный путь
-    this.apiUrl = '/api/uz/products/'; 
+    // Определяем текущий язык
+    this.currentLanguage = document.documentElement.lang || 
+                          window.LANGUAGE_CODE || 
+                          this.getCookie('django_language') || 
+                          'uz';
+    
+    // Определяем API URL в зависимости от языка
+    this.apiUrl = `/api/${this.currentLanguage}/products/`;
     this.currentCategory = null;
     this.currentPage = 1;
     this.cardsPerPage = 6;
     this.allProducts = [];
     this.filteredProducts = [];
     
-    // Полная информация о категориях с картинками и слоганами
-    this.categoryData = {
+    // Полная информация о категориях с переводами
+    this.categoryTranslations = {
       'tiger_vh': {
-        title: 'Tiger VH',
-        breadcrumb: 'Tiger VH',
-        slogan: 'Ikki yoqilg\'ida harakatlanuvchi texnika',
-        hero_image: 'images/categories/vh_models.png' // Укажите правильный путь
+        uz: {
+          title: 'Tiger VH',
+          breadcrumb: 'Tiger VH',
+          slogan: 'Ikki yoqilg\'ida harakatlanuvchi texnika',
+          buttonText: 'Batafsil o\'qish'
+        },
+        ru: {
+          title: 'Tiger VH',
+          breadcrumb: 'Tiger VH',
+          slogan: 'Техника на двух видах топлива',
+          buttonText: 'Подробнее'
+        },
+        en: {
+          title: 'Tiger VH',
+          breadcrumb: 'Tiger VH',
+          slogan: 'Dual-fuel technology',
+          buttonText: 'Read more'
+        },
+        hero_image: 'images/categories/vh_models.png'
       },
       'samosval': {
-        title: 'Samosvallar',
-        breadcrumb: 'Samosvallar',
-        slogan: 'Qurilish uchun eng yaxshi yechim',
+        uz: {
+          title: 'Samosvallar',
+          breadcrumb: 'Samosvallar',
+          slogan: 'Qurilish uchun eng yaxshi yechim',
+          buttonText: 'Batafsil o\'qish'
+        },
+        ru: {
+          title: 'Самосвалы',
+          breadcrumb: 'Самосвалы',
+          slogan: 'Лучшее решение для строительства',
+          buttonText: 'Подробнее'
+        },
+        en: {
+          title: 'Dump Trucks',
+          breadcrumb: 'Dump Trucks',
+          slogan: 'Best solution for construction',
+          buttonText: 'Read more'
+        },
         hero_image: 'images/categories/dump-truck-hero.png'
       },
       'maxsus': {
-        title: 'Maxsus texnika',
-        breadcrumb: 'Maxsus texnika',
-        slogan: 'Har qanday vazifa uchun',
+        uz: {
+          title: 'Maxsus texnika',
+          breadcrumb: 'Maxsus texnika',
+          slogan: 'Har qanday vazifa uchun',
+          buttonText: 'Batafsil o\'qish'
+        },
+        ru: {
+          title: 'Спецтехника',
+          breadcrumb: 'Спецтехника',
+          slogan: 'Для любых задач',
+          buttonText: 'Подробнее'
+        },
+        en: {
+          title: 'Special Equipment',
+          breadcrumb: 'Special Equipment',
+          slogan: 'For any task',
+          buttonText: 'Read more'
+        },
         hero_image: 'images/categories/special-hero.png'
       },
       'furgon': {
-        title: 'Avtofurgonlar',
-        breadcrumb: 'Avtofurgonlar',
-        slogan: 'Yuk tashish uchun ideal',
+        uz: {
+          title: 'Avtofurgonlar',
+          breadcrumb: 'Avtofurgonlar',
+          slogan: 'Yuk tashish uchun ideal',
+          buttonText: 'Batafsil o\'qish'
+        },
+        ru: {
+          title: 'Фургоны',
+          breadcrumb: 'Фургоны',
+          slogan: 'Идеально для перевозки грузов',
+          buttonText: 'Подробнее'
+        },
+        en: {
+          title: 'Vans',
+          breadcrumb: 'Vans',
+          slogan: 'Perfect for cargo transportation',
+          buttonText: 'Read more'
+        },
         hero_image: 'images/categories/avtofurgon-hero.png'
       },
       'shassi': {
-        title: 'Shassilar',
-        breadcrumb: 'Shassilar',
-        slogan: 'Ishonchli asos',
+        uz: {
+          title: 'Shassilar',
+          breadcrumb: 'Shassilar',
+          slogan: 'Ishonchli asos',
+          buttonText: 'Batafsil o\'qish'
+        },
+        ru: {
+          title: 'Шасси',
+          breadcrumb: 'Шасси',
+          slogan: 'Надежная основа',
+          buttonText: 'Подробнее'
+        },
+        en: {
+          title: 'Chassis',
+          breadcrumb: 'Chassis',
+          slogan: 'Reliable foundation',
+          buttonText: 'Read more'
+        },
         hero_image: 'images/categories/chassis-hero.png'
       },
       'tiger_v': {
-        title: 'Tiger V',
-        breadcrumb: 'Tiger V',
-        slogan: 'Kuchli va zamonaviy pikap',
+        uz: {
+          title: 'Tiger V',
+          breadcrumb: 'Tiger V',
+          slogan: 'Kuchli va zamonaviy pikap',
+          buttonText: 'Batafsil o\'qish'
+        },
+        ru: {
+          title: 'Tiger V',
+          breadcrumb: 'Tiger V',
+          slogan: 'Мощный и современный пикап',
+          buttonText: 'Подробнее'
+        },
+        en: {
+          title: 'Tiger V',
+          breadcrumb: 'Tiger V',
+          slogan: 'Powerful and modern pickup',
+          buttonText: 'Read more'
+        },
         hero_image: 'images/categories/tiger-v-hero.png'
       },
       'tiger_vr': {
-        title: 'Tiger VR',
-        breadcrumb: 'Tiger VR',
-        slogan: 'Premium sinf pikap',
+        uz: {
+          title: 'Tiger VR',
+          breadcrumb: 'Tiger VR',
+          slogan: 'Premium sinf pikap',
+          buttonText: 'Batafsil o\'qish'
+        },
+        ru: {
+          title: 'Tiger VR',
+          breadcrumb: 'Tiger VR',
+          slogan: 'Пикап премиум-класса',
+          buttonText: 'Подробнее'
+        },
+        en: {
+          title: 'Tiger VR',
+          breadcrumb: 'Tiger VR',
+          slogan: 'Premium class pickup',
+          buttonText: 'Read more'
+        },
         hero_image: 'images/categories/tiger-vr-hero.png'
       }
     };
     
     this.init();
+  }
+
+  // Определяем API URL в зависимости от текущего языка
+  getApiUrl() {
+    return `/api/${this.currentLanguage}/products/`;
+  }
+  
+  // Получаем данные категории на текущем языке
+  getCategoryData(categoryKey) {
+    const category = this.categoryTranslations[categoryKey];
+    if (!category) return null;
+    
+    const langData = category[this.currentLanguage] || category['uz'];
+    return {
+      ...langData,
+      hero_image: category.hero_image
+    };
+  }
+
+  // Получаем cookie
+  getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
   }
 
   async init() {
@@ -82,7 +218,7 @@ class ProductsManager {
       return;
     }
     
-    const categoryInfo = this.categoryData[this.currentCategory];
+    const categoryInfo = this.getCategoryData(this.currentCategory);
     if (!categoryInfo) {
       console.error('Unknown category:', this.currentCategory);
       return;
@@ -103,7 +239,6 @@ class ProductsManager {
     // 3. Обновляем hero изображение
     const heroImage = document.querySelector('.mxd-hero-06__img img');
     if (heroImage) {
-      // Используем полный путь через static
       const staticPath = `/static/${categoryInfo.hero_image}`;
       heroImage.src = staticPath;
       heroImage.alt = categoryInfo.title;
@@ -117,6 +252,9 @@ class ProductsManager {
     
     // 5. Обновляем title страницы
     document.title = `${categoryInfo.title} - FAW Trucks`;
+    
+    // Сохраняем текст кнопки для использования в карточках
+    this.buttonText = categoryInfo.buttonText;
   }
 
   async loadProducts() {
@@ -129,6 +267,8 @@ class ProductsManager {
         url += `?category=${this.currentCategory}`;
       }
       
+      console.log('Loading products from:', url);
+      
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -140,6 +280,8 @@ class ProductsManager {
       // Поддержка разных форматов ответа
       this.allProducts = data.results || data.products || data || [];
       this.filteredProducts = [...this.allProducts];
+      
+      console.log('Loaded products:', this.allProducts.length);
       
       if (this.allProducts.length === 0) {
         this.showNoResults();
@@ -177,7 +319,7 @@ class ProductsManager {
     cardsToShow.forEach(product => {
       const cardHTML = this.createCardHTML(product);
       const wrapper = document.createElement('div');
-      wrapper.className = 'col-12 col-xl-4 mxd-grid-item animate-card-3';
+      wrapper.className = 'product-card-wrapper';
       wrapper.innerHTML = cardHTML;
       container.appendChild(wrapper);
     });
@@ -192,10 +334,11 @@ class ProductsManager {
         .map(spec => {
           const iconUrl = spec.icon?.icon_url || spec.icon_url || '';
           const iconName = spec.icon?.name || spec.name || '';
+          const specValue = spec.value || '';
           return `
             <div class="spec-item">
               ${iconUrl ? `<img class="spec-icon" src="${iconUrl}" alt="${iconName}">` : ''}
-              <span class="spec-value">${spec.value || ''}</span>
+              <span class="spec-value">${specValue}</span>
             </div>
           `;
         }).join('');
@@ -205,6 +348,7 @@ class ProductsManager {
     const imageUrl = product.image_url || product.image || product.main_image || '';
     const productSlug = product.slug || '';
     const productTitle = product.title || product.name || 'Продукт';
+    const buttonText = this.buttonText || 'Подробнее';
 
     return `
       <div class="faw-truck-card">
@@ -215,7 +359,7 @@ class ProductsManager {
           <h3 class="truck-title">${productTitle}</h3>
           ${specsHTML ? `<div class="truck-specs">${specsHTML}</div>` : ''}
           <div class="truck-cta">
-            <a href="/products/${productSlug}/" class="btn-details">Batafsil o'qish</a>
+            <a href="/products/${productSlug}/" class="btn-details">${buttonText}</a>
           </div>
         </div>
       </div>

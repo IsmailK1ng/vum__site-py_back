@@ -8,8 +8,10 @@
     <meta name="description" content="FAW Trucks в Узбекистане">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-    <!-- Фавикон -->
-    <link rel="shortcut icon" href="{% static 'images/icon/favicon_5.ico' %}" type="image/x-icon" />
+    <!-- Универсальный favicon -->
+    <link rel="icon" href="{% static 'images/LOGO-VUM.png' %}" />
+    <!-- Для Apple устройств -->
+    <link rel="apple-touch-icon" href="{% static 'images/LOGO-VUM.png' %}">
 
     <!-- Подключение стилей -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
@@ -103,8 +105,16 @@
                                                     <!-- Заголовок загружается через JS -->
                                                     <h2 class="models_title">Yuklanmoqda...</h2>
                                                     <ul class="more_info-link">
-                                                        <li><a href="#parametrs">Parametrlar</a></li>
-                                                        <li><a href="#gallery">Galereya</a></li>
+                                                        <li>
+                                                            <a href="#parametrs">
+                                                                {% if LANGUAGE_CODE == 'ru' %}Параметры{% elif LANGUAGE_CODE == 'en' %}Parameters{% else %}Parametrlar{% endif %}
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="#gallery">
+                                                                {% if LANGUAGE_CODE == 'ru' %}Галерея{% elif LANGUAGE_CODE == 'en' %}Gallery{% else %}Galereya{% endif %}
+                                                            </a>
+                                                        </li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -124,7 +134,7 @@
                                                 </svg>
                                             </em>
                                             <em class="hero-05-title__item" style="font-size: 25px; max-width: 400px;">
-                                                Har qanday yomon yo'l muammosi to'g'risida xabar bering
+                                                {% if LANGUAGE_CODE == 'ru' %}Сообщите о любой проблеме на дорогах{% elif LANGUAGE_CODE == 'en' %}Report any problems on the roads{% else %}Har qanday yomon yo'l muammosi to'g'risida xabar bering{% endif %}
                                             </em>
                                         </span>
                                         <a class="btn btn-anim btn-default btn-mobile-icon btn-outline slide-right-up mt-3"
