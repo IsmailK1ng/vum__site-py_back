@@ -461,7 +461,6 @@ class ContactForm(models.Model):
         help_text="Какую модель автомобиля интересует клиента"
     )
     
-    message = models.TextField("Сообщение")
     
     referer = models.URLField(
         "Referer (откуда пришёл)",
@@ -476,6 +475,13 @@ class ContactForm(models.Model):
         blank=True,
         null=True,
         help_text="UTM метки в JSON формате"
+    )
+
+    visitor_uid = models.CharField(
+        max_length=100, 
+        blank=True, 
+        null=True,
+        verbose_name="amoCRM Visitor UID"
     )
     
     created_at = models.DateTimeField("Дата", auto_now_add=True)

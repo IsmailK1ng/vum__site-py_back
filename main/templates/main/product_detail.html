@@ -23,6 +23,18 @@
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
 
+    <!-- amoCRM Pixel для автораспределения -->
+    <script type="text/javascript" id="amo_pixel_identifier_js" async="async"
+        src="https://piper.amocrm.ru/pixel/js/identifier/pixel_identifier.js"></script>
+    <script>
+        window.AMOPIXEL_IDENTIFIER_PARAMS = window.AMOPIXEL_IDENTIFIER_PARAMS || {};
+        window.AMOPIXEL_IDENTIFIER_PARAMS.onload = function (pixel_identifier) {
+            var visitor_uid = pixel_identifier.getVisitorUid();
+            if (visitor_uid) {
+                sessionStorage.setItem('amo_visitor_uid', visitor_uid);
+            }
+        };
+    </script>
     <!-- Стили для loader -->
     <style>
         .page-loader {
@@ -325,33 +337,7 @@
     <script src="{% static 'js/product_detail.js' %}"></script>
 
     <script>
-        // ============ UTM СОХРАНЕНИЕ ============
-        (function () {
-            'use strict';
-
-            function setCookie(name, value, days) {
-                const expires = new Date();
-                expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-                document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/`;
-            }
-
-            const params = new URLSearchParams(window.location.search);
-            const utm = {};
-
-            ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(key => {
-                if (params.has(key)) {
-                    utm[key] = params.get(key);
-                }
-            });
-
-            if (Object.keys(utm).length > 0) {
-                const utmString = JSON.stringify(utm);
-                sessionStorage.setItem('utm_data', utmString);
-                setCookie('utm_data', utmString, 30);
-            }
-        })();
-
-        // ============ ГЛОБАЛЬНЫЕ ФУНКЦИИ ============
+        // ============ ГЛОБАЛЬНЫЕ ФУНКЦИИ (СВЕРХУ!) ============
         window.getCookie = function (name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
@@ -383,6 +369,32 @@
 
             return null;
         };
+
+        // ============ СОХРАНЕНИЕ UTM В COOKIE ============
+        (function () {
+            'use strict';
+
+            function setCookie(name, value, days) {
+                const expires = new Date();
+                expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+                document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/`;
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            const utm = {};
+
+            ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(key => {
+                if (params.has(key)) {
+                    utm[key] = params.get(key);
+                }
+            });
+
+            if (Object.keys(utm).length > 0) {
+                const utmString = JSON.stringify(utm);
+                sessionStorage.setItem('utm_data', utmString);
+                setCookie('utm_data', utmString, 30);
+            }
+        })();
 
         // ============ ОБРАБОТКА ФОРМЫ ============
         let isSubmitting = false;
@@ -464,7 +476,6 @@
 
             contactForm.addEventListener("submit", async (e) => {
                 e.preventDefault();
-
                 if (isSubmitting) return;
                 isSubmitting = true;
 
@@ -483,7 +494,8 @@
                     product: productField?.value || '',
                     message: contactForm.Message.value,
                     referer: document.referrer || window.location.href,
-                    utm_data: window.getUTMData()
+                    utm_data: window.getUTMData(),
+                    visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null
                 };
 
                 try {
@@ -498,7 +510,6 @@
 
                     const data = await response.json();
 
-                    // ✅ Проверяем и response.ok, и data.success
                     if (response.ok) {
                         (window.dataLayer = window.dataLayer || []).push({
                             event: "lead_form_submitted"
@@ -515,7 +526,7 @@
                         throw new Error(data.message || "Xatolik yuz berdi.");
                     }
                 } catch (err) {
-                    console.error("Contact form submission error:", err);
+                    console.error("Form error:", err);
                     showStatus("❌ Xatolik yuz berdi. Iltimos, qayta urinib ko'ring.", "error");
                 } finally {
                     isSubmitting = false;

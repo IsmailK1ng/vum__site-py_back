@@ -26,14 +26,20 @@ class ContactFormSerializer(serializers.ModelSerializer):
         model = ContactForm
         fields = [
             'id', 'name', 'phone', 'region', 'region_display', 
-            'product', 
-            'referer',  
-            'utm_data',  
-            'message',
-            'status', 'status_display', 'priority', 'priority_display',
+            'product', 'referer', 'utm_data', 'visitor_uid', 
+            'message', 'status', 'status_display', 
+            'priority', 'priority_display',
             'manager', 'manager_name', 'admin_comment', 'created_at'
         ]
         read_only_fields = ['id', 'created_at', 'status_display', 'priority_display', 'region_display']
+    
+    def validate_visitor_uid(self, value):
+        """Валидация visitor_uid от amoCRM Pixel"""
+        if value:
+            # Проверка формата: должен быть alphanumeric с дефисами/подчёркиваниями
+            if not (value.replace('-', '').replace('_', '').isalnum() and len(value) <= 100):
+                raise serializers.ValidationError("Невалидный visitor_uid")
+        return value
     
     def create(self, validated_data):
         import json
@@ -72,8 +78,11 @@ class ContactFormSerializer(serializers.ModelSerializer):
                     if utm_params:
                         validated_data['utm_data'] = json.dumps(utm_params, ensure_ascii=False)
         
-        return super().create(validated_data)
-    
+        contact_form = super().create(validated_data)
+        
+        return contact_form
+
+
 class JobApplicationSerializer(serializers.ModelSerializer):
     vacancy_title = serializers.CharField(source='vacancy.title', read_only=True)
     
@@ -95,7 +104,7 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Noto'g'ri fayl formati. PDF, DOC, DOCX, JPG yoki PNG foydalaning")
         
         return value
-    
+
 
 # ========== СЕРИАЛИЗАТОРЫ ДЛЯ ПРОДУКТОВ ==========
 
@@ -187,7 +196,7 @@ class ProductGallerySerializer(serializers.ModelSerializer):
 class ProductDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для детальной страницы продукта"""
     card_specs = ProductCardSpecSerializer(many=True, read_only=True)
-    spec_groups = serializers.SerializerMethodField()  # ← Группируем параметры
+    spec_groups = serializers.SerializerMethodField()
     features = ProductFeatureSerializer(many=True, read_only=True)
     gallery = ProductGallerySerializer(many=True, read_only=True)
     main_image_url = serializers.SerializerMethodField()
@@ -207,7 +216,6 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         """Группируем параметры по категориям для фронтенда"""
         parameters = obj.parameters.all().order_by('category', 'order')
         
-        # Группируем по категориям
         grouped = {}
         for param in parameters:
             category = param.category
@@ -225,7 +233,6 @@ class ProductDetailSerializer(serializers.ModelSerializer):
                 'order': param.order
             })
         
-        # Преобразуем в список с правильным порядком категорий
         category_order = ['main', 'engine', 'weight', 'transmission', 'brakes', 'comfort', 'superstructure', 'cabin', 'additional']
         result = []
         for cat in category_order:
@@ -249,7 +256,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
                 return request.build_absolute_uri(obj.card_image.url)
             return obj.card_image.url
         return None
-# Сериализаторы для дилеров
+
 
 class DealerServiceSerializer(serializers.ModelSerializer):
     class Meta:

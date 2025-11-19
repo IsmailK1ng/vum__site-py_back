@@ -209,6 +209,14 @@ class ContactFormViewSet(viewsets.ModelViewSet):
         return queryset
     
     def create(self, request, *args, **kwargs):
+        # ============ БЛОК 5: ЛОГ ЗАПРОСА ============
+        logger.info(f"🌐 === ВХОДЯЩИЙ ЗАПРОС ===")
+        logger.info(f"📍 IP: {request.META.get('REMOTE_ADDR')}")
+        logger.info(f"🔗 Referer: {request.META.get('HTTP_REFERER')}")
+        logger.info(f"📦 Body: {str(request.data)[:500]}")  # ← ИСПРАВЛЕНО!
+        logger.info(f"🎯 Query params: {request.GET.dict()}")
+        # ============ КОНЕЦ БЛОКА 5 ============
+        
         try:
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)

@@ -51,6 +51,19 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <!-- Custom Browser Color End -->
+
+    <!-- amoCRM Pixel для автораспределения -->
+    <script type="text/javascript" id="amo_pixel_identifier_js" async="async"
+        src="https://piper.amocrm.ru/pixel/js/identifier/pixel_identifier.js"></script>
+    <script>
+        window.AMOPIXEL_IDENTIFIER_PARAMS = window.AMOPIXEL_IDENTIFIER_PARAMS || {};
+        window.AMOPIXEL_IDENTIFIER_PARAMS.onload = function (pixel_identifier) {
+            var visitor_uid = pixel_identifier.getVisitorUid();
+            if (visitor_uid) {
+                sessionStorage.setItem('amo_visitor_uid', visitor_uid);
+            }
+        };
+    </script>
 </head>
 
 <body>
@@ -390,6 +403,67 @@
     <script src="{% static 'js/app.js' %}"></script>
     <script src="{% static 'js/faw.js' %}"></script>
     <script>
+        // ============ ГЛОБАЛЬНЫЕ ФУНКЦИИ (ПРАВИЛЬНЫЙ ПОРЯДОК!) ============
+
+  
+        window.getCookie = function (name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) {
+                return decodeURIComponent(parts.pop().split(';').shift());
+            }
+            return null;
+        };
+
+
+        window.getUTMData = function () {
+            const params = new URLSearchParams(window.location.search);
+            const utm = {};
+
+            ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(key => {
+                if (params.has(key)) {
+                    utm[key] = params.get(key);
+                }
+            });
+
+            if (Object.keys(utm).length > 0) {
+                return JSON.stringify(utm);
+            }
+
+            const savedSession = sessionStorage.getItem('utm_data');
+            if (savedSession) return savedSession;
+
+            const savedCookie = window.getCookie('utm_data');  // ← ИСПРАВЛЕНО: window.getCookie
+            if (savedCookie) return savedCookie;
+
+            return null;
+        };
+
+        // ============ СОХРАНЕНИЕ UTM В COOKIE ============
+        (function () {
+            function setCookie(name, value, days) {
+                const expires = new Date();
+                expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+                document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/`;
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            const utm = {};
+
+            ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(key => {
+                if (params.has(key)) {
+                    utm[key] = params.get(key);
+                }
+            });
+
+            if (Object.keys(utm).length > 0) {
+                const utmString = JSON.stringify(utm);
+                sessionStorage.setItem('utm_data', utmString);
+                setCookie('utm_data', utmString, 30);
+            }
+        })();
+
+        // ============ ОБРАБОТКА ФОРМЫ ============
         let isSubmitting = false;
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -398,13 +472,12 @@
             const statusBlock = document.querySelector(".form-status");
             const statusText = statusBlock.querySelector(".form-status__text");
 
-            // === Маска телефона ===
+            // Маска телефона
             phoneInput.addEventListener("input", (e) => {
-                let value = e.target.value.replace(/\D/g, ""); // убираем все нецифры
-                if (!value.startsWith("998")) value = "998" + value; // авто добавляем код страны
+                let value = e.target.value.replace(/\D/g, "");
+                if (!value.startsWith("998")) value = "998" + value;
                 if (value.length > 12) value = value.slice(0, 12);
 
-                // форматируем +998 (__) ___-__-__
                 let formatted = "+998 ";
                 if (value.length > 3) formatted += "(" + value.slice(3, 5);
                 if (value.length >= 5) formatted += ") " + value.slice(5, 8);
@@ -414,17 +487,7 @@
                 e.target.value = formatted;
             });
 
-            // === Отправка формы ===
-            // ✅ ДОБАВЬ ПЕРЕД form.addEventListener
-            function getUTMData() {
-                const params = new URLSearchParams(window.location.search);
-                const utm = {};
-                ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(key => {
-                    if (params.has(key)) utm[key] = params.get(key);
-                });
-                return Object.keys(utm).length > 0 ? JSON.stringify(utm) : null;
-            }
-
+            // Отправка формы
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
                 if (isSubmitting) return;
@@ -437,14 +500,14 @@
                     return;
                 }
 
-                // ✅ С UTM И REFERER
                 const formData = {
                     name: form.name.value,
                     region: form.region.value,
                     phone: phoneInput.value,
                     message: form.message.value,
                     referer: document.referrer || window.location.href,
-                    utm_data: getUTMData()
+                    utm_data: window.getUTMData(),
+                    visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null
                 };
 
                 try {
@@ -464,19 +527,20 @@
                             event: "lead_form_submitted"
                         });
 
-                        showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog‘lanamiz.", "success");
+                        showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
                         form.reset();
                     } else {
                         throw new Error(data.message || "Xatolik yuz berdi.");
                     }
                 } catch (error) {
+                    console.error("Form error:", error);
                     showStatus("❌ Xatolik yuz berdi. Qayta urinib ko'ring.", "error");
                 } finally {
                     isSubmitting = false;
                 }
             });
 
-            // === Функция показа статуса ===
+            // Показ статуса
             function showStatus(message, type = "success") {
                 statusText.textContent = message;
                 statusBlock.className = `form-status ${type} show`;
@@ -486,22 +550,6 @@
                     statusBlock.classList.remove("show");
                     setTimeout(() => statusBlock.classList.add("hidden"), 400);
                 }, 4000);
-            }
-
-            // === Функция для получения CSRF токена из cookie ===
-            function getCookie(name) {
-                let cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    const cookies = document.cookie.split(';');
-                    for (let i = 0; i < cookies.length; i++) {
-                        const cookie = cookies[i].trim();
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
-                    }
-                }
-                return cookieValue;
             }
         });
     </script>

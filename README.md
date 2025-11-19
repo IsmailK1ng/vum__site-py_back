@@ -103,6 +103,7 @@ python manage.py migrate app_name migration_name
 Пример:
 python manage.py migrate news 0002
 
+python manage.py collectstatic --noinput
 
 bash
 python manage.py save_amocrm_tokens

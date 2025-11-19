@@ -62,9 +62,21 @@
     fbq('track', 'PageView');
   </script>
   <noscript><img height="1" width="1" style="display:none"
-  
       src="https://www.facebook.com/tr?id=2271244510044933&ev=PageView&noscript=1" /></noscript>
   <!-- End Meta Pixel Code  Xurshid 2 chi kod-->
+
+  <!-- amoCRM Pixel для автораспределения -->
+  <script type="text/javascript" id="amo_pixel_identifier_js" async="async"
+    src="https://piper.amocrm.ru/pixel/js/identifier/pixel_identifier.js"></script>
+  <script>
+    window.AMOPIXEL_IDENTIFIER_PARAMS = window.AMOPIXEL_IDENTIFIER_PARAMS || {};
+    window.AMOPIXEL_IDENTIFIER_PARAMS.onload = function (pixel_identifier) {
+      var visitor_uid = pixel_identifier.getVisitorUid();
+      if (visitor_uid) {
+        sessionStorage.setItem('amo_visitor_uid', visitor_uid);
+      }
+    };
+  </script>
 
   <!-- Подключение стилей (начало) -->
   <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
@@ -576,24 +588,89 @@
   <!-- Счётчики FAW (инициализация) -->
   <script src="{% static 'js/faw.js' %}"></script>
   <script>
-    // Универсальный плавный скролл, сразу учитывающий высоту фиксированного хедера
+    // ============ ГЛОБАЛЬНЫЕ ФУНКЦИИ (СВЕРХУ!) ============
+    window.getCookie = function (name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) {
+        return decodeURIComponent(parts.pop().split(';').shift());
+      }
+      return null;
+    };
+
+    window.getUTMData = function () {
+      const params = new URLSearchParams(window.location.search);
+      const utm = {};
+
+      ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(key => {
+        if (params.has(key)) {
+          utm[key] = params.get(key);
+        }
+      });
+
+      if (Object.keys(utm).length > 0) {
+        return JSON.stringify(utm);
+      }
+
+      const savedSession = sessionStorage.getItem('utm_data');
+      if (savedSession) return savedSession;
+
+      const savedCookie = window.getCookie('utm_data');  // ← ИСПРАВЛЕНО
+      if (savedCookie) return savedCookie;
+
+      return null;
+    };
+
+    // ============ СОХРАНЕНИЕ UTM В COOKIE ============
+    (function () {
+      function setCookie(name, value, days) {
+        const expires = new Date();
+        expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+        document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/`;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const utm = {};
+
+      ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(key => {
+        if (params.has(key)) {
+          utm[key] = params.get(key);
+        }
+      });
+
+      if (Object.keys(utm).length > 0) {
+        const utmString = JSON.stringify(utm);
+        sessionStorage.setItem('utm_data', utmString);
+        setCookie('utm_data', utmString, 30);
+      }
+    })();
+
+
+    // ============ ПЛАВНЫЙ СКРОЛЛ ============
     (function () {
       function getHeaderHeight() {
-        try { var h = document.getElementById('header'); return h ? h.offsetHeight || 0 : 0; } catch (e) { return 0; }
+        try {
+          var h = document.getElementById('header');
+          return h ? h.offsetHeight || 0 : 0;
+        } catch (e) {
+          return 0;
+        }
       }
 
       function scrollToElementById(id) {
         var el = document.getElementById(id);
         if (!el) return;
         var headerH = getHeaderHeight();
-        var offset = 18; // отступ под хедером
+        var offset = 18;
         var rect = el.getBoundingClientRect();
         var targetY = Math.max(0, Math.round(window.pageYOffset + rect.top - headerH - offset));
-        try { window.scrollTo({ top: targetY, behavior: 'smooth' }); }
-        catch (e) { window.scrollTo(0, targetY); }
+        try {
+          window.scrollTo({ top: targetY, behavior: 'smooth' });
+        } catch (e) {
+          window.scrollTo(0, targetY);
+        }
       }
 
-      // Делегирование: клики по ссылкам вида href="#id"
       document.addEventListener('click', function (e) {
         var a = e.target.closest && e.target.closest('a[href^="#"]');
         if (!a) return;
@@ -607,14 +684,13 @@
         }
       }, false);
     })();
-  </script>
-  <!-- Мобильный фикс: надёжно отключаем инлайн-стили параллакса для маленьких экранов -->
-  <script>
+
+    // ============ МОБИЛЬНЫЙ ФИКС ПАРАЛЛАКСА ============
     (function () {
       var observer = null;
+
       function cleanNode(el) {
         try {
-          // сбрасываем распространённые inline-свойства, которые создают абсолютное позиционирование параллакса
           el.style.transform = 'none';
           el.style.webkitTransform = 'none';
           el.style.inset = '';
@@ -622,20 +698,17 @@
           el.style.left = '';
           el.style.right = '';
           el.style.bottom = '';
-          // предпочитаем static, чтобы отменить absolute
           el.style.position = 'static';
-        } catch (e) {/* игнорируем ошибки доступа */ }
+        } catch (e) {/* игнорируем ошибки */ }
       }
 
       function disableParallaxInline() {
         if (window.innerWidth > 550) return;
         var containers = document.querySelectorAll('.mxd-blog-preview__image');
         containers.forEach(function (container) {
-          // очищаем контейнер и всех потомков
           cleanNode(container);
           container.querySelectorAll('*').forEach(function (child) { cleanNode(child); });
 
-          // гарантируем, что изображение корректно заполнит контейнер
           var img = container.querySelector('img');
           if (img) {
             img.style.transform = 'none';
@@ -657,50 +730,86 @@
       }
 
       function startObserver() {
-        if (window.innerWidth > 550) { if (observer) { observer.disconnect(); observer = null; } return; }
-        if (observer) return; // уже наблюдаем
+        if (window.innerWidth > 550) {
+          if (observer) {
+            observer.disconnect();
+            observer = null;
+          }
+          return;
+        }
+        if (observer) return;
+
         var config = { attributes: true, attributeFilter: ['style'], subtree: true, childList: true };
         observer = new MutationObserver(function (mutations) {
-          // при любом изменении атрибутов/добавлении узлов внутри .mxd-blog-preview__image — повторно очищаем
           var shouldRun = false;
           for (var i = 0; i < mutations.length; i++) {
             var m = mutations[i];
             if (m.type === 'attributes' || m.type === 'childList') {
-              if (m.target && m.target.closest && m.target.closest('.mxd-blog-preview__image')) { shouldRun = true; break; }
-              if (m.addedNodes && m.addedNodes.length) { for (var j = 0; j < m.addedNodes.length; j++) { if (m.addedNodes[j].closest && m.addedNodes[j].closest('.mxd-blog-preview__image')) { shouldRun = true; break; } } }
+              if (m.target && m.target.closest && m.target.closest('.mxd-blog-preview__image')) {
+                shouldRun = true;
+                break;
+              }
+              if (m.addedNodes && m.addedNodes.length) {
+                for (var j = 0; j < m.addedNodes.length; j++) {
+                  if (m.addedNodes[j].closest && m.addedNodes[j].closest('.mxd-blog-preview__image')) {
+                    shouldRun = true;
+                    break;
+                  }
+                }
+              }
             }
           }
           if (shouldRun) disableParallaxInline();
         });
-        // привязываем наблюдатель к каждому контейнеру
-        document.querySelectorAll('.mxd-blog-preview__image').forEach(function (node) { observer.observe(node, config); });
+
+        document.querySelectorAll('.mxd-blog-preview__image').forEach(function (node) {
+          observer.observe(node, config);
+        });
       }
 
-      // жизненный цикл: инициализация и повторные проверки
-      function init() { disableParallaxInline(); startObserver(); }
+      function init() {
+        disableParallaxInline();
+        startObserver();
+      }
+
       window.addEventListener('DOMContentLoaded', init);
       window.addEventListener('load', init);
-      // повторная оценка при изменении размера окна
+
       var resizeTimer;
-      window.addEventListener('resize', function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(function () { disableParallaxInline(); startObserver(); }, 200); });
-      // запускаем несколько раз, чтобы поймать поздно инициализирующиеся скрипты
-      var runs = 0; var interval = setInterval(function () { disableParallaxInline(); startObserver(); runs++; if (runs > 12) { clearInterval(interval); } }, 500);
+      window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          disableParallaxInline();
+          startObserver();
+        }, 200);
+      });
+
+      var runs = 0;
+      var interval = setInterval(function () {
+        disableParallaxInline();
+        startObserver();
+        runs++;
+        if (runs > 12) {
+          clearInterval(interval);
+        }
+      }, 500);
     })();
 
+    // ============ ОБРАБОТКА ФОРМЫ ============
     let isSubmitting = false;
+
     document.addEventListener("DOMContentLoaded", () => {
       const form = document.getElementById("contactForm");
       const phoneInput = document.getElementById("phoneInput");
       const statusBlock = document.querySelector(".form-status");
       const statusText = statusBlock.querySelector(".form-status__text");
 
-      // === Маска телефона ===
+      // Маска телефона
       phoneInput.addEventListener("input", (e) => {
-        let value = e.target.value.replace(/\D/g, ""); // убираем все нецифры
-        if (!value.startsWith("998")) value = "998" + value; // авто добавляем код страны
+        let value = e.target.value.replace(/\D/g, "");
+        if (!value.startsWith("998")) value = "998" + value;
         if (value.length > 12) value = value.slice(0, 12);
 
-        // форматируем +998 (__) ___-__-__
         let formatted = "+998 ";
         if (value.length > 3) formatted += "(" + value.slice(3, 5);
         if (value.length >= 5) formatted += ") " + value.slice(5, 8);
@@ -710,16 +819,7 @@
         e.target.value = formatted;
       });
 
-      // === Отправка формы ===
-      function getUTMData() {
-        const params = new URLSearchParams(window.location.search);
-        const utm = {};
-        ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(key => {
-          if (params.has(key)) utm[key] = params.get(key);
-        });
-        return Object.keys(utm).length > 0 ? JSON.stringify(utm) : null;
-      }
-
+      // Отправка формы
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         if (isSubmitting) return;
@@ -732,14 +832,14 @@
           return;
         }
 
-        // ✅ ДОБАВЛЯЕМ UTM И REFERER
         const formData = {
           name: form.name.value,
           region: form.region.value,
           phone: phoneInput.value,
           message: form.message.value,
           referer: document.referrer || window.location.href,
-          utm_data: getUTMData()
+          utm_data: window.getUTMData(),
+          visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null
         };
 
         try {
@@ -759,19 +859,20 @@
               event: "lead_form_submitted"
             });
 
-            showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog‘lanamiz.", "success");
+            showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
             form.reset();
           } else {
             throw new Error(data.message || "Xatolik yuz berdi.");
           }
         } catch (error) {
-          showStatus("❌ Xatolik yuz berdi. Qayta urinib ko‘ring.", "error");
+          console.error("Form error:", error);
+          showStatus("❌ Xatolik yuz berdi. Qayta urinib ko'ring.", "error");
         } finally {
           isSubmitting = false;
         }
       });
 
-      // === Функция показа статуса ===
+      // Показ статуса
       function showStatus(message, type = "success") {
         statusText.textContent = message;
         statusBlock.className = `form-status ${type} show`;
@@ -783,7 +884,6 @@
         }, 4000);
       }
     });
-
   </script>
 
   <!-- Load Scripts End -->
