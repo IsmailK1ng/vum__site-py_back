@@ -5,20 +5,92 @@
 class ProductDetail {
     constructor() {
         this.productId = null;
+        
+        // Определяем текущий язык
+        this.currentLanguage = document.documentElement.lang || 
+                               window.LANGUAGE_CODE || 
+                               this.getCookie('django_language') || 
+                               'uz';
+        
         this.apiUrl = this.getApiUrl();
         this.product = null;
+        
+        // Переводы для категорий и текстов
+        this.translations = {
+            uz: {
+                loading: 'Yuklanmoqda...',
+                error: 'Xatolik',
+                notFound: 'Mahsulot topilmadi',
+                loadError: 'Mahsulot yuklanmadi. Qayta urinib ko\'ring.',
+                backToHome: 'Bosh sahifaga qaytish',
+                noParams: 'Parametrlar hali qo\'shilmagan',
+                available: 'Mavjud',
+                categories: {
+                    'samosval': 'Samosvallar',
+                    'maxsus': 'Maxsus texnika',
+                    'furgon': 'Avtofurgonlar',
+                    'shassi': 'Shassilar',
+                    'tiger_v': 'Tiger V',
+                    'tiger_vh': 'Tiger VH',
+                    'tiger_vr': 'Tiger VR'
+                }
+            },
+            ru: {
+                loading: 'Загрузка...',
+                error: 'Ошибка',
+                notFound: 'Продукт не найден',
+                loadError: 'Не удалось загрузить продукт. Попробуйте снова.',
+                backToHome: 'Вернуться на главную',
+                noParams: 'Параметры пока не добавлены',
+                available: 'Имеется',
+                categories: {
+                    'samosval': 'Самосвалы',
+                    'maxsus': 'Спецтехника',
+                    'furgon': 'Фургоны',
+                    'shassi': 'Шасси',
+                    'tiger_v': 'Tiger V',
+                    'tiger_vh': 'Tiger VH',
+                    'tiger_vr': 'Tiger VR'
+                }
+            },
+            en: {
+                loading: 'Loading...',
+                error: 'Error',
+                notFound: 'Product not found',
+                loadError: 'Failed to load product. Please try again.',
+                backToHome: 'Back to home',
+                noParams: 'Parameters not yet added',
+                available: 'Available',
+                categories: {
+                    'samosval': 'Dump Trucks',
+                    'maxsus': 'Special Equipment',
+                    'furgon': 'Vans',
+                    'shassi': 'Chassis',
+                    'tiger_v': 'Tiger V',
+                    'tiger_vh': 'Tiger VH',
+                    'tiger_vr': 'Tiger VR'
+                }
+            }
+        };
+        
         this.init();
     }
 
     // Определяем API URL в зависимости от текущего языка
     getApiUrl() {
-        // Получаем язык из Django
-        const lang = document.documentElement.lang || 
-                     window.LANGUAGE_CODE || 
-                     this.getCookie('django_language') || 
-                     'uz';
+        return `/api/${this.currentLanguage}/products/`;
+    }
+    
+    // Получаем перевод
+    t(key) {
+        const keys = key.split('.');
+        let value = this.translations[this.currentLanguage];
         
-        return `/api/${lang}/products/`;
+        for (const k of keys) {
+            value = value?.[k];
+        }
+        
+        return value || key;
     }
 
     // Получаем cookie
@@ -34,7 +106,7 @@ class ProductDetail {
         const slug = pathParts[pathParts.length - 1];
 
         if (!slug) {
-            this.showError('Mahsulot topilmadi');
+            this.showError(this.t('notFound'));
             return;
         }
 
@@ -47,7 +119,7 @@ class ProductDetail {
             const response = await fetch(`${this.apiUrl}${slug}/`);
 
             if (!response.ok) {
-                throw new Error('Mahsulot topilmadi');
+                throw new Error(this.t('notFound'));
             }
 
             const data = await response.json();
@@ -58,7 +130,7 @@ class ProductDetail {
 
         } catch (error) {
             console.error('Error loading product:', error);
-            this.showError('Mahsulot yuklanmadi. Qayta urinib ko\'ring.');
+            this.showError(this.t('loadError'));
         }
     }
 
@@ -98,7 +170,7 @@ class ProductDetail {
                     <img src="${feature.icon.icon_url}" class="car-spec-icon" alt="${feature.icon.name}">
                     <div class="car-spec-content">
                         <div class="car-spec-label">${feature.name}</div>
-                        <div class="car-spec-value">Mavjud</div>
+                        <div class="car-spec-value">${this.t('available')}</div>
                     </div>
                 </div>
             `;
@@ -113,7 +185,7 @@ class ProductDetail {
         specsContainer.innerHTML = '';
 
         if (!this.product.spec_groups || this.product.spec_groups.length === 0) {
-            specsContainer.innerHTML = '<p style="padding: 20px; text-align: center; color: #888;">Parametrlar hali qo\'shilmagan</p>';
+            specsContainer.innerHTML = `<p style="padding: 20px; text-align: center; color: #888;">${this.t('noParams')}</p>`;
             return;
         }
 
@@ -126,7 +198,7 @@ class ProductDetail {
         });
 
         if (specsContainer.innerHTML === '') {
-            specsContainer.innerHTML = '<p style="padding: 20px; text-align: center; color: #888;">Parametrlar hali qo\'shilmagan</p>';
+            specsContainer.innerHTML = `<p style="padding: 20px; text-align: center; color: #888;">${this.t('noParams')}</p>`;
         }
     }
 
@@ -285,16 +357,6 @@ class ProductDetail {
     }
 
     updateBreadcrumbs() {
-        const categoryNames = {
-            'shatakchi': 'Shatakchi mashinalar',
-            'samosval': 'Samosvallar',
-            'maxsus': 'Maxsus texnika',
-            'furgon': 'Avtofurgonlar',
-            'shassi': 'Shassilar',
-            'tiger_v': 'Tiger V',
-            'tiger_vr': 'Tiger VR'
-        };
-
         const breadcrumbLinks = document.querySelectorAll('.breadcrumb-ol li a');
         if (breadcrumbLinks.length < 3) return;
 
@@ -306,9 +368,8 @@ class ProductDetail {
 
         const categoryLink = breadcrumbLinks[1];
         if (categoryLink) {
-            const categoryName = this.product.category_display ||
-                categoryNames[this.product.category] ||
-                'Modellar';
+            // Берём перевод только из локального словаря, игнорируя category_display
+            const categoryName = this.t(`categories.${this.product.category}`) || 'Models';
 
             categoryLink.textContent = categoryName;
             categoryLink.href = `/#models`;
@@ -321,7 +382,7 @@ class ProductDetail {
         const loader = document.createElement('div');
         loader.id = 'product-loader';
         loader.className = 'page-loader';
-        loader.innerHTML = '<div class="loader">Yuklanmoqda...</div>';
+        loader.innerHTML = `<div class="loader">${this.t('loading')}</div>`;
         document.body.appendChild(loader);
     }
 
@@ -338,10 +399,10 @@ class ProductDetail {
                 <div class="error-page">
                     <div class="grid-container">
                         <div class="error-content">
-                            <h1>❌ Xatolik</h1>
+                            <h1>❌ ${this.t('error')}</h1>
                             <p>${message}</p>
-                            <a href="/products/?category=tractor" class="btn btn-primary">
-                                <span>Bosh sahifaga qaytish</span>
+                            <a href="/products/?category=samosval" class="btn btn-primary">
+                                <span>${this.t('backToHome')}</span>
                             </a>
                         </div>
                     </div>
