@@ -271,12 +271,16 @@
 }
 
 .truck-info {
-    max-height: 276px;
-    height: 100%;
+    row-gap: 10px;
+    min-height: 310px;
+    /* height: 100%; */
     background: linear-gradient(312deg, #353941 0%, #000000 100%);
     color: #fff;
     padding: 15px;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .truck-title {
@@ -301,6 +305,7 @@
     text-align: center;
     transition: background 0.3s;
 }
+
 /* 
 .product-card-wrapper {
     width: 29%;
