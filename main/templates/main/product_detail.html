@@ -140,7 +140,11 @@
                                             <div class="col-12 col-xl-12 mxd-grid-item no-margin">
                                                 <div class="mxd-section-models__title">
                                                     <!-- Заголовок загружается через JS -->
-                                                    <h2 class="models_title">Yuklanmoqda...</h2>
+                                                    <h2 class="models_title">
+                                                       {% if LANGUAGE_CODE == 'ru' %}Загрузка...
+                                                       {% elif LANGUAGE_CODE == 'en' %}Loading...
+                                                       {% else %}Yuklanmoqda...{% endif %}
+                                                    </h2>
                                                     <ul class="more_info-link">
                                                         <li>
                                                             <a href="#parametrs">
@@ -188,14 +192,19 @@
                                             </em>
                                             <em class="hero-05-title__item" style="font-size: 25px; max-width: 400px;">
                                                 <ul class="more_info-link">
-                                                    {% if LANGUAGE_CODE == 'ru' %}Сообщите о любой проблеме на дорогах{%
-                                                    elif LANGUAGE_CODE == 'en' %}Report any problems on the roads{% else
-                                                    %}Har qanday yomon yo'l muammosi to'g'risida xabar bering{% endif %}
+                                                    {% if LANGUAGE_CODE == 'ru' %}Сообщите о любой проблеме на дорогах
+                                                    {% elif LANGUAGE_CODE == 'en' %}Report any problems on the roads
+                                                    {% else %}Har qanday yomon yo'l muammosi to'g'risida xabar bering{% endif %}
+                                                </ul>
                                             </em>
                                         </span>
                                         <a class="btn btn-anim btn-default btn-mobile-icon btn-outline slide-right-up mt-3"
                                             href="#faw-main-contact-modal" aria-label="Narxini bilish">
-                                            <span class="btn-caption">Narxini bilish</span>
+                                            <span class="btn-caption">
+                                                {% if LANGUAGE_CODE == 'ru' %}Узнать цену
+                                                {% elif LANGUAGE_CODE == 'en' %}Get a Quote
+                                                {% else %}Narxini bilish{% endif %}
+                                            </span>
                                             <i class="ph-bold ph-arrow-up-right"></i>
                                         </a>
                                     </div>
@@ -210,7 +219,9 @@
                                     <div class="car-specs-grid">
                                         <!-- Loader для характеристик -->
                                         <div style="grid-column: 1/-1; text-align: center; padding: 20px; color: #999;">
-                                            Yuklanmoqda...
+                                            {% if LANGUAGE_CODE == 'ru' %}Загрузка...
+                                            {% elif LANGUAGE_CODE == 'en' %}Loading...
+                                            {% else %}Yuklanmoqda...{% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -233,9 +244,21 @@
                                 <div class="section-more_info">
                                     <div aria-label="breadcrumb">
                                         <ol class="breadcrumb-ol">
-                                            <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
-                                            <li><a href="javascript:void(0)">Modellar</a></li>
-                                            <li class="active"><a href="javascript:void(0)">Yuklanmoqda...</a></li>
+                                            <li><a href="{% url 'home' %}">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Главная
+                                                    {% elif LANGUAGE_CODE == 'en' %}Home
+                                                    {% else %}Bosh sahifa{% endif %}
+                                            </a></li>
+                                            <li><a href="javascript:void(0)">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Модели
+                                                    {% elif LANGUAGE_CODE == 'en' %}Models
+                                                    {% else %}Modellar{% endif %}
+                                            </a></li>
+                                            <li class="active"><a href="javascript:void(0)">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Загрузка...
+                                                    {% elif LANGUAGE_CODE == 'en' %}Loading...
+                                                    {% else %}Yuklanmoqda...{% endif %}
+                                            </a></li>
                                         </ol>
                                     </div>
                                 </div>
@@ -250,11 +273,17 @@
                         <div class="container-fluid p-0">
                             <div class="g-0 card_block">
                                 <div class="acardeon-cards_container">
-                                    <h2 class="acardeon-cards_title">Parametrlar</h2>
+                                    <h2 class="acardeon-cards_title">
+                                        {% if LANGUAGE_CODE == 'ru' %}Параметры
+                                        {% elif LANGUAGE_CODE == 'en' %}Parameters
+                                        {% else %}Parametrlar{% endif %}
+                                    </h2>
                                     <!-- Accordion загружается через JS -->
                                     <div class="acardeon-cards_block">
                                         <div style="text-align: center; padding: 40px; color: #999;">
-                                            Yuklanmoqda...
+                                            {% if LANGUAGE_CODE == 'ru' %}Загрузка...
+                                            {% elif LANGUAGE_CODE == 'en' %}Loading...
+                                            {% else %}Yuklanmoqda...{% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -269,13 +298,19 @@
             <div class="mxd-section padding-pre-grid section-galery" id="gallery">
                 <div class="grid-container">
                     <div class="mxd-block">
-                        <h2 class="reveal-type anim-uni-in-up" style="text-align: center;">Galereya</h2>
+                        <h2 class="reveal-type anim-uni-in-up" style="text-align: center;">
+                            {% if LANGUAGE_CODE == 'ru' %}Галерея
+                            {% elif LANGUAGE_CODE == 'en' %}Gallery
+                            {% else %}Galereya{% endif %}
+                        </h2>
                         <div class="mxd-demo-swiper mxd-grid-item anim-uni-in-up" data-custom-init="true"
                             style="min-height: 420px;">
                             <!-- Галерея загружается через JS -->
                             <div class="swiper-wrapper">
                                 <div style="text-align: center; padding: 100px; color: #999;">
-                                    Yuklanmoqda...
+                                    {% if LANGUAGE_CODE == 'ru' %}Загрузка...
+                                    {% elif LANGUAGE_CODE == 'en' %}Loading...
+                                    {% else %}Yuklanmoqda...{% endif %}
                                 </div>
                             </div>
                             <!-- Кнопки навигации -->
@@ -318,8 +353,15 @@
             </button>
 
             <div class="faw-modal__header">
-                <h2 class="faw-modal__title">Biz bilan bog'laning</h2>
-                <p class="faw-modal__subtitle">Ma'lumotlaringizni qoldiring, mutaxassislarimiz siz bilan bog'lanishadi
+                <h2 class="faw-modal__title">
+                    {% if LANGUAGE_CODE == 'ru' %}Связаться с нами
+                    {% elif LANGUAGE_CODE == 'en' %}Contact Us
+                    {% else %}Biz bilan bog'lanish{% endif %}
+                </h2>
+                <p class="faw-modal__subtitle">
+                    {% if LANGUAGE_CODE == 'ru' %}Оставьте свои контактные данные, и мы свяжемся с вами в ближайшее время.
+                    {% elif LANGUAGE_CODE == 'en' %}Leave your contact details and we will get back to you shortly.
+                    {% else %}Aloqa ma'lumotlaringizni qoldiring, biz tez orada siz bilan bog'lanamiz.{% endif %}
                 </p>
             </div>
 
@@ -337,21 +379,81 @@
 
                 <div class="faw-form__group">
                     <select name="Region" class="faw-form__select" required>
-                        <option value="" disabled selected>Viloyatni tanlang*</option>
-                        <option value="Toshkent shahri">Toshkent shahri</option>
-                        <option value="Andijon viloyati">Andijon viloyati</option>
-                        <option value="Buxoro viloyati">Buxoro viloyati</option>
-                        <option value="Fargʻona viloyati">Fargʻona viloyati</option>
-                        <option value="Jizzax viloyati">Jizzax viloyati</option>
-                        <option value="Xorazm viloyati">Xorazm viloyati</option>
-                        <option value="Namangan viloyati">Namangan viloyati</option>
-                        <option value="Navoiy viloyati">Navoiy viloyati</option>
-                        <option value="Qashqadaryo viloyati">Qashqadaryo viloyati</option>
-                        <option value="Samarqand viloyati">Samarqand viloyati</option>
-                        <option value="Sirdaryo viloyati">Sirdaryo viloyati</option>
-                        <option value="Surxondaryo viloyati">Surxondaryo viloyati</option>
-                        <option value="Toshkent viloyati">Toshkent viloyati</option>
-                        <option value="Qoraqalpogʻiston Respublikasi">Qoraqalpogʻiston Respublikasi</option>
+                        <option value="" disabled selected>
+                            {% if LANGUAGE_CODE == 'ru' %}Выберите регион*
+                            {% elif LANGUAGE_CODE == 'en' %}Select Region*
+                            {% else %}Viloyatni tanlang*{% endif %}
+                        </option>
+                        <option value="Toshkent shahri">
+                            {% if LANGUAGE_CODE == 'ru' %}г. Ташкент
+                            {% elif LANGUAGE_CODE == 'en' %}Tashkent City
+                            {% else %}Toshkent shahri{% endif %}
+                        </option>
+                        <option value="Andijon viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Андижанская область
+                            {% elif LANGUAGE_CODE == 'en' %}Andijan Region
+                            {% else %}Andijon viloyati{% endif %}
+                        </option>
+                        <option value="Buxoro viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Бухарская область
+                            {% elif LANGUAGE_CODE == 'en' %}Bukhara Region
+                            {% else %}Buxoro viloyati{% endif %}
+                        </option>
+                        <option value="Fargʻona viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Ферганская область
+                            {% elif LANGUAGE_CODE == 'en' %}Fergana Region
+                            {% else %}Fargʻona viloyati{% endif %}
+                        </option>
+                        <option value="Jizzax viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Джизакская область
+                            {% elif LANGUAGE_CODE == 'en' %}Jizzakh Region
+                            {% else %}Jizzax viloyati{% endif %}
+                        </option>
+                        <option value="Xorazm viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Хорезмская область
+                            {% elif LANGUAGE_CODE == 'en' %}Khorezm Region
+                            {% else %}Xorazm viloyati{% endif %}
+                        </option>
+                        <option value="Namangan viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Наманганская область
+                            {% elif LANGUAGE_CODE == 'en' %}Namangan Region
+                            {% else %}Namangan viloyati{% endif %}
+                        </option>
+                        <option value="Navoiy viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Навоийская область
+                            {% elif LANGUAGE_CODE == 'en' %}Navoiy Region
+                            {% else %}Navoiy viloyati{% endif %}
+                        </option>
+                        <option value="Qashqadaryo viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Кашкадарьинская область
+                            {% elif LANGUAGE_CODE == 'en' %}Kashkadarya Region
+                            {% else %}Qashqadaryo viloyati{% endif %}
+                        </option>
+                        <option value="Samarqand viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Самаркандская область
+                            {% elif LANGUAGE_CODE == 'en' %}Samarkand Region
+                            {% else %}Samarqand viloyati{% endif %}
+                        </option>
+                        <option value="Sirdaryo viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Сырдарьинская область
+                            {% elif LANGUAGE_CODE == 'en' %}Sirdaryo Region
+                            {% else %}Sirdaryo viloyati{% endif %}
+                        </option>
+                        <option value="Surxondaryo viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Сурхандарьинская область
+                            {% elif LANGUAGE_CODE == 'en' %}Surkhandarya Region
+                            {% else %}Surxondaryo viloyati{% endif %}
+                        </option>
+                        <option value="Toshkent viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Ташкентская область
+                            {% elif LANGUAGE_CODE == 'en' %}Tashkent Region
+                            {% else %}Toshkent viloyati{% endif %}
+                        </option>
+                        <option value="Qoraqalpog'iston Respublikasi">
+                            {% if LANGUAGE_CODE == 'ru' %}Республика Каракалпакстан
+                            {% elif LANGUAGE_CODE == 'en' %}Republic of Karakalpakstan
+                            {% else %}Qoraqalpog'iston Respublikasi{% endif %}
+                        </option>
                     </select>
                 </div>
 
@@ -367,7 +469,11 @@
 
                 <div class="faw-form__group">
                     <button type="submit" class="faw-form__submit">
-                        <span>Qongʻiroq kutaman</span>
+                        <span>
+                            {% if LANGUAGE_CODE == 'ru' %}Отправить
+                            {% elif LANGUAGE_CODE == 'en' %}Submit
+                            {% else %}Qong'iroq kutaman{% endif %}
+                        </span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <line x1="7" y1="17" x2="17" y2="7"></line>
