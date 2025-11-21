@@ -1,6 +1,10 @@
 from rest_framework import serializers
-from .models import News, NewsBlock, ContactForm, JobApplication, Product, FeatureIcon,ProductCardSpec, ProductParameter, ProductFeature, ProductGallery,  DealerService, Dealer, BecomeADealerPage, BecomeADealerApplication
-
+from .models import (
+    News, NewsBlock, ContactForm, JobApplication, 
+    Product, FeatureIcon, ProductCardSpec, ProductParameter, ProductFeature, ProductGallery,  
+    DealerService, Dealer, BecomeADealerPage, BecomeADealerApplication,
+    Vacancy, VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate  # ← Добавь это!
+)
 
 class NewsBlockSerializer(serializers.ModelSerializer):
     class Meta:
@@ -386,3 +390,63 @@ class BecomeADealerApplicationSerializer(serializers.ModelSerializer):
         validated_data['status'] = 'new'
         validated_data['priority'] = 'medium'
         return super().create(validated_data)
+    
+# ========== СЕРИАЛИЗАТОР ДЛЯ ВАКАНСИЙ ==========
+
+class VacancySerializer(serializers.ModelSerializer):
+    """Сериализатор для вакансий с поддержкой переводов"""
+    title = serializers.SerializerMethodField()
+    short_description = serializers.SerializerMethodField()
+    contact_info = serializers.SerializerMethodField()
+    responsibilities = serializers.SerializerMethodField()
+    requirements = serializers.SerializerMethodField()
+    conditions = serializers.SerializerMethodField()
+    ideal_candidates = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Vacancy
+        fields = [
+            'id', 'title', 'short_description', 'contact_info',
+            'responsibilities', 'requirements', 'conditions', 'ideal_candidates',
+            'is_active', 'created_at'
+        ]
+    
+    def get_language(self):
+        """Определяем текущий язык из запроса"""
+        request = self.context.get('request')
+        if request:
+            lang = request.session.get('_language') or request.COOKIES.get('django_language', 'uz')
+            return lang if lang in ['uz', 'ru', 'en'] else 'uz'
+        return 'uz'
+    
+    def get_title(self, obj):
+        lang = self.get_language()
+        return getattr(obj, f'title_{lang}', None) or obj.title
+    
+    def get_short_description(self, obj):
+        lang = self.get_language()
+        return getattr(obj, f'short_description_{lang}', None) or obj.short_description or ''
+    
+    def get_contact_info(self, obj):
+        lang = self.get_language()
+        return getattr(obj, f'contact_info_{lang}', None) or obj.contact_info or ''
+    
+    def get_responsibilities(self, obj):
+        lang = self.get_language()
+        responsibilities = obj.responsibilities.all().order_by('order')
+        return [{'id': item.id, 'title': getattr(item, f'title_{lang}', None) or item.title or '', 'text': getattr(item, f'text_{lang}', None) or item.text or ''} for item in responsibilities]
+    
+    def get_requirements(self, obj):
+        lang = self.get_language()
+        requirements = obj.requirements.all().order_by('order')
+        return [{'id': item.id, 'text': getattr(item, f'text_{lang}', None) or item.text or ''} for item in requirements]
+    
+    def get_conditions(self, obj):
+        lang = self.get_language()
+        conditions = obj.conditions.all().order_by('order')
+        return [{'id': item.id, 'text': getattr(item, f'text_{lang}', None) or item.text or ''} for item in conditions]
+    
+    def get_ideal_candidates(self, obj):
+        lang = self.get_language()
+        candidates = obj.ideal_candidates.all().order_by('order')
+        return [{'id': item.id, 'text': getattr(item, f'text_{lang}', None) or item.text or ''} for item in candidates]

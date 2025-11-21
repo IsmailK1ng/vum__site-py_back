@@ -339,8 +339,7 @@ body[data-theme="dark"] .mxd-contact {
 
 /* 1. Все карточки становятся затуманенными при ховере на любом */
 .mxd-blog-preview:hover .mxd-blog-preview__media {
-    filter: blur(2px);
-    opacity: 0.4;
+    opacity: 0.6;
 }
 
 /* 2. Карточка под курсором — яркая и увеличенная */

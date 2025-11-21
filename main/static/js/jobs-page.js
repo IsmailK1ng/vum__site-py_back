@@ -1,8 +1,8 @@
-    // Drag & drop + file select logic for job application form
+// Drag & drop + file select logic for job application form
 
 document.addEventListener('DOMContentLoaded', function () {
   // Сбросить все vacancy-details и .open при загрузке
-  document.querySelectorAll('.mxd-project-item__promo').forEach(function(block) {
+  document.querySelectorAll('.mxd-project-item__promo').forEach(function (block) {
     block.classList.remove('open');
     var det = block.querySelector('.vacancy-details');
     if (det) det.style.display = 'none';
@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
   // Vacancy details toggle
-  document.querySelectorAll('.vacancy-toggle-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
+  document.querySelectorAll('.vacancy-toggle-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
       var promo = btn.closest('.mxd-project-item__promo');
       var details = btn.nextElementSibling;
       if (!details || !promo) return;
@@ -25,12 +25,12 @@ document.addEventListener('DOMContentLoaded', function () {
         promo.classList.add('open');
         btn.classList.add('open');
         details.style.display = 'block';
-        if (btnText) btnText.textContent = 'Скрыть';
+        if (btnText) btnText.textContent = btnText.getAttribute('data-close-text') || 'Скрыть';
       } else {
         promo.classList.remove('open');
         btn.classList.remove('open');
         details.style.display = 'none';
-        if (btnText) btnText.textContent = 'Подробнее';
+        if (btnText) btnText.textContent = btnText.getAttribute('data-open-text') || 'Подробнее';
       }
     });
   });

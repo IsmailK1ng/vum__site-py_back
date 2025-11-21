@@ -86,7 +86,7 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-     
+
     {% include 'main/includes/header.html' %}
 
     <main id="mxd-page-content" class="mxd-page-content">
@@ -107,29 +107,6 @@
                         </div>
                         <div class="hero-09-headline__title loading__item">
                             <h1>VUM JAMOASI</h1>
-                        </div>
-                    </div>
-                    <div class="mxd-hero-09__objects">
-                        <div class="hero-09-objects__image loading__item">
-                            <img class="mxd-move" src="{% static 'images/jobs-foto.png' %}" alt="Hero Image">
-                        </div>
-                        <!-- <div class="hero-09-objects__item item-01 loading__item">
-                            <div class="mxd-counter horizontal">
-                                <p id="stats-counter-1" class="mxd-counter__number mxd-stats-number xsmall">0</p>
-                                <p class="mxd-counter__descr t-140 t-bright t-small">Yil<br>bozorda</p>
-                            </div>
-                        </div>
-                        <div class="hero-09-objects__item item-02 loading__item">
-                            <div class="mxd-counter horizontal">
-                                <p id="stats-counter-2" class="mxd-counter__number mxd-stats-number xsmall">0</p>
-                                <p class="mxd-counter__descr t-140 t-bright t-small">Dan ortiq<br>hodimlar</p>
-                            </div>
-                        </div> -->
-                        <div class="hero-09-objects__item item-03 loading__item">
-                            <div class="mxd-hero__mark">
-                                <span class="mark-icon"></span>
-                                <span class="mark-text">Yangi imkoniyatlarga ochiladi</span>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -157,8 +134,9 @@
                                                         </div>
                                                         <div class="col-12 mxd-grid-item no-margin">
                                                             <div class="mxd-section-title__descr p-0">
-                                                                <p class="anim-uni-in-up">O'z rezyumeni yuboring — biz
-                                                                    siz bilan bog'lanamiz!</p>
+                                                                <p class="anim-uni-in-up">{% if LANGUAGE_CODE == 'ru' %}Отправьте свое резюме — мы свяжемся с вами!
+                                                                    {% elif LANGUAGE_CODE == 'en' %}Send your resume — we will contact you!
+                                                                    {% else %}O'z rezyumeni yuboring — biz siz bilan bog'lanamiz!{% endif %}</p>
                                                             </div>
                                                         </div>
                                                         <div class="col-12 mxd-grid-item no-margin">
@@ -209,15 +187,21 @@
 
                                                                 <!-- Vacancy - DYNAMIC FROM DB -->
                                                                 <div class="form-group" style="margin-bottom:1.2em;">
-                                                                    <label for="job-select"
-                                                                        class="form-label label-job">Vakansiya</label>
+                                                                    <label for="job-select" class="form-label label-job">
+                                                                    {% if LANGUAGE_CODE == 'ru' %}Вакансия
+                                                                    {% elif LANGUAGE_CODE == 'en' %}Vacancy
+                                                                    {% else %}Vakansiya{% endif %}
+                                                                    </label>
                                                                     <select id="job-select" name="job" required
                                                                         style="width:100%;padding:12px;font-size:16px;border:1px solid #ccc;border-radius:4px;">
-                                                                        <option value="" disabled selected>Vakansiyani
-                                                                            tanlang*</option>
+                                                                        <option value="" disabled selected>
+                                                                        {% if LANGUAGE_CODE == 'ru' %}Выберите вакансию
+                                                                        {% elif LANGUAGE_CODE == 'en' %}Select a vacancy
+                                                                        {% else %}Vakansiyani tanlang{% endif %}
+                                                                        </option>
                                                                         {% for vacancy in vacancies %}
-                                                                        <option value="{{ vacancy.id }}">{{vacancy.title
-                                                                            }}</option>
+                                                                        <option value="{{ vacancy.id }}">
+                                                                            {{ vacancy.title }}</option>
                                                                         {% endfor %}
                                                                     </select>
                                                                 </div>
@@ -270,9 +254,10 @@
                                     </div>
 
                                     <!-- VACANCIES LIST - DYNAMIC FROM DB -->
+                                    <!-- VACANCIES LIST - DYNAMIC FROM DB -->
                                     <div class="col-12 col-xl-7 mxd-pinned-projects__scroll">
                                         <div class="mxd-pinned-projects__scroll-inner mxd-grid-item no-margin">
-                                            {% for vacancy in vacancies %}
+                                            {% for vacancy in vacancies_data %}
                                             <div class="mxd-project-item">
                                                 <div class="mxd-project-item__promo">
                                                     <div class="mxd-project-item__name" style="margin-bottom:1.2em;">
@@ -281,54 +266,70 @@
                                                     <button
                                                         class="vacancy-toggle-btn btn btn-anim btn-default btn-outline"
                                                         type="button">
-                                                        <span class="btn-text">Подробнее</span>
+                                                        <span class="btn-text">
+                                                            {% if LANGUAGE_CODE == 'ru' %}Подробнее
+                                                            {% elif LANGUAGE_CODE == 'en' %}Details
+                                                            {% else %}Batafsil{% endif %}
+                                                        </span>
                                                         <span class="arrow"></span>
                                                     </button>
                                                     <div class="job-details-block vacancy-details"
                                                         style="display:none;">
 
-                                                        {% if vacancy.responsibilities.all %}
+                                                        {% if vacancy.responsibilities %}
                                                         <div
                                                             style="margin-bottom:1.1em; font-size:1.3em; font-weight:700;">
-                                                            Обязанности:</div>
+                                                            {% if LANGUAGE_CODE == 'ru' %}Обязанности:
+                                                            {% elif LANGUAGE_CODE == 'en' %}Responsibilities:
+                                                            {% else %}Majburiyatlar:{% endif %}
+                                                        </div>
                                                         <ul style="margin-bottom:1.1em;padding-left:1.2em;">
-                                                            {% for item in vacancy.responsibilities.all %}
+                                                            {% for item in vacancy.responsibilities %}
                                                             <li>
-                                                                {% if item.title %}<b>{{ item.title }}</b><br>{% endif%}
+                                                                {% if item.title %}<b>{{ item.title }}</b><br>{% endif %}
                                                                 {{ item.text }}
                                                             </li>
                                                             {% endfor %}
                                                         </ul>
                                                         {% endif %}
 
-                                                        {% if vacancy.requirements.all %}
+                                                        {% if vacancy.requirements %}
                                                         <div
                                                             style="margin-bottom:1.1em; font-size:1.3em; font-weight:700;">
-                                                            Требования:</div>
+                                                            {% if LANGUAGE_CODE == 'ru' %}Требования:
+                                                            {% elif LANGUAGE_CODE == 'en' %}Requirements:
+                                                            {% else %}Talablar:{% endif %}
+                                                        </div>
                                                         <ul style="margin-bottom:1.1em;padding-left:1.2em;">
-                                                            {% for item in vacancy.requirements.all %}
+                                                            {% for item in vacancy.requirements %}
                                                             <li>{{ item.text }}</li>
                                                             {% endfor %}
                                                         </ul>
                                                         {% endif %}
 
-                                                        {% if vacancy.ideal_candidates.all %}
+                                                        {% if vacancy.ideal_candidates %}
                                                         <div
                                                             style="margin-bottom:1.1em; font-size:1.3em; font-weight:700;">
-                                                            Портрет идеального кандидата:</div>
+                                                            {% if LANGUAGE_CODE == 'ru' %}Портрет идеального кандидата:
+                                                            {% elif LANGUAGE_CODE == 'en' %}Ideal Candidate:
+                                                            {% else %}Ideal nomzod:{% endif %}
+                                                        </div>
                                                         <ul style="margin-bottom:1.1em;padding-left:1.2em;">
-                                                            {% for item in vacancy.ideal_candidates.all %}
+                                                            {% for item in vacancy.ideal_candidates %}
                                                             <li>{{ item.text }}</li>
                                                             {% endfor %}
                                                         </ul>
                                                         {% endif %}
 
-                                                        {% if vacancy.conditions.all %}
+                                                        {% if vacancy.conditions %}
                                                         <div
                                                             style="margin-bottom:1.1em; font-size:1.3em; font-weight:700;">
-                                                            Условия работы:</div>
+                                                            {% if LANGUAGE_CODE == 'ru' %}Условия работы:
+                                                            {% elif LANGUAGE_CODE == 'en' %}Working Conditions:
+                                                            {% else %}Ish sharoitlari:{% endif %}
+                                                        </div>
                                                         <ul style="margin-bottom:1.1em;padding-left:1.2em;">
-                                                            {% for item in vacancy.conditions.all %}
+                                                            {% for item in vacancy.conditions %}
                                                             <li>{{ item.text }}</li>
                                                             {% endfor %}
                                                         </ul>
@@ -337,15 +338,22 @@
                                                         {% if vacancy.contact_info %}
                                                         <div
                                                             style="margin-bottom:1.1em; font-size:1.3em; font-weight:700;">
-                                                            Как подать заявку:</div>
+                                                            {% if LANGUAGE_CODE == 'ru' %}Как подать заявку:
+                                                            {% elif LANGUAGE_CODE == 'en' %}How to Apply:
+                                                            {% else %}Qanday ariza topshirish:{% endif %}
+                                                        </div>
                                                         {{ vacancy.contact_info|safe }}
                                                         {% endif %}
-                                                    </div>
+
+                                                    </div> <!-- Закрываем vacancy-details -->
                                                 </div>
                                             </div>
                                             {% empty %}
-                                            <p style="text-align:center;color:#888;padding:2em;">Актуальных вакансий
-                                                пока нет</p>
+                                            <p style="text-align:center;color:#888;padding:2em;">
+                                                {% if LANGUAGE_CODE == 'ru' %}Актуальных вакансий пока нет
+                                                {% elif LANGUAGE_CODE == 'en' %}No vacancies available at the moment
+                                                {% else %}Hozircha vakansiyalar yo'q{% endif %}
+                                            </p>
                                             {% endfor %}
                                         </div>
                                     </div>
@@ -368,7 +376,8 @@
                                 <div class="mxd-promo__layout">
                                     <div class="mxd-promo__icon-section">
                                         <span class="mxd-promo__icon">
-                                            <img src="{% static 'images/faw-logo.svg' %}" alt="FAW Icon">
+                                            <img src="{% static 'images/logo/faw-logo.png' %}"
+                                                style="filter: brightness(0) invert(1);" alt="VUM Icon">
                                             <span class="mxd-promo__icon-tx reveal-type">FAW TRUCKS</span>
                                         </span>
                                     </div>

@@ -117,6 +117,8 @@ def dealers(request):
 
 def jobs(request):
     """Страница с вакансиями"""
+    from .serializers import VacancySerializer
+    
     vacancies = Vacancy.objects.filter(is_active=True).prefetch_related(
         'responsibilities', 
         'requirements', 
@@ -124,8 +126,14 @@ def jobs(request):
         'conditions'
     ).order_by('order', '-created_at')
     
-    return render(request, 'main/jobs.html', {'vacancies': vacancies})
-
+    # Сериализуем вакансии с учётом языка
+    serializer = VacancySerializer(vacancies, many=True, context={'request': request})
+    vacancies_data = serializer.data
+    
+    return render(request, 'main/jobs.html', {
+        'vacancies': vacancies,  # Для ID в селекте формы
+        'vacancies_data': vacancies_data  # Переведённые данные для отображения
+    })
 
 def news_detail(request, slug):
     """Детальная страница новости"""
