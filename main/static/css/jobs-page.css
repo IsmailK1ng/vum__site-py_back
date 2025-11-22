@@ -115,6 +115,7 @@
 
 .vacancy-title_header {
     padding-bottom: 0.5em;
+    border-bottom: 2px solid transparent;
 }
 
 .vacancy-toggle-btn .btn-text {
