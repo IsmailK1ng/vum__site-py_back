@@ -92,8 +92,16 @@
     <main id="mxd-page-content" class="mxd-page-content">
         <div aria-label="breadcrumb">
             <ol class="breadcrumb-ol">
-                <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
-                <li class="active"><a href="{% url 'jobs' %}">Vakansiya</a></li>
+                <li><a href="{% url 'home' %}">
+                        {% if LANGUAGE_CODE == 'ru' %}Главная
+                        {% elif LANGUAGE_CODE == 'en' %}Home
+                        {% else %}Bosh sahifa{% endif %}
+                </a></li>
+                <li class="active"><a href="{% url 'jobs' %}">
+                        {% if LANGUAGE_CODE == 'ru' %}Вакансии
+                        {% elif LANGUAGE_CODE == 'en' %}Jobs
+                        {% else %}Vakansiyalar{% endif %}
+                </a></li>
             </ol>
         </div>
 
@@ -103,10 +111,18 @@
                 <div class="mxd-hero-09__wrap loading-wrap">
                     <div class="mxd-hero-09__headline">
                         <div class="hero-09-headline__caption loading__item">
-                            <p style="font-size: 4rem;">Bizning safimizga qoshiling</p>
+                            <p style="font-size: 4rem;">
+                                {% if LANGUAGE_CODE == 'ru' %}Присоединяйтесь к нашей команде
+                                {% elif LANGUAGE_CODE == 'en' %}Join Our Team
+                                {% else %}Jamoamizga qo'shiling{% endif %}
+                            </p>
                         </div>
                         <div class="hero-09-headline__title loading__item">
-                            <h1>VUM JAMOASI</h1>
+                            <h1>
+                                {% if LANGUAGE_CODE == 'ru' %}Команда VUM
+                                {% elif LANGUAGE_CODE == 'en' %}VUM Team
+                                {% else %}VUM JAMOASI{% endif %}
+                            </h1>
                         </div>
                     </div>
                 </div>
@@ -129,14 +145,20 @@
                                                     <div class="row g-0">
                                                         <div class="col-12 mxd-grid-item no-margin">
                                                             <div class="mxd-section-title__title">
-                                                                <h2 class="reveal-type">Ishga qabul uchun ariza</h2>
+                                                                <h2 class="reveal-type">
+                                                                    {% if LANGUAGE_CODE == 'ru' %}Подать заявку на работу
+                                                                    {% elif LANGUAGE_CODE == 'en' %}Apply for a Job
+                                                                    {% else %}Ishga qabul uchun ariza{% endif %}
+                                                                </h2>
                                                             </div>
                                                         </div>
                                                         <div class="col-12 mxd-grid-item no-margin">
                                                             <div class="mxd-section-title__descr p-0">
-                                                                <p class="anim-uni-in-up">{% if LANGUAGE_CODE == 'ru' %}Отправьте свое резюме — мы свяжемся с вами!
+                                                                <p class="anim-uni-in-up">
+                                                                    {% if LANGUAGE_CODE == 'ru' %}Отправьте свое резюме — мы свяжемся с вами!
                                                                     {% elif LANGUAGE_CODE == 'en' %}Send your resume — we will contact you!
-                                                                    {% else %}O'z rezyumeni yuboring — biz siz bilan bog'lanamiz!{% endif %}</p>
+                                                                    {% else %}O'z rezyumeni yuboring — biz siz bilan bog'lanamiz!{% endif %}
+                                                                </p>
                                                             </div>
                                                         </div>
                                                         <div class="col-12 mxd-grid-item no-margin">
@@ -147,41 +169,87 @@
 
                                                                 <!-- Region -->
                                                                 <div class="form-group">
-                                                                    <label for="region-select"
-                                                                        class="form-label label-job">Viloyat /
-                                                                        shahar</label>
+                                                                    <label for="region-select" class="form-label label-job">
+                                                                        {% if LANGUAGE_CODE == 'ru' %}Регион / город
+                                                                        {% elif LANGUAGE_CODE == 'en' %}Region / City
+                                                                        {% else %}Viloyat / shahar{% endif %}
+                                                                    </label>
                                                                     <select id="region-select" name="region"
                                                                         class="form-control select-job" required>
-                                                                        <option value="" disabled selected>Viloyatni
-                                                                            tanlang*</option>
-                                                                        <option value="Toshkent shahri">Toshkent shahri
+                                                                        <option value="" disabled selected>
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Выберите регион / город
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Select Region / City
+                                                                            {% else %}Viloyat / shaharni tanlang{% endif %}</option>
+                                                                        <option value="Toshkent shahri">
+                                                                            {% if LANGUAGE_CODE == 'ru' %}г. Ташкент
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Tashkent City
+                                                                            {% else %}Toshkent shahri{% endif %}
                                                                         </option>
-                                                                        <option value="Andijon viloyati">Andijon
-                                                                            viloyati</option>
-                                                                        <option value="Buxoro viloyati">Buxoro viloyati
+                                                                        <option value="Andijon viloyati">
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Андижанская область
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Andijan Region
+                                                                            {% else %}Andijon viloyati{% endif %}
                                                                         </option>
-                                                                        <option value="Fargʻona viloyati">Fargʻona
-                                                                            viloyati</option>
-                                                                        <option value="Jizzax viloyati">Jizzax viloyati
+                                                                        <option value="Buxoro viloyati">
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Бухарская область
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Bukhara Region
+                                                                            {% else %}Buxoro viloyati{% endif %}
                                                                         </option>
-                                                                        <option value="Xorazm viloyati">Xorazm viloyati
+                                                                        <option value="Fargʻona viloyati">
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Ферганская область
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Fergana Region
+                                                                            {% else %}Fargʻona viloyati{% endif %}
                                                                         </option>
-                                                                        <option value="Namangan viloyati">Namangan
-                                                                            viloyati</option>
-                                                                        <option value="Navoiy viloyati">Navoiy viloyati
+                                                                        <option value="Jizzax viloyati">
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Джизакская область
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Jizzakh Region
+                                                                            {% else %}Jizzax viloyati{% endif %}
                                                                         </option>
-                                                                        <option value="Qashqadaryo viloyati">Qashqadaryo
-                                                                            viloyati</option>
-                                                                        <option value="Samarqand viloyati">Samarqand
-                                                                            viloyati</option>
-                                                                        <option value="Sirdaryo viloyati">Sirdaryo
-                                                                            viloyati</option>
-                                                                        <option value="Surxondaryo viloyati">Surxondaryo
-                                                                            viloyati</option>
-                                                                        <option value="Toshkent viloyati">Toshkent
-                                                                            viloyati</option>
+                                                                        <option value="Xorazm viloyati">
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Хорезмская область
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Khorezm Region
+                                                                            {% else %}Xorazm viloyati{% endif %}
+                                                                        </option>
+                                                                        <option value="Namangan viloyati">
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Наманганская область
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Namangan Region
+                                                                            {% else %}Namangan viloyati{% endif %}
+                                                                        </option>
+                                                                        <option value="Navoiy viloyati">
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Навоийская область
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Navoiy Region
+                                                                            {% else %}Navoiy viloyati{% endif %}
+                                                                        </option>
+                                                                        <option value="Qashqadaryo viloyati">
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Кашкадарьинская область
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Kashkadarya Region
+                                                                            {% else %}Qashqadaryo viloyati{% endif %}
+                                                                        </option>
+                                                                        <option value="Samarqand viloyati">
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Самаркандская область
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Samarkand Region
+                                                                            {% else %}Samarqand viloyati{% endif %}
+                                                                        </option>
+                                                                        <option value="Sirdaryo viloyati">
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Сырдарьинская область
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Syrdarya Region
+                                                                            {% else %}Sirdaryo viloyati{% endif %}
+                                                                        </option>
+                                                                        <option value="Surxondaryo viloyati">
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Сурхандарьинская область
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Surkhandarya Region
+                                                                            {% else %}Surxondaryo viloyati{% endif %}
+                                                                        </option>
+                                                                        <option value="Toshkent viloyati">
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Ташкентская область
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Tashkent Region
+                                                                            {% else %}Toshkent viloyati{% endif %}
+                                                                        </option>
                                                                         <option value="Qoraqalpogʻiston Respublikasi">
-                                                                            Qoraqalpogʻiston Respublikasi</option>
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Республика Каракалпакстан
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Republic of Karakalpakstan
+                                                                            {% else %}Qoraqalpogʻiston Respublikasi{% endif %}    
+                                                                        </option>
                                                                     </select>
                                                                 </div>
 
@@ -209,11 +277,17 @@
                                                                 <!-- Resume Upload -->
                                                                 <div class="form-group">
                                                                     <label for="resume-upload" class="form-label"
-                                                                        style="font-weight:600;font-size:1.1em;">Rezyumeni
-                                                                        yuklang</label>
+                                                                        style="font-weight:600;font-size:1.1em;">
+                                                                        {% if LANGUAGE_CODE == 'ru' %}Загрузить резюме
+                                                                        {% elif LANGUAGE_CODE == 'en' %}Upload Resume
+                                                                        {% else %}Rezyumeni yuklash{% endif %}
+                                                                    </label>
                                                                     <div id="resume-drop-area" class="resume-drop-area">
-                                                                        <span class="drop-text">Faylni bu yerga tortib
-                                                                            tashlang yoki tanlang</span>
+                                                                        <span class="drop-text">
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Перетащите файл сюда или выберите файл
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Drag & drop file here or select file
+                                                                            {% else %}Faylni shu yerga sudrab olib keling yoki tanlang{% endif %}
+                                                                        </span>
                                                                         <input type="file" id="resume-upload"
                                                                             name="resume"
                                                                             accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
@@ -221,12 +295,18 @@
                                                                         <button type="button" id="resume-upload-btn"
                                                                             class="btn btn-anim btn-default btn-outline"
                                                                             style="margin-top:1rem;">
-                                                                            Faylni tanlash
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Выбрать файл
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Select File
+                                                                            {% else %}Faylni tanlang{% endif %}
                                                                         </button>
                                                                         <div class="file-hint"
                                                                             style="font-size:0.95em;color:#888;margin-top:0.5em;">
-                                                                            Format: PDF, DOC, DOCX, JPG, PNG. Uzog'i 10
+                                                                            {% if LANGUAGE_CODE == 'ru' %}Формат: PDF, DOC, DOCX, JPG, PNG. Максимум 10
+                                                                            МБ.
+                                                                            {% elif LANGUAGE_CODE == 'en' %}Format: PDF, DOC, DOCX, JPG, PNG. Max 10
                                                                             MB.
+                                                                            {% else %}Format: PDF, DOC, DOCX, JPG, PNG. Maksimal 10
+                                                                            MB.{% endif %}
                                                                         </div>
                                                                         <div class="file-selected" id="file-selected"
                                                                             style="margin-top:0.5em;"></div>
@@ -239,11 +319,15 @@
                                                                 <button type="submit"
                                                                     class="btn btn-anim btn-default btn-outline"
                                                                     style="margin-top:1.5rem;">
-                                                                    Yuborish
+                                                                    {% if LANGUAGE_CODE == 'ru' %}Отправить резюме
+                                                                    {% elif LANGUAGE_CODE == 'en' %}Submit Resume
+                                                                    {% else %}Rezyumeni yuborish{% endif %}
                                                                 </button>
                                                                 <div class="form-success" id="form-success"
                                                                     style="color:green;font-size:1.1em;margin-top:1em;display:none;">
-                                                                    Rezyume muvaffaqiyatli yuborildi!
+                                                                    {% if LANGUAGE_CODE == 'ru' %}Резюме успешно отправлено!
+                                                                    {% elif LANGUAGE_CODE == 'en' %}Resume submitted successfully!
+                                                                    {% else %}Rezyume muvaffaqiyatli yuborildi!{% endif %}
                                                                 </div>
                                                             </form>
                                                         </div>
@@ -260,16 +344,21 @@
                                             {% for vacancy in vacancies_data %}
                                             <div class="mxd-project-item">
                                                 <div class="mxd-project-item__promo">
+                                                    <h2 class="reveal-type vacancy-title_header">
+                                                        {% if LANGUAGE_CODE == 'ru' %}Вакансии
+                                                        {% elif LANGUAGE_CODE == 'en' %}Vacancies
+                                                        {% else %}Vakansiyalar{% endif %}
+                                                    </h2>
                                                     <div class="mxd-project-item__name" style="margin-bottom:1.2em;">
                                                         <span>{{ vacancy.title }}</span>
                                                     </div>
                                                     <button
                                                         class="vacancy-toggle-btn btn btn-anim btn-default btn-outline"
                                                         type="button">
-                                                        <span class="btn-text">
-                                                            {% if LANGUAGE_CODE == 'ru' %}Подробнее
-                                                            {% elif LANGUAGE_CODE == 'en' %}Details
-                                                            {% else %}Batafsil{% endif %}
+                                                        <span class="btn-text"
+                                                              data-open-text="{% if LANGUAGE_CODE == 'ru' %}Подробнее{% elif LANGUAGE_CODE == 'en' %}Learn More{% else %}Batafsil{% endif %}"
+                                                              data-close-text="{% if LANGUAGE_CODE == 'ru' %}Скрыть{% elif LANGUAGE_CODE == 'en' %}Hide{% else %}Yopish{% endif %}">
+                                                            {% if LANGUAGE_CODE == 'ru' %}Подробнее{% elif LANGUAGE_CODE == 'en' %}Learn More{% else %}Batafsil{% endif %}
                                                         </span>
                                                         <span class="arrow"></span>
                                                     </button>

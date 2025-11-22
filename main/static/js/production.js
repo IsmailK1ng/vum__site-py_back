@@ -14,7 +14,7 @@ class ProductsManager {
     this.apiUrl = `/api/${this.currentLanguage}/products/`;
     this.currentCategory = null;
     this.currentPage = 1;
-    this.cardsPerPage = 6;
+    this.cardsPerPage = 8;
     this.allProducts = [];
     this.filteredProducts = [];
     

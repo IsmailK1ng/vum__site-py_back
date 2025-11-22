@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (btn) {
       btn.classList.remove('open');
       var btnText = btn.querySelector('.btn-text');
-      if (btnText) btnText.textContent = 'Подробнее';
+      // if (btnText) btnText.textContent = '{% if LANGUAGE_CODE == 'ru' %}Подробнее{% elif LANGUAGE_CODE == 'en' %}Learn More{% else %}Batafsil{% endif %}';
     }
   });
   // Vacancy details toggle
@@ -25,12 +25,12 @@ document.addEventListener('DOMContentLoaded', function () {
         promo.classList.add('open');
         btn.classList.add('open');
         details.style.display = 'block';
-        if (btnText) btnText.textContent = btnText.getAttribute('data-close-text') || 'Скрыть';
+        if (btnText) btnText.textContent = btnText.dataset.closeText;
       } else {
         promo.classList.remove('open');
         btn.classList.remove('open');
         details.style.display = 'none';
-        if (btnText) btnText.textContent = btnText.getAttribute('data-open-text') || 'Подробнее';
+        if (btnText) btnText.textContent = btnText.dataset.openText;
       }
     });
   });

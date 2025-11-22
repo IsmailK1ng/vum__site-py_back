@@ -108,9 +108,13 @@
 }
 
 .mxd-project-item__promo {
-    padding: 2.2em 2em;
+    /* padding: 2.2em 2em; */
     background: #fff;
     color: #000000;
+}
+
+.vacancy-title_header {
+    padding-bottom: 0.5em;
 }
 
 .vacancy-toggle-btn .btn-text {
