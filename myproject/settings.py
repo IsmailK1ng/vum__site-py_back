@@ -93,7 +93,7 @@ JAZZMIN_SETTINGS = {
     "show_language_switcher": False,
     
     "topmenu_links": [
-        {"name": "Сайт UZ", "url": "https://new.faw.uz", "new_window": True},
+        {"name": "Сайт UZ", "url": "https://faw.uz", "new_window": True},
         {"name": "Сайт KG", "url": "https://faw.kg", "new_window": True},
     ],
     
@@ -282,6 +282,8 @@ if not DEBUG:
         'https://www.new.faw.uz',
     ]
     ALLOWED_HOSTS = [
+        'faw.uz',
+        'www.faw.uz',
         'new.faw.uz',
         'www.new.faw.uz',
         'faw.uz', 'www.faw.uz',
@@ -402,7 +404,7 @@ SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']
 AMOCRM_SUBDOMAIN = config('AMOCRM_SUBDOMAIN', default='fawtrucks')
 AMOCRM_CLIENT_ID = config('AMOCRM_CLIENT_ID')
 AMOCRM_CLIENT_SECRET = config('AMOCRM_CLIENT_SECRET')
-AMOCRM_REDIRECT_URI = config('AMOCRM_REDIRECT_URI', default='https://new.faw.uz')
+AMOCRM_REDIRECT_URI = config('AMOCRM_REDIRECT_URI', default='https://faw.uz')
 
 AMOCRM_PIPELINE_ID = config('AMOCRM_PIPELINE_ID', default='5811904', cast=int)
 AMOCRM_STATUS_ID = config('AMOCRM_STATUS_ID', default='50905042', cast=int)  
