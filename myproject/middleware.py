@@ -1,5 +1,8 @@
 from django.utils import translation
 from django.conf import settings
+from django.http import HttpResponseRedirect
+from urllib.parse import urlencode
+
 
 class ForceRussianMiddleware:
     """Принудительно устанавливает русский язык для админки, узбекский для сайта"""
@@ -62,3 +65,42 @@ class RefreshUserPermissionsMiddleware:
         
         response = self.get_response(request)
         return response
+
+class PreserveFiltersMiddleware:
+    """Сохранение фильтров ContactForm"""
+    
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        import logging
+        logger = logging.getLogger('django')
+        
+        if request.path == '/admin/main/contactform/' and request.method == 'GET':
+            logger.error(f"🔍 MIDDLEWARE: path={request.path}, GET={dict(request.GET)}")
+            
+            has_e = 'e' in request.GET
+            has_filters = any(k != 'e' for k in request.GET.keys())
+            
+            logger.error(f"🔍 MIDDLEWARE: has_e={has_e}, has_filters={has_filters}")
+            
+            # ✅ Если ТОЛЬКО e=1 - убираем его и добавляем сохраненные фильтры
+            if has_e and not has_filters:
+                saved = request.session.get('contactform_filters')
+                logger.error(f"📂 MIDDLEWARE: Retrieved filters: {saved}")
+                
+                if saved:
+                    # НЕ УДАЛЯЕМ! Просто редиректим
+                    params = [f"{key}={value}" for key, values in saved.items() for value in values]
+                    new_url = f"{request.path}?{'&'.join(params)}"
+                    
+                    logger.error(f"🔄 MIDDLEWARE: Redirecting to {new_url}")
+                    return HttpResponseRedirect(new_url)
+            
+            # ✅ Сохраняем фильтры БЕЗ e=1 (перезаписываем)
+            elif not has_e and has_filters:
+                request.session['contactform_filters'] = dict(request.GET.lists())
+                request.session.modified = True
+                logger.error(f"💾 MIDDLEWARE: Saved filters: {request.session['contactform_filters']}")
+
+        return self.get_response(request)

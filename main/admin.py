@@ -1,15 +1,14 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import path  
 from django import forms
+from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib import messages
 from modeltranslation.admin import TranslationTabularInline, TranslationStackedInline, TabbedTranslationAdmin
 from reversion.admin import VersionAdmin
 from reversion.models import Version
 from datetime import datetime
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.contrib import messages
 from main.models import AmoCRMToken
 from main.services.amocrm.token_manager import TokenManager
 from .models import (
@@ -305,30 +304,23 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
 
 @admin.register(ContactForm)
 class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
+    change_list_template = 'main/contactform/change_list.html'
+    preserve_filters = False
+    
+    # Оптимизация
+    list_select_related = ['manager']
+    list_per_page = 50
+    show_full_result_count = False
+    
     list_display = [
-        'name', 'phone', 'region', 
-        'priority', 'status', 
-        'amocrm_badge', 
-        'manager', 'created_at', 
-        'action_buttons'
+        'name', 'phone', 'product_display', 'region', 
+        'priority', 'status', 'amocrm_badge', 
+        'manager', 'created_at', 'action_buttons'
     ]
-    list_editable = ['priority', 'status', 'manager']
-    list_filter = [
-        'status', 
-        'amocrm_status', 
-        'priority', 
-        'region', 
-        'created_at'
-    ]
-    search_fields = ['name', 'phone', 'amocrm_lead_id'] 
-    readonly_fields = [
-        'created_at', 
-        'amocrm_sent_at',   
-        'amocrm_lead_link'  
-    ]
+    search_fields = ['name', 'phone', 'amocrm_lead_id']
+    readonly_fields = ['created_at', 'amocrm_sent_at', 'amocrm_lead_link']
     autocomplete_fields = ['manager']
-    date_hierarchy = 'created_at'
-    actions = ['export_to_excel', 'retry_failed_leads']
+    actions = ['retry_failed_leads', 'export_to_excel']
 
     fieldsets = (
         ('Информация о клиенте', {
@@ -337,59 +329,90 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         ('Управление', {
             'fields': ('status', 'priority', 'manager', 'admin_comment')
         }),
-        ('amoCRM', {  
-            'fields': (
-                'amocrm_status', 
-                'amocrm_lead_link',  
-                'amocrm_sent_at', 
-                'amocrm_error'
-            ),
-            'classes': ('collapse',) 
+        ('amoCRM', {
+            'fields': ('amocrm_status', 'amocrm_lead_link', 'amocrm_sent_at', 'amocrm_error'),
+            'classes': ('collapse',)
         }),
     )
     
     class Media:
-        css = {
-            'all': ('css/amocrm_modal.css',)
-        }
-        js = ('js/amocrm_modal.js',)
+        css = {'all': ('css/amocrm_modal.css', 'css/contactform_admin.css')}
+        js = ('js/amocrm_modal.js', 'js/contactform_admin.js')
+    
+    # ==================== ОТОБРАЖЕНИЕ ====================
+    
+    def product_display(self, obj):
+        """Отображение модели"""
+        if obj.product:
+            return format_html(
+                '<span style="color:#1976d2;padding:5px 10px;border-radius:6px;font-size:13px;font-weight:600;">{}</span>',
+                obj.product[:30]
+            )
+        return format_html('<span style="color:#999;">—</span>')
+    
+    product_display.short_description = "Модель"
+    product_display.admin_order_field = 'product'
     
     def amocrm_badge(self, obj):
-        """Бейдж со статусом amoCRM"""
+        """Бейдж статуса amoCRM"""
         if obj.amocrm_status == 'sent':
             return format_html(
-                '<span style="background:#28a745;color:white;padding:4px 8px;border-radius:4px;font-weight:600;">Отправлено</span>'
+                '<span style="background:#10b981;color:white;padding:5px 12px;border-radius:6px;font-weight:600;font-size:12px;">Отправлено</span>'
             )
         elif obj.amocrm_status == 'failed':
-            error_text = obj.amocrm_error if obj.amocrm_error else 'Неизвестная ошибка'
-            # Экранируем кавычки
-            error_text = error_text.replace('"', '&quot;').replace("'", '&#39;')
+            error_text = (obj.amocrm_error or 'Неизвестная ошибка').replace('"', '&quot;').replace("'", '&#39;')
             return format_html(
-                '<span class="amocrm-error-badge" data-error="{}" style="background:#dc3545;color:white;padding:4px 8px;border-radius:4px;font-weight:600;cursor:pointer;">Ошибка</span>',
+                '<span class="amocrm-error-badge" data-error="{}" style="background:#ef4444;color:white;padding:5px 12px;border-radius:6px;font-weight:600;font-size:12px;cursor:pointer;" title="Нажмите для просмотра ошибки">Ошибка</span>',
                 error_text
             )
-        else:  # pending
-            return format_html(
-                '<span style="background:#ffc107;color:#000;padding:4px 8px;border-radius:4px;font-weight:600;">Ожидает</span>'
-            )
-    
+        return format_html(
+            '<span style="background:#f59e0b;color:white;padding:5px 12px;border-radius:6px;font-weight:600;font-size:12px;">Ожидает</span>'
+        )
+
     amocrm_badge.short_description = "amoCRM"
     amocrm_badge.admin_order_field = 'amocrm_status'
+    
+    def action_buttons(self, obj):
+        """Кнопки действий"""
+        view_url = f"https://fawtrucks.amocrm.ru/leads/detail/{obj.amocrm_lead_id}" if obj.amocrm_lead_id else f"/admin/main/contactform/{obj.id}/change/"
+        view_title = "Открыть в amoCRM" if obj.amocrm_lead_id else "Просмотр заявки"
+        
+        return format_html('''
+            <div style="display:flex;gap:8px;">
+                <a href="{}" title="Редактировать" style="padding:6px;border-radius:6px;display:inline-block;transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <img src="/static/media/icon-adminpanel/pencil.png" width="20" height="20">
+                </a>
+                <a href="{}" title="{}" target="_blank" style="padding:6px;border-radius:6px;display:inline-block;transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <img src="/static/media/icon-adminpanel/eyes.png" width="20" height="20">
+                </a>
+                <a href="{}" title="Удалить" onclick="return confirm('Удалить заявку?')" style="padding:6px;border-radius:6px;display:inline-block;transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <img src="/static/media/icon-adminpanel/recycle-bin.png" width="20" height="20">
+                </a>
+            </div>
+        ''', f'/admin/main/contactform/{obj.id}/change/', view_url, view_title, f'/admin/main/contactform/{obj.id}/delete/')
+    
+    action_buttons.short_description = "Действия"
     
     def amocrm_lead_link(self, obj):
         """Ссылка на лид в amoCRM"""
         if obj.amocrm_lead_id:
             url = f"https://fawtrucks.amocrm.ru/leads/detail/{obj.amocrm_lead_id}"
             return format_html(
-                '<a href="{}" target="_blank" style="color:#007bff;font-weight:600;">Открыть в amoCRM (ID: {})</a>',
+                '<a href="{}" target="_blank" style="color:#3b82f6;font-weight:600;">Открыть в amoCRM (ID: {})</a>',
                 url, obj.amocrm_lead_id
             )
         return "—"
     
     amocrm_lead_link.short_description = "Ссылка на лид"
     
+    # ==================== ДЕЙСТВИЯ ====================
+    
     def retry_failed_leads(self, request, queryset):
-        """Повторная отправка ошибочных лидов"""
+        """Повторная отправка ошибочных заявок"""
+        from main.services.amocrm.lead_sender import LeadSender
+        import logging
+        logger = logging.getLogger('django')
+        
         failed_leads = queryset.filter(amocrm_status='failed')
         
         if not failed_leads.exists():
@@ -401,8 +424,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         
         for lead in failed_leads:
             try:
-                from main.services.amocrm.lead_sender import LeadSender
-                # Сбрасываем статус перед повторной отправкой
                 lead.amocrm_status = 'pending'
                 lead.amocrm_error = None
                 lead.save()
@@ -414,7 +435,8 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
                     success_count += 1
                 else:
                     fail_count += 1
-            except Exception:
+            except Exception as e:
+                logger.error(f"Error retrying lead {lead.id}: {str(e)}", exc_info=True)
                 fail_count += 1
         
         if success_count > 0:
@@ -425,99 +447,155 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     retry_failed_leads.short_description = 'Повторно отправить ошибочные заявки'
     
     def export_to_excel(self, request, queryset):
-        import openpyxl
-        from openpyxl.styles import Font, PatternFill, Alignment
+        """Экспорт в Excel"""
+        import logging
+        logger = logging.getLogger('django')
+        
+        try:
+            if request.POST.get('select_across') == '1':
+                queryset = self.get_queryset(request)
+            
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = "Заявки FAW UZ"
+            
+            headers = [
+                'Номер', 'ФИО', 'Телефон', 'Модель', 'Регион', 'Сообщение', 
+                'Статус', 'Приоритет', 'Менеджер', 'Дата',
+                'amoCRM Статус', 'amoCRM ID', 'amoCRM Дата', 'amoCRM Ошибка'
+            ]
+            ws.append(headers)
+            
+            from openpyxl.styles import Font, PatternFill, Alignment
+            header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
+            header_font = Font(bold=True, color='FFFFFF')
+            
+            for cell in ws[1]:
+                cell.fill = header_fill
+                cell.font = header_font
+                cell.alignment = Alignment(horizontal='center', vertical='center')
+            
+            for idx, contact in enumerate(queryset, start=1):
+                ws.append([
+                    idx,
+                    contact.name,
+                    contact.phone,
+                    contact.product[:30] if contact.product else '-',
+                    contact.get_region_display(),
+                    contact.message[:100] if contact.message else '-',
+                    contact.get_status_display(),
+                    contact.get_priority_display(),
+                    contact.manager.username if contact.manager else '-',
+                    contact.created_at.strftime('%d.%m.%Y %H:%M'),
+                    contact.get_amocrm_status_display(),
+                    contact.amocrm_lead_id or '-',
+                    contact.amocrm_sent_at.strftime('%d.%m.%Y %H:%M') if contact.amocrm_sent_at else '-',
+                    contact.amocrm_error[:100] if contact.amocrm_error else '-'
+                ])
+            
+            for column in ws.columns:
+                max_length = max(len(str(cell.value)) for cell in column)
+                ws.column_dimensions[column[0].column_letter].width = min(max_length + 2, 50)
+            
+            response = HttpResponse(
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            response['Content-Disposition'] = f'attachment; filename="faw_uz_contacts_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+            wb.save(response)
+            
+            return response
+            
+        except Exception as e:
+            logger.error(f"❌ Error exporting to Excel: {str(e)}", exc_info=True)
+            self.message_user(request, f'Ошибка экспорта: {str(e)}', level=messages.ERROR)
+            return redirect(request.path)
+    
+    export_to_excel.short_description = 'Экспорт в Excel'
+    
+    # ==================== QUERYSET ====================
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        """Отключаем управление менеджерами"""
+        formfield = super().formfield_for_foreignkey(db_field, request, **kwargs)
+        if db_field.name == "manager":
+            formfield.widget.can_add_related = False
+            formfield.widget.can_change_related = False
+            formfield.widget.can_delete_related = False
+            formfield.widget.can_view_related = False
+        return formfield
+    
+    def get_queryset(self, request):
+        """Фильтрация queryset"""
+        from django.db.models import Q
         from datetime import datetime
-        from django.http import HttpResponse
+        from django.utils import timezone
         
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.title = "Заявки FAW UZ"
+        qs = super().get_queryset(request)
         
-        headers = [
-            '№', 'ФИО', 'Телефон', 'Регион', 'Сообщение', 
-            'Статус', 'Приоритет', 'Менеджер', 'Дата',
-            'amoCRM Статус', 'amoCRM ID', 'amoCRM Дата', 'amoCRM Ошибка'  
-        ]
-        ws.append(headers)
+        # Поиск
+        if search_query := request.GET.get('q', '').strip():
+            qs = qs.filter(
+                Q(name__icontains=search_query) | 
+                Q(phone__icontains=search_query) | 
+                Q(amocrm_lead_id__icontains=search_query)
+            )
         
-        header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
-        header_font = Font(bold=True, color='FFFFFF')
+        # Фильтры
+        if status := request.GET.get('status', '').strip():
+            qs = qs.filter(status=status)
         
-        for cell in ws[1]:
-            cell.fill = header_fill
-            cell.font = header_font
-            cell.alignment = Alignment(horizontal='center', vertical='center')
+        if amocrm_status := request.GET.get('amocrm_status', '').strip():
+            qs = qs.filter(amocrm_status=amocrm_status)
         
-        for idx, contact in enumerate(queryset, start=1):
-            ws.append([
-                idx,
-                contact.name,
-                contact.phone,
-                contact.get_region_display(),
-                contact.message[:100] if contact.message else '-',
-                contact.get_status_display(),
-                contact.get_priority_display(),
-                contact.manager.username if contact.manager else '-',
-                contact.created_at.strftime('%d.%m.%Y %H:%M'),
-                contact.get_amocrm_status_display(),
-                contact.amocrm_lead_id or '-',
-                contact.amocrm_sent_at.strftime('%d.%m.%Y %H:%M') if contact.amocrm_sent_at else '-',
-                contact.amocrm_error[:100] if contact.amocrm_error else '-'
-            ])
+        if priority := request.GET.get('priority', '').strip():
+            qs = qs.filter(priority=priority)
         
-        for column in ws.columns:
-            max_length = max(len(str(cell.value)) for cell in column)
-            ws.column_dimensions[column[0].column_letter].width = min(max_length + 2, 50)
+        if region := request.GET.get('region', '').strip():
+            qs = qs.filter(region=region)
         
-        response = HttpResponse(
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
-        response['Content-Disposition'] = f'attachment; filename="faw_uz_contacts_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
-        wb.save(response)
-        return response
-    
-    export_to_excel.short_description = 'Экспорт в Excel (с amoCRM)'
-    
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        formfield = super().formfield_for_foreignkey(db_field, request, **kwargs)
-        if db_field.name == "manager":
-            formfield.widget.can_add_related = False
-            formfield.widget.can_change_related = False
-            formfield.widget.can_delete_related = False
-            formfield.widget.can_view_related = False
-        return formfield
-    
-    def action_buttons(self, obj):
-        return format_html('''
-            <div style="display: flex; gap: 10px;">
-                <a href="{}" style="color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: orange;">✏️</a>
-                <a href="{}" onclick="return confirm('Удалить?')" style="color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: red;">🗑</a>
-            </div>
-        ''', f'/admin/main/contactform/{obj.id}/change/', f'/admin/main/contactform/{obj.id}/delete/')
-    action_buttons.short_description = "Действия"
-    
-    # ========== ОСТАЛЬНЫЕ МЕТОДЫ БЕЗ ИЗМЕНЕНИЙ ==========
-    
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        formfield = super().formfield_for_foreignkey(db_field, request, **kwargs)
-        if db_field.name == "manager":
-            formfield.widget.can_add_related = False
-            formfield.widget.can_change_related = False
-            formfield.widget.can_delete_related = False
-            formfield.widget.can_view_related = False
-        return formfield
-    
-    def action_buttons(self, obj):
-        return format_html('''
-            <div style="display: flex; gap: 10px;">
-                <a href="{}" style="color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: orange;">✏️</a>
-                <a href="{}" onclick="return confirm('Удалить?')" style="color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: red;">🗑</a>
-            </div>
-        ''', f'/admin/main/contactform/{obj.id}/change/', f'/admin/main/contactform/{obj.id}/delete/')
-    action_buttons.short_description = "Действия"
+        if product := request.GET.get('product', '').strip():
+            qs = qs.filter(product__icontains=product)
+        
+        # Даты
+        if date_from := request.GET.get('date_from', '').strip():
+            try:
+                parsed_date = datetime.strptime(date_from, '%Y-%m-%d')
+                date_from_aware = timezone.make_aware(
+                    parsed_date.replace(hour=0, minute=0, second=0, microsecond=0)
+                )
+                qs = qs.filter(created_at__gte=date_from_aware)
+            except ValueError:
+                pass
+        
+        if date_to := request.GET.get('date_to', '').strip():
+            try:
+                parsed_date = datetime.strptime(date_to, '%Y-%m-%d')
+                date_to_aware = timezone.make_aware(
+                    parsed_date.replace(hour=23, minute=59, second=59, microsecond=999999)
+                )
+                qs = qs.filter(created_at__lte=date_to_aware)
+            except ValueError:
+                pass
+        
+        return qs
 
-
+    def changelist_view(self, request, extra_context=None):
+        """Контекст для фильтров"""
+        extra_context = extra_context or {}
+        
+        from main.models import REGION_CHOICES
+        extra_context['regions'] = REGION_CHOICES
+        
+        products = ContactForm.objects.exclude(
+            product__isnull=True
+        ).exclude(
+            product=''
+        ).values_list('product', flat=True).distinct().order_by('product')
+        
+        extra_context['products'] = list(products)
+        
+        return super().changelist_view(request, extra_context)
+    
 # ============ ВАКАНСИИ ============
 
 class VacancyResponsibilityInline(TranslationStackedInline):

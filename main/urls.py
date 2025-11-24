@@ -14,4 +14,4 @@ urlpatterns = [
     path('news/<slug:slug>/', views.news_detail, name='news_detail'),
     path('dealers/', views.dealers, name='dealers'),
     path('jobs/', views.jobs, name='jobs'),
-]
+]   

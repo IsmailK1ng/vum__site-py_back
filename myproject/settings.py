@@ -337,68 +337,78 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
+            'format': '{levelname} {asctime} {module} {funcName} {lineno} {message}',
             'style': '{',
         },
         'simple': {
-            'format': '{levelname} {message}',
+            'format': '{levelname} {asctime} {message}',
             'style': '{',
         },
     },
     'handlers': {
-        'file': {
+        'errors_file': {
             'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': BASE_DIR / 'logs' / 'errors.log',
-            'maxBytes': 1024 * 1024 * 10,  # 10MB
+            'maxBytes': 1024 * 1024 * 10,  
             'backupCount': 5,
             'formatter': 'verbose',
+            'encoding': 'utf-8',
         },
-        'console': {
-            'level': 'ERROR', 
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-        },
-  
         'amocrm_file': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs' / 'amocrm.log', 
+            'filename': BASE_DIR / 'logs' / 'amocrm.log',
             'maxBytes': 1024 * 1024 * 10,
             'backupCount': 5,
             'formatter': 'verbose',
             'encoding': 'utf-8',
         },
+        'console': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
     },
     'root': {
-        'handlers': ['console'],
-        'level': 'ERROR',  
+        # Ловим ВСЕ ошибки и критические моменты
+        'handlers': ['errors_file', 'console'],
+        'level': 'ERROR',
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'console'],
+            'handlers': ['errors_file'],
             'level': 'ERROR',
             'propagate': False,
         },
         'django.request': {
-            'handlers': ['file'],
+            'handlers': ['errors_file'],
             'level': 'ERROR',
             'propagate': False,
         },
-     
+        'django.db.backends': {
+            'handlers': ['errors_file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['errors_file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
         'amocrm': {
-            'handlers': ['amocrm_file', 'console'],  
-            'level': 'INFO',  
+            'handlers': ['amocrm_file'],
+            'level': 'INFO',
             'propagate': False,
         },
     },
 }
 
-# Создать директорию для логов
+# Создаем директорию для логов
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)
 
-
 SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']
+
 
 # ========== amoCRM настройки ==========
 AMOCRM_SUBDOMAIN = config('AMOCRM_SUBDOMAIN', default='fawtrucks')

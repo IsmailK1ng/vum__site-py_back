@@ -1,0 +1,91 @@
+{% extends "admin/change_list.html" %}
+{% load i18n static %}
+
+{% block breadcrumbs %}
+{{ block.super }}
+{% endblock %}
+
+{% block content_title %}
+<h1>Заявки — Общие заявки</h1>
+{% endblock %}
+
+{% block search %}
+<div class="leads-filters">
+    <form method="get" id="leads-filter-form">
+        <div class="filters-grid">
+            <input type="text" 
+                   name="q" 
+                   value="{{ request.GET.q|default:'' }}" 
+                   placeholder="Поиск...">
+            
+            <input type="date" 
+                   name="date_from" 
+                   value="{{ request.GET.date_from|default:'' }}">
+            
+            <input type="date" 
+                   name="date_to" 
+                   value="{{ request.GET.date_to|default:'' }}">
+
+            <select name="status">
+                <option value="">Статус</option>
+                <option value="new" {% if request.GET.status == "new" %}selected{% endif %}>Новая</option>
+                <option value="in_process" {% if request.GET.status == "in_process" %}selected{% endif %}>В процессе</option>
+                <option value="done" {% if request.GET.status == "done" %}selected{% endif %}>Обработана</option>
+            </select>
+
+            <select name="amocrm_status">
+                <option value="">AmoCRM</option>
+                <option value="sent" {% if request.GET.amocrm_status == "sent" %}selected{% endif %}>Отправлено</option>
+                <option value="pending" {% if request.GET.amocrm_status == "pending" %}selected{% endif %}>Ожидает</option>
+                <option value="failed" {% if request.GET.amocrm_status == "failed" %}selected{% endif %}>Ошибка</option>
+            </select>
+
+            <select name="priority">
+                <option value="">Приоритет</option>
+                <option value="high" {% if request.GET.priority == "high" %}selected{% endif %}>Высокий</option>
+                <option value="medium" {% if request.GET.priority == "medium" %}selected{% endif %}>Средний</option>
+                <option value="low" {% if request.GET.priority == "low" %}selected{% endif %}>Низкий</option>
+            </select>
+
+            <select name="region">
+                <option value="">Регион</option>
+                {% for code, name in regions %}
+                <option value="{{ code }}" {% if request.GET.region == code %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="product">
+                <option value="">Модель</option>
+                {% for prod in products %}
+                <option value="{{ prod }}" {% if request.GET.product == prod %}selected{% endif %}>{{ prod }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filters-actions">
+            <button type="submit" class="btn btn-apply">Применить</button>
+            <button type="button" id="btn-reset" class="btn btn-clear">Сброс</button>
+            <button type="button" id="btn-export" class="btn btn-export">Экспорт</button>
+            <button type="button" id="btn-delete" class="btn btn-delete" disabled>
+                Удалить (<span id="count">0</span>)
+            </button>
+        </div>
+    </form>
+</div>
+
+<div style="display:none;">{{ block.super }}</div>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Удаляем параметр e=1 из всех ссылок на странице
+    document.querySelectorAll('a').forEach(function(link) {
+        if (link.href.includes('?e=1') || link.href.includes('&e=1')) {
+            link.href = link.href.replace(/[?&]e=1/, '');
+        }
+    });
+});
+</script>
+{% endblock %}

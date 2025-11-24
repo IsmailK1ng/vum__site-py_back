@@ -1,0 +1,214 @@
+/* ==================== ПЕРЕМЕННЫЕ ==================== */
+:root {
+    --blue: #1e57eb;
+    --blue-dark: #002b9b;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --red: #ef4444;
+    --gray: #6b7280;
+    --border: #e5e7eb;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+/* ==================== ФИЛЬТРЫ ==================== */
+.leads-filters {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 24px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+.filters-grid input,
+.filters-grid select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    transition: var(--transition);
+    box-sizing: border-box;
+}
+
+.filters-grid input:focus,
+.filters-grid select:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(30, 87, 235, 0.1);
+}
+
+.filters-grid input::placeholder {
+    color: #9ca3af;
+}
+
+.filters-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.btn-apply {
+    background: var(--blue);
+    color: white;
+}
+
+.btn-apply:hover {
+    background: var(--blue-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 87, 235, 0.3);
+}
+
+.btn-clear {
+    background: white;
+    color: var(--gray);
+    border: 2px solid var(--border);
+}
+
+.btn-clear:hover {
+    background: #f9fafb;
+    border-color: var(--gray);
+}
+
+.btn-export {
+    background: var(--green);
+    color: white;
+}
+
+.btn-export:hover {
+    background: #059669;
+    transform: translateY(-2px);
+}
+
+.btn-delete {
+    background: var(--red);
+    color: white;
+}
+
+.btn-delete:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-delete:not(:disabled):hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+
+/* ==================== ТАБЛИЦА ==================== */
+#changelist-form .results {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#changelist-form thead th {
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 16px 12px;
+}
+
+#changelist-form tbody tr {
+    transition: background 0.15s ease;
+}
+
+#changelist-form tbody tr:hover {
+    background: #eff6ff;
+}
+
+#changelist-form tbody td {
+    padding: 16px 12px;
+    font-size: 15px;
+    font-weight: 500;
+    vertical-align: middle;
+}
+
+/* ==================== СЕЛЕКТЫ В ТАБЛИЦЕ ==================== */
+#changelist-form select {
+    padding: 8px 12px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+#changelist-form select:focus {
+    outline: none;
+    border-color: var(--blue);
+}
+
+#changelist-form select[name*="priority"] option[value="high"],
+#changelist-form select[name*="status"] option[value="new"] {
+    font-weight: 700;
+}
+
+/* ==================== ЧЕКБОКСЫ ==================== */
+#changelist-form input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--blue);
+    cursor: pointer;
+}
+
+/* ==================== СКРЫТЬ СТАРЫЕ ЭЛЕМЕНТЫ ==================== */
+#changelist-filter,
+#toolbar,
+.actions,
+#changelist-search {
+    display: none !important;
+}
+
+/* ==================== АДАПТИВНОСТЬ ==================== */
+@media (max-width: 1400px) {
+    .filters-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 1024px) {
+    .filters-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filters-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
