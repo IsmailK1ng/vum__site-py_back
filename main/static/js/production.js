@@ -150,19 +150,19 @@ class ProductsManager {
         uz: {
           title: 'Tiger VR',
           breadcrumb: 'Tiger VR',
-          slogan: 'Premium sinf pikap',
+          slogan: 'Shahar ichida ishlash uchun ideal texnika',
           buttonText: 'Batafsil o\'qish'
         },
         ru: {
           title: 'Tiger VR',
           breadcrumb: 'Tiger VR',
-          slogan: 'Пикап премиум-класса',
+          slogan: 'Идеальная техника для работы внутри города',
           buttonText: 'Подробнее'
         },
         en: {
           title: 'Tiger VR',
           breadcrumb: 'Tiger VR',
-          slogan: 'Premium class pickup',
+          slogan: 'Ideal equipment for working within the city',
           buttonText: 'Read more'
         },
         hero_image: 'images/categories/tiger-vr-hero.png'
