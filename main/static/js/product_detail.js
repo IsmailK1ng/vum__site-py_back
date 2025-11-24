@@ -24,7 +24,6 @@ class ProductDetail {
                 loadError: 'Mahsulot yuklanmadi. Qayta urinib ko\'ring.',
                 backToHome: 'Bosh sahifaga qaytish',
                 noParams: 'Parametrlar hali qo\'shilmagan',
-                available: 'Mavjud',
                 categories: {
                     'samosval': 'Samosvallar',
                     'maxsus': 'Maxsus texnika',
@@ -42,7 +41,6 @@ class ProductDetail {
                 loadError: 'Не удалось загрузить продукт. Попробуйте снова.',
                 backToHome: 'Вернуться на главную',
                 noParams: 'Параметры пока не добавлены',
-                available: 'Имеется',
                 categories: {
                     'samosval': 'Самосвалы',
                     'maxsus': 'Спецтехника',
@@ -60,7 +58,6 @@ class ProductDetail {
                 loadError: 'Failed to load product. Please try again.',
                 backToHome: 'Back to home',
                 noParams: 'Parameters not yet added',
-                available: 'Available',
                 categories: {
                     'samosval': 'Dump Trucks',
                     'maxsus': 'Special Equipment',
@@ -170,7 +167,6 @@ class ProductDetail {
                     <img src="${feature.icon.icon_url}" class="car-spec-icon" alt="${feature.icon.name}">
                     <div class="car-spec-content">
                         <div class="car-spec-label">${feature.name}</div>
-                        <div class="car-spec-value">${this.t('available')}</div>
                     </div>
                 </div>
             `;
