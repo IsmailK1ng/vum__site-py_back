@@ -14,9 +14,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   <!-- Универсальный favicon -->
-  <link rel="icon" href="{% static 'images/LOGO-VUM.png' %}" />
+  <link rel="icon" href="{% static 'images/logo/logo-vum.png' %}" />
   <!-- Для Apple устройств -->
-  <link rel="apple-touch-icon" href="{% static 'images/LOGO-VUM.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'images/logo/logo-vum.png' %}">
 
   <!-- Open Graph -->
   <meta property="og:image:height" content="1200">
@@ -134,7 +134,7 @@
   <!-- Main Title -->
   <div class="title-after-video">
     <div class="faw-history-title fade-in">
-      <h2 class="reveal-type anim-uni-in-up">{{ news.title }}</h2>
+      <h2 class="reveal-type">{{ news.title }}</h2>
     </div>
     <div class="mxd-block"></div>
   </div>
@@ -191,7 +191,7 @@
   {% if block.block_type == 'text' and block.text %}
   <div class="mxd-hero-00__bottom">
     <div class="hero-00-manifest">
-      <div class="mxd-manifest reveal-type anim-uni-in-up">
+      <div class="mxd-manifest reveal-type">
         {% if block.title %}
         <div class="faw-history-title fade-in">
           <h3>{{ block.title }}</h3>

@@ -15,9 +15,9 @@
     <meta name="author" content="mix_design" />
 
     <!-- Универсальный favicon -->
-    <link rel="icon" href="{% static 'images/LOGO-VUM.png' %}" />
+    <link rel="icon" href="{% static 'images/logo/logo-vum.png' %}" />
     <!-- Для Apple устройств -->
-    <link rel="apple-touch-icon" href="{% static 'images/LOGO-VUM.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/logo/logo-vum.png' %}">
 
     <!-- Open Graph -->
     <meta property="og:title" content="{{ page_data.title }} | FAW Trucks" />
@@ -125,7 +125,7 @@
 
         <!-- Page Title & Content -->
         <article class="dealer-content">
-            <header class="faw-history-title fade-in reveal-type anim-uni-in-up">
+            <header class="faw-history-title fade-in reveal-type ">
                 <h1>{{ page_data.title }}</h1>
             </header>
 
@@ -167,7 +167,7 @@
                         <div class="col-12 col-md-6 mxd-grid-item animate-card-3">
                             <aside class="contact-info">
                                 <div class="contact-info__content">
-                                    <p class="contact-info__description anim-uni-in-up">
+                                    <p class="contact-info__description ">
                                         {% if LANGUAGE_CODE == 'uz' %}
                                         FAW dileri bo'lish bo'yicha savollaringiz bormi? Bizning mutaxassislar sizga yordam berishga tayyor. Formani to'ldiring va biz tez orada siz bilan bog'lanamiz.
                                         {% elif LANGUAGE_CODE == 'ru' %}
@@ -178,7 +178,7 @@
                                     </p>
 
                                     <div class="contact-info__details">
-                                        <div class="contact-detail anim-uni-in-up">
+                                        <div class="contact-detail ">
                                             <div class="contact-detail__icon" aria-hidden="true">
                                                 <i class="ph-fill ph-phone"></i>
                                             </div>
@@ -190,7 +190,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="contact-detail anim-uni-in-up">
+                                        <div class="contact-detail ">
                                             <div class="contact-detail__icon" aria-hidden="true">
                                                 <i class="ph-fill ph-envelope"></i>
                                             </div>
@@ -202,7 +202,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="contact-detail anim-uni-in-up">
+                                        <div class="contact-detail ">
                                             <div class="contact-detail__icon" aria-hidden="true">
                                                 <i class="ph-fill ph-map-pin"></i>
                                             </div>
@@ -247,22 +247,22 @@
 
                                             <div class="container-fluid p-0">
                                                 <div class="row gx-0">
-                                                    <div class="col-12 mxd-grid-item anim-uni-in-up">
+                                                    <div class="col-12 mxd-grid-item ">
                                                         <label for="dealer_name" class="visually-hidden">{% if LANGUAGE_CODE == 'uz' %}F.I.SH{% elif LANGUAGE_CODE == 'ru' %}Ф.И.О{% else %}Full name{% endif %}</label>
                                                         <input type="text" id="dealer_name" name="Name" placeholder="{% if LANGUAGE_CODE == 'uz' %}F.I.SH*{% elif LANGUAGE_CODE == 'ru' %}Ф.И.О*{% else %}Full name*{% endif %}" required autocomplete="name" />
                                                     </div>
 
-                                                    <div class="col-12 mxd-grid-item anim-uni-in-up">
+                                                    <div class="col-12 mxd-grid-item ">
                                                         <label for="dealer_company" class="visually-hidden">{% if LANGUAGE_CODE == 'uz' %}Kompaniya{% elif LANGUAGE_CODE == 'ru' %}Компания{% else %}Company{% endif %}</label>
                                                         <input type="text" id="dealer_company" name="Company" placeholder="{% if LANGUAGE_CODE == 'uz' %}Kompaniya nomi (ixtiyoriy){% elif LANGUAGE_CODE == 'ru' %}Название компании (необязательно){% else %}Company name (optional){% endif %}" autocomplete="organization" />
                                                     </div>
 
-                                                    <div class="col-12 mxd-grid-item anim-uni-in-up">
+                                                    <div class="col-12 mxd-grid-item ">
                                                         <label for="dealer_experience" class="visually-hidden">{% if LANGUAGE_CODE == 'uz' %}Tajriba{% elif LANGUAGE_CODE == 'ru' %}Опыт{% else %}Experience{% endif %}</label>
                                                         <input type="number" id="dealer_experience" name="Experience" placeholder="{% if LANGUAGE_CODE == 'uz' %}Tajriba (yil){% elif LANGUAGE_CODE == 'ru' %}Опыт (лет){% else %}Experience (years){% endif %}" min="0" max="50" />
                                                     </div>
 
-                                                    <div class="col-12 mxd-grid-item anim-uni-in-up">
+                                                    <div class="col-12 mxd-grid-item ">
                                                         <label for="dealer_region" class="visually-hidden">{% if LANGUAGE_CODE == 'uz' %}Viloyat{% elif LANGUAGE_CODE == 'ru' %}Регион{% else %}Region{% endif %}</label>
                                                         <select id="dealer_region" name="Region" required>
                                                             <option value="" disabled selected>{% if LANGUAGE_CODE == 'uz' %}Viloyatni tanlang*{% elif LANGUAGE_CODE == 'ru' %}Выберите регион*{% else %}Select region*{% endif %}</option>
@@ -283,17 +283,17 @@
                                                         </select>
                                                     </div>
 
-                                                    <div class="col-12 mxd-grid-item anim-uni-in-up">
+                                                    <div class="col-12 mxd-grid-item ">
                                                         <label for="dealer_phone" class="visually-hidden">{% if LANGUAGE_CODE == 'uz' %}Telefon{% elif LANGUAGE_CODE == 'ru' %}Телефон{% else %}Phone{% endif %}</label>
                                                         <input type="tel" id="dealer_phone" name="Phone" placeholder="{% if LANGUAGE_CODE == 'uz' %}Telefon raqami*{% elif LANGUAGE_CODE == 'ru' %}Номер телефона*{% else %}Phone number*{% endif %}" required pattern="[+]*[0-9\s\-\(\)]*" autocomplete="tel" />
                                                     </div>
 
-                                                    <div class="col-12 mxd-grid-item anim-uni-in-up">
+                                                    <div class="col-12 mxd-grid-item ">
                                                         <label for="dealer_message" class="visually-hidden">{% if LANGUAGE_CODE == 'uz' %}Xabar{% elif LANGUAGE_CODE == 'ru' %}Сообщение{% else %}Message{% endif %}</label>
                                                         <textarea id="dealer_message" name="Message" placeholder="{% if LANGUAGE_CODE == 'uz' %}Qo'shimcha savol*{% elif LANGUAGE_CODE == 'ru' %}Дополнительный вопрос*{% else %}Additional question*{% endif %}" required rows="5"></textarea>
                                                     </div>
 
-                                                    <div class="col-12 mxd-grid-item anim-uni-in-up">
+                                                    <div class="col-12 mxd-grid-item ">
                                                         <button class="btn btn-anim btn-default btn-large btn-opposite slide-right-up shimmer-btn" type="submit">
                                                             <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Jo'natish{% elif LANGUAGE_CODE == 'ru' %}Отправить{% else %}Send{% endif %}</span>
                                                             <span class="shimmer" aria-hidden="true"></span>

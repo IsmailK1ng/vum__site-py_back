@@ -95,14 +95,17 @@ document.addEventListener('DOMContentLoaded', function () {
     fileSelected.textContent = 'Выбран файл: ' + file.name;
   }
 
-  // Submit logic (заглушка, без реальной отправки)
+  // Submit logic - РЕАЛЬНАЯ ОТПРАВКА
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     fileError.textContent = '';
     formSuccess.style.display = 'none';
+
     const file = fileInput.files[0];
     const regionSelect = document.getElementById('region-select');
     const jobSelect = document.getElementById('job-select');
+
+    // Валидация на фронте
     let errorMsg = '';
     if (!regionSelect.value) {
       errorMsg += 'Пожалуйста, выберите город/регион.\n';
@@ -113,17 +116,97 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!file) {
       errorMsg += 'Пожалуйста, выберите файл.';
     }
+
     if (errorMsg) {
       fileError.textContent = errorMsg.trim();
       return;
     }
-    // Здесь должна быть отправка на сервер через AJAX/fetch
-    // Пока просто показываем успех
-    formSuccess.style.display = 'block';
-    fileInput.value = '';
-    fileSelected.textContent = '';
-    regionSelect.selectedIndex = 0;
-    jobSelect.selectedIndex = 0;
-    setTimeout(() => { formSuccess.style.display = 'none'; }, 4000);
+
+    // Создаём FormData для отправки файла
+    const formData = new FormData();
+    formData.append('region', regionSelect.value);
+    formData.append('vacancy', jobSelect.value);  // ← ВАЖНО: vacancy, не job!
+    formData.append('resume', file);
+
+    // Получаем CSRF токен
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // Определяем текущий язык из URL или cookie
+    const currentLang = document.documentElement.lang || 'uz';
+    const apiUrl = `/api/${currentLang}/job-applications/`;  // ← Используем роутер с языком
+
+    // Блокируем кнопку отправки
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = currentLang === 'ru' ? 'Отправка...' : currentLang === 'en' ? 'Sending...' : 'Yuborilmoqda...';
+
+    // AJAX запрос
+    fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrfToken
+      },
+      body: formData
+    })
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(err => {
+            throw new Error(JSON.stringify(err));
+          });
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          // Успех
+          const successMessages = {
+            'uz': 'Rezyume muvaffaqiyatli yuborildi!',
+            'ru': 'Резюме успешно отправлено!',
+            'en': 'Resume submitted successfully!'
+          };
+
+          formSuccess.textContent = data.message || successMessages[currentLang] || successMessages['uz'];
+          formSuccess.style.display = 'block';
+          formSuccess.style.color = 'green';
+
+          // Сброс формы
+          fileInput.value = '';
+          fileSelected.textContent = '';
+          regionSelect.selectedIndex = 0;
+          jobSelect.selectedIndex = 0;
+
+          setTimeout(() => {
+            formSuccess.style.display = 'none';
+          }, 4000);
+        } else {
+          // Ошибка с сервера
+          fileError.textContent = data.message || 'Произошла ошибка';
+        }
+      })
+      .catch(error => {
+        console.error('Ошибка:', error);
+
+        // Пытаемся распарсить детали ошибки
+        try {
+          const errorData = JSON.parse(error.message);
+          if (errorData.vacancy) {
+            fileError.textContent = 'Выберите вакансию из списка';
+          } else if (errorData.resume) {
+            fileError.textContent = 'Прикрепите файл резюме';
+          } else if (errorData.region) {
+            fileError.textContent = 'Выберите регион';
+          } else {
+            fileError.textContent = 'Ошибка: ' + JSON.stringify(errorData);
+          }
+        } catch {
+          fileError.textContent = 'Ошибка соединения с сервером';
+        }
+      })
+        .finally(() => {
+          // Разблокируем кнопку
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        });
+    });
   });
-});

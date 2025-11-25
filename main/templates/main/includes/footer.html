@@ -16,39 +16,39 @@
                 <div class="footer-blocks__card fullheight-card">
                     <div class="footer-blocks__nav">
                         <ul class="footer-nav">
-                            <li class="footer-nav__item anim-uni-in-up">
+                            <li class="footer-nav__item">
                                 <a href="{% url 'home' %}" class="footer-nav__link btn-anim">
                                     <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}</span>
                                 </a>
                             </li>
-                            <li class="footer-nav__item anim-uni-in-up">
+                            <li class="footer-nav__item">
                                 <a href="{% url 'about' %}" class="footer-nav__link btn-anim">
                                     <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Biz haqimizda{% elif LANGUAGE_CODE == 'ru' %}О нас{% else %}About us{% endif %}</span>
                                 </a>
                             </li>
-                            <li class="footer-nav__item anim-uni-in-up">
+                            <li class="footer-nav__item">
                                 <a href="{% url 'products' %}" class="footer-nav__link btn-anim">
                                     <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Yuk mashinalari{% elif LANGUAGE_CODE == 'ru' %}Грузовики{% else %}Trucks{% endif %}</span>
                                 </a>
                             </li>
-                            <li class="footer-nav__item anim-uni-in-up">
+                            <li class="footer-nav__item">
                                 <a href="{% url 'services' %}" class="footer-nav__link btn-anim">
                                     <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Xizmatlar{% elif LANGUAGE_CODE == 'ru' %}Услуги{% else %}Services{% endif %}</span>
                                 </a>
                             </li>
-                            <li class="footer-nav__item anim-uni-in-up">
+                            <li class="footer-nav__item">
                                 <a href="{% url 'news' %}" class="footer-nav__link btn-anim">
                                     <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Yangiliklar{% elif LANGUAGE_CODE == 'ru' %}Новости{% else %}News{% endif %}</span>
                                 </a>
                             </li>
-                            <li class="footer-nav__item anim-uni-in-up">
+                            <li class="footer-nav__item">
                                 <a href="{% url 'contact' %}" class="footer-nav__link btn-anim">
                                     <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Aloqa{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contact{% endif %}</span>
                                 </a>
                             </li>
                         </ul>
                     </div>
-                    <div class="footer-blocks__links anim-uni-in-up">
+                    <div class="footer-blocks__links">
                         <a class="btn btn-line-xsmall btn-muted slide-right anim-no-delay" href="#">
                             <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Maxfiylik siyosati{% elif LANGUAGE_CODE == 'ru' %}Политика конфиденциальности{% else %}Privacy policy{% endif %}</span>
                         </a>
@@ -62,7 +62,7 @@
             <!-- Колонка 2: Контакты и карта -->
             <div class="footer-blocks__column animate-card-3">
                 <div class="footer-blocks__card">
-                    <p class="mxd-point-subtitle anim-uni-in-up">
+                    <p class="mxd-point-subtitle">
                         <i class="ph-fill ph-envelope"></i>
                         <a href="mailto:info@fawtrucks.uz?subject=FAW%20TRUCKS%20inquiry">
                             <span style="font-weight: bold;">
@@ -70,7 +70,7 @@
                             </span> info@faw.uz
                         </a>
                     </p>
-                    <p class="mxd-point-subtitle anim-uni-in-up">
+                    <p class="mxd-point-subtitle">
                         <i class="ph-fill ph-phone"></i>
                         <a href="tel:+998712345678">
                             <span style="font-weight: bold;">
@@ -78,7 +78,7 @@
                             </span> +998 55 508 60 60
                         </a>
                     </p>
-                    <p class="mxd-point-subtitle anim-uni-in-up">
+                    <p class="mxd-point-subtitle">
                         <i class="ph-fill ph-map-pin"></i>
                         <a href="https://yandex.uz/maps/-/CHxF6XPZ" target="_blank" rel="noopener noreferrer">
                             <span style="font-weight: bold;">
@@ -106,7 +106,7 @@
             <div class="footer-blocks__column animate-card-3">
                 <div class="footer-blocks__card fullheight-card">
                     <div class="footer-blocks__block">
-                        <div class="footer-blocks__title anim-uni-in-up">
+                        <div class="footer-blocks__title">
                             <p class="footer-blocks__title-l">
                                 {% if LANGUAGE_CODE == 'uz' %}Ijtimoiy tarmoqlar{% elif LANGUAGE_CODE == 'ru' %}Социальные сети{% else %}Social networks{% endif %}
                             </p>
@@ -114,23 +114,23 @@
 
                         <div class="footer-blocks__socials">
                             <ul class="footer-socials">
-                                <li class="footer-socials__item anim-uni-in-up">
+                                <li class="footer-socials__item">
                                     <img src="{% static 'images/icons/main-social__icon/facebook.png' %}" alt="Facebook" class="footer-socials__icon" width="24" height="24" loading="lazy">
                                     <a href="https://www.facebook.com/fawtrucksuz" class="footer-socials__link" target="_blank" rel="noopener noreferrer">Facebook</a>
                                 </li>
-                                <li class="footer-socials__item anim-uni-in-up">
+                                <li class="footer-socials__item">
                                     <img src="{% static 'images/icons/main-social__icon/instagram.png' %}" alt="Instagram" class="footer-socials__icon" width="24" height="24" loading="lazy">
                                     <a href="https://www.instagram.com/fawtrucks.uz" class="footer-socials__link" target="_blank" rel="noopener noreferrer">Instagram</a>
                                 </li>
-                                <li class="footer-socials__item anim-uni-in-up">
+                                <li class="footer-socials__item">
                                     <img src="{% static 'images/icons/main-social__icon/telegram.png' %}" alt="Telegram" class="footer-socials__icon" width="24" height="24" loading="lazy">
                                     <a href="https://t.me/fawtrucksuz" class="footer-socials__link" target="_blank" rel="noopener noreferrer">Telegram</a>
                                 </li>
-                                <li class="footer-socials__item anim-uni-in-up">
+                                <li class="footer-socials__item">
                                     <img src="{% static 'images/icons/main-social__icon/youtube.png' %}" alt="YouTube" class="footer-socials__icon" width="24" height="24" loading="lazy">
                                     <a href="https://www.youtube.com/c/fawtrucksuz" class="footer-socials__link" target="_blank" rel="noopener noreferrer">YouTube</a>
                                 </li>
-                                <li class="footer-socials__item anim-uni-in-up">
+                                <li class="footer-socials__item">
                                     <img src="{% static 'images/icons/main-social__icon/linkedin.png' %}" alt="LinkedIn" class="footer-socials__icon" width="24" height="24" loading="lazy">
                                     <a href="https://www.linkedin.com/company/faw-trucks-uzbekistan" class="footer-socials__link" target="_blank" rel="noopener noreferrer">LinkedIn</a>
                                 </li>
@@ -138,7 +138,7 @@
                         </div>
                     </div>
 
-                    <div class="footer-blocks__links anim-uni-in-up">
+                    <div class="footer-blocks__links">
                         <p class="t-xsmall t-muted">
                             <a class="no-effect" href="#" target="_blank" rel="noopener noreferrer">FAW TRUCKS</a>
                             © 2025 - {% if LANGUAGE_CODE == 'uz' %}Barcha huquqlar himoyalangan{% elif LANGUAGE_CODE == 'ru' %}Все права защищены{% else %}All rights reserved{% endif %}
