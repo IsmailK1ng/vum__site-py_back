@@ -283,16 +283,26 @@ class ProductFeature(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='features')
     icon = models.ForeignKey(FeatureIcon, on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField("Название", max_length=100)
-    order = models.PositiveIntegerField("Порядок", default=0)
+    order = models.PositiveIntegerField("Порядок", default=0, blank=True)
     
     class Meta:
         verbose_name = "Характеристика"
         verbose_name_plural = "Характеристики с иконками"
         ordering = ['order']
     
+    def save(self, *args, **kwargs):
+        # Если order не задан (0 или пустой), ставим следующий по порядку
+        if not self.order and self.product_id:
+            max_order = ProductFeature.objects.filter(
+                product=self.product
+            ).exclude(pk=self.pk).aggregate(
+                models.Max('order')
+            )['order__max'] or 0
+            self.order = max_order + 1
+        super().save(*args, **kwargs)
+    
     def __str__(self):
         return self.name
-
 
 class ProductCardSpec(models.Model):
     """Характеристики для карточки"""
