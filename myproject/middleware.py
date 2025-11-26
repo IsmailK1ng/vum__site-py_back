@@ -1,7 +1,9 @@
 from django.utils import translation
 from django.conf import settings
 from django.http import HttpResponseRedirect
-from urllib.parse import urlencode
+import logging
+
+logger = logging.getLogger('django')
 
 
 class ForceRussianMiddleware:
@@ -11,60 +13,60 @@ class ForceRussianMiddleware:
         self.get_response = get_response
     
     def __call__(self, request):
-        # Для админки принудительно русский
-        if request.path.startswith('/admin/'):
-            translation.activate('ru')
-            request.LANGUAGE_CODE = 'ru'
-        else:
-            # Для сайта - проверяем есть ли сохранённый язык
-            # Используем правильную константу для Django 5.x
-            saved_language = request.session.get('_language')  # ← Изменено!
-            cookie_language = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME, None)
-            
-            # Приоритет: сессия > cookie > узбекский по умолчанию
-            language = saved_language or cookie_language or 'uz'
-            
-            # Проверяем что язык поддерживается
-            if language in [lang[0] for lang in settings.LANGUAGES]:
-                translation.activate(language)
-                request.LANGUAGE_CODE = language
+        try:
+            if request.path.startswith('/admin/'):
+                translation.activate('ru')
+                request.LANGUAGE_CODE = 'ru'
             else:
-                translation.activate('uz')
-                request.LANGUAGE_CODE = 'uz'
+                saved_language = request.session.get('_language')
+                cookie_language = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME, None)
+                
+                language = saved_language or cookie_language or 'uz'
+                
+                if language in [lang[0] for lang in settings.LANGUAGES]:
+                    translation.activate(language)
+                    request.LANGUAGE_CODE = language
+                else:
+                    translation.activate('uz')
+                    request.LANGUAGE_CODE = 'uz'
+            
+            response = self.get_response(request)
+            
+            if request.path.startswith('/admin/'):
+                response['Content-Language'] = 'ru'
+            else:
+                response['Content-Language'] = request.LANGUAGE_CODE
+            
+            return response
         
-        response = self.get_response(request)
-        
-        # Устанавливаем заголовок Content-Language
-        if request.path.startswith('/admin/'):
-            response['Content-Language'] = 'ru'
-        else:
-            response['Content-Language'] = request.LANGUAGE_CODE
-        
-        return response
+        except Exception as e:
+            logger.error(f"Ошибка в ForceRussianMiddleware: {str(e)}", exc_info=True)
+            translation.activate('uz')
+            return self.get_response(request)
 
 
 class RefreshUserPermissionsMiddleware:
-    """
-    Лёгкий middleware: просто сбрасывает кэш прав при каждом запросе.
-    Django автоматически перезагрузит права из БД при первом обращении.
-    """
+    """Сбрасывает кэш прав при каждом запросе"""
     
     def __init__(self, get_response):
         self.get_response = get_response
     
     def __call__(self, request):
-        # Сбрасываем кэш прав только для обычных админов (не суперюзеров)
-        if request.user.is_authenticated and not request.user.is_superuser:
-            # Удаляем кэшированные права
-            if hasattr(request.user, '_perm_cache'):
-                delattr(request.user, '_perm_cache')
-            if hasattr(request.user, '_user_perm_cache'):
-                delattr(request.user, '_user_perm_cache')
-            if hasattr(request.user, '_group_perm_cache'):
-                delattr(request.user, '_group_perm_cache')
+        try:
+            if request.user.is_authenticated and not request.user.is_superuser:
+                if hasattr(request.user, '_perm_cache'):
+                    delattr(request.user, '_perm_cache')
+                if hasattr(request.user, '_user_perm_cache'):
+                    delattr(request.user, '_user_perm_cache')
+                if hasattr(request.user, '_group_perm_cache'):
+                    delattr(request.user, '_group_perm_cache')
+            
+            return self.get_response(request)
         
-        response = self.get_response(request)
-        return response
+        except Exception as e:
+            logger.error(f"Ошибка в RefreshUserPermissionsMiddleware: {str(e)}", exc_info=True)
+            return self.get_response(request)
+
 
 class PreserveFiltersMiddleware:
     """Сохранение фильтров ContactForm"""
@@ -73,34 +75,26 @@ class PreserveFiltersMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        import logging
-        logger = logging.getLogger('django')
-        
-        if request.path == '/admin/main/contactform/' and request.method == 'GET':
-            logger.error(f"🔍 MIDDLEWARE: path={request.path}, GET={dict(request.GET)}")
-            
-            has_e = 'e' in request.GET
-            has_filters = any(k != 'e' for k in request.GET.keys())
-            
-            logger.error(f"🔍 MIDDLEWARE: has_e={has_e}, has_filters={has_filters}")
-            
-            # ✅ Если ТОЛЬКО e=1 - убираем его и добавляем сохраненные фильтры
-            if has_e and not has_filters:
-                saved = request.session.get('contactform_filters')
-                logger.error(f"📂 MIDDLEWARE: Retrieved filters: {saved}")
+        try:
+            if request.path == '/admin/main/contactform/' and request.method == 'GET':
                 
-                if saved:
-                    # НЕ УДАЛЯЕМ! Просто редиректим
-                    params = [f"{key}={value}" for key, values in saved.items() for value in values]
-                    new_url = f"{request.path}?{'&'.join(params)}"
+                has_e = 'e' in request.GET
+                has_filters = any(k != 'e' for k in request.GET.keys())
+                
+                if has_e and not has_filters:
+                    saved = request.session.get('contactform_filters')
                     
-                    logger.error(f"🔄 MIDDLEWARE: Redirecting to {new_url}")
-                    return HttpResponseRedirect(new_url)
-            
-            # ✅ Сохраняем фильтры БЕЗ e=1 (перезаписываем)
-            elif not has_e and has_filters:
-                request.session['contactform_filters'] = dict(request.GET.lists())
-                request.session.modified = True
-                logger.error(f"💾 MIDDLEWARE: Saved filters: {request.session['contactform_filters']}")
+                    if saved:
+                        params = [f"{key}={value}" for key, values in saved.items() for value in values]
+                        new_url = f"{request.path}?{'&'.join(params)}"
+                        return HttpResponseRedirect(new_url)
+                
+                elif not has_e and has_filters:
+                    request.session['contactform_filters'] = dict(request.GET.lists())
+                    request.session.modified = True
 
-        return self.get_response(request)
+            return self.get_response(request)
+        
+        except Exception as e:
+            logger.error(f"Ошибка в PreserveFiltersMiddleware: {str(e)}", exc_info=True)
+            return self.get_response(request)

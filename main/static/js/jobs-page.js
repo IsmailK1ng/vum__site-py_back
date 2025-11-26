@@ -185,9 +185,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       })
       .catch(error => {
-        console.error('Ошибка:', error);
+        window.logJSError('Job application submission error: ' + error.message, {
+          file: 'job-applications.js',
+          vacancy: jobSelect.value,
+          region: regionSelect.value
+        });
 
-        // Пытаемся распарсить детали ошибки
         try {
           const errorData = JSON.parse(error.message);
           if (errorData.vacancy) {
@@ -204,9 +207,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       })
         .finally(() => {
-          // Разблокируем кнопку
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalText;
-        });
+      // Разблокируем кнопку
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
     });
   });
+});
