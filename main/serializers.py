@@ -1,10 +1,19 @@
+# main/serializers.py
+
 from rest_framework import serializers
+import logging
+
+logger = logging.getLogger('django')
+
 from .models import (
     News, NewsBlock, ContactForm, JobApplication, 
     Product, FeatureIcon, ProductCardSpec, ProductParameter, ProductFeature, ProductGallery,  
     DealerService, Dealer, BecomeADealerPage, BecomeADealerApplication,
-    Vacancy, VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate  # ← Добавь это!
+    Vacancy, VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate
 )
+
+
+# ========== НОВОСТИ ==========
 
 class NewsBlockSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,6 +28,8 @@ class NewsSerializer(serializers.ModelSerializer):
         model = News
         fields = '__all__'
 
+
+# ========== ЗАЯВКИ ==========
 
 class ContactFormSerializer(serializers.ModelSerializer):
     manager_name = serializers.CharField(source='manager.username', read_only=True)
@@ -40,7 +51,6 @@ class ContactFormSerializer(serializers.ModelSerializer):
     def validate_visitor_uid(self, value):
         """Валидация visitor_uid от amoCRM Pixel"""
         if value:
-            # Проверка формата: должен быть alphanumeric с дефисами/подчёркиваниями
             if not (value.replace('-', '').replace('_', '').isalnum() and len(value) <= 100):
                 raise serializers.ValidationError("Невалидный visitor_uid")
         return value
@@ -83,11 +93,11 @@ class ContactFormSerializer(serializers.ModelSerializer):
                         validated_data['utm_data'] = json.dumps(utm_params, ensure_ascii=False)
         
         contact_form = super().create(validated_data)
-        
         return contact_form
 
 
 class JobApplicationSerializer(serializers.ModelSerializer):
+    """Заявки на вакансии с валидацией резюме"""
     vacancy_title = serializers.CharField(source='vacancy.title', read_only=True)
     
     class Meta:
@@ -97,31 +107,35 @@ class JobApplicationSerializer(serializers.ModelSerializer):
     
     def validate_resume(self, value):
         """Валидация файла резюме"""
-        # Проверка размера (10 MB)
-        if value.size > 10 * 1024 * 1024:
-            raise serializers.ValidationError("Fayl hajmi juda katta. Maksimal 10 MB")
+        try:
+            # Проверка размера (10 MB)
+            if value.size > 10 * 1024 * 1024:
+                raise serializers.ValidationError("Fayl hajmi juda katta. Maksimal 10 MB")
+            
+            # Проверка формата
+            allowed_extensions = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png']
+            file_ext = value.name.lower().split('.')[-1]
+            if file_ext not in allowed_extensions:
+                raise serializers.ValidationError("Noto'g'ri fayl formati. PDF, DOC, DOCX, JPG yoki PNG foydalaning")
+            
+            return value
         
-        # Проверка формата
-        allowed_extensions = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png']
-        file_ext = value.name.lower().split('.')[-1]
-        if file_ext not in allowed_extensions:
-            raise serializers.ValidationError("Noto'g'ri fayl formati. PDF, DOC, DOCX, JPG yoki PNG foydalaning")
-        
-        return value
+        except serializers.ValidationError:
+            raise  # Пробрасываем ValidationError
+        except Exception as e:
+            logger.error(f"Критическая ошибка валидации резюме: {str(e)}", exc_info=True)
+            raise serializers.ValidationError("Xatolik yuz berdi")
 
 
-# ========== СЕРИАЛИЗАТОРЫ ДЛЯ ПРОДУКТОВ ==========
+# ========== ПРОДУКТЫ ==========
 
 class FeatureIconSerializer(serializers.ModelSerializer):
+    """Иконки для характеристик"""
     icon_url = serializers.SerializerMethodField()
-    name = serializers.SerializerMethodField()
 
     class Meta:
         model = FeatureIcon
         fields = ['id', 'name', 'icon_url']
-
-    def get_name(self, obj):
-        return obj.name   # ← фикс
 
     def get_icon_url(self, obj):
         request = self.context.get('request')
@@ -131,16 +145,18 @@ class FeatureIconSerializer(serializers.ModelSerializer):
             return obj.icon.url
         return None
 
+
 class ProductCardSpecSerializer(serializers.ModelSerializer):
-    """Сериализатор для 4 характеристик карточки"""
+    """4 характеристики для карточки продукта"""
     icon = FeatureIconSerializer(read_only=True)
     
     class Meta:
         model = ProductCardSpec
         fields = ['id', 'icon', 'value', 'order']
 
+
 class ProductCardSerializer(serializers.ModelSerializer):
-    """Сериализатор для карточек продуктов (список)"""
+    """Карточки продуктов для списка"""
     card_specs = ProductCardSpecSerializer(many=True, read_only=True)
     image_url = serializers.SerializerMethodField()
     category_display = serializers.CharField(source='get_category_display', read_only=True)
@@ -163,19 +179,10 @@ class ProductCardSerializer(serializers.ModelSerializer):
         return None
 
 
-class ProductParameterSerializer(serializers.ModelSerializer):
-    """Сериализатор для параметров"""
-    category_display = serializers.CharField(source='get_category_display', read_only=True)
-    
-    class Meta:
-        model = ProductParameter
-        fields = ['id', 'category', 'category_name', 'text', 'order']
-
-
 class ProductFeatureSerializer(serializers.ModelSerializer):
-    """Сериализатор для характеристик с иконками (8 шт)"""
+    """8 характеристик с иконками"""
     icon = FeatureIconSerializer(read_only=True)
-    name = serializers.SerializerMethodField()  # ← Добавляем перевод name
+    name = serializers.SerializerMethodField()
     
     class Meta:
         model = ProductFeature
@@ -194,7 +201,7 @@ class ProductFeatureSerializer(serializers.ModelSerializer):
 
 
 class ProductGallerySerializer(serializers.ModelSerializer):
-    """Сериализатор для галереи"""
+    """Галерея продукта"""
     image_url = serializers.SerializerMethodField()
     
     class Meta:
@@ -209,8 +216,9 @@ class ProductGallerySerializer(serializers.ModelSerializer):
             return obj.image.url
         return None
 
+
 class ProductDetailSerializer(serializers.ModelSerializer):
-    """Сериализатор для детальной страницы продукта"""
+    """Детальная страница продукта"""
     card_specs = ProductCardSpecSerializer(many=True, read_only=True)
     spec_groups = serializers.SerializerMethodField()
     features = ProductFeatureSerializer(many=True, read_only=True)
@@ -218,7 +226,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     main_image_url = serializers.SerializerMethodField()
     card_image_url = serializers.SerializerMethodField()
     category_display = serializers.CharField(source='get_category_display', read_only=True)
-    title = serializers.SerializerMethodField()  # ← Добавляем перевод названия
+    title = serializers.SerializerMethodField()
     
     class Meta:
         model = Product
@@ -230,7 +238,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         ]
     
     def get_title(self, obj):
-        """Возвращаем название продукта на нужном языке"""
+        """Название продукта на текущем языке"""
         request = self.context.get('request')
         if request:
             path = request.path
@@ -394,7 +402,7 @@ class BecomeADealerApplicationSerializer(serializers.ModelSerializer):
 # ========== СЕРИАЛИЗАТОР ДЛЯ ВАКАНСИЙ ==========
 
 class VacancySerializer(serializers.ModelSerializer):
-    """Сериализатор для вакансий с поддержкой переводов"""
+    """Вакансии с поддержкой переводов"""
     title = serializers.SerializerMethodField()
     short_description = serializers.SerializerMethodField()
     contact_info = serializers.SerializerMethodField()
@@ -434,19 +442,44 @@ class VacancySerializer(serializers.ModelSerializer):
     def get_responsibilities(self, obj):
         lang = self.get_language()
         responsibilities = obj.responsibilities.all().order_by('order')
-        return [{'id': item.id, 'title': getattr(item, f'title_{lang}', None) or item.title or '', 'text': getattr(item, f'text_{lang}', None) or item.text or ''} for item in responsibilities]
+        return [
+            {
+                'id': item.id, 
+                'title': getattr(item, f'title_{lang}', None) or item.title or '', 
+                'text': getattr(item, f'text_{lang}', None) or item.text or ''
+            } 
+            for item in responsibilities
+        ]
     
     def get_requirements(self, obj):
         lang = self.get_language()
         requirements = obj.requirements.all().order_by('order')
-        return [{'id': item.id, 'text': getattr(item, f'text_{lang}', None) or item.text or ''} for item in requirements]
+        return [
+            {
+                'id': item.id, 
+                'text': getattr(item, f'text_{lang}', None) or item.text or ''
+            } 
+            for item in requirements
+        ]
     
     def get_conditions(self, obj):
         lang = self.get_language()
         conditions = obj.conditions.all().order_by('order')
-        return [{'id': item.id, 'text': getattr(item, f'text_{lang}', None) or item.text or ''} for item in conditions]
+        return [
+            {
+                'id': item.id, 
+                'text': getattr(item, f'text_{lang}', None) or item.text or ''
+            } 
+            for item in conditions
+        ]
     
     def get_ideal_candidates(self, obj):
         lang = self.get_language()
         candidates = obj.ideal_candidates.all().order_by('order')
-        return [{'id': item.id, 'text': getattr(item, f'text_{lang}', None) or item.text or ''} for item in candidates]
+        return [
+            {
+                'id': item.id, 
+                'text': getattr(item, f'text_{lang}', None) or item.text or ''
+            } 
+            for item in candidates
+        ]

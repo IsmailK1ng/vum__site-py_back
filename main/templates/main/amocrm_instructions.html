@@ -2,204 +2,309 @@
 
 {% block content %}
 <style>
-.logs-container {
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 20px;
-}
+    .instructions-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
 
-.logs-title {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 30px;
-    color: #333;
-}
+    .instructions-title {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 30px;
+        color: #333;
+    }
 
-.log-section {
-    background: #fff;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    margin-bottom: 30px;
-    overflow: hidden;
-}
+    .instructions-section {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
 
-.log-section__header {
-    background: linear-gradient(135deg, #dc3545, #c82333);
-    color: white;
-    padding: 15px 20px;
-    font-size: 18px;
-    font-weight: 600;
-}
+    .instructions-section__header {
+        background: linear-gradient(135deg, #194acb, #062065);
+        color: white;
+        padding: 15px 20px;
+        font-size: 18px;
+        font-weight: 600;
+    }
 
-.log-section__content {
-    padding: 20px;
-    max-height: 500px;
-    overflow-y: auto;
-    background: #f8f9fa;
-}
+    .instructions-section__content {
+        padding: 20px;
+        background: #f8f9fa;
+    }
 
-.log-line {
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    line-height: 1.6;
-    padding: 8px 12px;
-    margin-bottom: 4px;
-    background: #fff;
-    border-left: 3px solid #dc3545;
-    border-radius: 4px;
-    word-wrap: break-word;
-    white-space: pre-wrap;
-}
-
-.log-line:hover {
-    background: #fff3cd;
-}
-
-.log-empty {
-    text-align: center;
-    padding: 40px;
-    color: #6c757d;
-    font-size: 16px;
-}
-
-.log-actions {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-
-.log-btn {
-    padding: 10px 20px;
-    border-radius: 6px;
-    text-decoration: none !important;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.log-btn--back {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: white !important;
-}
-
-.log-btn--back:hover {
-    background: linear-gradient(135deg, #0056b3, #004085);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-}
-
-.log-btn--refresh {
-    background: linear-gradient(135deg, #28a745, #218838);
-    color: white !important;
-}
-
-.log-btn--refresh:hover {
-    background: linear-gradient(135deg, #218838, #1e7e34);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-}
-
-.log-stats {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 30px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.log-stats__item {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 15px;
-    border-radius: 6px;
-}
-
-.log-stats__label {
-    font-size: 14px;
-    opacity: 0.9;
-    margin-bottom: 5px;
-}
-
-.log-stats__value {
-    font-size: 24px;
-    font-weight: 700;
-}
-
-@media (max-width: 768px) {
-    .logs-container {
+    .instructions-step {
+        background: #fff;
         padding: 15px;
+        margin-bottom: 15px;
+        border-left: 4px solid #007bff;
+        border-radius: 4px;
     }
-    
-    .log-stats {
-        grid-template-columns: 1fr;
+
+    .instructions-step h3 {
+        margin: 0 0 10px 0;
+        color: #007bff;
+        font-size: 16px;
     }
-    
-    .log-actions {
-        flex-direction: column;
+
+    .instructions-step p {
+        margin: 0;
+        line-height: 1.6;
+        color: #333;
     }
-}
+
+    .instructions-code {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        padding: 12px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        overflow-x: auto;
+        margin: 10px 0;
+    }
+
+    .instructions-warning {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 12px;
+        margin: 15px 0;
+        border-radius: 4px;
+    }
+
+    .instructions-info {
+        background: #d1ecf1;
+        border-left: 4px solid #17a2b8;
+        padding: 12px;
+        margin: 15px 0;
+        border-radius: 4px;
+    }
+
+    .instructions-actions {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .instructions-btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none !important;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .instructions-btn--back {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white !important;
+    }
+
+    .instructions-btn--back:hover {
+        background: linear-gradient(135deg, #0056b3, #004085);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+
+    .token-status {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .token-status__row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .token-status__row:last-child {
+        border-bottom: none;
+    }
+
+    .token-status__label {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .token-status__value {
+        color: #333;
+    }
+
+    @media (max-width: 768px) {
+        .instructions-container {
+            padding: 15px;
+        }
+
+        .instructions-actions {
+            flex-direction: column;
+        }
+    }
 </style>
 
-<div class="logs-container">
-    <h1 class="logs-title">Логи ошибок amoCRM</h1>
-    
-    <!-- СТАТИСТИКА -->
-    <div class="log-stats">
-        <div class="log-stats__item">
-            <div class="log-stats__label">Ошибок в amocrm.log:</div>
-            <div class="log-stats__value">{{ amocrm_logs|length }}</div>
-        </div>
-        <div class="log-stats__item">
-            <div class="log-stats__label">Ошибок в errors.log:</div>
-            <div class="log-stats__value">{{ errors_logs|length }}</div>
-        </div>
-    </div>
-    
-    <!-- ДЕЙСТВИЯ -->
-    <div class="log-actions">
-        <a href="/admin/main/amocrmtoken/" class="log-btn log-btn--back">
+<div class="instructions-container">
+    <h1 class="instructions-title">Инструкция: Обновление токенов amoCRM</h1>
+
+    <div class="instructions-actions">
+        <a href="/admin/main/amocrmtoken/" class="instructions-btn instructions-btn--back">
             Вернуться к токенам
         </a>
-        <a href="/admin/main/amocrmtoken/logs/" class="log-btn log-btn--refresh">
-            Обновить логи
-        </a>
     </div>
-    
-    <!-- AMOCRM.LOG -->
-    <div class="log-section">
-        <div class="log-section__header">
-            logs/amocrm.log (последние 100 ошибок)
+
+    <div class="token-status">
+        <h2 style="margin-top:0;">Текущий статус токена</h2>
+        {% if token %}
+        <div class="token-status__row">
+            <span class="token-status__label">Статус:</span>
+            <span class="token-status__value">
+                {% if token.access_token %}
+                Настроен
+                {% else %}
+                Не настроен
+                {% endif %}
+            </span>
         </div>
-        <div class="log-section__content">
-            {% if amocrm_logs %}
-                {% for line in amocrm_logs %}
-                    <div class="log-line">{{ line }}</div>
-                {% endfor %}
-            {% else %}
-                <div class="log-empty">
-                    Ошибок не найдено
+        <div class="token-status__row">
+            <span class="token-status__label">Истекает:</span>
+            <span class="token-status__value">
+                {% if token.expires_at %}
+                {{ token.expires_at|date:"d.m.Y H:i" }}
+                {% else %}
+                —
+                {% endif %}
+            </span>
+        </div>
+        <div class="token-status__row">
+            <span class="token-status__label">Осталось времени:</span>
+            <span class="token-status__value">{{ time_left_text|default:"—" }}</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="instructions-section">
+        <div class="instructions-section__header">
+            Шаг 1: Получение Authorization Code
+        </div>
+        <div class="instructions-section__content">
+            <div class="instructions-step">
+                <h3>1. Откройте ссылку для авторизации</h3>
+                <p>Перейдите по следующей ссылке (замените YOUR_SUBDOMAIN на ваш поддомен):</p>
+                <div class="instructions-code">
+                    https://www.amocrm.ru/oauth?client_id=YOUR_CLIENT_ID&amp;mode=post_message
                 </div>
-            {% endif %}
+            </div>
+
+            <div class="instructions-step">
+                <h3>2. Авторизуйтесь в amoCRM</h3>
+                <p>Войдите в систему под учетной записью с правами администратора.</p>
+            </div>
+
+            <div class="instructions-step">
+                <h3>3. Скопируйте Authorization Code</h3>
+                <p>После авторизации откроется окно с кодом. Скопируйте значение <strong>code</strong>.</p>
+            </div>
+
+            <div class="instructions-warning">
+                <strong>Важно:</strong> Authorization Code действителен только 20 минут. Используйте его сразу после
+                получения.
+            </div>
         </div>
     </div>
-    
-    <!-- ERRORS.LOG -->
-    <div class="log-section">
-        <div class="log-section__header">
-            logs/errors.log (последние 50 строк с упоминанием amoCRM)
+
+    <div class="instructions-section">
+        <div class="instructions-section__header">
+            Шаг 2: Получение токенов через API
         </div>
-        <div class="log-section__content">
-            {% if errors_logs %}
-                {% for line in errors_logs %}
-                    <div class="log-line">{{ line }}</div>
-                {% endfor %}
-            {% else %}
-                <div class="log-empty">
-                    Ошибок с amoCRM не найдено
+        <div class="instructions-section__content">
+            <div class="instructions-step">
+                <h3>1. Выполните POST-запрос</h3>
+                <p>Используйте следующий curl-запрос (замените YOUR_SUBDOMAIN, CLIENT_ID, CLIENT_SECRET, CODE,
+                    REDIRECT_URI):</p>
+                <div class="instructions-code">
+                    curl -X POST https://YOUR_SUBDOMAIN.amocrm.ru/oauth2/access_token \
+                    -H "Content-Type: application/json" \
+                    -d '{
+                    "client_id": "YOUR_CLIENT_ID",
+                    "client_secret": "YOUR_CLIENT_SECRET",
+                    "grant_type": "authorization_code",
+                    "code": "YOUR_CODE",
+                    "redirect_uri": "YOUR_REDIRECT_URI"
+                    }'
                 </div>
-            {% endif %}
+            </div>
+
+            <div class="instructions-step">
+                <h3>2. Сохраните полученные токены</h3>
+                <p>В ответе вы получите:</p>
+                <div class="instructions-code">
+                    {
+                    "access_token": "...",
+                    "refresh_token": "...",
+                    "expires_in": 86400
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="instructions-section">
+        <div class="instructions-section__header">
+            Шаг 3: Обновление токенов в админке
+        </div>
+        <div class="instructions-section__content">
+            <div class="instructions-step">
+                <h3>1. Откройте Django shell</h3>
+                <div class="instructions-code">
+                    python manage.py shell
+                </div>
+            </div>
+
+            <div class="instructions-step">
+                <h3>2. Обновите токены</h3>
+                <div class="instructions-code">
+                    from main.models import AmoCRMToken
+                    from django.utils import timezone
+                    from datetime import timedelta
+
+                    token = AmoCRMToken.get_instance()
+                    token.access_token = 'YOUR_ACCESS_TOKEN'
+                    token.refresh_token = 'YOUR_REFRESH_TOKEN'
+                    token.expires_at = timezone.now() + timedelta(seconds=86400)
+                    token.save()
+
+                    print('Токены успешно обновлены')
+                </div>
+            </div>
+
+            <div class="instructions-info">
+                <strong>Совет:</strong> После обновления токенов система будет автоматически продлевать их каждый час.
+            </div>
+        </div>
+    </div>
+
+    <div class="instructions-section">
+        <div class="instructions-section__header">
+            Автоматическое обновление токенов
+        </div>
+        <div class="instructions-section__content">
+            <div class="instructions-step">
+                <p>Токены автоматически обновляются через:</p>
+                <ul>
+                    <li>Кнопку "Обновить токен" в админке</li>
+                    <li>Автоматически при отправке заявок, если токен истёк</li>
+                </ul>
+            </div>
+
+            <div class="instructions-warning">
+                <strong>Внимание:</strong> Если refresh_token истечёт, потребуется повторить процесс авторизации с шага
+                1.
+            </div>
         </div>
     </div>
 </div>

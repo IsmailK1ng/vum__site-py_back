@@ -5,11 +5,11 @@
 class ProductsManager {
   constructor() {
     // Определяем текущий язык
-    this.currentLanguage = document.documentElement.lang || 
-                          window.LANGUAGE_CODE || 
-                          this.getCookie('django_language') || 
-                          'uz';
-    
+    this.currentLanguage = document.documentElement.lang ||
+      window.LANGUAGE_CODE ||
+      this.getCookie('django_language') ||
+      'uz';
+
     // Определяем API URL в зависимости от языка
     this.apiUrl = `/api/${this.currentLanguage}/products/`;
     this.currentCategory = null;
@@ -17,7 +17,7 @@ class ProductsManager {
     this.cardsPerPage = 8;
     this.allProducts = [];
     this.filteredProducts = [];
-    
+
     // Полная информация о категориях с переводами
     this.categoryTranslations = {
       'tiger_vh': {
@@ -168,7 +168,7 @@ class ProductsManager {
         hero_image: 'images/categories/tiger-vr-hero.png'
       }
     };
-    
+
     this.init();
   }
 
@@ -176,12 +176,12 @@ class ProductsManager {
   getApiUrl() {
     return `/api/${this.currentLanguage}/products/`;
   }
-  
+
   // Получаем данные категории на текущем языке
   getCategoryData(categoryKey) {
     const category = this.categoryTranslations[categoryKey];
     if (!category) return null;
-    
+
     const langData = category[this.currentLanguage] || category['uz'];
     return {
       ...langData,
@@ -201,13 +201,13 @@ class ProductsManager {
     // Получаем категорию из URL
     const urlParams = new URLSearchParams(window.location.search);
     this.currentCategory = urlParams.get('category');
-    
+
     // Обновляем все элементы страницы
     this.updatePageContent();
-    
+
     // Загружаем продукты
     await this.loadProducts();
-    
+
     // Инициализируем поиск
     this.initSearch();
   }
@@ -217,25 +217,25 @@ class ProductsManager {
       console.log('No category specified');
       return;
     }
-    
+
     const categoryInfo = this.getCategoryData(this.currentCategory);
     if (!categoryInfo) {
       console.error('Unknown category:', this.currentCategory);
       return;
     }
-      
+
     // 1. Обновляем главный заголовок
     const titleElement = document.querySelector('.models_title');
     if (titleElement) {
       titleElement.textContent = categoryInfo.title;
     }
-    
+
     // 2. Обновляем слоган
     const sloganElement = document.querySelector('.hero-05-title__item:not(.title-item-image)');
     if (sloganElement) {
       sloganElement.textContent = categoryInfo.slogan;
     }
-    
+
     // 3. Обновляем hero изображение
     const heroImage = document.querySelector('.mxd-hero-06__img img');
     if (heroImage) {
@@ -243,16 +243,16 @@ class ProductsManager {
       heroImage.src = staticPath;
       heroImage.alt = categoryInfo.title;
     }
-    
+
     // 4. Обновляем хлебные крошки
     const breadcrumbActive = document.querySelector('.breadcrumb-ol .active a');
     if (breadcrumbActive) {
       breadcrumbActive.textContent = categoryInfo.breadcrumb;
     }
-    
+
     // 5. Обновляем title страницы
     document.title = `${categoryInfo.title} - FAW Trucks`;
-    
+
     // Сохраняем текст кнопки для использования в карточках
     this.buttonText = categoryInfo.buttonText;
   }
@@ -260,40 +260,41 @@ class ProductsManager {
   async loadProducts() {
     try {
       this.showLoader();
-      
+
       // Формируем URL с категорией
       let url = this.apiUrl;
       if (this.currentCategory) {
         url += `?category=${this.currentCategory}`;
       }
-      
-      console.log('Loading products from:', url);
-      
+
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       // Поддержка разных форматов ответа
       this.allProducts = data.results || data.products || data || [];
       this.filteredProducts = [...this.allProducts];
-      
-      console.log('Loaded products:', this.allProducts.length);
-      
+
+
       if (this.allProducts.length === 0) {
         this.showNoResults();
         return;
       }
-      
+
       this.renderCards();
       this.createPagination();
       this.hideLoader();
-      
+
     } catch (error) {
-      console.error('Ошибка загрузки:', error);
+      window.logJSError('Products loading error: ' + error.message, {
+        file: 'products.js',
+        category: this.currentCategory,
+        url: url
+      });
       this.showError(error.message);
     }
   }
@@ -301,21 +302,21 @@ class ProductsManager {
   renderCards() {
     const container = document.querySelector('.faw-truck-card-container');
     if (!container) {
-      console.error('Container .faw-truck-card-container not found');
+      window.logJSError('Container .faw-truck-card-container not found', { file: 'products.js' });
       return;
     }
-    
+
     container.innerHTML = '';
-    
+
     const start = (this.currentPage - 1) * this.cardsPerPage;
     const end = start + this.cardsPerPage;
     const cardsToShow = this.filteredProducts.slice(start, end);
-    
+
     if (cardsToShow.length === 0) {
       this.showNoResults();
       return;
     }
-    
+
     cardsToShow.forEach(product => {
       const cardHTML = this.createCardHTML(product);
       const wrapper = document.createElement('div');
@@ -369,16 +370,16 @@ class ProductsManager {
   createPagination() {
     const pagination = document.getElementById('pagination');
     if (!pagination) return;
-    
+
     const totalPages = Math.ceil(this.filteredProducts.length / this.cardsPerPage);
-    
+
     if (totalPages <= 1) {
       pagination.innerHTML = '';
       return;
     }
-    
+
     pagination.innerHTML = '';
-    
+
     // Кнопка "Назад"
     const prevButton = this.createButton('prev', 'Ortga', this.currentPage > 1);
     prevButton.addEventListener('click', (e) => {
@@ -391,7 +392,7 @@ class ProductsManager {
       }
     });
     pagination.appendChild(prevButton);
-    
+
     // Номера страниц
     for (let i = 1; i <= totalPages; i++) {
       const pageButton = document.createElement('a');
@@ -407,7 +408,7 @@ class ProductsManager {
       });
       pagination.appendChild(pageButton);
     }
-    
+
     // Кнопка "Вперед"
     const nextButton = this.createButton('next', 'Oldinga', this.currentPage < totalPages);
     nextButton.addEventListener('click', (e) => {
@@ -426,32 +427,32 @@ class ProductsManager {
     const button = document.createElement('a');
     button.href = 'javascript:void(0);';
     button.className = `mxd-blog-pagination__item blog-pagination-control ${type} btn btn-anim btn-line-small btn-bright anim-no-delay slide-${type === 'prev' ? 'left' : 'right'}`;
-    
+
     if (!enabled) button.classList.add('disabled');
-    
+
     if (type === 'prev') {
       button.innerHTML = `<i class="ph ph-arrow-left"></i><span class="btn-caption">${text}</span>`;
     } else {
       button.innerHTML = `<span class="btn-caption">${text}</span><i class="ph ph-arrow-right"></i>`;
     }
-    
+
     return button;
   }
 
   updatePagination() {
     const pagination = document.getElementById('pagination');
     if (!pagination) return;
-    
+
     const pageButtons = pagination.querySelectorAll('.blog-pagination-number');
     pageButtons.forEach(btn => {
       const pageNum = parseInt(btn.querySelector('.btn-caption').textContent);
       btn.classList.toggle('active', pageNum === this.currentPage);
     });
-    
+
     const prevButton = pagination.querySelector('.prev');
     const nextButton = pagination.querySelector('.next');
     const totalPages = Math.ceil(this.filteredProducts.length / this.cardsPerPage);
-    
+
     if (prevButton) prevButton.classList.toggle('disabled', this.currentPage === 1);
     if (nextButton) nextButton.classList.toggle('disabled', this.currentPage === totalPages);
   }
@@ -459,10 +460,10 @@ class ProductsManager {
   initSearch() {
     const searchInput = document.querySelector('.filter-search__input');
     if (!searchInput) return;
-    
+
     searchInput.addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase().trim();
-      
+
       if (query === '') {
         this.filteredProducts = [...this.allProducts];
       } else {
@@ -471,7 +472,7 @@ class ProductsManager {
           return title.includes(query);
         });
       }
-      
+
       this.currentPage = 1;
       this.renderCards();
       this.createPagination();
@@ -482,10 +483,10 @@ class ProductsManager {
     const header = document.getElementById('header');
     const headerHeight = header ? header.offsetHeight : 0;
     const offset = 25;
-    
-    window.scrollTo({ 
-      top: Math.max(0, headerHeight + offset), 
-      behavior: 'smooth' 
+
+    window.scrollTo({
+      top: Math.max(0, headerHeight + offset),
+      behavior: 'smooth'
     });
   }
 

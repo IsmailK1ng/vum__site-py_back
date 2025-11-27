@@ -5,16 +5,16 @@
 class ProductDetail {
     constructor() {
         this.productId = null;
-        
+
         // Определяем текущий язык
-        this.currentLanguage = document.documentElement.lang || 
-                               window.LANGUAGE_CODE || 
-                               this.getCookie('django_language') || 
-                               'uz';
-        
+        this.currentLanguage = document.documentElement.lang ||
+            window.LANGUAGE_CODE ||
+            this.getCookie('django_language') ||
+            'uz';
+
         this.apiUrl = this.getApiUrl();
         this.product = null;
-        
+
         // Переводы для категорий и текстов
         this.translations = {
             uz: {
@@ -69,7 +69,7 @@ class ProductDetail {
                 }
             }
         };
-        
+
         this.init();
     }
 
@@ -77,16 +77,16 @@ class ProductDetail {
     getApiUrl() {
         return `/api/${this.currentLanguage}/products/`;
     }
-    
+
     // Получаем перевод
     t(key) {
         const keys = key.split('.');
         let value = this.translations[this.currentLanguage];
-        
+
         for (const k of keys) {
             value = value?.[k];
         }
-        
+
         return value || key;
     }
 
@@ -126,7 +126,11 @@ class ProductDetail {
             this.hideLoader();
 
         } catch (error) {
-            console.error('Error loading product:', error);
+            window.logJSError('Product detail loading error: ' + error.message, {
+                file: 'product-detail.js',
+                slug: slug,
+                apiUrl: this.apiUrl
+            });
             this.showError(this.t('loadError'));
         }
     }

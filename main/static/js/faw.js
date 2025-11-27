@@ -9,7 +9,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
   if (typeof countUp === 'undefined') {
-    console.error('CountUp library not found. Please ensure libs.min.js is loaded before this script.');
+    window.logJSError('CountUp library not found', { file: 'faw-scripts.js' });
     return;
   }
   initFAWCounters();
@@ -29,7 +29,6 @@ function initFAWCounters() {
 
     if (counterData.isText) {
       element.textContent = counterData.value;
-      console.log(`Counter ${counterData.id} set to ${counterData.value}`);
     } else {
       const counter = new countUp.CountUp(counterData.id, counterData.value, {
         suffix: counterData.suffix,
@@ -37,15 +36,9 @@ function initFAWCounters() {
         enableScrollSpy: true,
         scrollSpyOnce: true
       });
-
-      if (!counter.error) {
-        console.log(`Counter ${counterData.id} initialized successfully`);
-      } else {
-        console.error(`Counter ${counterData.id} error:`, counter.error);
-      }
     }
   });
-}
+} 
 
 // --------------------------------------------- //
 // FAW Image Slider Functionality
@@ -56,7 +49,7 @@ function initFAWCounters() {
 let slides = [];
 
 function initializeSlidesFromDjango() {
-  
+
   const sliderDataElement = document.getElementById('slider-data');
 
   if (!sliderDataElement) {
@@ -67,7 +60,7 @@ function initializeSlidesFromDjango() {
 
   // Получаем содержимое в зависимости от типа элемента
   let content = '';
-  
+
   if (sliderDataElement.tagName === 'SCRIPT') {
     // Если это <script type="application/json">
     content = sliderDataElement.textContent || sliderDataElement.innerHTML;
@@ -117,8 +110,8 @@ function initializeSlidesFromDjango() {
 }
 
 function loadFallbackSlides() {
-  console.warn('⚠️ Using fallback slides (no Django data found)');
-  
+
+
   slides = [
     {
       year: "2025",
@@ -148,8 +141,6 @@ function loadFallbackSlides() {
       cta: [{ type: "main", label: "Batafsil", link: "#" }]
     }
   ];
-  
-  console.log('📊 Fallback slides loaded:', slides.length);
 }
 function getPlaceholderSVG(title, size = "large") {
   const dimensions = size === "large" ? { w: 420, h: 210, fs: 28 } : { w: 210, h: 105, fs: 14 };
@@ -425,7 +416,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     document.addEventListener('visibilitychange', function () {
-      if (document.hidden) stopAutoplay(); 
+      if (document.hidden) stopAutoplay();
       else if (!isSmallScreen()) startAutoplay();
     });
 
@@ -490,7 +481,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }, { passive: true });
     })();
   } else {
-    console.error('FAW Slider elements not found. Check HTML structure.');
+    window.logJSError('FAW Slider elements not found', { file: 'faw-scripts.js' });
   }
 });
 
@@ -802,15 +793,17 @@ document.addEventListener('DOMContentLoaded', function () {
           throw new Error(data.message || 'Xatolik yuz berdi');
         }
       } catch (error) {
-        console.error('Dealer form error:', error);
+        window.logJSError('Dealer form submission error: ' + error.message, {
+          file: 'faw-scripts.js',
+          formData: formData
+        });
         alert('Xatolik yuz berdi. Iltimos qaytadan urinib ko\'ring.');
-      } finally {
+      }
+      finally {
         btn.disabled = false;
         btn.innerHTML = originalHTML;
       }
     });
-
-    console.log('Dealer form initialized successfully');
   }
 
   if (document.readyState === 'loading') {

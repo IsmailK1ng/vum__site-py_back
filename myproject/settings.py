@@ -340,23 +340,19 @@ LOGGING = {
             'format': '{levelname} {asctime} {module} {funcName} {lineno} {message}',
             'style': '{',
         },
-        'simple': {
-            'format': '{levelname} {asctime} {message}',
-            'style': '{',
-        },
     },
     'handlers': {
         'errors_file': {
-            'level': 'ERROR',
+            'level': 'ERROR',   
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': BASE_DIR / 'logs' / 'errors.log',
-            'maxBytes': 1024 * 1024 * 10,  
+            'maxBytes': 1024 * 1024 * 10,
             'backupCount': 5,
             'formatter': 'verbose',
             'encoding': 'utf-8',
         },
         'amocrm_file': {
-            'level': 'INFO',
+            'level': 'ERROR', 
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': BASE_DIR / 'logs' / 'amocrm.log',
             'maxBytes': 1024 * 1024 * 10,
@@ -367,11 +363,10 @@ LOGGING = {
         'console': {
             'level': 'ERROR',
             'class': 'logging.StreamHandler',
-            'formatter': 'simple',
+            'formatter': 'verbose',
         },
     },
     'root': {
-        # Ловим ВСЕ ошибки и критические моменты
         'handlers': ['errors_file', 'console'],
         'level': 'ERROR',
     },
@@ -386,25 +381,14 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
-        'django.db.backends': {
-            'handlers': ['errors_file'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-        'django.security': {
-            'handlers': ['errors_file'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
         'amocrm': {
-            'handlers': ['amocrm_file'],
-            'level': 'INFO',
+            'handlers': ['amocrm_file'], 
+            'level': 'ERROR',  
             'propagate': False,
         },
     },
 }
 
-# Создаем директорию для логов
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)
 
 SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']
