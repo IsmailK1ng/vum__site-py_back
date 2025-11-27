@@ -95,6 +95,16 @@
     #faw-main-contact-form {
       padding-top: 120px;
     }
+
+    .video-bg iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 110%;
+      height: 110%;
+      pointer-events: none;
+    }
   </style>
 </head>
 
@@ -117,12 +127,14 @@
           <div class="mxd-hero-06__top">
             <div class="mxd-hero-06__content">
               <div class="mxd-hero-06__video">
-                <video class="video" preload="auto" autoplay="autoplay" loop="loop" muted="muted"
-                  poster="https://dummyimage.com/1920x1080/5d5d5d/838383">
-                  <source type="video/mp4" src="{% static 'videos/1-variant.mp4' %}">
-                  <!-- <source type="video/mp4" src="faw_site-video/1-variant.mp4"> -->
-                </video>
-                <div class="hero-06-video__cover"></div>
+                <div class="hero-06-video__cover">
+                  <div class="video-bg">
+                    <iframe
+                      src="https://www.youtube.com/embed/id9xnrstgQg?autoplay=1&mute=1&controls=0&showinfo=0&modestbranding=1&loop=1&playlist=id9xnrstgQg&rel=0"
+                      frameborder="0" allow="autoplay; encrypted-media" allowfullscreen
+                      referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                  </div>
+                </div>
               </div>
               <div class="mxd-hero-06__data">
                 <div class="mxd-hero-06__headline">
@@ -261,8 +273,8 @@
                     </div>
                   </a>
                   <div class="mxd-blog-preview__data">
-                    <a class="" href="{% url 'products' %}?category=tiger_vh"><span>Tiger VH</span> — Gaz–dizel. Tejamkor.
-                      Kuchli.
+                    <a class="" href="{% url 'products' %}?category=tiger_vh"><span>Tiger VH</span>
+                      — Gaz–dizel.Tejamkor.Kuchli.
                       (ikki yoqilg‘ida harakatlanuvchi model)</a>
                   </div>
                 </div>
@@ -278,8 +290,8 @@
                     </div>
                   </a>
                   <div class="mxd-blog-preview__data">
-                    <a class="" href="{% url 'products' %}?category=tiger_vr"><span>Tiger VR</span> — sArzon xarajat. Yengil.
-                      Amaliy.
+                    <a class="" href="{% url 'products' %}?category=tiger_vr"><span>Tiger VR</span>
+                      — sArzon xarajat.Yengil.Amaliy.
                       (kichik segment, kam xarajatli, qulay model)</a>
                   </div>
                 </div>
@@ -554,7 +566,8 @@
                 <div class="mxd-promo__layout">
                   <div class="mxd-promo__icon-section">
                     <span class="mxd-promo__icon">
-                      <img src="{% static 'images/logo/faw-logo.png' %}" style="filter: brightness(0) invert(1);" alt="VUM Icon">
+                      <img src="{% static 'images/logo/faw-logo.png' %}" style="filter: brightness(0) invert(1);"
+                        alt="VUM Icon">
                       <span class="mxd-promo__icon-tx reveal-type">FAW TRUCKS</span>
                     </span>
                   </div>

@@ -963,6 +963,10 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
     history_latest_first = True
     actions = ['add_to_slider', 'remove_from_slider']
     
+    list_per_page = 15  # Показывать по 25 продуктов на странице
+    show_full_result_count = False  # Отключает подсчёт всех записей (ускоряет загрузку)
+    list_select_related = []  # Оптимизация запросов
+    
     fieldsets = (
         ('Основная информация', {
             'fields': (
