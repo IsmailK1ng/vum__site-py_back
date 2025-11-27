@@ -6,11 +6,11 @@
     <meta charset="UTF-8" />
 
     <!-- Page Title -->
-    <title>VUM Kontaktlar</title>
+    <title>{% if LANGUAGE_CODE == 'uz' %}Kontaktlar{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %} | FAW Trucks</title>
 
     <!-- Meta Tags -->
-    <meta name="description" content="Faw Trucks в Узбекистане" />
-    <meta name="keywords" content="Faw Trucks в Узбекистане" />
+    <meta name="description" content="{% if LANGUAGE_CODE == 'uz' %}FAW Trucks Oʻzbekiston - aloqa maʼlumotlari{% elif LANGUAGE_CODE == 'ru' %}FAW Trucks Узбекистан - контактная информация{% else %}FAW Trucks Uzbekistan - contact information{% endif %}" />
+    <meta name="keywords" content="FAW Trucks, {% if LANGUAGE_CODE == 'uz' %}Oʻzbekiston, kontaktlar{% elif LANGUAGE_CODE == 'ru' %}Узбекистан, контакты{% else %}Uzbekistan, contacts{% endif %}" />
     <meta name="author" content="mix_design" />
 
     <!-- Viewport Meta-->
@@ -19,19 +19,17 @@
 
     <!-- Универсальный favicon -->
     <link rel="icon" href="{% static 'images/logo/logo-vum.png' %}" />
-    <!-- Для Apple устройств -->
     <link rel="apple-touch-icon" href="{% static 'images/logo/logo-vum.png' %}">
 
-    <!-- Facebook Metadata Start -->
+    <!-- Facebook Metadata -->
     <meta property="og:image:height" content="1200" />
     <meta property="og:image:width" content="1200" />
-    <meta property="og:title" content="Faw Trucks в Узбекистане" />
-    <meta property="og:description" content="Faw Trucks в Узбекистане" />
-    <meta property="og:url" content="https://mixdesign.dev/themeforest/rayo" />
-    <meta property="og:image" content="https://mixdesign.dev/themeforest/rayo/img/og-image.jpg" />
-    <!-- Facebook Metadata End -->
+    <meta property="og:title" content="{% if LANGUAGE_CODE == 'uz' %}Kontaktlar{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %} | FAW Trucks" />
+    <meta property="og:description" content="{% if LANGUAGE_CODE == 'uz' %}FAW Trucks bilan bogʻlaning{% elif LANGUAGE_CODE == 'ru' %}Свяжитесь с FAW Trucks{% else %}Contact FAW Trucks{% endif %}" />
+    <meta property="og:url" content="https://fawtrucks.uz/contact" />
+    <meta property="og:image" content="{% static 'images/og-image.jpg' %}" />
 
-    <!-- Google Tag Manager Xurshid 1 chi kod -->
+    <!-- Google Tag Manager -->
     <script>(function (w, d, s, l, i) {
             w[l] = w[l] || []; w[l].push({
                 'gtm.start':
@@ -40,9 +38,8 @@
                 j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
                     'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
         })(window, document, 'script', 'dataLayer', 'GTM-M33GWKMW');</script>
-    <!-- End Google Tag Manager Xurshid 1 chi kod-->
 
-    <!-- Meta Pixel Code Xurshid 2 chi kod-->
+    <!-- Meta Pixel Code -->
     <script>
         !function (f, b, e, v, n, t, s) {
             if (f.fbq) return; n = f.fbq = function () {
@@ -58,12 +55,10 @@
         fbq('init', '2271244510044933');
         fbq('track', 'PageView');
     </script>
-
     <noscript><img height="1" width="1" style="display:none"
             src="https://www.facebook.com/tr?id=2271244510044933&ev=PageView&noscript=1" /></noscript>
-    <!-- End Meta Pixel Code  Xurshid 2 chi kod-->
 
-    <!-- amoCRM Pixel для автораспределения -->
+    <!-- amoCRM Pixel -->
     <script type="text/javascript" id="amo_pixel_identifier_js" async="async"
         src="https://piper.amocrm.ru/pixel/js/identifier/pixel_identifier.js"></script>
     <script>
@@ -76,7 +71,7 @@
         };
     </script>
 
-    <!-- Template Styles Start -->
+    <!-- Template Styles -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}" />
@@ -84,37 +79,20 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/breadcrumbs.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/site_contact.css' %}" />
 
-    <!-- Template Styles End -->
-
-    <!-- Custom Browser Color Start -->
+    <!-- Custom Browser Color -->
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616" />
     <meta name="msapplication-navbutton-color" content="#161616" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <!-- Custom Browser Color End -->
-
-    <!-- amoCRM Pixel для автораспределения -->
-    <script type="text/javascript" id="amo_pixel_identifier_js" async="async"
-        src="https://piper.amocrm.ru/pixel/js/identifier/pixel_identifier.js"></script>
-    <script>
-        window.AMOPIXEL_IDENTIFIER_PARAMS = window.AMOPIXEL_IDENTIFIER_PARAMS || {};
-        window.AMOPIXEL_IDENTIFIER_PARAMS.onload = function (pixel_identifier) {
-            var visitor_uid = pixel_identifier.getVisitorUid();
-            if (visitor_uid) {
-                sessionStorage.setItem('amo_visitor_uid', visitor_uid);
-            }
-        };
-    </script>
 </head>
 
 <body>
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-     
-    <!-- Loader Start -->
+
+    <!-- Loader -->
     <div id="loader" style="display: none" class="loader">
         <div class="loader__wrapper">
             <div class="loader__content">
@@ -124,24 +102,22 @@
             </div>
         </div>
     </div>
-    <!-- Loader End -->
 
-    <!-- Меню и шапка (начало) -->
+    <!-- Header -->
     {% include 'main/includes/header.html' %}
-    <!-- Меню и шапка (конец) -->
 
-    <div class="mxd-block loading-wrap">
-    </div>
-    <!-- Хлебные крошки -->
+    <div class="mxd-block loading-wrap"></div>
+
+    <!-- Breadcrumbs -->
     <div class="mxd-section-filter pre-grid">
         <div class="mxd-section-filter__inner animate-card-3">
             <div class="mxd-grid-item-1">
                 <div class="section-filter">
                     <div aria-label="breadcrumb">
                         <ol class="breadcrumb-ol">
-                            <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
+                            <li><a href="{% url 'home' %}">{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}</a></li>
                             <li class="active">
-                                <a href="{% url 'about' %}">Kontaktlar </a>
+                                <a href="{% url 'contact' %}">{% if LANGUAGE_CODE == 'uz' %}Kontaktlar{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %}</a>
                             </li>
                         </ol>
                     </div>
@@ -153,114 +129,66 @@
     <!-- Section - Text Block Start -->
     <div class="mxd-section padding-default">
         <div class="mxd-container grid-container">
-            <!-- Block - Text Block with H2 Title, Paragraph and Contact Lists Start -->
             <div class="mxd-block">
                 <div class="container-fluid px-0">
                     <div class="col contact-col">
                         <div class="col-12 col-xl-5 mxd-grid-item no-margin">
                             <div class="mxd-block__name">
                                 <div class="faw-history-title fade-in">
-                                    <h2>Bizning ofisimizga xush kelibsiz
-                                    </h2>
+                                    <h2>{% if LANGUAGE_CODE == 'uz' %}Bizning ofisimizga xush kelibsiz{% elif LANGUAGE_CODE == 'ru' %}Добро пожаловать в наш офис{% else %}Welcome to our office{% endif %}</h2>
                                 </div>
                             </div>
                         </div>
                         <div class="col-12 col-xl-6 mxd-grid-item no-margin">
                             <div class="mxd-block__content">
                                 <div class="mxd-block__paragraph">
-
                                     <div class="mxd-paragraph__lists">
                                         <div class="container-fluid p-0">
                                             <div class="row g-0 contact-info__container">
-                                                <div
-                                                    class="col-12 col-md-6 col-xl-5 mxd-paragraph__lists-item card_border">
+                                                <div class="col-12 col-md-6 col-xl-5 mxd-paragraph__lists-item card_border">
                                                     <div class="mxd-paragraph__lists-title">
-                                                        <p
-                                                            class="t-large t-bright t-caption  contact-fluid__txt">
-                                                            VUM
-                                                        </p>
+                                                        <p class="t-large t-bright t-caption contact-fluid__txt">VUM</p>
                                                     </div>
                                                     <div class="contact-info__details">
-                                                        <div class="contact-detail ">
+                                                        <div class="contact-detail">
                                                             <div class="contact-detail__icon">
                                                                 <i class="ph-fill ph-phone"></i>
                                                             </div>
                                                             <div class="contact-detail__content">
-                                                                <h4 class="contact-detail__title">Telefon</h4>
-                                                                <a href="tel:+998712345678"
-                                                                    class="contact-detail__value">+998 55 508 60 60</a>
+                                                                <h4 class="contact-detail__title">{% if LANGUAGE_CODE == 'uz' %}Telefon{% elif LANGUAGE_CODE == 'ru' %}Телефон{% else %}Phone{% endif %}</h4>
+                                                                <a href="tel:+998555086060" class="contact-detail__value">+998 55 508 60 60</a>
                                                             </div>
                                                         </div>
 
-                                                        <div class="contact-detail ">
+                                                        <div class="contact-detail">
                                                             <div class="contact-detail__icon">
                                                                 <i class="ph-fill ph-envelope"></i>
                                                             </div>
                                                             <div class="contact-detail__content">
                                                                 <h4 class="contact-detail__title">Email</h4>
-                                                                <a href="mailto:info@fawtrucks.uz"
-                                                                    class="contact-detail__value">info@faw.uz</a>
+                                                                <a href="mailto:info@faw.uz" class="contact-detail__value">info@faw.uz</a>
                                                             </div>
                                                         </div>
 
-                                                        <div class="contact-detail ">
+                                                        <div class="contact-detail">
                                                             <div class="contact-detail__icon">
                                                                 <i class="ph-fill ph-map-pin"></i>
                                                             </div>
                                                             <div class="contact-detail__content">
-                                                                <h4 class="contact-detail__title">Manzil</h4>
+                                                                <h4 class="contact-detail__title">{% if LANGUAGE_CODE == 'uz' %}Manzil{% elif LANGUAGE_CODE == 'ru' %}Адрес{% else %}Address{% endif %}</h4>
                                                                 <p class="contact-detail__value">
-                                                                    Toshkent shahri, Yakkasaroy tumani
-                                                                    A. Qahxara ko‘chasi, 2A
+                                                                    {% if LANGUAGE_CODE == 'uz' %}
+                                                                    Toshkent shahri, Yakkasaroy tumani A. Qahxara koʻchasi, 2A
+                                                                    {% elif LANGUAGE_CODE == 'ru' %}
+                                                                    г. Ташкент, район Яккасарай, ул. А. Кахара, 2А
+                                                                    {% else %}
+                                                                    Tashkent city, Yakkasaray district, A. Kakhara street, 2A
+                                                                    {% endif %}
                                                                 </p>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <!-- <div
-                                                    class="col-12 col-md-6 col-xl-5 mxd-paragraph__lists-item  card_border">
-                                                    <div class="mxd-paragraph__lists-title">
-                                                        <p
-                                                            class="t-large t-bright t-caption  contact-fluid__txt">
-                                                            Andijon
-                                                        </p>
-                                                    </div>
-                                                    <div class="contact-info__details">
-                                                        <div class="contact-detail ">
-                                                            <div class="contact-detail__icon">
-                                                                <i class="ph-fill ph-phone"></i>
-                                                            </div>
-                                                            <div class="contact-detail__content">
-                                                                <h4 class="contact-detail__title">Telefon</h4>
-                                                                <a href="tel:+998712345678"
-                                                                    class="contact-detail__value">+998 71
-                                                                    234-56-78</a>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="contact-detail ">
-                                                            <div class="contact-detail__icon">
-                                                                <i class="ph-fill ph-envelope"></i>
-                                                            </div>
-                                                            <div class="contact-detail__content">
-                                                                <h4 class="contact-detail__title">Email</h4>
-                                                                <a href="mailto:info@fawtrucks.uz"
-                                                                    class="contact-detail__value">info@fawtrucks.uz</a>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="contact-detail ">
-                                                            <div class="contact-detail__icon">
-                                                                <i class="ph-fill ph-map-pin"></i>
-                                                            </div>
-                                                            <div class="contact-detail__content">
-                                                                <h4 class="contact-detail__title">Manzil</h4>
-                                                                <p class="contact-detail__value">Toshkent shahar,
-                                                                    Yunusobod tumani</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div> -->
                                             </div>
                                         </div>
                                     </div>
@@ -270,104 +198,76 @@
                     </div>
                 </div>
             </div>
-            <!-- Block - Text Block with H2 Title, Paragraph and Contact Lists End -->
         </div>
     </div>
-    <!-- Section - Text Block End -->
+
     <div class="faw-history-title fade-in">
-        <h3>Biz bilan boglaning
-        </h3>
+        <h3>{% if LANGUAGE_CODE == 'uz' %}Biz bilan bogʻlaning{% elif LANGUAGE_CODE == 'ru' %}Свяжитесь с нами{% else %}Contact us{% endif %}</h3>
     </div>
+
     <!-- Page Content Start -->
     <main id="mxd-page-content" class="mxd-page-content inner-page-content">
-        <!-- Section - Inner Page Headline Start -->
         <div class="mxd-section mxd-section-inner-headline padding-s-text-pre-form overflow-hidden">
-            <div class="mxd-container grid-container">
-
-            </div>
+            <div class="mxd-container grid-container"></div>
         </div>
-        <!-- Section - Inner Page Headline End -->
 
         <!-- Section - Inner Page Form Start -->
         <div class="mxd-section mxd-section-inner-form padding-default">
             <div class="mxd-container grid-container">
-                <!-- Block - Inner Page Headline Start -->
                 <div class="mxd-block">
                     <div class="container-fluid px-0">
                         <div class="row gx-0">
-                            <!-- Inner Headline Name Start -->
                             <div class="col-12 col-xl-2 mxd-grid-item no-margin"></div>
-                            <!-- Inner Headline Name Start -->
-
-                            <!-- Inner Headline Content Start -->
+                            
                             <div class="col-12 col-xl-8">
                                 <div class="mxd-block__content contact">
                                     <div class="mxd-block__inner-form loading__fade">
                                         <div class="form-container">
-
-                                            <!-- Сообщение о статусе (встроенное уведомление) -->
+                                            <!-- Form Status -->
                                             <div class="form-status hidden">
                                                 <p class="form-status__text"></p>
                                             </div>
 
-                                            <!-- Contact Form Start -->
+                                            <!-- Contact Form -->
                                             <form class="form contact-form" id="contactForm">
                                                 {% csrf_token %}
-
                                                 <div class="container-fluid p-0">
                                                     <div class="row gx-0">
-                                                        <div
-                                                            class="col-12 mxd-grid-item  contact-grid-item">
-                                                            <input type="text" name="name" placeholder="F.I.Sh*"
-                                                                required />
+                                                        <div class="col-12 mxd-grid-item contact-grid-item">
+                                                            <input type="text" name="name" placeholder="{% if LANGUAGE_CODE == 'uz' %}F.I.SH*{% elif LANGUAGE_CODE == 'ru' %}Ф.И.О*{% else %}Full name*{% endif %}" required />
                                                         </div>
-                                                        <div
-                                                            class="col-12 mxd-grid-item  contact-grid-item">
+                                                        
+                                                        <div class="col-12 mxd-grid-item contact-grid-item">
                                                             <select name="region" required>
-                                                                <option value="" disabled selected>Viloyatni tanlang*
-                                                                </option>
-                                                                <option value="Toshkent shahri">Toshkent shahri</option>
-                                                                <option value="Andijon viloyati">Andijon viloyati
-                                                                </option>
-                                                                <option value="Buxoro viloyati">Buxoro viloyati</option>
-                                                                <option value="Fargʻona viloyati">Fargʻona viloyati
-                                                                </option>
-                                                                <option value="Jizzax viloyati">Jizzax viloyati</option>
-                                                                <option value="Xorazm viloyati">Xorazm viloyati</option>
-                                                                <option value="Namangan viloyati">Namangan viloyati
-                                                                </option>
-                                                                <option value="Navoiy viloyati">Navoiy viloyati</option>
-                                                                <option value="Qashqadaryo viloyati">Qashqadaryo
-                                                                    viloyati</option>
-                                                                <option value="Samarqand viloyati">Samarqand viloyati
-                                                                </option>
-                                                                <option value="Sirdaryo viloyati">Sirdaryo viloyati
-                                                                </option>
-                                                                <option value="Surxondaryo viloyati">Surxondaryo
-                                                                    viloyati</option>
-                                                                <option value="Toshkent viloyati">Toshkent viloyati
-                                                                </option>
-                                                                <option value="Qoraqalpogʻiston Respublikasi">
-                                                                    Qoraqalpogʻiston Respublikasi</option>
+                                                                <option value="" disabled selected>{% if LANGUAGE_CODE == 'uz' %}Viloyatni tanlang*{% elif LANGUAGE_CODE == 'ru' %}Выберите регион*{% else %}Select region*{% endif %}</option>
+                                                                <option value="Toshkent shahri">{% if LANGUAGE_CODE == 'uz' %}Toshkent shahri{% elif LANGUAGE_CODE == 'ru' %}г. Ташкент{% else %}Tashkent city{% endif %}</option>
+                                                                <option value="Andijon viloyati">{% if LANGUAGE_CODE == 'uz' %}Andijon viloyati{% elif LANGUAGE_CODE == 'ru' %}Андижанская область{% else %}Andijan region{% endif %}</option>
+                                                                <option value="Buxoro viloyati">{% if LANGUAGE_CODE == 'uz' %}Buxoro viloyati{% elif LANGUAGE_CODE == 'ru' %}Бухарская область{% else %}Bukhara region{% endif %}</option>
+                                                                <option value="Fargʻona viloyati">{% if LANGUAGE_CODE == 'uz' %}Fargʻona viloyati{% elif LANGUAGE_CODE == 'ru' %}Ферганская область{% else %}Fergana region{% endif %}</option>
+                                                                <option value="Jizzax viloyati">{% if LANGUAGE_CODE == 'uz' %}Jizzax viloyati{% elif LANGUAGE_CODE == 'ru' %}Джизакская область{% else %}Jizzakh region{% endif %}</option>
+                                                                <option value="Xorazm viloyati">{% if LANGUAGE_CODE == 'uz' %}Xorazm viloyati{% elif LANGUAGE_CODE == 'ru' %}Хорезмская область{% else %}Khorezm region{% endif %}</option>
+                                                                <option value="Namangan viloyati">{% if LANGUAGE_CODE == 'uz' %}Namangan viloyati{% elif LANGUAGE_CODE == 'ru' %}Наманганская область{% else %}Namangan region{% endif %}</option>
+                                                                <option value="Navoiy viloyati">{% if LANGUAGE_CODE == 'uz' %}Navoiy viloyati{% elif LANGUAGE_CODE == 'ru' %}Навоийская область{% else %}Navoiy region{% endif %}</option>
+                                                                <option value="Qashqadaryo viloyati">{% if LANGUAGE_CODE == 'uz' %}Qashqadaryo viloyati{% elif LANGUAGE_CODE == 'ru' %}Кашкадарьинская область{% else %}Kashkadarya region{% endif %}</option>
+                                                                <option value="Samarqand viloyati">{% if LANGUAGE_CODE == 'uz' %}Samarqand viloyati{% elif LANGUAGE_CODE == 'ru' %}Самаркандская область{% else %}Samarkand region{% endif %}</option>
+                                                                <option value="Sirdaryo viloyati">{% if LANGUAGE_CODE == 'uz' %}Sirdaryo viloyati{% elif LANGUAGE_CODE == 'ru' %}Сырдарьинская область{% else %}Sirdaryo region{% endif %}</option>
+                                                                <option value="Surxondaryo viloyati">{% if LANGUAGE_CODE == 'uz' %}Surxondaryo viloyati{% elif LANGUAGE_CODE == 'ru' %}Сурхандарьинская область{% else %}Surkhandarya region{% endif %}</option>
+                                                                <option value="Toshkent viloyati">{% if LANGUAGE_CODE == 'uz' %}Toshkent viloyati{% elif LANGUAGE_CODE == 'ru' %}Ташкентская область{% else %}Tashkent region{% endif %}</option>
+                                                                <option value="Qoraqalpogʻiston Respublikasi">{% if LANGUAGE_CODE == 'uz' %}Qoraqalpogʻiston Respublikasi{% elif LANGUAGE_CODE == 'ru' %}Республика Каракалпакстан{% else %}Republic of Karakalpakstan{% endif %}</option>
                                                             </select>
                                                         </div>
-                                                        <div
-                                                            class="col-12 mxd-grid-item  contact-grid-item">
-                                                            <input type="tel" name="phone"
-                                                                placeholder="+998 (__) ___-__-__" id="phoneInput"
-                                                                pattern="[+]*[0-9\s\-\(\)]*" data-default="+998"
-                                                                required />
+                                                        
+                                                        <div class="col-12 mxd-grid-item contact-grid-item">
+                                                            <input type="tel" name="phone" placeholder="+998 (__) ___-__-__" id="phoneInput" pattern="[+]*[0-9\s\-\(\)]*" data-default="+998" required />
                                                         </div>
-                                                        <div
-                                                            class="col-12 mxd-grid-item  contact-grid-item">
-                                                            <textarea name="message"
-                                                                placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*"></textarea>
+                                                        
+                                                        <div class="col-12 mxd-grid-item contact-grid-item">
+                                                            <textarea name="message" placeholder="{% if LANGUAGE_CODE == 'uz' %}Qanday yuk mashinasiga qiziqasiz? Qoʻshimcha savollar*{% elif LANGUAGE_CODE == 'ru' %}Какой грузовик вас интересует? Дополнительные вопросы*{% else %}What truck are you interested in? Additional questions*{% endif %}"></textarea>
                                                         </div>
-                                                        <div class="col-12 mxd-grid-item ">
-                                                            <button
-                                                                class="btn btn-anim btn-default btn-large btn-opposite slide-right-up shimmer-btn"
-                                                                type="submit">
-                                                                <span class="btn-caption">Qongʻiroq kutaman</span>
+                                                        
+                                                        <div class="col-12 mxd-grid-item">
+                                                            <button class="btn btn-anim btn-default btn-large btn-opposite slide-right-up shimmer-btn" type="submit">
+                                                                <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Qongʻiroq kutaman{% elif LANGUAGE_CODE == 'ru' %}Жду звонка{% else %}Waiting for a call{% endif %}</span>
                                                                 <span class="shimmer"></span>
                                                                 <i class="ph-bold ph-arrow-up-right"></i>
                                                             </button>
@@ -375,34 +275,23 @@
                                                     </div>
                                                 </div>
                                             </form>
-                                            <!-- Contact Form End -->
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Inner Headline Content End -->
                         </div>
                     </div>
                 </div>
-                <!-- Block - Inner Page Headline End -->
             </div>
         </div>
-        <!-- Section - Inner Page Form End -->
 
-
-
-
-        <!-- Секция — CTA (начало) -->
+        <!-- Section CTA -->
         <div class="mxd-section overflow-hidden">
             <div class="mxd-container">
-
-                <!-- Блок — CTA (начало) -->
                 <div class="mxd-block">
                     <div class="mxd-promo">
                         <div class="mxd-promo__inner anim-zoom-out-container">
-                            <!-- background -->
                             <div class="mxd-promo__bg"></div>
-                            <!-- caption -->
                             <div class="mxd-promo__content">
                                 <div class="mxd-promo__layout">
                                     <div class="mxd-promo__icon-section">
@@ -413,12 +302,13 @@
                                     </div>
                                     <div class="mxd-promo__text-section">
                                         <span class="mxd-promo__caption reveal-type">
-                                            FAW bu – ishonchli texnika. Har qanday iqlimda, har qanday yo'lda FAW o'zini
-                                            ko'rsatadi.
-                                            Buning ortida esa o'z ishini sidqidildan bajarayotgan kuchli va jips
-                                            jamoamiz turibdi.
-                                            Har bir mijoz biz uchun muhim, har bir yuk – mas'uliyat.
-                                            FAW jamoasi – bu tajriba, halollik va xizmatga sadoqat!
+                                            {% if LANGUAGE_CODE == 'uz' %}
+                                            FAW bu – ishonchli texnika. Har qanday iqlimda, har qanday yoʻlda FAW oʻzini koʻrsatadi. Buning ortida esa oʻz ishini sidqidildan bajarayotgan kuchli va jips jamoamiz turibdi. Har bir mijoz biz uchun muhim, har bir yuk – masʼuliyat. FAW jamoasi – bu tajriba, halollik va xizmatga sadoqat!
+                                            {% elif LANGUAGE_CODE == 'ru' %}
+                                            FAW — это надежная техника. В любом климате, на любой дороге FAW показывает себя. За этим стоит наша сильная и сплоченная команда, искренне выполняющая свою работу. Каждый клиент для нас важен, каждый груз — ответственность. Команда FAW — это опыт, честность и преданность делу!
+                                            {% else %}
+                                            FAW is reliable equipment. In any climate, on any road, FAW proves itself. Behind this stands our strong and cohesive team, sincerely performing their work. Every client is important to us, every cargo is a responsibility. The FAW team is experience, honesty, and dedication to service!
+                                            {% endif %}
                                         </span>
                                     </div>
                                 </div>
@@ -426,33 +316,26 @@
                         </div>
                     </div>
                 </div>
-                <!-- Блок — CTA (конец) -->
-
             </div>
         </div>
-        <!-- Секция — CTA (конец) -->
-
     </main>
-    <!-- Page Content End -->
 
-    <!-- Футер (начало) -->
+    <!-- Footer -->
     {% include 'main/includes/footer.html' %}
-    <!-- Футер (конец) -->
-    <!-- To Top Button Start -->
+
+    <!-- To Top Button -->
     <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
         <i class="ph ph-arrow-up"></i>
     </a>
-    <!-- To Top Button End -->
 
-    <!-- Load Scripts Start -->
+    <!-- Scripts -->
     <script src="{% static 'js/libs.min.js' %}"></script>
     <script src="{% static 'js/app.js' %}"></script>
     <script src="{% static 'js/error-logger.js' %}"></script>
     <script src="{% static 'js/faw.js' %}"></script>
 
     <script>
-        // ============ ГЛОБАЛЬНЫЕ ФУНКЦИИ (ПРАВИЛЬНЫЙ ПОРЯДОК!) ============
-
+        // Global Functions
         window.getCookie = function (name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
@@ -485,22 +368,17 @@
             return null;
         };
 
-        // ============ СОХРАНЕНИЕ UTM В COOKIE ============
+        // Save UTM to Cookie
         (function () {
             'use strict';
 
             function setCookie(name, value, days) {
                 const expires = new Date();
                 expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-
-                // ✅ ИСПРАВЛЕНО: добавлены Secure и SameSite
                 let cookieString = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
-
-                // На HTTPS добавляем Secure
                 if (location.protocol === 'https:') {
                     cookieString += ';Secure';
                 }
-
                 document.cookie = cookieString;
             }
 
@@ -513,16 +391,14 @@
                 }
             });
 
-
             if (Object.keys(utm).length > 0) {
                 const utmString = JSON.stringify(utm);
                 sessionStorage.setItem('utm_data', utmString);
                 setCookie('utm_data', utmString, 30);
-            } else {
             }
         })();
 
-        // ============ ОБРАБОТКА ФОРМЫ ============
+        // Form Handler
         let isSubmitting = false;
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -531,7 +407,29 @@
             const statusBlock = document.querySelector(".form-status");
             const statusText = statusBlock.querySelector(".form-status__text");
 
-            // Маска телефона
+            // Translations
+            const translations = {
+                'uz': {
+                    phoneError: "❌ Iltimos, telefon raqamingizni toʻliq kiriting.",
+                    success: "✅ Xabar yuborildi! Tez orada siz bilan bogʻlanamiz.",
+                    error: "❌ Xatolik yuz berdi. Qayta urinib koʻring."
+                },
+                'ru': {
+                    phoneError: "❌ Пожалуйста, введите полный номер телефона.",
+                    success: "✅ Сообщение отправлено! Мы свяжемся с вами в ближайшее время.",
+                    error: "❌ Произошла ошибка. Попробуйте еще раз."
+                },
+                'en': {
+                    phoneError: "❌ Please enter your full phone number.",
+                    success: "✅ Message sent! We will contact you soon.",
+                    error: "❌ An error occurred. Please try again."
+                }
+            };
+
+            const currentLang = document.documentElement.lang || 'uz';
+            const t = translations[currentLang] || translations['uz'];
+
+            // Phone Mask
             phoneInput.addEventListener("input", (e) => {
                 let value = e.target.value.replace(/\D/g, "");
                 if (!value.startsWith("998")) value = "998" + value;
@@ -546,7 +444,7 @@
                 e.target.value = formatted;
             });
 
-            // Отправка формы
+            // Form Submit
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
                 if (isSubmitting) return;
@@ -554,7 +452,7 @@
 
                 const phone = phoneInput.value.replace(/\D/g, "");
                 if (phone.length !== 12) {
-                    showStatus("❌ Iltimos, telefon raqamingizni to'liq kiriting.", "error");
+                    showStatus(t.phoneError, "error");
                     isSubmitting = false;
                     return;
                 }
@@ -572,7 +470,7 @@
                 };
 
                 try {
-                    const response = await fetch("/api/uz/contact/", {
+                    const response = await fetch("/api/" + currentLang + "/contact/", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -588,20 +486,19 @@
                             event: "lead_form_submitted"
                         });
 
-                        showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
+                        showStatus(t.success, "success");
                         form.reset();
                     } else {
-                        throw new Error(data.message || "Xatolik yuz berdi.");
+                        throw new Error(data.message || t.error);
                     }
                 } catch (error) {
                     console.error("Form error:", error);
-                    showStatus("❌ Xatolik yuz berdi. Qayta urinib ko'ring.", "error");
+                    showStatus(t.error, "error");
                 } finally {
                     isSubmitting = false;
                 }
             });
 
-            // Показ статуса
             function showStatus(message, type = "success") {
                 statusText.textContent = message;
                 statusBlock.className = `form-status ${type} show`;

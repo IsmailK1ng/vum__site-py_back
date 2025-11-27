@@ -29,6 +29,10 @@
     line-height: 1.2;
 }
 
+h1 {
+    font-size: 7rem;
+}
+
 /* Текстовый блок manifest */
 .mxd-hero-00__bottom {
     position: relative;

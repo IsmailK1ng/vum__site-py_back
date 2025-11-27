@@ -378,6 +378,10 @@ body[data-theme="dark"] {
     height: 60vh;
 }
 
+h1 {
+    font-size: 7rem;
+}
+
 @media (max-width: 1200px) {
     .mxd-hero-09__wrap {
         height: 75vh;

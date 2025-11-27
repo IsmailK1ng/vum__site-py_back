@@ -4,166 +4,205 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Faw Trucks O'zbekistonda</title>
-    <meta name="description" content="Faw Trucks O'zbekistonda">
-    <meta name="keywords" content="Faw Trucks O'zbekistonda">
-    <meta name="author" content="mix_design">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-    <!-- Универсальный favicon -->
+    <!-- Page Title -->
+    <title>{% if LANGUAGE_CODE == 'uz' %}Lizing{% elif LANGUAGE_CODE == 'ru' %}Лизинг{% else %}Leasing{% endif %} | FAW Trucks</title>
+
+    <!-- Meta Tags -->
+    <meta name="description" content="{% if LANGUAGE_CODE == 'uz' %}FAW Trucks lizing xizmatlari O'zbekistonda - qulay shartlar, tez rasmiylashtirish{% elif LANGUAGE_CODE == 'ru' %}Лизинговые услуги FAW Trucks в Узбекистане - удобные условия, быстрое оформление{% else %}FAW Trucks leasing services in Uzbekistan - convenient terms, fast processing{% endif %}">
+    <meta name="keywords" content="FAW Trucks, {% if LANGUAGE_CODE == 'uz' %}lizing, O'zbekiston{% elif LANGUAGE_CODE == 'ru' %}лизинг, Узбекистан{% else %}leasing, Uzbekistan{% endif %}">
+    <meta name="author" content="mix_design">
+
+    <!-- Favicon -->
     <link rel="icon" href="{% static 'images/logo/logo-vum.png' %}" />
-    <!-- Для Apple устройств -->
     <link rel="apple-touch-icon" href="{% static 'images/logo/logo-vum.png' %}">
 
-    <!-- Мета для Facebook -->
-    <meta property="og:image:height" content="1200">
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% if LANGUAGE_CODE == 'uz' %}Lizing{% elif LANGUAGE_CODE == 'ru' %}Лизинг{% else %}Leasing{% endif %} | FAW Trucks">
+    <meta property="og:description" content="{% if LANGUAGE_CODE == 'uz' %}Qulay lizing shartlari{% elif LANGUAGE_CODE == 'ru' %}Удобные условия лизинга{% else %}Convenient leasing terms{% endif %}">
+    <meta property="og:url" content="https://fawtrucks.uz/lizing">
+    <meta property="og:image" content="{% static 'images/lizing.png' %}">
     <meta property="og:image:width" content="1200">
-    <meta property="og:title" content="Faw Trucks в Узбекистане">
-    <meta property="og:description" content="Faw Trucks в Узбекистане">
-    <meta property="og:url" content="https://mixdesign.dev/themeforest/rayo">
-    <meta property="og:image" content="https://mixdesign.dev/themeforest/rayo/img/og-image.jpg">
+    <meta property="og:image:height" content="630">
 
-    <!-- Google Tag Manager Xurshid 1 chi kod -->
-    <script>(function (w, d, s, l, i) {
-            w[l] = w[l] || []; w[l].push({
-                'gtm.start':
-                    new Date().getTime(), event: 'gtm.js'
-            }); var f = d.getElementsByTagName(s)[0],
-                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer', 'GTM-M33GWKMW');</script>
-    <!-- End Google Tag Manager Xurshid 1 chi kod-->
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-M33GWKMW');</script>
 
-    <!-- Meta Pixel Code Xurshid 2 chi kod-->
+    <!-- Meta Pixel -->
     <script>
-        !function (f, b, e, v, n, t, s) {
-            if (f.fbq) return; n = f.fbq = function () {
-                n.callMethod ?
-                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
-            };
-            if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
-            n.queue = []; t = b.createElement(e); t.async = !0;
-            t.src = v; s = b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t, s)
-        }(window, document, 'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '2271244510044933');
-        fbq('track', 'PageView');
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2271244510044933');
+    fbq('track', 'PageView');
     </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2271244510044933&ev=PageView&noscript=1" /></noscript>
 
-    <noscript><img height="1" width="1" style="display:none"
-            src="https://www.facebook.com/tr?id=2271244510044933&ev=PageView&noscript=1" /></noscript>
-    <!-- End Meta Pixel Code  Xurshid 2 chi kod-->
+    <!-- Preload Critical CSS -->
+    <link rel="preload" href="{% static 'css/main_site.css' %}" as="style">
 
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{% static 'css/loaders/loader.css' %}">
+    <link rel="stylesheet" href="{% static 'css/plugins.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main_site.css' %}">
+    <link rel="stylesheet" href="{% static 'css/site_main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/site_lizing.css' %}">
 
-    <!-- Подключение стилей -->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/site_lizing.css' %}">
-
-    <!-- Цвет браузера -->
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#FAF7F6" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#161616" media="(prefers-color-scheme: dark)">
     <meta name="msapplication-navbutton-color" content="#161616">
-    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 
 <body>
     <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
-            style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-     
-    <!-- Меню и шапка -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <!-- Header -->
     {% include 'main/includes/header.html' %}
-    <!-- шапка конец -->
-    <!-- Контент страницы -->
+
+    <!-- Page Content -->
     <main id="mxd-page-content" class="mxd-page-content">
-        <div aria-label="breadcrumb">
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb">
             <ol class="breadcrumb-ol">
-                <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
-                <li class="active"><a href="{% url 'lizing' %}">Lizing</a></li>
+                <li><a href="{% url 'home' %}">{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}</a></li>
+                <li class="active"><a href="{% url 'lizing' %}">{% if LANGUAGE_CODE == 'uz' %}Lizing{% elif LANGUAGE_CODE == 'ru' %}Лизинг{% else %}Leasing{% endif %}</a></li>
             </ol>
-        </div>
-        <!-- Баннер -->
-        <!-- Hero Section Start -->
-        <div class="mxd-section">
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="mxd-section">
             <div class="mxd-hero-09">
                 <div class="mxd-hero-09__wrap loading-wrap lizing__hero-cont">
                     <div class="mxd-hero-09__headline">
                         <div class="hero-09-headline__caption loading__item">
-                            <h2> LIZING</h2>
+                            <h1>{% if LANGUAGE_CODE == 'uz' %}LIZING{% elif LANGUAGE_CODE == 'ru' %}ЛИЗИНГ{% else %}LEASING{% endif %}</h1>
                             <p class="mxd-hero-09__desc">
-                                Lizing orqali siz o'zingizga kerakli FAW yuk mashinasini sotib olishingiz mumkin.
-                                Bizning lizing shartlarimiz moslashuvchan bo'lib, sizning biznesingiz ehtiyojlariga mos
-                                keladi.
-
-
+                                {% if LANGUAGE_CODE == 'uz' %}
+                                Lizing orqali siz o'zingizga kerakli FAW yuk mashinasini sotib olishingiz mumkin. Bizning lizing shartlarimiz moslashuvchan bo'lib, sizning biznesingiz ehtiyojlariga mos keladi.
+                                {% elif LANGUAGE_CODE == 'ru' %}
+                                С помощью лизинга вы можете приобрести необходимый грузовой автомобиль FAW. Наши условия лизинга гибкие и соответствуют потребностям вашего бизнеса.
+                                {% else %}
+                                Through leasing, you can purchase the FAW truck you need. Our leasing terms are flexible and meet your business needs.
+                                {% endif %}
                             </p>
                         </div>
                     </div>
                     <div class="mxd-hero-09__objects">
                         <div class="hero-09-objects__image loading__item">
-                            <img class="mxd-move" src="{% static 'images/lizing.png' %}" alt="Hero Image">
+                            <img class="mxd-move" src="{% static 'images/lizing.png' %}" alt="{% if LANGUAGE_CODE == 'uz' %}Lizing{% elif LANGUAGE_CODE == 'ru' %}Лизинг{% else %}Leasing{% endif %}">
                         </div>
                         <div class="hero-09-objects__item item-01 loading__item">
                             <div class="mxd-counter horizontal">
                                 <p id="stats-counter-1" class="mxd-counter__number mxd-stats-number xsmall">0</p>
-                                <p class="mxd-counter__descr t-140 t-bright t-small">Yil<br>bozorda</p>
+                                <p class="mxd-counter__descr t-140 t-bright t-small">
+                                    {% if LANGUAGE_CODE == 'uz' %}
+                                    Yil<br>bozorda
+                                    {% elif LANGUAGE_CODE == 'ru' %}
+                                    Лет<br>на рынке
+                                    {% else %}
+                                    Years<br>in market
+                                    {% endif %}
+                                </p>
                             </div>
                         </div>
                         <div class="hero-09-objects__item item-02 loading__item">
                             <div class="mxd-counter horizontal">
-                                <span class="mark-text">Minimal dastlabki to'lov - 30%</span>
+                                <span class="mark-text">
+                                    {% if LANGUAGE_CODE == 'uz' %}
+                                    Minimal dastlabki to'lov - 30%
+                                    {% elif LANGUAGE_CODE == 'ru' %}
+                                    Минимальный первоначальный взнос - 30%
+                                    {% else %}
+                                    Minimum down payment - 30%
+                                    {% endif %}
+                                </span>
                             </div>
                         </div>
                         <div class="hero-09-objects__item item-03 loading__item">
                             <div class="mxd-hero__mark">
                                 <span class="mark-icon"></span>
-                                <span class="mark-text">Tez rasmiylashtirish</span>
+                                <span class="mark-text">
+                                    {% if LANGUAGE_CODE == 'uz' %}
+                                    Tez rasmiylashtirish
+                                    {% elif LANGUAGE_CODE == 'ru' %}
+                                    Быстрое оформление
+                                    {% else %}
+                                    Fast processing
+                                    {% endif %}
+                                </span>
                             </div>
                         </div>
                     </div>
                     <div class="lizing-calc__title">
-                        <h2 class="calc-title">Lizing kalkulatori</h2>
+                        <h2 class="calc-title">
+                            {% if LANGUAGE_CODE == 'uz' %}
+                            Lizing kalkulatori
+                            {% elif LANGUAGE_CODE == 'ru' %}
+                            Лизинговый калькулятор
+                            {% else %}
+                            Leasing Calculator
+                            {% endif %}
+                        </h2>
                     </div>
                 </div>
             </div>
-        </div>
-        <!-- Hero Section End -->
-        <!-- ЛИЗИНГОВЫЙ КАЛЬКУЛЯТОР -->
-        <div class="mxd-section">
+        </section>
+
+        <!-- Leasing Calculator -->
+        <section class="mxd-section">
             <div class="mxd-hero-06">
                 <div class="mxd-hero-06__wrap loading-wrap">
                     <div class="mxd-hero-06__top">
                         <div class="mxd-hero-06__content">
                             <div class="lizing-calc-container">
                                 <div class="lizing-form-section">
+                                    <!-- Vehicle Price -->
                                     <div class="lizing-form-group">
-                                        <label>Texnika narxi</label>
-                                        <input type="text" class="lizing-input-field" id="amountInput"
-                                            value="300 000 000 so'm">
+                                        <label>
+                                            {% if LANGUAGE_CODE == 'uz' %}
+                                            Texnika narxi
+                                            {% elif LANGUAGE_CODE == 'ru' %}
+                                            Стоимость техники
+                                            {% else %}
+                                            Vehicle Price
+                                            {% endif %}
+                                        </label>
+                                        <input type="text" class="lizing-input-field" id="amountInput" value="300 000 000 so'm">
                                         <div class="lizing-slider-container">
-                                            <input type="range" class="lizing-slider" id="amountSlider" min="250000000"
-                                                max="600000000" value="300000000" step="1000000">
+                                            <input type="range" class="lizing-slider" id="amountSlider" min="250000000" max="600000000" value="300000000" step="1000000">
                                             <div class="lizing-slider-labels">
-                                                <span>250 mln. so'm</span>
-                                                <span>400 mln. so'm</span>
-                                                <span>600 mln. so'm</span>
+                                                <span>250 {% if LANGUAGE_CODE == 'uz' %}mln. so'm{% elif LANGUAGE_CODE == 'ru' %}млн. сум{% else %}mln. sum{% endif %}</span>
+                                                <span>400 {% if LANGUAGE_CODE == 'uz' %}mln. so'm{% elif LANGUAGE_CODE == 'ru' %}млн. сум{% else %}mln. sum{% endif %}</span>
+                                                <span>600 {% if LANGUAGE_CODE == 'uz' %}mln. so'm{% elif LANGUAGE_CODE == 'ru' %}млн. сум{% else %}mln. sum{% endif %}</span>
                                             </div>
                                         </div>
                                     </div>
+
+                                    <!-- Down Payment -->
                                     <div class="lizing-form-group">
-                                        <label>Dastlabki to'lov</label>
-                                        <input type="text" class="lizing-input-field" id="downPaymentInput"
-                                            value="120 000 000 so'm">
+                                        <label>
+                                            {% if LANGUAGE_CODE == 'uz' %}
+                                            Dastlabki to'lov
+                                            {% elif LANGUAGE_CODE == 'ru' %}
+                                            Первоначальный взнос
+                                            {% else %}
+                                            Down Payment
+                                            {% endif %}
+                                        </label>
+                                        <input type="text" class="lizing-input-field" id="downPaymentInput" value="120 000 000 so'm">
                                         <div class="lizing-slider-container">
-                                            <input type="range" class="lizing-slider" id="downPaymentSlider" min="30"
-                                                max="60" value="40" step="1">
+                                            <input type="range" class="lizing-slider" id="downPaymentSlider" min="30" max="60" value="40" step="1">
                                             <div class="lizing-slider-labels">
                                                 <span>30%</span>
                                                 <span>45%</span>
@@ -171,49 +210,126 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <!-- Lease Term -->
                                     <div class="lizing-form-group">
-                                        <label>Lizing muddati</label>
-                                        <input type="text" class="lizing-input-field" id="termInput" value="24 oy">
+                                        <label>
+                                            {% if LANGUAGE_CODE == 'uz' %}
+                                            Lizing muddati
+                                            {% elif LANGUAGE_CODE == 'ru' %}
+                                            Срок лизинга
+                                            {% else %}
+                                            Lease Term
+                                            {% endif %}
+                                        </label>
+                                        <input type="text" class="lizing-input-field" id="termInput" value="24 {% if LANGUAGE_CODE == 'uz' %}oy{% elif LANGUAGE_CODE == 'ru' %}мес{% else %}mo{% endif %}">
                                         <div class="lizing-slider-container">
-                                            <input type="range" class="lizing-slider" id="termSlider" min="12" max="60"
-                                                value="24" step="1">
+                                            <input type="range" class="lizing-slider" id="termSlider" min="12" max="60" value="24" step="1">
                                             <div class="lizing-slider-labels">
-                                                <span>12 oy</span>
-                                                <span>33 oy</span>
-                                                <span>60 oy</span>
+                                                <span>12 {% if LANGUAGE_CODE == 'uz' %}oy{% elif LANGUAGE_CODE == 'ru' %}мес{% else %}mo{% endif %}</span>
+                                                <span>33 {% if LANGUAGE_CODE == 'uz' %}oy{% elif LANGUAGE_CODE == 'ru' %}мес{% else %}mo{% endif %}</span>
+                                                <span>60 {% if LANGUAGE_CODE == 'uz' %}oy{% elif LANGUAGE_CODE == 'ru' %}мес{% else %}mo{% endif %}</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Results Section -->
                                 <div class="lizing-result-section">
-                                    <div class="lizing-result-amount">Moliyalashtirish summasi</div>
+                                    <div class="lizing-result-amount">
+                                        {% if LANGUAGE_CODE == 'uz' %}
+                                        Moliyalashtirish summasi
+                                        {% elif LANGUAGE_CODE == 'ru' %}
+                                        Сумма финансирования
+                                        {% else %}
+                                        Financing Amount
+                                        {% endif %}
+                                    </div>
                                     <div class="lizing-result-value" id="financeAmount">180 900 000 so'm</div>
+                                    
                                     <div class="lizing-payment-info">
                                         <div>
-                                            <div class="lizing-monthly-label">Oylik to'lov</div>
-                                            <div class="lizing-monthly-value" id="monthlyPayment">8 625 000 so'mdan
+                                            <div class="lizing-monthly-label">
+                                                {% if LANGUAGE_CODE == 'uz' %}
+                                                Oylik to'lov
+                                                {% elif LANGUAGE_CODE == 'ru' %}
+                                                Ежемесячный платеж
+                                                {% else %}
+                                                Monthly Payment
+                                                {% endif %}
                                             </div>
+                                            <div class="lizing-monthly-value" id="monthlyPayment">8 625 000 {% if LANGUAGE_CODE == 'uz' %}so'mdan{% elif LANGUAGE_CODE == 'ru' %}сум от{% else %}sum from{% endif %}</div>
                                         </div>
                                         <div>
-                                            <div class="lizing-monthly-label">Dastlabki to'lov <span
-                                                    class="lizing-info-icon">?</span></div>
+                                            <div class="lizing-monthly-label">
+                                                {% if LANGUAGE_CODE == 'uz' %}
+                                                Dastlabki to'lov
+                                                {% elif LANGUAGE_CODE == 'ru' %}
+                                                Первоначальный взнос
+                                                {% else %}
+                                                Down Payment
+                                                {% endif %}
+                                                <span class="lizing-info-icon">?</span>
+                                            </div>
                                             <div class="lizing-payment-value" id="downPaymentAmount">40%</div>
                                         </div>
                                     </div>
+
+                                    <!-- Documents Section -->
                                     <div class="lizing-document-section">
-                                        <div class="lizing-document-label">Kerakli hujjatlar <span
-                                                class="lizing-info-icon">?</span></div>
-                                        <button class="lizing-document-btn">Pasport</button>
-                                        <button class="lizing-document-btn">Daromad haqida ma'lumotnoma</button>
+                                        <div class="lizing-document-label">
+                                            {% if LANGUAGE_CODE == 'uz' %}
+                                            Kerakli hujjatlar
+                                            {% elif LANGUAGE_CODE == 'ru' %}
+                                            Необходимые документы
+                                            {% else %}
+                                            Required Documents
+                                            {% endif %}
+                                            <span class="lizing-info-icon">?</span>
+                                        </div>
+                                        <button class="lizing-document-btn">
+                                            {% if LANGUAGE_CODE == 'uz' %}
+                                            Pasport
+                                            {% elif LANGUAGE_CODE == 'ru' %}
+                                            Паспорт
+                                            {% else %}
+                                            Passport
+                                            {% endif %}
+                                        </button>
+                                        <button class="lizing-document-btn">
+                                            {% if LANGUAGE_CODE == 'uz' %}
+                                            Daromad haqida ma'lumotnoma
+                                            {% elif LANGUAGE_CODE == 'ru' %}
+                                            Справка о доходах
+                                            {% else %}
+                                            Income Certificate
+                                            {% endif %}
+                                        </button>
                                     </div>
+
                                     <div class="lizing-calculation-info">
-                                        <div class="lizing-calculation-label">Hisob-kitob dastlabki <span
-                                                class="lizing-info-icon">?</span></div>
+                                        <div class="lizing-calculation-label">
+                                            {% if LANGUAGE_CODE == 'uz' %}
+                                            Hisob-kitob dastlabki
+                                            {% elif LANGUAGE_CODE == 'ru' %}
+                                            Предварительный расчет
+                                            {% else %}
+                                            Preliminary Calculation
+                                            {% endif %}
+                                            <span class="lizing-info-icon">?</span>
+                                        </div>
                                     </div>
+
                                     <div class="lizing-buttons">
-                                        <!-- <button class="lizing-btn-primary">Ariza yuborish</button> -->
-                                        <button type="button" class="lizing-btn-secondary" id="detailsBtn">Lizing haqida
-                                            batafsil</button>
+                                        <button type="button" class="lizing-btn-secondary" id="detailsBtn">
+                                            {% if LANGUAGE_CODE == 'uz' %}
+                                            Lizing haqida batafsil
+                                            {% elif LANGUAGE_CODE == 'ru' %}
+                                            Подробнее о лизинге
+                                            {% else %}
+                                            Leasing Details
+                                            {% endif %}
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -221,78 +337,151 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     </main>
 
-    <!-- Футер -->
+    <!-- Footer -->
     {% include 'main/includes/footer.html' %}
 
-    <!-- Кнопка вверх -->
-    <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
+    <!-- To Top Button -->
+    <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay" aria-label="{% if LANGUAGE_CODE == 'uz' %}Yuqoriga{% elif LANGUAGE_CODE == 'ru' %}Наверх{% else %}To top{% endif %}">
         <i class="ph ph-arrow-up"></i>
     </a>
 
-    <!-- МОДАЛЬНОЕ ОКНО КАЛЬКУЛЯТОРА -->
+    <!-- MODAL -->
     <div id="detailsModal" class="modal">
         <div class="modal-wrapper">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 class="modal-title">Lizing haqida batafsil ma'lumot</h2>
+                    <h2 class="modal-title">
+                        {% if LANGUAGE_CODE == 'uz' %}
+                        Lizing haqida batafsil ma'lumot
+                        {% elif LANGUAGE_CODE == 'ru' %}
+                        Подробная информация о лизинге
+                        {% else %}
+                        Detailed Leasing Information
+                        {% endif %}
+                    </h2>
                     <span class="close">&times;</span>
                 </div>
                 <div class="modal-body">
                     <div class="calculation-summary">
                         <div class="summary-grid">
                             <div class="summary-item">
-                                <div class="summary-label">Texnika narxi</div>
+                                <div class="summary-label">
+                                    {% if LANGUAGE_CODE == 'uz' %}
+                                    Texnika narxi
+                                    {% elif LANGUAGE_CODE == 'ru' %}
+                                    Стоимость техники
+                                    {% else %}
+                                    Vehicle Price
+                                    {% endif %}
+                                </div>
                                 <div class="summary-value" id="modal-car-price">300 000 000 so'm</div>
                             </div>
                             <div class="summary-item">
-                                <div class="summary-label">Dastlabki to'lov</div>
+                                <div class="summary-label">
+                                    {% if LANGUAGE_CODE == 'uz' %}
+                                    Dastlabki to'lov
+                                    {% elif LANGUAGE_CODE == 'ru' %}
+                                    Первоначальный взнос
+                                    {% else %}
+                                    Down Payment
+                                    {% endif %}
+                                </div>
                                 <div class="summary-value" id="modal-initial-payment">120 000 000 so'm</div>
                             </div>
                             <div class="summary-item">
-                                <div class="summary-label">Lizing muddati</div>
-                                <div class="summary-value" id="modal-term">24 oy</div>
+                                <div class="summary-label">
+                                    {% if LANGUAGE_CODE == 'uz' %}
+                                    Lizing muddati
+                                    {% elif LANGUAGE_CODE == 'ru' %}
+                                    Срок лизинга
+                                    {% else %}
+                                    Lease Term
+                                    {% endif %}
+                                </div>
+                                <div class="summary-value" id="modal-term">24 {% if LANGUAGE_CODE == 'uz' %}oy{% elif LANGUAGE_CODE == 'ru' %}мес{% else %}mo{% endif %}</div>
                             </div>
                             <div class="summary-item">
-                                <div class="summary-label">Oylik to'lov</div>
+                                <div class="summary-label">
+                                    {% if LANGUAGE_CODE == 'uz' %}
+                                    Oylik to'lov
+                                    {% elif LANGUAGE_CODE == 'ru' %}
+                                    Ежемесячный платеж
+                                    {% else %}
+                                    Monthly Payment
+                                    {% endif %}
+                                </div>
                                 <div class="summary-value primary" id="modal-monthly-payment">8 625 000 so'm</div>
                             </div>
                             <div class="summary-item">
-                                <div class="summary-label">Jami to'lov</div>
+                                <div class="summary-label">
+                                    {% if LANGUAGE_CODE == 'uz' %}
+                                    Jami to'lov
+                                    {% elif LANGUAGE_CODE == 'ru' %}
+                                    Общая сумма
+                                    {% else %}
+                                    Total Payment
+                                    {% endif %}
+                                </div>
                                 <div class="summary-value" id="modal-total-payment">207 000 000 so'm</div>
                             </div>
                             <div class="summary-item">
-                                <div class="summary-label">Foiz stavkasi</div>
+                                <div class="summary-label">
+                                    {% if LANGUAGE_CODE == 'uz' %}
+                                    Foiz stavkasi
+                                    {% elif LANGUAGE_CODE == 'ru' %}
+                                    Процентная ставка
+                                    {% else %}
+                                    Interest Rate
+                                    {% endif %}
+                                </div>
                                 <div class="summary-value" id="modal-rate">22%</div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Payment Schedule -->
                     <div class="payment-schedule">
-                        <h3 class="schedule-title">To'lov jadvali</h3>
+                        <h3 class="schedule-title">
+                            {% if LANGUAGE_CODE == 'uz' %}
+                            To'lov jadvali
+                            {% elif LANGUAGE_CODE == 'ru' %}
+                            График платежей
+                            {% else %}
+                            Payment Schedule
+                            {% endif %}
+                        </h3>
                         <div class="schedule-table-wrapper">
                             <table class="schedule-table">
                                 <thead>
                                     <tr>
-                                        <th>Oy</th>
-                                        <th>Asosiy qarz</th>
-                                        <th>Foizlar</th>
-                                        <th>Oylik to'lov</th>
-                                        <th>Qoldiq</th>
+                                        <th>{% if LANGUAGE_CODE == 'uz' %}Oy{% elif LANGUAGE_CODE == 'ru' %}Месяц{% else %}Month{% endif %}</th>
+                                        <th>{% if LANGUAGE_CODE == 'uz' %}Asosiy qarz{% elif LANGUAGE_CODE == 'ru' %}Основной долг{% else %}Principal{% endif %}</th>
+                                        <th>{% if LANGUAGE_CODE == 'uz' %}Foizlar{% elif LANGUAGE_CODE == 'ru' %}Проценты{% else %}Interest{% endif %}</th>
+                                        <th>{% if LANGUAGE_CODE == 'uz' %}Oylik to'lov{% elif LANGUAGE_CODE == 'ru' %}Ежемесячный платеж{% else %}Monthly Payment{% endif %}</th>
+                                        <th>{% if LANGUAGE_CODE == 'uz' %}Qoldiq{% elif LANGUAGE_CODE == 'ru' %}Остаток{% else %}Balance{% endif %}</th>
                                     </tr>
                                 </thead>
-                                <tbody id="schedule-tbody">
-                                    <!-- JavaScript tomonidan to'ldiriladi -->
-                                </tbody>
+                                <tbody id="schedule-tbody"></tbody>
                             </table>
                         </div>
                     </div>
 
+                    <!-- Conditions -->
                     <div class="conditions-section">
-                        <h3 class="conditions-title">Lizing shartlari</h3>
+                        <h3 class="conditions-title">
+                            {% if LANGUAGE_CODE == 'uz' %}
+                            Lizing shartlari
+                            {% elif LANGUAGE_CODE == 'ru' %}
+                            Условия лизинга
+                            {% else %}
+                            Leasing Terms
+                            {% endif %}
+                        </h3>
                         <ul class="conditions-list">
+                            {% if LANGUAGE_CODE == 'uz' %}
                             <li>Minimal dastlabki to'lov - 30%</li>
                             <li>Maksimal lizing muddati - 60 oy</li>
                             <li>Texnikaning har qanday holatda bo'lishi mumkin</li>
@@ -301,6 +490,25 @@
                             <li>Muddatdan oldin to'lash imkoniyati</li>
                             <li>Lizing tugagandan keyin texnika sizniki bo'ladi</li>
                             <li>Kasko sug'urta majburiy</li>
+                            {% elif LANGUAGE_CODE == 'ru' %}
+                            <li>Минимальный первоначальный взнос - 30%</li>
+                            <li>Максимальный срок лизинга - 60 месяцев</li>
+                            <li>Техника может быть в любом состоянии</li>
+                            <li>Возможно оформление без кредитной истории</li>
+                            <li>Быстрое оформление (1-2 дня)</li>
+                            <li>Возможность досрочного погашения</li>
+                            <li>По окончании лизинга техника становится вашей</li>
+                            <li>Страхование КАСКО обязательно</li>
+                            {% else %}
+                            <li>Minimum down payment - 30%</li>
+                            <li>Maximum lease term - 60 months</li>
+                            <li>Vehicle can be in any condition</li>
+                            <li>Processing without credit history possible</li>
+                            <li>Fast processing (1-2 days)</li>
+                            <li>Early payment option</li>
+                            <li>Vehicle becomes yours after lease ends</li>
+                            <li>CASCO insurance mandatory</li>
+                            {% endif %}
                         </ul>
                     </div>
                 </div>
@@ -308,13 +516,13 @@
         </div>
     </div>
 
-    <!-- Подключение скриптов -->
+    <!-- Scripts -->
     <script src="{% static 'js/libs.min.js' %}"></script>
     <script src="{% static 'js/app.js' %}"></script>
     <script src="{% static 'js/error-logger.js' %}"></script>
     <script src="{% static 'js/faw.js' %}"></script>
 
-    <!-- Скролл скрипт -->
+    <!-- Scroll Script -->
     <script>
         (function () {
             function getHeaderHeight() {
@@ -347,8 +555,9 @@
         })();
     </script>
 
-    <!-- ЛИЗИНГОВЫЙ КАЛЬКУЛЯТОР СКРИПТ -->
+    <!-- Leasing Calculator Script -->
     <script>
+        const LANGUAGE_CODE = '{{ LANGUAGE_CODE|default:"uz" }}';
         const amountSlider = document.getElementById('amountSlider');
         const downPaymentSlider = document.getElementById('downPaymentSlider');
         const termSlider = document.getElementById('termSlider');
@@ -358,313 +567,322 @@
         const financeAmount = document.getElementById('financeAmount');
         const monthlyPayment = document.getElementById('monthlyPayment');
         const downPaymentAmount = document.getElementById('downPaymentAmount');
-
         let updatingFromSlider = false;
-        let updatingFromInput = false;
+    let updatingFromInput = false;
 
-        function formatNumber(num) {
-            return new Intl.NumberFormat('ru-RU').format(num);
+    const TRANSLATIONS = {
+        uz: {
+            month: 'oy',
+            from: "so'mdan",
+            sum: "so'm"
+        },
+        ru: {
+            month: 'мес',
+            from: 'сум от',
+            sum: 'сум'
+        },
+        en: {
+            month: 'mo',
+            from: 'sum from',
+            sum: 'sum'
+        }
+    };
+
+    const t = TRANSLATIONS[LANGUAGE_CODE] || TRANSLATIONS.uz;
+
+    function formatNumber(num) {
+        return new Intl.NumberFormat('ru-RU').format(num);
+    }
+
+    function parseAmount(text) {
+        return parseInt(text.replace(/[^\d]/g, '')) || 0;
+    }
+
+    function parseTerm(text) {
+        return parseInt(text.replace(/[^\d]/g, '')) || 0;
+    }
+
+    const AMOUNT_MIN = 250000000;
+    const AMOUNT_MAX = 600000000;
+    const DOWNPAY_MIN = 30;
+    const DOWNPAY_MAX = 60;
+    const TERM_MIN = 12;
+    const TERM_MAX = 60;
+
+    function calculateLeasing(carPrice, initialPaymentPercent, termInMonths) {
+        let annualRate;
+        if (termInMonths <= 24) {
+            annualRate = 0.22;
+        } else if (termInMonths <= 36) {
+            annualRate = 0.23;
+        } else if (termInMonths <= 48) {
+            annualRate = 0.26;
+        } else if (termInMonths <= 60) {
+            annualRate = 0.265;
+        } else {
+            annualRate = 0.265;
         }
 
-        function parseAmount(text) {
-            return parseInt(text.replace(/[^\d]/g, '')) || 0;
-        }
+        const initialPayment = Math.round(carPrice * initialPaymentPercent / 100);
+        const financingBase = carPrice - initialPayment;
+        const additionalCosts = Math.round(financingBase * 0.005);
+        const totalAmount = financingBase + additionalCosts;
 
-        function parseTerm(text) {
-            return parseInt(text.replace(/[^\d]/g, '')) || 0;
-        }
+        const monthlyRate = annualRate / 12;
+        const annuityCoefficient = (monthlyRate * Math.pow(1 + monthlyRate, termInMonths)) / (Math.pow(1 + monthlyRate, termInMonths) - 1);
+        const monthlyPayment = Math.round(totalAmount * annuityCoefficient);
 
-        const AMOUNT_MIN = 250000000;
-        const AMOUNT_MAX = 600000000;
-        const DOWNPAY_MIN = 30;
-        const DOWNPAY_MAX = 60;
-        const TERM_MIN = 12;
-        const TERM_MAX = 60;
+        return {
+            carPrice,
+            initialPayment,
+            financingBase,
+            totalAmount,
+            monthlyPayment,
+            totalPayment: monthlyPayment * termInMonths,
+            annualRate,
+            termInMonths
+        };
+    }
 
-        function calculateLeasing(carPrice, initialPaymentPercent, termInMonths) {
-            let annualRate;
-            if (termInMonths <= 24) {
-                annualRate = 0.22;
-            } else if (termInMonths <= 36) {
-                annualRate = 0.23;
-            } else if (termInMonths <= 48) {
-                annualRate = 0.26;
-            } else if (termInMonths <= 60) {
-                annualRate = 0.265;
-            } else {
-                annualRate = 0.265;
-            }
+    function generatePaymentSchedule(totalAmount, monthlyPayment, annualRate, termInMonths) {
+        const schedule = [];
+        let remainingDebt = totalAmount;
+        const monthlyRate = annualRate / 12;
 
-            const initialPayment = Math.round(carPrice * initialPaymentPercent / 100);
-            const financingBase = carPrice - initialPayment;
-            const additionalCosts = Math.round(financingBase * 0.005);
-            const totalAmount = financingBase + additionalCosts;
+        for (let month = 1; month <= termInMonths; month++) {
+            const interestPayment = Math.round(remainingDebt * monthlyRate);
+            const principalPayment = monthlyPayment - interestPayment;
+            remainingDebt = Math.max(0, remainingDebt - principalPayment);
 
-            const monthlyRate = annualRate / 12;
-            const annuityCoefficient = (monthlyRate * Math.pow(1 + monthlyRate, termInMonths)) / (Math.pow(1 + monthlyRate, termInMonths) - 1);
-            const monthlyPayment = Math.round(totalAmount * annuityCoefficient);
-
-            return {
-                carPrice,
-                initialPayment,
-                financingBase,
-                totalAmount,
+            schedule.push({
+                month,
+                principalPayment,
+                interestPayment,
                 monthlyPayment,
-                totalPayment: monthlyPayment * termInMonths,
-                annualRate,
-                termInMonths
-            };
+                remainingDebt
+            });
         }
 
-        function generatePaymentSchedule(totalAmount, monthlyPayment, annualRate, termInMonths) {
-            const schedule = [];
-            let remainingDebt = totalAmount;
-            const monthlyRate = annualRate / 12;
+        return schedule;
+    }
 
-            for (let month = 1; month <= termInMonths; month++) {
-                const interestPayment = Math.round(remainingDebt * monthlyRate);
-                const principalPayment = monthlyPayment - interestPayment;
-                remainingDebt = Math.max(0, remainingDebt - principalPayment);
+    function updateFromSliders() {
+        if (updatingFromInput) return;
+        updatingFromSlider = true;
 
-                schedule.push({
-                    month,
-                    principalPayment,
-                    interestPayment,
-                    monthlyPayment,
-                    remainingDebt
-                });
-            }
+        const amount = parseInt(amountSlider.value);
+        const downPaymentPercent = parseInt(downPaymentSlider.value);
+        const term = parseInt(termSlider.value);
+        const downPaymentSum = Math.round(amount * downPaymentPercent / 100);
 
-            return schedule;
-        }
+        amountInput.value = `${formatNumber(amount)} ${t.sum}`;
+        downPaymentInput.value = `${formatNumber(downPaymentSum)} ${t.sum}`;
+        termInput.value = `${term} ${t.month}`;
 
-        function updateFromSliders() {
-            if (updatingFromInput) return;
-            updatingFromSlider = true;
+        updateResults();
+        updateSliderBackgrounds();
+        updatingFromSlider = false;
+    }
 
-            const amount = parseInt(amountSlider.value);
-            const downPaymentPercent = parseInt(downPaymentSlider.value);
-            const term = parseInt(termSlider.value);
-            const downPaymentSum = Math.round(amount * downPaymentPercent / 100);
+    function updateResults() {
+        const amount = parseInt(amountSlider.value);
+        const downPaymentPercent = parseInt(downPaymentSlider.value);
+        const term = parseInt(termSlider.value);
+        const result = calculateLeasing(amount, downPaymentPercent, term);
 
-            amountInput.value = `${formatNumber(amount)} so'm`;
-            downPaymentInput.value = `${formatNumber(downPaymentSum)} so'm`;
-            termInput.value = `${term} oy`;
+        financeAmount.textContent = `${formatNumber(result.totalAmount)} ${t.sum}`;
+        monthlyPayment.textContent = `${formatNumber(result.monthlyPayment)} ${t.from}`;
+        downPaymentAmount.textContent = `${downPaymentPercent}%`;
+    }
 
-            updateResults();
-            updateSliderBackgrounds();
-            updatingFromSlider = false;
-        }
+    function updateSliderBackground(slider) {
+        const min = parseFloat(slider.min);
+        const max = parseFloat(slider.max);
+        const value = parseFloat(slider.value);
+        const percentage = ((value - min) / (max - min)) * 100;
+        slider.style.background = `linear-gradient(to right, black 0%, grey ${percentage}%, var(--base-shade) ${percentage}%, var(--base-shade) 100%)`;
+    }
 
-        function updateResults() {
-            const amount = parseInt(amountSlider.value);
-            const downPaymentPercent = parseInt(downPaymentSlider.value);
-            const term = parseInt(termSlider.value);
-            const result = calculateLeasing(amount, downPaymentPercent, term);
+    function updateSliderBackgrounds() {
+        updateSliderBackground(amountSlider);
+        updateSliderBackground(downPaymentSlider);
+        updateSliderBackground(termSlider);
+    }
 
-            financeAmount.textContent = `${formatNumber(result.totalAmount)} so'm`;
-            monthlyPayment.textContent = `${formatNumber(result.monthlyPayment)} so'mdan`;
-            downPaymentAmount.textContent = `${downPaymentPercent}%`;
-        }
+    // Event handlers
+    amountSlider.addEventListener('input', updateFromSliders);
+    downPaymentSlider.addEventListener('input', updateFromSliders);
+    termSlider.addEventListener('input', updateFromSliders);
 
-        function updateSliderBackground(slider) {
-            const min = parseFloat(slider.min);
-            const max = parseFloat(slider.max);
-            const value = parseFloat(slider.value);
-            const percentage = ((value - min) / (max - min)) * 100;
-            slider.style.background = `linear-gradient(to right, black 0%, grey ${percentage}%, var(--base-shade) ${percentage}%, var(--base-shade) 100%)`;
-        }
+    amountInput.addEventListener('blur', function () {
+        if (updatingFromSlider) return;
+        updatingFromInput = true;
+        const value = parseAmount(this.value);
+        const clampedValue = Math.max(AMOUNT_MIN, Math.min(AMOUNT_MAX, value));
+        amountSlider.value = clampedValue;
+        this.value = `${formatNumber(clampedValue)} ${t.sum}`;
+        const downPaymentPercent = parseInt(downPaymentSlider.value);
+        const newDownPayment = Math.round(clampedValue * downPaymentPercent / 100);
+        downPaymentInput.value = `${formatNumber(newDownPayment)} ${t.sum}`;
+        updateResults();
+        updateSliderBackgrounds();
+        updatingFromInput = false;
+    });
 
-        function updateSliderBackgrounds() {
-            updateSliderBackground(amountSlider);
-            updateSliderBackground(downPaymentSlider);
-            updateSliderBackground(termSlider);
-        }
+    downPaymentInput.addEventListener('blur', function () {
+        if (updatingFromSlider) return;
+        updatingFromInput = true;
+        const value = parseAmount(this.value);
+        const amount = parseInt(amountSlider.value);
+        let percent = Math.round((value / amount) * 100);
+        percent = Math.max(DOWNPAY_MIN, Math.min(DOWNPAY_MAX, percent));
+        downPaymentSlider.value = percent;
+        const exactDownPayment = Math.round(amount * percent / 100);
+        this.value = `${formatNumber(exactDownPayment)} ${t.sum}`;
+        updateResults();
+        updateSliderBackgrounds();
+        updatingFromInput = false;
+    });
 
-        // Обработчики слайдеров
-        amountSlider.addEventListener('input', updateFromSliders);
-        downPaymentSlider.addEventListener('input', updateFromSliders);
-        termSlider.addEventListener('input', updateFromSliders);
+    termInput.addEventListener('blur', function () {
+        if (updatingFromSlider) return;
+        updatingFromInput = true;
+        const value = parseTerm(this.value);
+        const clampedValue = Math.max(TERM_MIN, Math.min(TERM_MAX, value));
+        termSlider.value = clampedValue;
+        this.value = `${clampedValue} ${t.month}`;
+        updateResults();
+        updateSliderBackgrounds();
+        updatingFromInput = false;
+    });
 
-        // Обработчики полей ввода
-        amountInput.addEventListener('blur', function () {
-            if (updatingFromSlider) return;
-            updatingFromInput = true;
-            const value = parseAmount(this.value);
-            const clampedValue = Math.max(AMOUNT_MIN, Math.min(AMOUNT_MAX, value));
-            amountSlider.value = clampedValue;
-            this.value = `${formatNumber(clampedValue)} so'm`;
-            const downPaymentPercent = parseInt(downPaymentSlider.value);
-            const newDownPayment = Math.round(clampedValue * downPaymentPercent / 100);
-            downPaymentInput.value = `${formatNumber(newDownPayment)} so'm`;
-            updateResults();
-            updateSliderBackgrounds();
-            updatingFromInput = false;
-        });
+    amountInput.addEventListener('focus', function () {
+        if (updatingFromSlider) return;
+        const value = parseAmount(this.value);
+        this.value = value.toString();
+    });
 
-        downPaymentInput.addEventListener('blur', function () {
-            if (updatingFromSlider) return;
-            updatingFromInput = true;
-            const value = parseAmount(this.value);
-            const amount = parseInt(amountSlider.value);
-            let percent = Math.round((value / amount) * 100);
-            percent = Math.max(DOWNPAY_MIN, Math.min(DOWNPAY_MAX, percent));
-            downPaymentSlider.value = percent;
-            const exactDownPayment = Math.round(amount * percent / 100);
-            this.value = `${formatNumber(exactDownPayment)} so'm`;
-            updateResults();
-            updateSliderBackgrounds();
-            updatingFromInput = false;
-        });
+    downPaymentInput.addEventListener('focus', function () {
+        if (updatingFromSlider) return;
+        const value = parseAmount(this.value);
+        this.value = value.toString();
+    });
 
-        termInput.addEventListener('blur', function () {
-            if (updatingFromSlider) return;
-            updatingFromInput = true;
-            const value = parseTerm(this.value);
-            const clampedValue = Math.max(TERM_MIN, Math.min(TERM_MAX, value));
-            termSlider.value = clampedValue;
-            this.value = `${clampedValue} oy`;
-            updateResults();
-            updateSliderBackgrounds();
-            updatingFromInput = false;
-        });
+    termInput.addEventListener('focus', function () {
+        if (updatingFromSlider) return;
+        const value = parseTerm(this.value);
+        this.value = value.toString();
+    });
 
-        // Обработчики фокуса
-        amountInput.addEventListener('focus', function () {
-            if (updatingFromSlider) return;
-            const value = parseAmount(this.value);
-            this.value = value.toString();
-        });
+    // Modal
+    const modal = document.getElementById('detailsModal');
+    const detailsBtn = document.getElementById('detailsBtn');
+    const closeBtn = document.querySelector('.close');
 
-        downPaymentInput.addEventListener('focus', function () {
-            if (updatingFromSlider) return;
-            const value = parseAmount(this.value);
-            this.value = value.toString();
-        });
-
-        termInput.addEventListener('focus', function () {
-            if (updatingFromSlider) return;
-            const value = parseTerm(this.value);
-            this.value = value.toString();
-        });
-
-        // Модальное окно
+    function fixModalScroll() {
+        const modalWrapper = document.querySelector('.modal-wrapper');
         const modal = document.getElementById('detailsModal');
-        const detailsBtn = document.getElementById('detailsBtn');
-        const closeBtn = document.querySelector('.close');
 
-        // Исправление скролла колесиком мыши в модальном окне
-        function fixModalScroll() {
-            const modalWrapper = document.querySelector('.modal-wrapper');
-            const modal = document.getElementById('detailsModal');
+        if (modalWrapper && modal) {
+            modalWrapper.addEventListener('wheel', function (e) {
+                e.stopPropagation();
+            }, { passive: false });
 
-            if (modalWrapper && modal) {
-                // Предотвращаем всплытие события wheel
-                modalWrapper.addEventListener('wheel', function (e) {
-                    e.stopPropagation();
-                }, { passive: false });
+            modal.addEventListener('wheel', function (e) {
+                if (e.target.closest('.modal-wrapper')) {
+                    const wrapper = e.target.closest('.modal-wrapper');
+                    const scrollTop = wrapper.scrollTop;
+                    const scrollHeight = wrapper.scrollHeight;
+                    const height = wrapper.clientHeight;
+                    const wheelDelta = e.deltaY;
+                    const scrollDown = wheelDelta > 0;
 
-                // Альтернативный вариант - перехват на самом модальном окне
-                modal.addEventListener('wheel', function (e) {
-                    if (e.target.closest('.modal-wrapper')) {
-                        const wrapper = e.target.closest('.modal-wrapper');
-                        const scrollTop = wrapper.scrollTop;
-                        const scrollHeight = wrapper.scrollHeight;
-                        const height = wrapper.clientHeight;
-                        const wheelDelta = e.deltaY;
-                        const scrollDown = wheelDelta > 0;
-
-                        // Разрешаем скролл только если есть куда скроллить
-                        if (scrollDown && scrollTop + height >= scrollHeight) {
-                            e.preventDefault();
-                        } else if (!scrollDown && scrollTop <= 0) {
-                            e.preventDefault();
-                        } else {
-                            e.stopPropagation();
-                        }
+                    if (scrollDown && scrollTop + height >= scrollHeight) {
+                        e.preventDefault();
+                    } else if (!scrollDown && scrollTop <= 0) {
+                        e.preventDefault();
+                    } else {
+                        e.stopPropagation();
                     }
-                }, { passive: false });
-            }
+                }
+            }, { passive: false });
         }
+    }
 
-        function showModal() {
-            const amount = parseInt(amountSlider.value);
-            const downPaymentPercent = parseInt(downPaymentSlider.value);
-            const term = parseInt(termSlider.value);
-            const result = calculateLeasing(amount, downPaymentPercent, term);
+    function showModal() {
+        const amount = parseInt(amountSlider.value);
+        const downPaymentPercent = parseInt(downPaymentSlider.value);
+        const term = parseInt(termSlider.value);
+        const result = calculateLeasing(amount, downPaymentPercent, term);
 
-            document.getElementById('modal-car-price').textContent = `${formatNumber(result.carPrice)} so'm`;
-            document.getElementById('modal-initial-payment').textContent = `${formatNumber(result.initialPayment)} so'm`;
-            document.getElementById('modal-term').textContent = `${term} oy`;
-            document.getElementById('modal-monthly-payment').textContent = `${formatNumber(result.monthlyPayment)} so'm`;
-            document.getElementById('modal-total-payment').textContent = `${formatNumber(result.totalPayment)} so'm`;
-            document.getElementById('modal-rate').textContent = `${(result.annualRate * 100).toFixed(1)}%`;
+        document.getElementById('modal-car-price').textContent = `${formatNumber(result.carPrice)} ${t.sum}`;
+        document.getElementById('modal-initial-payment').textContent = `${formatNumber(result.initialPayment)} ${t.sum}`;
+        document.getElementById('modal-term').textContent = `${term} ${t.month}`;
+        document.getElementById('modal-monthly-payment').textContent = `${formatNumber(result.monthlyPayment)} ${t.sum}`;
+        document.getElementById('modal-total-payment').textContent = `${formatNumber(result.totalPayment)} ${t.sum}`;
+        document.getElementById('modal-rate').textContent = `${(result.annualRate * 100).toFixed(1)}%`;
 
-            const schedule = generatePaymentSchedule(result.totalAmount, result.monthlyPayment, result.annualRate, term);
-            const tbody = document.getElementById('schedule-tbody');
-            tbody.innerHTML = '';
+        const schedule = generatePaymentSchedule(result.totalAmount, result.monthlyPayment, result.annualRate, term);
+        const tbody = document.getElementById('schedule-tbody');
+        tbody.innerHTML = '';
 
-            schedule.forEach(payment => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-            <td>${payment.month}</td>
-            <td>${formatNumber(payment.principalPayment)} so'm</td>
-            <td>${formatNumber(payment.interestPayment)} so'm</td>
-            <td>${formatNumber(payment.monthlyPayment)} so'm</td>
-            <td>${formatNumber(payment.remainingDebt)} so'm</td>
-        `;
-            });
-
-            modal.classList.add('show');
-            document.body.classList.add('modal-open');
-
-            // Исправляем скролл колесиком
-            fixModalScroll();
-
-            modal.focus();
-        }
-
-        function hideModal() {
-            modal.classList.remove('show');
-            document.body.classList.remove('modal-open');
-        }
-
-        detailsBtn.addEventListener('click', function (event) {
-            event.preventDefault();
-            showModal();
-        });
-        closeBtn.addEventListener('click', hideModal);
-        window.addEventListener('click', function (event) {
-            if (event.target === modal || event.target.classList.contains('modal-wrapper')) {
-                hideModal();
-            }
+        schedule.forEach(payment => {
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>${payment.month}</td>
+                <td>${formatNumber(payment.principalPayment)} ${t.sum}</td>
+                <td>${formatNumber(payment.interestPayment)} ${t.sum}</td>
+                <td>${formatNumber(payment.monthlyPayment)} ${t.sum}</td>
+                <td>${formatNumber(payment.remainingDebt)} ${t.sum}</td>
+            `;
         });
 
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape') {
-                hideModal();
-            }
-        });
-        // Интеграция с переключателем темы
-        const themeToggle = document.getElementById('color-switcher');
-        if (themeToggle) {
-            themeToggle.addEventListener('click', function () {
-                const currentTheme = document.body.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                document.body.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                updateSliderBackgrounds();
-            });
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        fixModalScroll();
+        modal.focus();
+    }
 
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme) {
-                document.body.setAttribute('data-theme', savedTheme);
-            }
+    function hideModal() {
+        modal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+    }
+
+    detailsBtn.addEventListener('click', function (event) {
+        event.preventDefault();
+        showModal();
+    });
+    closeBtn.addEventListener('click', hideModal);
+    window.addEventListener('click', function (event) {
+        if (event.target === modal || event.target.classList.contains('modal-wrapper')) {
+            hideModal();
         }
-        // Инициализация
-        updateFromSliders();
-    </script>
+    });
 
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            hideModal();
+        }
+    });
+
+    const themeToggle = document.getElementById('color-switcher');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function () {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateSliderBackgrounds();
+        });
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.body.setAttribute('data-theme', savedTheme);
+        }
+    }
+
+    // Initialize
+    updateFromSliders();
+</script>
 </body>
-
 </html>

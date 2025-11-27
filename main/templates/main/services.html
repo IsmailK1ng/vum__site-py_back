@@ -4,34 +4,34 @@
 
 <head>
     <meta charset="UTF-8">
-
-    <!-- Page Title -->
-    <title>VUM Servis</title>
-
-    <!-- Meta Tags -->
-    <meta name="description" content="Faw Trucks в Узбекистане">
-    <meta name="keywords" content="Faw Trucks в Узбекистане">
-    <meta name="author" content="mix_design">
-
-    <!-- Viewport Meta-->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-    <!-- Универсальный favicon -->
+    <!-- Page Title -->
+    <title>{% if LANGUAGE_CODE == 'uz' %}VUM Servis{% elif LANGUAGE_CODE == 'ru' %}Сервис VUM{% else %}VUM Service{%endif %} | FAW Trucks</title>
+
+    <!-- Meta Tags -->
+    <meta name="description"
+        content="{% if LANGUAGE_CODE == 'uz' %}FAW Trucks servis xizmati O'zbekistonda - kafolat, texnik xizmat, ehtiyot qismlar{% elif LANGUAGE_CODE == 'ru' %}Сервисное обслуживание FAW Trucks в Узбекистане - гарантия, техобслуживание, запчасти{% else %}FAW Trucks service in Uzbekistan - warranty, maintenance, spare parts{% endif %}">
+    <meta name="keywords"
+        content="FAW Trucks, {% if LANGUAGE_CODE == 'uz' %}servis, texnik xizmat, O'zbekiston{% elif LANGUAGE_CODE == 'ru' %}сервис, техобслуживание, Узбекистан{% else %}service, maintenance, Uzbekistan{% endif %}">
+    <meta name="author" content="mix_design">
+
+    <!-- Favicon -->
     <link rel="icon" href="{% static 'images/logo/logo-vum.png' %}" />
-    <!-- Для Apple устройств -->
     <link rel="apple-touch-icon" href="{% static 'images/logo/logo-vum.png' %}">
 
-    <!-- Facebook Metadata Start -->
-    <meta property="og:image:height" content="1200">
+    <!-- Open Graph -->
+    <meta property="og:title"
+        content="{% if LANGUAGE_CODE == 'uz' %}VUM Servis{% elif LANGUAGE_CODE == 'ru' %}Сервис VUM{% else %}VUM Service{% endif %} | FAW Trucks">
+    <meta property="og:description"
+        content="{% if LANGUAGE_CODE == 'uz' %}Professional servis xizmati{% elif LANGUAGE_CODE == 'ru' %}Профессиональное сервисное обслуживание{% else %}Professional service{% endif %}">
+    <meta property="og:url" content="https://fawtrucks.uz/services">
+    <meta property="og:image" content="{% static 'images/service-img/1.JPG' %}">
     <meta property="og:image:width" content="1200">
-    <meta property="og:title" content="Faw Trucks в Узбекистане">
-    <meta property="og:description" content="Faw Trucks в Узбекистане">
-    <meta property="og:url" content="https://mixdesign.dev/themeforest/rayo">
-    <meta property="og:image" content="https://mixdesign.dev/themeforest/rayo/img/og-image.jpg">
-    <!-- Facebook Metadata End -->
+    <meta property="og:image:height" content="630">
 
-    <!-- Google Tag Manager Xurshid 1 chi kod -->
+    <!-- Google Tag Manager -->
     <script>(function (w, d, s, l, i) {
             w[l] = w[l] || []; w[l].push({
                 'gtm.start':
@@ -40,411 +40,571 @@
                 j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
                     'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
         })(window, document, 'script', 'dataLayer', 'GTM-M33GWKMW');</script>
-    <!-- End Google Tag Manager Xurshid 1 chi kod-->
 
-    <!-- Meta Pixel Code Xurshid 2 chi kod-->
+    <!-- Meta Pixel -->
     <script>
         !function (f, b, e, v, n, t, s) {
             if (f.fbq) return; n = f.fbq = function () {
                 n.callMethod ?
                     n.callMethod.apply(n, arguments) : n.queue.push(arguments)
-            };
-            if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
-            n.queue = []; t = b.createElement(e); t.async = !0;
-            t.src = v; s = b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t, s)
-        }(window, document, 'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
+            }; if (!f._fbq) f._fbq = n;
+            n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = []; t = b.createElement(e); t.async = !0;
+            t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s)
+        }(window,
+            document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '2271244510044933');
         fbq('track', 'PageView');
     </script>
-
     <noscript><img height="1" width="1" style="display:none"
             src="https://www.facebook.com/tr?id=2271244510044933&ev=PageView&noscript=1" /></noscript>
-    <!-- End Meta Pixel Code  Xurshid 2 chi kod-->
 
-    <!-- Template Styles Start -->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/breadcrumbs.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/site_service.css' %}">
+    <!-- Preload Critical CSS -->
+    <link rel="preload" href="{% static 'css/main_site.css' %}" as="style">
 
-    <!-- Template Styles End -->
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{% static 'css/loaders/loader.css' %}">
+    <link rel="stylesheet" href="{% static 'css/plugins.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main_site.css' %}">
+    <link rel="stylesheet" href="{% static 'css/site_main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+    <link rel="stylesheet" href="{% static 'css/site_service.css' %}">
 
-    <!-- Custom Browser Color Start -->
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#FAF7F6" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#161616" media="(prefers-color-scheme: dark)">
     <meta name="msapplication-navbutton-color" content="#161616">
-    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Custom Browser Color End -->
-
 </head>
 
 <body>
-
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
 
-    <!-- Loader Start -->
-    <div id="loader" style="display: none;" class="loader">
+    <!-- Loader -->
+    <div id="loader" class="loader" style="display: none;">
         <div class="loader__wrapper">
             <div class="loader__content">
                 <div class="loader__count">
                     <span class="count__text">0</span>
-                    <!-- <span class="count__percent">%</span> -->
                 </div>
             </div>
         </div>
     </div>
-    <!-- Loader End -->
 
-    <!-- Меню и шапка (начало) -->
+    <!-- Header -->
     {% include 'main/includes/header.html' %}
-    <!-- Меню и шапка (конец) -->
 
-    <!-- Menu & Header Navigation End -->
-    <!-- Page Content Start -->
-    <div class="mxd-block loading-wrap">
-    </div>
-    <!-- Хлебные крошки -->
-    <div class="mxd-section-filter pre-grid">
+    <div class="mxd-block loading-wrap"></div>
+
+    <!-- Breadcrumbs -->
+    <nav class="mxd-section-filter pre-grid" aria-label="breadcrumb">
         <div class="mxd-section-filter__inner animate-card-3">
             <div class="mxd-grid-item-1">
                 <div class="section-filter">
-                    <div aria-label="breadcrumb">
-                        <ol class="breadcrumb-ol">
-                            <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
-                            <li class="active"><a href="{% url 'services' %}">VUM Servis xizmati </a></li>
-                        </ol>
-                    </div>
+                    <ol class="breadcrumb-ol">
+                        <li><a href="{% url 'home' %}">{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}</a></li>
+                        <li class="active" aria-current="page"><a href="{% url 'services' %}">{% if LANGUAGE_CODE == 'uz' %}VUM Servis xizmati{% elif LANGUAGE_CODE == 'ru' %}Сервис VUM{% else %}VUM Service{% endif %}</a></li>
+                    </ol>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="faw-history-title fade-in">
-        <h2 class="reveal-type">VUM servis xizmati</h2>
-    </div>
-    <!-- Section - Parallax Divider Start -->
-    <div class="mxd-section padding-grid-pre-mtext">
+    </nav>
+
+    <!-- Page Title -->
+    <header class="faw-history-title fade-in">
+        <h1 class="reveal-type">{% if LANGUAGE_CODE == 'uz' %}VUM servis xizmati{% elif LANGUAGE_CODE == 'ru' %}Сервисное обслуживание VUM{% else %}VUM Service{% endif %}</h1>
+    </header>
+
+    <!-- Hero Image -->
+    <section class="mxd-section padding-grid-pre-mtext">
         <div class="mxd-container">
             <div class="mxd-divider">
-                <div class="mxd-divider__image  parallax-img">
-                    <img src="{% static 'images/service-img/1.JPG' %}" alt="">
+                <div class="mxd-divider__image parallax-img">
+                    <img src="{% static 'images/service-img/1.JPG' %}"
+                        alt="{% if LANGUAGE_CODE == 'uz' %}VUM Servis{% elif LANGUAGE_CODE == 'ru' %}Сервис VUM{% else %}VUM Service{% endif %}"
+                        loading="lazy">
                 </div>
             </div>
         </div>
-    </div>
-    <!-- Section - Parallax Divider End -->
+    </section>
 
-
-    <div class="mxd-hero-00__bottom">
+    <!-- Intro Text -->
+    <article class="mxd-hero-00__bottom">
         <div class="hero-00-manifest loading__fade">
             <p class="mxd-manifest reveal-type">
-                13 iyul kuni Toshkentda Van Universal Motors (VUM) kompaniyasi tashabbusi bilan O‘zbekiston bo‘ylab
-                faoliyat
-                yuritayotgan dilerlik markazlari vakillari ishtirokida yirik konferensiya bo‘lib o‘tdi. Tadbir
-                “Ishonchli hamkor
-                — barqaror kelajak” shiori ostida o‘tkazildi.
+                {% if LANGUAGE_CODE == 'uz' %}
+                13 iyul kuni Toshkentda Van Universal Motors (VUM) kompaniyasi tashabbusi bilan O'zbekiston bo'ylab
+                faoliyat yuritayotgan dilerlik markazlari vakillari ishtirokida yirik konferensiya bo'lib o'tdi. Tadbir
+                "Ishonchli hamkor — barqaror kelajak" shiori ostida o'tkazildi.
                 <br><br>
                 Mazkur uchrashuvning asosiy maqsadi — dilerlar bilan hamkorlikni mustahkamlash va biznesni
-                rivojlantirish
-                bo‘ldi. Shuningdek, ushbu tadbirda O‘zbekiston yuk mashinalari bozori uchun yangilik — gaz va benzin
-                yoqilg‘isida harakatlanuvchi mutlaqo yangi avlod yuk mashinasi FAW Tiger VH modeli taqdimoti o‘tkazildi.
+                rivojlantirish bo'ldi. Shuningdek, ushbu tadbirda O'zbekiston yuk mashinalari bozori uchun yangilik —
+                gaz va benzin yoqilg'isida harakatlanuvchi mutlaqo yangi avlod yuk mashinasi FAW Tiger VH modeli
+                taqdimoti o'tkazildi.
+                {% elif LANGUAGE_CODE == 'ru' %}
+                13 июля в Ташкенте по инициативе компании Van Universal Motors (VUM) прошла крупная конференция с
+                участием представителей дилерских центров, работающих по всему Узбекистану. Мероприятие прошло под
+                девизом «Надежный партнер — стабильное будущее».
+                <br><br>
+                Основная цель встречи — укрепление партнерства с дилерами и развитие бизнеса. Также на мероприятии была
+                представлена новинка для рынка грузовых автомобилей Узбекистана — грузовик нового поколения FAW Tiger
+                VH, работающий на газе и бензине.
+                {% else %}
+                On July 13, a major conference was held in Tashkent at the initiative of Van Universal Motors (VUM) with
+                representatives of dealer centers operating throughout Uzbekistan. The event was held under the slogan
+                "Reliable partner — stable future".
+                <br><br>
+                The main goal of the meeting was to strengthen partnerships with dealers and develop business. The event
+                also featured the presentation of a novelty for the Uzbekistan truck market — the new generation truck
+                FAW Tiger VH, running on gas and gasoline.
+                {% endif %}
             </p>
         </div>
-    </div>
-    <div class="mxd-section padding-blog">
+    </article>
+
+    <!-- Image Gallery 1 -->
+    <section class="mxd-section padding-blog">
         <div class="mxd-container grid-container">
-            <!-- Block - Blog Preview Cards Start -->
             <div class="mxd-block">
                 <div class="mxd-blog-preview">
                     <div class="container-fluid p-0">
                         <div class="row g-0">
-                            <!-- item -->
+                            {% for img in '623' %}
                             <div class="col-12 col-xl-4 mxd-blog-preview__item mxd-grid-item animate-card-3">
-                                <div class="mxd-blog-preview__image blog-preview-image-2 parallax-img-small">
-                                    <img src="{% static 'images/service-img/card/6.jpg' %}" alt="Blog Preview Image">
+                                <div
+                                    class="mxd-blog-preview__image blog-preview-image-{{ forloop.counter }} parallax-img-small">
+                                    <img src="{% static 'images/service-img/card/'|add:img|add:'.jpg' %}"
+                                        alt="Service Image" loading="lazy">
                                 </div>
                             </div>
-                            <!-- item -->
-                            <div class="col-12 col-xl-4 mxd-blog-preview__item mxd-grid-item animate-card-3">
-
-                                <div class="mxd-blog-preview__image blog-preview-image-3 parallax-img-small">
-                                    <img src="{% static 'images/service-img/card/2.jpg' %}" alt="Blog Preview Image">
-                                </div>
-                            </div>
-                            <!-- item -->
-                            <div class="col-12 col-xl-4 mxd-blog-preview__item mxd-grid-item animate-card-3">
-
-                                <div class="mxd-blog-preview__image blog-preview-image-3 parallax-img-small">
-                                    <img src="{% static 'images/service-img/card/3.jpg' %}" alt="Blog Preview Image">
-                                </div>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Block - Blog Preview Cards End -->
         </div>
-    </div>
-    <!-- Блок — карточки превью (начало) -->
-    <div class="mxd-block" id="parametrs">
+    </section>
+
+    <!-- Accordion Section -->
+    <section class="mxd-block" id="parametrs">
         <div class="mxd-blog-preview">
             <div class="container-fluid p-0">
                 <div class="g-0 card_block">
                     <div class="acardeon-cards_container">
                         <div class="acardeon-cards_block">
-                            <div class="acardeon-card">
+
+                            <!-- Accordion 1: Vehicle Purchase -->
+                            <article class="acardeon-card">
                                 <input type="checkbox" id="accordion-1" class="accordion-checkbox">
                                 <label for="accordion-1" class="acardeon-card__header">
-                                    <h3 class="acardeon-card__title">Avtomobil xaridi</h3>
-                                    <span class="acardeon-card__icon"></span>
+                                    <h2 class="acardeon-card__title">{% if LANGUAGE_CODE == 'uz' %}Avtomobil xaridi{%elif LANGUAGE_CODE == 'ru' %}Покупка автомобиля{% else %}Vehicle Purchase{%endif %}</h2>
+                                    <span class="acardeon-card__icon" aria-hidden="true"></span>
                                 </label>
                                 <div class="acardeon-card__content">
                                     <ul class="specs-list custom-marker">
+                                        {% if LANGUAGE_CODE == 'uz' %}
                                         <li class="specs-list__item">Siz xarid qiladigan FAW Trucks texnikasi darhol
                                             foydalanishga tayyor holda topshiriladi. Avtomobilni xaridorga topshirishdan
                                             oldin diler oldindan tayyorgarlik ishlarini amalga oshiradi: barcha
                                             tizimlarning ishlashini tekshiradi, nosozliklarni bartaraf etadi, tashqi
-                                            ko‘rinishini ko‘zdan kechiradi va zaruriy ehtiyot qismlarni almashtiradi.
-                                            Oldindan tayyorgarlik sanasi servis daftaridagi talonda ko‘rsatiladi.</li>
-                                        <li class="specs-list__item"> Avtomobilni qabul qilishdan oldin xaridor uning
-                                            texnik holatini ko‘zdan
-                                            kechirishi va to‘g‘ri holatda ekanligini tasdiqlashi lozim: to‘liq
-                                            jihozlanganligi, ishlashga yaroqliligi hamda shikastlanmaganligi. Mashina
-                                            bilan birga unga foydalanish qo‘llanmasi va servis daftarchasi ham
-                                            topshiriladi.</li>
+                                            ko'rinishini ko'zdan kechiradi va zaruriy ehtiyot qismlarni almashtiradi.
+                                            Oldindan tayyorgarlik sanasi servis daftaridagi talonda ko'rsatiladi.</li>
+                                        <li class="specs-list__item">Avtomobilni qabul qilishdan oldin xaridor uning
+                                            texnik holatini ko'zdan kechirishi va to'g'ri holatda ekanligini tasdiqlashi
+                                            lozim: to'liq jihozlanganligi, ishlashga yaroqliligi hamda
+                                            shikastlanmaganligi. Mashina bilan birga unga foydalanish qo'llanmasi va
+                                            servis daftarchasi ham topshiriladi.</li>
+                                        {% elif LANGUAGE_CODE == 'ru' %}
+                                        <li class="specs-list__item">Приобретаемая вами техника FAW Trucks передается в
+                                            состоянии, готовом к немедленной эксплуатации. Перед передачей автомобиля
+                                            покупателю дилер проводит предпродажную подготовку: проверяет работу всех
+                                            систем, устраняет неисправности, осматривает внешний вид и заменяет
+                                            необходимые запчасти. Дата предпродажной подготовки указывается в талоне
+                                            сервисной книжки.</li>
+                                        <li class="specs-list__item">Перед приемкой автомобиля покупатель должен
+                                            осмотреть его техническое состояние и подтвердить его исправность: полную
+                                            комплектацию, работоспособность и отсутствие повреждений. Вместе с машиной
+                                            передается руководство по эксплуатации и сервисная книжка.</li>
+                                        {% else %}
+                                        <li class="specs-list__item">The FAW Trucks equipment you purchase is delivered
+                                            ready for immediate use. Before handing over the vehicle to the buyer, the
+                                            dealer performs pre-delivery preparation: checks the operation of all
+                                            systems, eliminates malfunctions, inspects the appearance, and replaces
+                                            necessary spare parts. The pre-delivery preparation date is indicated in the
+                                            service book coupon.</li>
+                                        <li class="specs-list__item">Before accepting the vehicle, the buyer must
+                                            inspect its technical condition and confirm its serviceability: complete
+                                            equipment, operability, and absence of damage. Along with the vehicle, an
+                                            operating manual and service book are provided.</li>
+                                        {% endif %}
                                     </ul>
                                 </div>
-                            </div>
-                            <div class="acardeon-card">
+                            </article>
+
+                            <!-- Accordion 2: Warranty Obligations -->
+                            <article class="acardeon-card">
                                 <input type="checkbox" id="accordion-2" class="accordion-checkbox">
                                 <label for="accordion-2" class="acardeon-card__header">
-                                    <h2 class="acardeon-card__title">Kafolat majburiyatlari</h2>
-                                    <span class="acardeon-card__icon"></span>
+                                    <h2 class="acardeon-card__title">{% if LANGUAGE_CODE == 'uz' %}Kafolat majburiyatlari{% elif LANGUAGE_CODE == 'ru' %}Гарантийные обязательства{% else%}Warranty Obligations{% endif %}</h2>
+                                    <span class="acardeon-card__icon" aria-hidden="true"></span>
                                 </label>
                                 <div class="acardeon-card__content">
                                     <ul class="specs-list custom-marker">
+                                        {% if LANGUAGE_CODE == 'uz' %}
                                         <li class="specs-list__item">Kafolatli xizmat FAW Trucks yuk avtomobillarining
                                             barchasiga tatbiq etiladi. Yetkazib berish shartnomasida kafolat muddati —
-                                            vaqt va yurish masofasi bo‘yicha belgilanadi. Kafolat shartlari yuzaga
+                                            vaqt va yurish masofasi bo'yicha belgilanadi. Kafolat shartlari yuzaga
                                             kelgan taqdirda, xaridor servis markaziga murojaat qilib, ishlab chiqaruvchi
-                                            aybi sababli ishdan chiqqan uzel va ehtiyot qismlarni bepul ta’mirlash
-                                            huquqiga ega bo‘ladi.</li>
+                                            aybi sababli ishdan chiqqan uzel va ehtiyot qismlarni bepul ta'mirlash
+                                            huquqiga ega bo'ladi.</li>
+                                        {% elif LANGUAGE_CODE == 'ru' %}
+                                        <li class="specs-list__item">Гарантийное обслуживание распространяется на все
+                                            грузовые автомобили FAW Trucks. В договоре поставки указывается гарантийный
+                                            срок — по времени и пробегу. При наступлении гарантийных случаев покупатель
+                                            имеет право обратиться в сервисный центр для бесплатного ремонта узлов и
+                                            запчастей, вышедших из строя по вине производителя.</li>
+                                        {% else %}
+                                        <li class="specs-list__item">Warranty service applies to all FAW Trucks
+                                            vehicles. The delivery contract specifies the warranty period — by time and
+                                            mileage. In case of warranty events, the buyer has the right to contact the
+                                            service center for free repair of units and parts that have failed due to
+                                            the manufacturer's fault.</li>
+                                        {% endif %}
                                     </ul>
                                 </div>
-                            </div>
-                            <div class="acardeon-card">
+                            </article>
+
+                            <!-- Accordion 3: Warranty Repair -->
+                            <article class="acardeon-card">
                                 <input type="checkbox" id="accordion-3" class="accordion-checkbox">
                                 <label for="accordion-3" class="acardeon-card__header">
-                                    <h3 class="acardeon-card__title">Kafolatli ta’mirlash</h3>
-                                    <span class="acardeon-card__icon"></span>
+                                    <h2 class="acardeon-card__title">{% if LANGUAGE_CODE == 'uz' %}Kafolatli ta'mirlash{% elif LANGUAGE_CODE == 'ru' %}Гарантийный ремонт{% else %}Warranty Repair{% endif %}</h2>
+                                    <span class="acardeon-card__icon" aria-hidden="true"></span>
                                 </label>
                                 <div class="acardeon-card__content">
                                     <ul class="specs-list custom-marker">
-                                        <li class="specs-list__item">Agar texnikangizga kafolatli ta’mirlash kerak
-                                            bo‘lsa, FAW Trucks dilerlik tarmog‘idagi servis markaziga murojaat qiling.
+                                        {% if LANGUAGE_CODE == 'uz' %}
+                                        <li class="specs-list__item">Agar texnikangizga kafolatli ta'mirlash kerak bo'lsa, FAW Trucks dilerlik tarmog'idagi servis markaziga murojaat qiling.
                                         </li>
                                         <li class="specs-list__item">Kafolatli, kafolatdan keyingi va texnik xizmat
-                                            ko‘rsatish bo‘yicha batafsil ma’lumot olish uchun +998 55 508-60-60 raqamiga
-                                            qo‘ng‘iroq qiling yoki info@faw.uz
-                                            elektron pochta manziliga yozing. Shuningdek, servis markazlari faoliyati
-                                            bo‘yicha fikr va mulohazalaringizni ham shu manzilga yuborishingiz mumkin.
-                                        </li>
+                                            ko'rsatish bo'yicha batafsil ma'lumot olish uchun +998 55 508-60-60 raqamiga
+                                            qo'ng'iroq qiling yoki info@faw.uz elektron pochta manziliga yozing.
+                                            Shuningdek, servis markazlari faoliyati bo'yicha fikr va mulohazalaringizni
+                                            ham shu manzilga yuborishingiz mumkin.</li>
+                                        {% elif LANGUAGE_CODE == 'ru' %}
+                                        <li class="specs-list__item">Если вашей технике требуется гарантийный ремонт,
+                                            обратитесь в сервисный центр дилерской сети FAW Trucks.</li>
+                                        <li class="specs-list__item">Для получения подробной информации о гарантийном,
+                                            послегарантийном и техническом обслуживании звоните по номеру +998 55
+                                            508-60-60 или пишите на info@faw.uz. Также вы можете отправлять свои отзывы
+                                            и предложения о работе сервисных центров на этот адрес.</li>
+                                        {% else %}
+                                        <li class="specs-list__item">If your equipment requires warranty repair, contact
+                                            a FAW Trucks dealer network service center.</li>
+                                        <li class="specs-list__item">For detailed information on warranty,
+                                            post-warranty, and maintenance services, call +998 55 508-60-60 or email
+                                            info@faw.uz. You can also send your feedback and suggestions about service
+                                            center operations to this address.</li>
+                                        {% endif %}
                                     </ul>
                                 </div>
-                            </div>
-                            <div class="acardeon-card">
+                            </article>
+
+                            <!-- Accordion 4: Parts Warranty -->
+                            <article class="acardeon-card">
                                 <input type="checkbox" id="accordion-4" class="accordion-checkbox">
                                 <label for="accordion-4" class="acardeon-card__header">
-                                    <h3 class="acardeon-card__title">Ehtiyot qismlarga kafolat</h3>
-                                    <span class="acardeon-card__icon"></span>
+                                    <h2 class="acardeon-card__title">{% if LANGUAGE_CODE == 'uz' %}Ehtiyot qismlarga kafolat{% elif LANGUAGE_CODE == 'ru' %}Гарантия на запчасти{% else %}Parts Warranty{% endif %}</h2>
+                                    <span class="acardeon-card__icon" aria-hidden="true"></span>
                                 </label>
                                 <div class="acardeon-card__content">
                                     <ul class="specs-list custom-marker">
-                                        <li class="specs-list__item">Ishlab chiqaruvchi tomonidan ehtiyot qismlarga
-                                            beriladigan kafolat muddati 3 oyni tashkil etadi. Ushbu muddat ehtiyot qism
-                                            rasmiy dilerning servis markazida avtomobilga o‘rnatilgan vaqtdan boshlab
-                                            hisoblanadi.
-                                        </li>
+                                        {% if LANGUAGE_CODE == 'uz' %}
+                                        <li class="specs-list__item">Ishlab chiqaruvchi tomonidan ehtiyot qismlarga beriladigan kafolat muddati 3 oyni tashkil etadi. Ushbu muddat ehtiyot qism rasmiy dilerning servis markazida avtomobilga o'rnatilgan vaqtdan boshlab hisoblanadi.</li>
+                                        {% elif LANGUAGE_CODE == 'ru' %}
+                                        <li class="specs-list__item">Гарантийный срок на запчасти от производителя
+                                            составляет 3 месяца. Этот срок исчисляется с момента установки запчасти на
+                                            автомобиль в сервисном центре официального дилера.</li>
+                                        {% else %}
+                                        <li class="specs-list__item">The manufacturer's warranty period for spare parts
+                                            is 3 months. This period is calculated from the moment the spare part is
+                                            installed on the vehicle at an official dealer's service center.</li>
+                                        {% endif %}
                                     </ul>
                                 </div>
-                            </div>
-                            <div class="acardeon-card">
+                            </article>
+
+                            <!-- Accordion 5: Owner Responsibility -->
+                            <article class="acardeon-card">
                                 <input type="checkbox" id="accordion-5" class="accordion-checkbox">
                                 <label for="accordion-5" class="acardeon-card__header">
-                                    <h3 class="acardeon-card__title">Egasining mas’uliyati</h3>
-                                    <span class="acardeon-card__icon"></span>
+                                    <h2 class="acardeon-card__title">{% if LANGUAGE_CODE == 'uz' %}Egasining mas'uliyati{% elif LANGUAGE_CODE == 'ru' %}Ответственность владельца{% else%}Owner Responsibility{% endif %}</h2>
+                                    <span class="acardeon-card__icon" aria-hidden="true"></span>
                                 </label>
                                 <div class="acardeon-card__content">
                                     <ul class="specs-list custom-marker">
-                                        <li class="specs-list__item">Kafolatli va texnik xizmat ko‘rsatish yoki yuzaga
+                                        {% if LANGUAGE_CODE == 'uz' %}
+                                        <li class="specs-list__item">Kafolatli va texnik xizmat ko'rsatish yoki yuzaga
                                             kelgan nosozliklarni bartaraf etish uchun FAW Trucks rasmiy dilerlik servis
                                             markazlariga murojaat qilish zarur.</li>
                                         <li class="specs-list__item">Servis markaziga murojaat qilganda, egadan servis
-                                            kitobi talab etiladi. Amalga oshirilgan barcha ishlar bo‘yicha hujjatlar
-                                            egada saqlanishi kerak, bu ularni tasdiqlash imkonini beradi.S</li>
-                                        <li class="specs-list__item">Avtomobil egasi servis kitobida ko‘rsatilgan ishlar
-                                            ro‘yxatiga muvofiq rasmiy dilerlarda belgilangan texnik xizmatdan o‘z
-                                            vaqtida va to‘liq o‘tishi lozim. Ushbu shart buzilganda kafolat bekor
+                                            kitobi talab etiladi. Amalga oshirilgan barcha ishlar bo'yicha hujjatlar
+                                            egada saqlanishi kerak, bu ularni tasdiqlash imkonini beradi.</li>
+                                        <li class="specs-list__item">Avtomobil egasi servis kitobida ko'rsatilgan ishlar
+                                            ro'yxatiga muvofiq rasmiy dilerlarda belgilangan texnik xizmatdan o'z
+                                            vaqtida va to'liq o'tishi lozim. Ushbu shart buzilganda kafolat bekor
                                             qilinadi va avtomobilning ishlash muddati qisqaradi.</li>
-                                        <li class="specs-list__item">Egasi yonilg‘i, moylash suyuqliklari
-                                            yetishmasligi, yonib turgan signal chiroqlari va boshqa ogohlantirish
-                                            belgilari sababli yuzaga kelgan nosozliklar uchun mas’uldir.</li>
+                                        <li class="specs-list__item">Egasi yonilg'i, moylash suyuqliklari yetishmasligi,
+                                            yonib turgan signal chiroqlari va boshqa ogohlantirish belgilari sababli
+                                            yuzaga kelgan nosozliklar uchun mas'uldir.</li>
                                         <li class="specs-list__item">Texnikani -25°C va undan past haroratda ishlatishda
-                                            ishlab chiqaruvchi ko‘rsatmalariga muvofiq yonilg‘i va texnik suyuqliklarni
-                                            tanlash hamda avtomobilni qo‘shimcha issiqlik izolyatsiya vositalari bilan
+                                            ishlab chiqaruvchi ko'rsatmalariga muvofiq yonilg'i va texnik suyuqliklarni
+                                            tanlash hamda avtomobilni qo'shimcha issiqlik izolyatsiya vositalari bilan
                                             jihozlash talab etiladi.</li>
+                                        {% elif LANGUAGE_CODE == 'ru' %}
+                                        <li class="specs-list__item">Для гарантийного и технического обслуживания или
+                                            устранения возникших неисправностей необходимо обращаться в официальные
+                                            дилерские сервисные центры FAW Trucks.</li>
+                                        <li class="specs-list__item">При обращении в сервисный центр от владельца
+                                            требуется сервисная книжка. Документы по всем выполненным работам должны
+                                            храниться у владельца, это позволяет их подтвердить.</li>
+                                        <li class="specs-list__item">Владелец автомобиля обязан своевременно и в полном
+                                            объеме проходить предусмотренное техническое обслуживание у официальных
+                                            дилеров в соответствии с перечнем работ, указанным в сервисной книжке. При
+                                            нарушении этого условия гарантия аннулируется, а срок службы автомобиля
+                                            сокращается.</li>
+                                        <li class="specs-list__item">Владелец несет ответственность за неисправности,
+                                            возникшие из-за недостатка топлива, смазочных жидкостей, горящих сигнальных
+                                            ламп и других предупреждающих знаков.</li>
+                                        <li class="specs-list__item">При эксплуатации техники при температуре -25°C и
+                                            ниже требуется подбор топлива и технических жидкостей согласно указаниям
+                                            производителя, а также оснащение автомобиля дополнительными средствами
+                                            теплоизоляции.</li>
+                                        {% else %}
+                                        <li class="specs-list__item">For warranty and maintenance services or
+                                            troubleshooting, it is necessary to contact official FAW Trucks dealer
+                                            service centers.</li>
+                                        <li class="specs-list__item">When contacting the service center, the owner is
+                                            required to provide the service book. Documents for all work performed must
+                                            be kept by the owner for verification purposes.</li>
+                                        <li class="specs-list__item">The vehicle owner must undergo timely and complete
+                                            scheduled maintenance at official dealers in accordance with the list of
+                                            works specified in the service book. Violation of this condition voids the
+                                            warranty and shortens the vehicle's service life.</li>
+                                        <li class="specs-list__item">The owner is responsible for malfunctions caused by
+                                            lack of fuel, lubricants, lit warning lights, and other warning signs.</li>
+                                        <li class="specs-list__item">When operating equipment at temperatures of -25°C
+                                            and below, it is required to select fuel and technical fluids according to
+                                            the manufacturer's instructions and equip the vehicle with additional
+                                            thermal insulation.</li>
+                                        {% endif %}
                                     </ul>
                                 </div>
-                            </div>
-                            <div class="acardeon-card">
+                            </article>
+
+                            <!-- Accordion 6: When Defects Detected -->
+                            <article class="acardeon-card">
                                 <input type="checkbox" id="accordion-6" class="accordion-checkbox">
                                 <label for="accordion-6" class="acardeon-card__header">
-                                    <h3 class="acardeon-card__title">Nosozliklar aniqlanganda</h3>
-                                    <span class="acardeon-card__icon"></span>
+                                    <h2 class="acardeon-card__title">{% if LANGUAGE_CODE == 'uz' %}Nosozliklar aniqlanganda{% elif LANGUAGE_CODE == 'ru' %}При обнаружении неисправностей{%else %}When Defects Detected{% endif %}</h2>
+                                    <span class="acardeon-card__icon" aria-hidden="true"></span>
                                 </label>
                                 <div class="acardeon-card__content">
                                     <ul class="specs-list custom-marker">
+                                        {% if LANGUAGE_CODE == 'uz' %}
                                         <li class="specs-list__item">Agar avtomobilingizda nuqson yoki nosozliklar
                                             yuzaga kelsa, FAW Trucks rasmiy dileriga murojaat qiling. Mutaxassislar
-                                            sizga maslahat berishadi va zarurat tug‘ilganda texnikani eng yaqin servis
-                                            markaziga yetkazib berishni taklif qilishadi. Ba’zi hollarda servis kitobi
+                                            sizga maslahat berishadi va zarurat tug'ilganda texnikani eng yaqin servis
+                                            markaziga yetkazib berishni taklif qilishadi. Ba'zi hollarda servis kitobi
                                             talab qilinishi mumkin.</li>
-                                        <li class="specs-list__item">Servis markazida texnik xizmat ko‘rsatish vaqtida
-                                            holat kafolatli hisoblanishi aniqlanadi. Agar shunday bo‘lsa, barcha
-                                            ta’mirlash ishlari diler tomonidan bepul amalga oshiriladi. Kafolat asosida
-                                            almashtirilgan ehtiyot qismlar ishlab chiqaruvchiga tegishli bo‘lib qoladi.
+                                        <li class="specs-list__item">Servis markazida texnik xizmat ko'rsatish vaqtida
+                                            holat kafolatli hisoblanishi aniqlanadi. Agar shunday bo'lsa, barcha
+                                            ta'mirlash ishlari diler tomonidan bepul amalga oshiriladi. Kafolat asosida
+                                            almashtirilgan ehtiyot qismlar ishlab chiqaruvchiga tegishli bo'lib qoladi.
                                         </li>
+                                        {% elif LANGUAGE_CODE == 'ru' %}
+                                        <li class="specs-list__item">Если в вашем автомобиле возникли дефекты или
+                                            неисправности, обратитесь к официальному дилеру FAW Trucks. Специалисты
+                                            проконсультируют вас и при необходимости предложат доставку техники в
+                                            ближайший сервисный центр. В некоторых случаях может потребоваться сервисная
+                                            книжка.</li>
+                                        <li class="specs-list__item">В сервисном центре при техническом обслуживании
+                                            определяется, является ли случай гарантийным. Если да, то все ремонтные
+                                            работы выполняются дилером бесплатно. Запчасти, замененные по гарантии,
+                                            остаются в собственности производителя.</li>
+                                        {% else %}
+                                        <li class="specs-list__item">If defects or malfunctions occur in your vehicle,
+                                            contact an official FAW Trucks dealer. Specialists will advise you and, if
+                                            necessary, offer delivery of the equipment to the nearest service center. In
+                                            some cases, a service book may be required.</li>
+                                        <li class="specs-list__item">At the service center during maintenance, it is
+                                            determined whether the case is covered by warranty. If so, all repair work
+                                            is performed by the dealer free of charge. Parts replaced under warranty
+                                            remain the property of the manufacturer.</li>
+                                        {% endif %}
                                     </ul>
                                 </div>
-                            </div>
+                            </article>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="faw-history-title fade-in">
-        <h3 class="reveal-type">Texnik xizmat ko‘rsatish</h3>
-    </div>
-    <!-- Section - Parallax Divider Start -->
-    <div class="mxd-section padding-grid-pre-mtext">
+    </section>
+
+    <!-- Maintenance Section -->
+    <header class="faw-history-title fade-in">
+        <h2 class="reveal-type">{% if LANGUAGE_CODE == 'uz' %}Texnik xizmat ko'rsatish{% elif LANGUAGE_CODE == 'ru'%}Техническое обслуживание{% else %}Maintenance{% endif %}</h2>
+    </header>
+
+    <section class="mxd-section padding-grid-pre-mtext">
         <div class="mxd-container">
             <div class="mxd-divider">
-                <div class="mxd-divider__image  parallax-img">
-                    <img src="{% static 'images/service-img/2.JPG' %}" alt="">
+                <div class="mxd-divider__image parallax-img">
+                    <img src="{% static 'images/service-img/2.JPG' %}"
+                        alt="{% if LANGUAGE_CODE == 'uz' %}Texnik xizmat{% elif LANGUAGE_CODE == 'ru' %}Техобслуживание{% else %}Maintenance{% endif %}"
+                        loading="lazy">
                 </div>
             </div>
         </div>
-    </div>
-    <div class="mxd-hero-00__bottom">
+    </section>
+
+    <article class="mxd-hero-00__bottom">
         <div class="hero-00-manifest loading__fade">
             <p class="mxd-manifest reveal-type">
-                FAW Trucks yuk avtomobillarini texnik xizmat ko‘rsatishga taklif etamiz — bu rejalashtirilgan
-                profilaktika ishlari bo‘lib, texnikani soz holatda ushlab turishga va jiddiy nosozliklarning oldini
+                {% if LANGUAGE_CODE == 'uz' %}
+                FAW Trucks yuk avtomobillarini texnik xizmat ko'rsatishga taklif etamiz — bu rejalashtirilgan
+                profilaktika ishlari bo'lib, texnikani soz holatda ushlab turishga va jiddiy nosozliklarning oldini
                 olishga yordam beradi.
-                <br>
-                Texnik xizmat ko‘rsatish ikki bosqichda amalga oshiriladi:
                 <br><br>
-                •Ekspluatatsiyaning boshlang‘ich davrida servis;
-                <br><br>
-                •Asosiy davrda servis.
+                Texnik xizmat ko'rsatish ikki bosqichda amalga oshiriladi:
+                <br>• Ekspluatatsiyaning boshlang'ich davrida servis
+                <br>• Asosiy davrda servis
                 <br><br>
                 Biz ishimizning ishonchliligini, faqat original ehtiyot qismlardan foydalanishni va FAW standartlariga
                 muvofiq xalqaro darajadagi xizmatni kafolatlaymiz.
-                <br>
-                Servis oldidan dilerlik tarmog‘idagi markazlarda xizmatlarning mavjudligini aniqlab oling.
+                <br><br>
+                Servis oldidan dilerlik tarmog'idagi markazlarda xizmatlarning mavjudligini aniqlab oling.
+                {% elif LANGUAGE_CODE == 'ru' %}
+                Приглашаем на техническое обслуживание грузовых автомобилей FAW Trucks — это плановые профилактические
+                работы, которые помогают поддерживать технику в исправном состоянии и предотвращать серьезные
+                неисправности.
+                <br><br>
+                Техническое обслуживание проводится в два этапа:
+                <br>• Сервис в начальный период эксплуатации
+                <br>• Сервис в основной период
+                <br><br>
+                Мы гарантируем надежность работы, использование только оригинальных запчастей и обслуживание
+                международного уровня в соответствии со стандартами FAW.
+                <br><br>
+                Перед сервисом уточните наличие услуг в центрах дилерской сети.
+                {% else %}
+                We invite you for maintenance of FAW Trucks — these are planned preventive works that help keep
+                equipment in good condition and prevent serious malfunctions.
+                <br><br>
+                Maintenance is carried out in two stages:
+                <br>• Service during the initial operating period
+                <br>• Service during the main period
+                <br><br>
+                We guarantee reliable work, use of only original spare parts, and international-level service in
+                accordance with FAW standards.
+                <br><br>
+                Before service, clarify the availability of services at dealer network centers.
+                {% endif %}
             </p>
         </div>
-    </div>
-    <div class="mxd-section padding-blog">
+    </article>
+
+    <!-- Image Gallery 1 -->
+    <section class="mxd-section padding-blog">
         <div class="mxd-container grid-container">
-            <!-- Block - Blog Preview Cards Start -->
             <div class="mxd-block">
                 <div class="mxd-blog-preview">
                     <div class="container-fluid p-0">
                         <div class="row g-0">
-                            <!-- item -->
+                            {% for img in '451' %}
                             <div class="col-12 col-xl-4 mxd-blog-preview__item mxd-grid-item animate-card-3">
-                                <div class="mxd-blog-preview__image blog-preview-image-2 parallax-img-small">
-                                    <img src="{% static 'images/service-img/card/4.jpg' %}" alt="Blog Preview Image">
+                                <div class="mxd-blog-preview__image blog-preview-image-{{ forloop.counter }} parallax-img-small">
+                                    <img src="{% static 'images/service-img/card/'|add:img|add:'.jpg' %}"
+                                        alt="Service Image" loading="lazy">
                                 </div>
                             </div>
-                            <!-- item -->
-                            <div class="col-12 col-xl-4 mxd-blog-preview__item mxd-grid-item animate-card-3">
-
-                                <div class="mxd-blog-preview__image blog-preview-image-3 parallax-img-small">
-                                    <img src="{% static 'images/service-img/card/5.jpg' %}" alt="Blog Preview Image">
-                                </div>
-                            </div>
-                            <!-- item -->
-                            <div class="col-12 col-xl-4 mxd-blog-preview__item mxd-grid-item animate-card-3">
-
-                                <div class="mxd-blog-preview__image blog-preview-image-3 parallax-img-small">
-                                    <img src="{% static 'images/service-img/card/1.jpg' %}" alt="Blog Preview Image">
-                                </div>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Block - Blog Preview Cards End -->
         </div>
-    </div>
-    <div class="faw-history-title fade-in">
-        <h3 class="reveal-type">Ehtiyot qismlar FAW</h3>
-    </div>
-    <!-- Section - Parallax Divider Start -->
-    <div class="mxd-section padding-grid-pre-mtext">
+    </section>
+
+    <!-- Spare Parts Section -->
+    <header class="faw-history-title fade-in">
+        <h2 class="reveal-type">{% if LANGUAGE_CODE == 'uz' %}Ehtiyot qismlar FAW{% elif LANGUAGE_CODE == 'ru'%}Запчасти FAW{% else %}FAW Spare Parts{% endif %}</h2>
+    </header>
+
+    <section class="mxd-section padding-grid-pre-mtext">
         <div class="mxd-container">
             <div class="mxd-divider">
-                <div class="mxd-divider__image  parallax-img">
-                    <img src="{% static 'images/service-img/3.jpg' %}" alt="">
+                <div class="mxd-divider__image parallax-img">
+                    <img src="{% static 'images/service-img/3.jpg' %}"
+                        alt="{% if LANGUAGE_CODE == 'uz' %}FAW ehtiyot qismlar{% elif LANGUAGE_CODE == 'ru' %}Запчасти FAW{% else %}FAW spare parts{% endif %}"
+                        loading="lazy">
                 </div>
             </div>
         </div>
-    </div>
-    <div class="mxd-hero-00__bottom">
+    </section>
+
+    <article class="mxd-hero-00__bottom">
         <div class="hero-00-manifest loading__fade">
             <p class="mxd-manifest reveal-type">
+                {% if LANGUAGE_CODE == 'uz' %}
                 Ishlab chiqaruvchidan taqdim etiladigan FAW ehtiyot qismlari – bu sifat va ishonchlilik kafolati.
                 Dvigatel, uzatmalar qutisi, shassi, kuzov qismlari hamda boshqa butlovchi qismlar transport
                 vositalarining xavfsizligini oshiradi, xizmat muddatini uzaytiradi va ekspluatatsiya xarajatlarini
                 kamaytiradi.
                 <br><br>
                 Har bir original ehtiyot qism aniq modelning xususiyatlarini hisobga olgan holda ishlab chiqariladi.
-                Ular foydalanishga chiqarilishidan avval qat’iy sifat nazoratidan o‘tadi, mustahkamlik va uzoq
-                muddatlilik bo‘yicha sinovdan o‘tkaziladi.
+                Ular foydalanishga chiqarilishidan avval qat'iy sifat nazoratidan o'tadi, mustahkamlik va uzoq
+                muddatlilik bo'yicha sinovdan o'tkaziladi.
                 <br><br>
-                Ehtiyot qismlar mavjudligini dilerlik tarmog‘idagi do‘konlardan bilib olishingiz yoki sayt orqali so‘rov
+                Ehtiyot qismlar mavjudligini dilerlik tarmog'idagi do'konlardan bilib olishingiz yoki sayt orqali so'rov
                 qoldirishingiz mumkin.
+                {% elif LANGUAGE_CODE == 'ru' %}
+                Запчасти FAW от производителя — это гарантия качества и надежности. Двигатель, коробка передач, шасси,
+                кузовные и другие комплектующие детали повышают безопасность транспортных средств, продлевают срок
+                службы и снижают эксплуатационные расходы.
+                <br><br>
+                Каждая оригинальная запчасть производится с учетом особенностей конкретной модели. Перед вводом в
+                эксплуатацию они проходят строгий контроль качества, испытания на прочность и долговечность.
+                <br><br>
+                Узнать о наличии запчастей можно в магазинах дилерской сети или оставить запрос через сайт.
+                {% else %}
+                FAW spare parts from the manufacturer are a guarantee of quality and reliability. Engine, gearbox,
+                chassis, body, and other components increase vehicle safety, extend service life, and reduce operating
+                costs.
+                <br><br>
+                Each original spare part is manufactured taking into account the characteristics of a specific model.
+                Before being put into operation, they undergo strict quality control, strength and durability tests.
+                <br><br>
+                You can find out about the availability of spare parts at dealer network stores or leave a request
+                through the website.
+                {% endif %}
             </p>
         </div>
-    </div>
+    </article>
 
-    <!-- Блок — карточки превью (конец) -->
-    <!-- Футер (начало) -->
+    <!-- Footer -->
     {% include 'main/includes/footer.html' %}
-    <!-- Футер (конец) -->
-    <!-- To Top Button Start -->
-    <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
-        <i class="ph ph-arrow-up"></i>
-    </a>
-    <!-- To Top Button End -->
 
-    <!-- Load Scripts Start -->
+    <!-- To Top Button -->
+    <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay"
+        aria-label="{% if LANGUAGE_CODE == 'uz' %}Yuqoriga{% elif LANGUAGE_CODE == 'ru' %}Наверх{% else %}To top{% endif %}">
+        <i class="ph ph-arrow-up" aria-hidden="true"></i>
+    </a>
+
+    <!-- Scripts -->
     <script src="{% static 'js/libs.min.js' %}"></script>
-    <!-- <script src="template/js/app.js"></script> -->
+    <script src="{% static 'js/error-logger.js' %}"></script>
     <script src="{% static 'js/faw.js' %}"></script>
     <script src="{% static 'js/about.js' %}"></script>
-
-
-</body>
-
-</html>
