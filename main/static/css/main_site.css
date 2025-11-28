@@ -9728,6 +9728,14 @@ form textarea:required:valid {
     .mxd-hero-06 {
         height: 24vh;
     }
+
+    .btn-mobile-icon {
+      display: none;
+    }
+
+    * {
+      padding: 0;
+    }
 }
 
 .mxd-hero-06__wrap {
