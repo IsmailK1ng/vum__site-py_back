@@ -161,11 +161,11 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.locale.LocaleMiddleware',  # ← Сначала стандартный
-    'myproject.middleware.ForceRussianMiddleware',  # ← Потом наш (перекрывает LocaleMiddleware)
+    'django.middleware.locale.LocaleMiddleware',  
+    'myproject.middleware.ForceRussianMiddleware', 
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'myproject.middleware.RefreshUserPermissionsMiddleware',
+    'myproject.middleware.RefreshUserPermissionsMiddleware', 
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'reversion.middleware.RevisionMiddleware',
@@ -330,8 +330,6 @@ CKEDITOR_CONFIGS = {
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
 
-# ============ ЛОГИРОВАНИЕ ============
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -343,7 +341,7 @@ LOGGING = {
     },
     'handlers': {
         'errors_file': {
-            'level': 'ERROR',   
+            'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': BASE_DIR / 'logs' / 'errors.log',
             'maxBytes': 1024 * 1024 * 10,
@@ -352,23 +350,23 @@ LOGGING = {
             'encoding': 'utf-8',
         },
         'amocrm_file': {
-            'level': 'ERROR', 
+            'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': BASE_DIR / 'logs' / 'amocrm.log',
-            'maxBytes': 1024 * 1024 * 10,
+            'maxBytes': 1024 * 1024 * 10,  
             'backupCount': 5,
             'formatter': 'verbose',
             'encoding': 'utf-8',
         },
         'console': {
-            'level': 'ERROR',
+            'level': 'WARNING', 
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
     },
     'root': {
         'handlers': ['errors_file', 'console'],
-        'level': 'ERROR',
+        'level': 'WARNING',  
     },
     'loggers': {
         'django': {
@@ -381,9 +379,24 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
+        'django.db.backends': {
+            'handlers': ['errors_file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
         'amocrm': {
-            'handlers': ['amocrm_file'], 
-            'level': 'ERROR',  
+            'handlers': ['amocrm_file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'main': { 
+            'handlers': ['errors_file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'myproject': { 
+            'handlers': ['errors_file'],
+            'level': 'WARNING',
             'propagate': False,
         },
     },

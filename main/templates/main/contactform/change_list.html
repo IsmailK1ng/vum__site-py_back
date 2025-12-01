@@ -75,17 +75,3 @@
 
 <div style="display:none;">{{ block.super }}</div>
 {% endblock %}
-
-{% block extrahead %}
-{{ block.super }}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Удаляем параметр e=1 из всех ссылок на странице
-    document.querySelectorAll('a').forEach(function(link) {
-        if (link.href.includes('?e=1') || link.href.includes('&e=1')) {
-            link.href = link.href.replace(/[?&]e=1/, '');
-        }
-    });
-});
-</script>
-{% endblock %}

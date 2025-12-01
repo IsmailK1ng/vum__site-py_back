@@ -1,38 +1,17 @@
 (function () {
     'use strict';
 
-    console.log('=== ContactForm Admin Init ===');
-
     if (typeof window.django === 'undefined' || typeof window.django.jQuery === 'undefined') {
-        window.logJSError('jQuery not found in admin', { file: 'contactform_admin.js' });
         return;
     }
 
     const $ = window.django.jQuery;
 
-    // ========== УБИРАЕМ e=1 ИЗ URL ==========
-    (function removeEParam() {
-        const url = new URL(window.location.href);
-        if (url.searchParams.has('e')) {
-            console.log('🔄 Found e=1, removing...');
-            url.searchParams.delete('e');
-            window.history.replaceState({}, '', url.toString());
-            console.log('✅ Removed e=1 from URL');
-        }
-    })();
-
     $(document).ready(function () {
-        console.log('DOM ready');
-
         const $form = $('#leads-filter-form');
-        if ($form.length === 0) {
-            window.logJSError('Form #leads-filter-form not found', { file: 'contactform_admin.js' });
-            return;
-        }
+        if ($form.length === 0) return;
 
-        console.log('Form found');
-
-        // ==================== ПРИМЕНИТЬ ФИЛЬТРЫ ====================
+        // Применить фильтры
         $form.on('submit', function (e) {
             e.preventDefault();
 
@@ -49,22 +28,20 @@
             });
 
             const queryString = params.toString();
-            const newUrl = window.location.pathname + (queryString ? '?' + queryString : '');
-            window.location.href = newUrl;
+            window.location.href = window.location.pathname + (queryString ? '?' + queryString : '');
         });
 
-        // ==================== СБРОС ====================
+        // Сброс
         $('#btn-reset').on('click', function (e) {
             e.preventDefault();
             window.location.href = window.location.pathname;
         });
 
-        // ==================== ЭКСПОРТ ====================
+        // Экспорт
         $('#btn-export').on('click', function (e) {
             e.preventDefault();
 
             const currentParams = new URLSearchParams(window.location.search);
-            currentParams.delete('e');
 
             const selectedIds = [];
             $('input[name="_selected_action"]:checked').each(function () {
@@ -112,7 +89,7 @@
             $exportForm.remove();
         });
 
-        // ==================== СЧЁТЧИК ====================
+        // Счётчик выбранных
         function updateDeleteButton() {
             const count = $('input[name="_selected_action"]:checked').length;
             $('#count').text(count);
@@ -123,7 +100,7 @@
         $(document).on('change', '#action-toggle', updateDeleteButton);
         updateDeleteButton();
 
-        // ==================== УДАЛИТЬ ====================
+        // Удаление
         $('#btn-delete').on('click', function (e) {
             e.preventDefault();
             const count = $('input[name="_selected_action"]:checked').length;
@@ -137,7 +114,6 @@
                 const $changelistForm = $('#changelist-form');
 
                 if ($changelistForm.length === 0) {
-                    window.logJSError('Form #changelist-form not found', { file: 'contactform_admin.js' });
                     alert('Ошибка: форма не найдена');
                     return;
                 }
@@ -155,14 +131,12 @@
             }
         });
 
-        // ==================== ENTER ====================
+        // Enter для применения фильтров
         $form.find('input[type="text"], input[type="date"]').on('keypress', function (e) {
             if (e.which === 13) {
                 e.preventDefault();
                 $form.submit();
             }
         });
-
-        console.log('✅ All handlers initialized');
     });
 })();

@@ -1,6 +1,5 @@
 from django.utils import translation
 from django.conf import settings
-from django.http import HttpResponseRedirect
 import logging
 
 logger = logging.getLogger('django')
@@ -65,36 +64,4 @@ class RefreshUserPermissionsMiddleware:
         
         except Exception as e:
             logger.error(f"Ошибка в RefreshUserPermissionsMiddleware: {str(e)}", exc_info=True)
-            return self.get_response(request)
-
-
-class PreserveFiltersMiddleware:
-    """Сохранение фильтров ContactForm"""
-    
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        try:
-            if request.path == '/admin/main/contactform/' and request.method == 'GET':
-                
-                has_e = 'e' in request.GET
-                has_filters = any(k != 'e' for k in request.GET.keys())
-                
-                if has_e and not has_filters:
-                    saved = request.session.get('contactform_filters')
-                    
-                    if saved:
-                        params = [f"{key}={value}" for key, values in saved.items() for value in values]
-                        new_url = f"{request.path}?{'&'.join(params)}"
-                        return HttpResponseRedirect(new_url)
-                
-                elif not has_e and has_filters:
-                    request.session['contactform_filters'] = dict(request.GET.lists())
-                    request.session.modified = True
-
-            return self.get_response(request)
-        
-        except Exception as e:
-            logger.error(f"Ошибка в PreserveFiltersMiddleware: {str(e)}", exc_info=True)
             return self.get_response(request)

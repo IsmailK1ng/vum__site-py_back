@@ -317,6 +317,8 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         'priority', 'status', 'amocrm_badge', 
         'manager', 'created_at', 'action_buttons'
     ]
+    # list_editable = ['priority', 'status', 'manager']  # ← ДОБАВЛЕНО
+    list_filter = ['status', 'priority', 'region']
     search_fields = ['name', 'phone', 'amocrm_lead_id']
     readonly_fields = ['created_at', 'amocrm_sent_at', 'amocrm_lead_link']
     autocomplete_fields = ['manager']
@@ -579,6 +581,23 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         
         return qs
 
+    def get_changelist(self, request, **kwargs):
+        """Переопределяем ChangeList чтобы игнорировать date_from/date_to"""
+        from django.contrib.admin.views.main import ChangeList
+        
+        class CustomChangeList(ChangeList):
+            def get_filters_params(self, params=None):
+                """Убираем date_from и date_to из lookup параметров"""
+                lookup_params = super().get_filters_params(params)
+                
+                # Удаляем наши кастомные параметры из lookup
+                lookup_params.pop('date_from', None)
+                lookup_params.pop('date_to', None)
+                
+                return lookup_params
+        
+        return CustomChangeList
+    
     def changelist_view(self, request, extra_context=None):
         """Контекст для фильтров"""
         extra_context = extra_context or {}
@@ -859,7 +878,6 @@ class BecomeADealerApplicationForm(forms.ModelForm):
 class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
     form = BecomeADealerApplicationForm
     list_display = ['dealer_badge', 'name', 'company_name', 'phone', 'region', 'experience_years', 'status', 'priority', 'manager', 'created_at', 'action_buttons']
-    list_filter = ['status', 'priority', 'region', 'created_at']
     search_fields = ['name', 'company_name', 'phone', 'message']
     list_editable = ['status', 'priority', 'manager']
     readonly_fields = ['created_at']
