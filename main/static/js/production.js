@@ -239,10 +239,20 @@ class ProductsManager {
 
     // 3. Обновляем hero изображение
     const heroImage = document.querySelector('.mxd-hero-06__img img');
-    if (heroImage) {
+    if (heroImage && categoryInfo.hero_image) {
       const staticPath = `/static/${categoryInfo.hero_image}`;
-      heroImage.src = staticPath;
-      heroImage.alt = categoryInfo.title;
+
+      // Проверяем существование изображения
+      const testImg = new Image();
+      testImg.onload = () => {
+        heroImage.src = staticPath;
+        heroImage.alt = categoryInfo.title;
+      };
+      testImg.onerror = () => {
+        // Если нет - оставляем текущее или ставим заглушку
+        console.warn(`Hero image not found: ${staticPath}`);
+      };
+      testImg.src = staticPath;
     }
 
     // 4. Обновляем хлебные крошки
@@ -262,17 +272,30 @@ class ProductsManager {
     try {
       this.showLoader();
 
-      // Загружаем ВСЕ продукты (без фильтра на бэкенде)
-      const response = await fetch(this.apiUrl);
+      // ✅ Загружаем ВСЕ страницы
+      let allProducts = [];
+      let nextUrl = this.apiUrl;
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      while (nextUrl) {
+        const response = await fetch(nextUrl);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Добавляем продукты из текущей страницы
+        const products = data.results || data.products || data || [];
+        allProducts = allProducts.concat(products);
+
+        // Проверяем есть ли следующая страница
+        nextUrl = data.next || null;
       }
 
-      const data = await response.json();
+      this.allProducts = allProducts;
 
-      // Поддержка разных форматов ответа
-      this.allProducts = data.results || data.products || data || [];
+      console.log(`✅ Загружено ${this.allProducts.length} продуктов`);
 
       // ✅ ФИЛЬТРУЕМ продукты по категории на фронтенде
       if (this.currentCategory) {
@@ -289,6 +312,8 @@ class ProductsManager {
 
           return false;
         });
+
+        console.log(`✅ Найдено ${this.filteredProducts.length} продуктов в категории "${this.currentCategory}"`);
       } else {
         this.filteredProducts = [...this.allProducts];
       }
@@ -303,11 +328,14 @@ class ProductsManager {
       this.hideLoader();
 
     } catch (error) {
-      window.logJSError('Products loading error: ' + error.message, {
-        file: 'products.js',
-        category: this.currentCategory,
-        url: this.apiUrl
-      });
+      console.error('Products loading error:', error);
+      if (window.logJSError) {
+        window.logJSError('Products loading error: ' + error.message, {
+          file: 'products.js',
+          category: this.currentCategory,
+          url: this.apiUrl
+        });
+      }
       this.showError(error.message);
     }
   }
@@ -494,16 +522,16 @@ class ProductsManager {
         }
       } else {
         // ✅ Ищем среди уже отфильтрованных по категории продуктов
-        const categoryFiltered = this.currentCategory 
+        const categoryFiltered = this.currentCategory
           ? this.allProducts.filter(product => {
-              if (product.category === this.currentCategory) {
-                return true;
-              }
-              if (product.all_categories && Array.isArray(product.all_categories)) {
-                return product.all_categories.some(cat => cat.slug === this.currentCategory);
-              }
-              return false;
-            })
+            if (product.category === this.currentCategory) {
+              return true;
+            }
+            if (product.all_categories && Array.isArray(product.all_categories)) {
+              return product.all_categories.some(cat => cat.slug === this.currentCategory);
+            }
+            return false;
+          })
           : this.allProducts;
 
         this.filteredProducts = categoryFiltered.filter(product => {

@@ -91,7 +91,6 @@ function startLoader() {
 startLoader();
 
 imgLoad.on('done', instance => {
-  hideLoader();
   pageAppearance();
 });
 
