@@ -945,6 +945,96 @@ class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
 
 # ============ ПРОДУКТЫ ============
 
+# КАСТОМНЫЙ ФИЛЬТР ДЛЯ КАТЕГОРИЙ
+class ProductCategoryFilter(admin.SimpleListFilter):
+    """Фильтр по категориям с учетом основной и дополнительных"""
+    title = 'категория'
+    parameter_name = 'category_filter'
+    
+    def lookups(self, request, model_admin):
+        """Возвращаем все доступные категории"""
+        return Product.CATEGORY_CHOICES
+    
+    def queryset(self, request, queryset):
+        """Фильтруем по основной И дополнительным категориям"""
+        if self.value():
+            from django.db.models import Q
+            
+            # Ищем продукты где:
+            # 1. Основная категория совпадает
+            # 2. ИЛИ категория есть в дополнительных (через LIKE)
+            return queryset.filter(
+                Q(category=self.value()) | 
+                Q(categories__contains=self.value())
+            )
+        return queryset
+
+class ProductCategoriesForm(forms.ModelForm):
+    """Форма с множественным выбором категорий"""
+    selected_categories = forms.MultipleChoiceField(
+        choices=Product.CATEGORY_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        required=True,  # ✅ Обязательно выбрать хотя бы одну
+        label="Категории",
+        help_text="Выберите одну или несколько категорий, в которых будет отображаться продукт"
+    )
+    
+    class Meta:
+        model = Product
+        # ✅ Исключаем старые поля из формы
+        exclude = ['category', 'categories']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # ✅ Предзаполняем выбранные категории
+        if self.instance.pk:
+            selected = []
+            
+            # Добавляем основную категорию
+            if self.instance.category:
+                selected.append(self.instance.category)
+            
+            # Добавляем дополнительные категории
+            if self.instance.categories:
+                additional = [cat.strip() for cat in self.instance.categories.split(',') if cat.strip()]
+                selected.extend(additional)
+            
+            # Убираем дубликаты
+            selected = list(dict.fromkeys(selected))
+            
+            self.fields['selected_categories'].initial = selected
+    
+    def clean_selected_categories(self):
+        """Валидация: должна быть выбрана хотя бы одна категория"""
+        categories = self.cleaned_data.get('selected_categories', [])
+        
+        if not categories:
+            raise forms.ValidationError("Выберите хотя бы одну категорию")
+        
+        return categories
+    
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        
+        # ✅ Получаем выбранные категории
+        selected = self.cleaned_data.get('selected_categories', [])
+        
+        if selected:
+            # Первая категория становится основной
+            instance.category = selected[0]
+            
+            # Остальные категории идут в дополнительные
+            if len(selected) > 1:
+                instance.categories = ','.join(selected[1:])
+            else:
+                instance.categories = ''
+        
+        if commit:
+            instance.save()
+        return instance
+
+
 class ProductParameterInline(TranslationTabularInline):
     model = ProductParameter
     extra = 1
@@ -973,24 +1063,26 @@ class ProductGalleryInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
-    list_display = ['thumbnail', 'title', 'category', 'is_active', 'is_featured', 'slider_order', 'order']
-    list_filter = ['category', 'is_active', 'is_featured']
+    form = ProductCategoriesForm  # ✅ Используем кастомную форму
+    
+    list_display = ['thumbnail', 'title', 'all_categories_display', 'is_active', 'is_featured', 'slider_order', 'order']
+    list_filter = [ProductCategoryFilter, 'is_active', 'is_featured'] 
     search_fields = ['title', 'slug']
     list_editable = ['is_active', 'is_featured', 'slider_order', 'order']
     prepopulated_fields = {'slug': ('title',)}
     history_latest_first = True
     actions = ['add_to_slider', 'remove_from_slider']
     
-    list_per_page = 15  # Показывать по 25 продуктов на странице
-    show_full_result_count = False  # Отключает подсчёт всех записей (ускоряет загрузку)
-    list_select_related = []  # Оптимизация запросов
+    list_per_page = 15
+    show_full_result_count = False
+    list_select_related = []
     
     fieldsets = (
         ('Основная информация', {
             'fields': (
                 ('title', 'slug'), 
-                ('category', 'order'), 
-                ('is_active', 'is_featured'), 
+                'selected_categories',  # ✅ Единый чеклист категорий
+                ('order', 'is_active', 'is_featured'), 
                 ('main_image', 'card_image')
             )
         }),
@@ -1016,6 +1108,42 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
             )
         return "—"
     thumbnail.short_description = "Фото"
+    
+    # ✅ Обновленный метод для отображения ВСЕХ категорий
+    def all_categories_display(self, obj):
+        """Отображение всех категорий продукта"""
+        categories = obj.get_all_categories()
+        
+        if not categories:
+            return "—"
+        
+        # Получаем названия категорий
+        category_names = []
+        for cat_slug in categories:
+            for slug, name in Product.CATEGORY_CHOICES:
+                if slug == cat_slug:
+                    category_names.append(name)
+                    break
+        
+        if category_names:
+            # Первая категория - основная (синий цвет)
+            tags = []
+            for idx, name in enumerate(category_names):
+                if idx == 0:
+                    # Основная категория
+                    tags.append(
+                        f'<span style="background:#1976d2;color:white;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;">{name}</span>'
+                    )
+                else:
+                    # Дополнительные категории
+                    tags.append(
+                        f'<span style="background:#d3ecff;color:#006ad3;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:400;">{name}</span>'
+                    )
+            
+            return format_html(' '.join(tags))
+        return "—"
+    
+    all_categories_display.short_description = "Категории"
     
     def add_to_slider(self, request, queryset):
         """Добавить выбранные продукты в слайдер"""

@@ -1,5 +1,6 @@
 /**
  * FAW Products - Динамическая загрузка карточек с поддержкой переводов
+ * Обновлено: поддержка множественных категорий
  */
 
 class ProductsManager {
@@ -261,13 +262,8 @@ class ProductsManager {
     try {
       this.showLoader();
 
-      // Формируем URL с категорией
-      let url = this.apiUrl;
-      if (this.currentCategory) {
-        url += `?category=${this.currentCategory}`;
-      }
-
-      const response = await fetch(url);
+      // Загружаем ВСЕ продукты (без фильтра на бэкенде)
+      const response = await fetch(this.apiUrl);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -277,10 +273,27 @@ class ProductsManager {
 
       // Поддержка разных форматов ответа
       this.allProducts = data.results || data.products || data || [];
-      this.filteredProducts = [...this.allProducts];
 
+      // ✅ ФИЛЬТРУЕМ продукты по категории на фронтенде
+      if (this.currentCategory) {
+        this.filteredProducts = this.allProducts.filter(product => {
+          // Проверяем основную категорию
+          if (product.category === this.currentCategory) {
+            return true;
+          }
 
-      if (this.allProducts.length === 0) {
+          // Проверяем дополнительные категории
+          if (product.all_categories && Array.isArray(product.all_categories)) {
+            return product.all_categories.some(cat => cat.slug === this.currentCategory);
+          }
+
+          return false;
+        });
+      } else {
+        this.filteredProducts = [...this.allProducts];
+      }
+
+      if (this.filteredProducts.length === 0) {
         this.showNoResults();
         return;
       }
@@ -293,7 +306,7 @@ class ProductsManager {
       window.logJSError('Products loading error: ' + error.message, {
         file: 'products.js',
         category: this.currentCategory,
-        url: url
+        url: this.apiUrl
       });
       this.showError(error.message);
     }
@@ -465,9 +478,35 @@ class ProductsManager {
       const query = e.target.value.toLowerCase().trim();
 
       if (query === '') {
-        this.filteredProducts = [...this.allProducts];
+        // ✅ Сбрасываем на отфильтрованные по категории продукты
+        if (this.currentCategory) {
+          this.filteredProducts = this.allProducts.filter(product => {
+            if (product.category === this.currentCategory) {
+              return true;
+            }
+            if (product.all_categories && Array.isArray(product.all_categories)) {
+              return product.all_categories.some(cat => cat.slug === this.currentCategory);
+            }
+            return false;
+          });
+        } else {
+          this.filteredProducts = [...this.allProducts];
+        }
       } else {
-        this.filteredProducts = this.allProducts.filter(product => {
+        // ✅ Ищем среди уже отфильтрованных по категории продуктов
+        const categoryFiltered = this.currentCategory 
+          ? this.allProducts.filter(product => {
+              if (product.category === this.currentCategory) {
+                return true;
+              }
+              if (product.all_categories && Array.isArray(product.all_categories)) {
+                return product.all_categories.some(cat => cat.slug === this.currentCategory);
+              }
+              return false;
+            })
+          : this.allProducts;
+
+        this.filteredProducts = categoryFiltered.filter(product => {
           const title = (product.title || product.name || '').toLowerCase();
           return title.includes(query);
         });
