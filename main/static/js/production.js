@@ -289,27 +289,27 @@ class ProductsManager {
         const products = data.results || data.products || data || [];
         allProducts = allProducts.concat(products);
 
-        // Проверяем есть ли следующая страница
-        nextUrl = data.next || null;
+        // ✅ ИСПРАВЛЕНИЕ: Приводим URL к HTTPS
+        if (data.next) {
+          nextUrl = data.next.replace('http://', 'https://');
+        } else {
+          nextUrl = null;
+        }
       }
 
       this.allProducts = allProducts;
 
       console.log(`✅ Загружено ${this.allProducts.length} продуктов`);
 
-      // ✅ ФИЛЬТРУЕМ продукты по категории на фронтенде
+      // ФИЛЬТРУЕМ продукты по категории на фронтенде
       if (this.currentCategory) {
         this.filteredProducts = this.allProducts.filter(product => {
-          // Проверяем основную категорию
           if (product.category === this.currentCategory) {
             return true;
           }
-
-          // Проверяем дополнительные категории
           if (product.all_categories && Array.isArray(product.all_categories)) {
             return product.all_categories.some(cat => cat.slug === this.currentCategory);
           }
-
           return false;
         });
 
@@ -338,7 +338,7 @@ class ProductsManager {
       }
       this.showError(error.message);
     }
-  }
+  }ы
 
   renderCards() {
     const container = document.querySelector('.faw-truck-card-container');
