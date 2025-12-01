@@ -161,12 +161,38 @@ class ProductCardSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
     category_display = serializers.CharField(source='get_category_display', read_only=True)
     
+    # ✅ Новое поле
+    all_categories = serializers.SerializerMethodField()
+    
     class Meta:
         model = Product
         fields = [
             'id', 'title', 'slug', 'category', 'category_display',
+            'all_categories',  # ✅ добавили
             'image_url', 'card_specs', 'is_featured', 'order'
         ]
+    
+    def get_all_categories(self, obj):
+        """Возвращает все категории продукта (основную + дополнительные)"""
+        categories = [obj.category]  # Основная категория
+        
+        # Добавляем дополнительные
+        if obj.categories:
+            additional = [cat.strip() for cat in obj.categories.split(',') if cat.strip()]
+            categories.extend(additional)
+        
+        # Убираем дубликаты
+        categories = list(dict.fromkeys(categories))
+        
+        # Возвращаем с названиями
+        result = []
+        for cat_slug in categories:
+            for slug, name in Product.CATEGORY_CHOICES:
+                if slug == cat_slug:
+                    result.append({'slug': slug, 'name': name})
+                    break
+        
+        return result
     
     def get_image_url(self, obj):
         """Возвращает URL изображения для карточки"""
@@ -228,14 +254,52 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     category_display = serializers.CharField(source='get_category_display', read_only=True)
     title = serializers.SerializerMethodField()
     
+    # ✅ Новое поле
+    all_categories = serializers.SerializerMethodField()
+    
     class Meta:
         model = Product
         fields = [
             'id', 'title', 'slug', 'category', 'category_display',
+            'all_categories',  # ✅ добавили
             'main_image_url', 'card_image_url',
             'card_specs', 'spec_groups', 'features', 'gallery',
             'is_active', 'is_featured', 'order'
         ]
+    
+    def get_all_categories(self, obj):
+        """Возвращает все категории продукта с переводами"""
+        request = self.context.get('request')
+        language = 'ru'
+        
+        if request:
+            path = request.path
+            if '/uz/' in path:
+                language = 'uz'
+            elif '/ru/' in path:
+                language = 'ru'
+            elif '/en/' in path:
+                language = 'en'
+        
+        # Получаем все категории
+        categories = [obj.category]
+        if obj.categories:
+            additional = [cat.strip() for cat in obj.categories.split(',') if cat.strip()]
+            categories.extend(additional)
+        
+        # Убираем дубликаты
+        categories = list(dict.fromkeys(categories))
+        
+        # Возвращаем с названиями на нужном языке
+        result = []
+        for cat_slug in categories:
+            for slug, name in Product.CATEGORY_CHOICES:
+                if slug == cat_slug:
+                    # Здесь можно добавить переводы названий категорий если нужно
+                    result.append({'slug': slug, 'name': name})
+                    break
+        
+        return result
     
     def get_title(self, obj):
         """Название продукта на текущем языке"""

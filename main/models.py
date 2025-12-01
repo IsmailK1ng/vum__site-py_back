@@ -166,6 +166,13 @@ class Product(models.Model):
     title = models.CharField("Название модели", max_length=255)
     slug = models.SlugField("URL", max_length=255, unique=True)
     category = models.CharField("Категория", max_length=50, choices=CATEGORY_CHOICES)
+    categories = models.CharField(
+        "Категории (множественный выбор)",
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Выберите категории через запятую. Например: samosval,maxsus"
+    )
     main_image = models.ImageField("Главное изображение", upload_to="products/main/")
     card_image = models.ImageField(
         "Изображение для карточки", 
@@ -245,6 +252,29 @@ class Product(models.Model):
             'image': (self.slider_image or self.main_image).url if (self.slider_image or self.main_image) else None,
             'link': f'/products/{self.slug}/',
         }
+    
+    def get_all_categories(self):
+        """Получить все категории продукта (основную + дополнительные)"""
+        categories = [self.category]
+        
+        if self.categories:
+            additional = [cat.strip() for cat in self.categories.split(',') if cat.strip()]
+            categories.extend(additional)
+        
+        # Убираем дубликаты, сохраняя порядок
+        return list(dict.fromkeys(categories))
+        
+    def get_all_categories_display(self):
+        """Получить названия всех категорий"""
+        category_names = []
+        for cat_slug in self.get_all_categories():
+            for slug, name in self.CATEGORY_CHOICES:
+                if slug == cat_slug:
+                    category_names.append(name)
+                    break
+        return category_names
+
+
 class ProductParameter(models.Model):
     """Параметры грузовика"""
     CATEGORY_CHOICES = [
