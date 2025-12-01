@@ -305,7 +305,7 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
 @admin.register(ContactForm)
 class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     change_list_template = 'main/contactform/change_list.html'
-    preserve_filters = False
+    preserve_filters = True
     
     # Оптимизация
     list_select_related = ['manager']
@@ -317,7 +317,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         'priority', 'status', 'amocrm_badge', 
         'manager', 'created_at', 'action_buttons'
     ]
-    # list_editable = ['priority', 'status', 'manager']  # ← ДОБАВЛЕНО
+    list_editable = ['priority', 'status', 'manager']  
     list_filter = ['status', 'priority', 'region']
     search_fields = ['name', 'phone', 'amocrm_lead_id']
     readonly_fields = ['created_at', 'amocrm_sent_at', 'amocrm_lead_link']
@@ -614,6 +614,42 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         extra_context['products'] = list(products)
         
         return super().changelist_view(request, extra_context)
+
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        custom_urls = [
+            path('<int:object_id>/quick-update/', self.admin_site.admin_view(self.quick_update_view), name='contactform_quick_update'),
+        ]
+        return custom_urls + urls
+
+    def quick_update_view(self, request, object_id):
+        """AJAX автосохранение статуса/приоритета/менеджера"""
+        import json
+        from django.http import JsonResponse
+        
+        if request.method != 'POST':
+            return JsonResponse({'error': 'Method not allowed'}, status=405)
+        
+        try:
+            obj = ContactForm.objects.get(pk=object_id)
+            data = json.loads(request.body)
+            
+            if 'status' in data:
+                obj.status = data['status']
+            if 'priority' in data:
+                obj.priority = data['priority']
+            if 'manager' in data:
+                obj.manager_id = data['manager'] if data['manager'] else None
+            
+            obj.save()
+            
+            return JsonResponse({'success': True})
+        
+        except ContactForm.DoesNotExist:
+            return JsonResponse({'error': 'Object not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
     
 # ============ ВАКАНСИИ ============
 

@@ -1,20 +1,22 @@
-(function () {
+(function() {
     'use strict';
 
-    if (typeof window.django === 'undefined' || typeof window.django.jQuery === 'undefined') {
-        return;
-    }
+    function initContactFormAdmin() {
+        if (typeof window.django === 'undefined' || typeof window.django.jQuery === 'undefined') {
+            setTimeout(initContactFormAdmin, 100);
+            return;
+        }
 
-    const $ = window.django.jQuery;
-
-    $(document).ready(function () {
+        const $ = window.django.jQuery;
         const $form = $('#leads-filter-form');
-        if ($form.length === 0) return;
+        if ($form.length === 0) {
+            setTimeout(initContactFormAdmin, 100);
+            return;
+        }
 
         // Применить фильтры
         $form.on('submit', function (e) {
             e.preventDefault();
-
             const params = new URLSearchParams();
 
             $form.find('input, select').each(function () {
@@ -42,7 +44,6 @@
             e.preventDefault();
 
             const currentParams = new URLSearchParams(window.location.search);
-
             const selectedIds = [];
             $('input[name="_selected_action"]:checked').each(function () {
                 selectedIds.push($(this).val());
@@ -138,5 +139,98 @@
                 $form.submit();
             }
         });
-    });
+
+        // ==================== АВТОСОХРАНЕНИЕ СТАТУСА/ПРИОРИТЕТА/МЕНЕДЖЕРА ====================
+        const editableSelects = $('#changelist-form select').filter(function() {
+            const name = $(this).attr('name') || '';
+            return name.match(/priority|status|manager/);
+        });
+
+        editableSelects.each(function() {
+            const select = $(this);
+            const row = select.closest('tr');
+            const checkbox = row.find('input[name="_selected_action"]');
+            const objectId = checkbox.val();
+
+            if (!objectId) return;
+
+            select.data('original-value', select.val());
+
+            select.on('change', function() {
+                const newValue = $(this).val();
+                const originalValue = select.data('original-value');
+                
+                let fieldName = '';
+                const selectName = select.attr('name') || '';
+                
+                if (selectName.includes('priority')) fieldName = 'priority';
+                else if (selectName.includes('status')) fieldName = 'status';
+                else if (selectName.includes('manager')) fieldName = 'manager';
+
+                if (!fieldName) return;
+
+                const saveUrl = `/admin/main/contactform/${objectId}/quick-update/`;
+
+                select.css({
+                    'opacity': '0.5',
+                    'pointer-events': 'none'
+                });
+
+                $.ajax({
+                    url: saveUrl,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    headers: {
+                        'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()
+                    },
+                    data: JSON.stringify({
+                        [fieldName]: newValue || ''
+                    }),
+                    success: function(response) {
+                        select.data('original-value', newValue);
+                        
+                        select.css({
+                            'opacity': '1',
+                            'pointer-events': 'auto',
+                            'background': 'linear-gradient(90deg, #d4edda 0%, #c3e6cb 100%)',
+                            'transition': 'all 0.3s',
+                            'border': '2px solid #28a745'
+                        });
+                        
+                        setTimeout(() => {
+                            select.css({
+                                'background': '',
+                                'border': ''
+                            });
+                        }, 2000);
+                    },
+                    error: function(xhr) {
+                        select.val(originalValue);
+                        
+                        select.css({
+                            'opacity': '1',
+                            'pointer-events': 'auto',
+                            'background': '#f8d7da',
+                            'border': '2px solid #dc3545'
+                        });
+                        
+                        setTimeout(() => {
+                            select.css({
+                                'background': '',
+                                'border': ''
+                            });
+                        }, 2000);
+                        
+                        alert('Ошибка сохранения. Попробуйте обновить страницу.');
+                    }
+                });
+            });
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initContactFormAdmin);
+    } else {
+        initContactFormAdmin();
+    }
 })();
