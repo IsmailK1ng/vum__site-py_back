@@ -95,13 +95,13 @@ imgLoad.on('done', instance => {
   pageAppearance();
 });
 
-// function hideLoader() {
-//   gsap.to(".loader__count", { duration: 0.8, ease: 'power2.in', y: "100%", delay: 1.8 });
-//   gsap.to(".loader__wrapper", { duration: 0.8, ease: 'power4.in', y: "-100%", delay: 2.2 });
-//   setTimeout(() => {
-//     document.getElementById("loader").classList.add("loaded");
-//   }, 3200);
-// }
+function hideLoader() {
+  gsap.to(".loader__count", { duration: 0.8, ease: 'power2.in', y: "100%", delay: 1.8 });
+  gsap.to(".loader__wrapper", { duration: 0.8, ease: 'power4.in', y: "-100%", delay: 2.2 });
+  setTimeout(() => {
+    document.getElementById("loader").classList.add("loaded");
+  }, 3200);
+}
 
 function pageAppearance() {
   gsap.set(loadingItems, { opacity: 0 })

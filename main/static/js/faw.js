@@ -481,7 +481,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }, { passive: true });
     })();
   } else {
-    window.logJSError('FAW Slider elements not found', { file: 'faw-scripts.js' });
   }
 });
 

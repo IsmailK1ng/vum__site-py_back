@@ -290,8 +290,15 @@ class ProductsManager {
         allProducts = allProducts.concat(products);
 
         // ✅ ИСПРАВЛЕНИЕ: Приводим URL к HTTPS
+           // Приводим URL к текущему протоколу (http/https)
         if (data.next) {
-          nextUrl = data.next.replace('http://', 'https://');
+          // Используем относительный URL вместо абсолютного
+          try {
+            const url = new URL(data.next);
+            nextUrl = url.pathname + url.search;
+          } catch (e) {
+            nextUrl = data.next;
+          }
         } else {
           nextUrl = null;
         }
@@ -338,7 +345,7 @@ class ProductsManager {
       }
       this.showError(error.message);
     }
-  }ы
+  }
 
   renderCards() {
     const container = document.querySelector('.faw-truck-card-container');
