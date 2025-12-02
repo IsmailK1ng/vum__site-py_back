@@ -7,7 +7,6 @@ from django.utils import timezone
 from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
 
-
 # ========== ОБЩИЕ CHOICES ==========
 
 REGION_CHOICES = [
@@ -38,7 +37,6 @@ PRIORITY_CHOICES = [
     ('medium', 'Средний'),
     ('low', 'Низкий'),
 ]
-
 
 # ========== 01. КОНТЕНТ - НОВОСТИ ==========
 
@@ -87,7 +85,6 @@ class News(models.Model):
         
         super().save(*args, **kwargs)
 
-
 class NewsBlock(models.Model):
     """Гибкие блоки внутри новости"""
     BLOCK_TYPES = [
@@ -131,7 +128,6 @@ class NewsBlock(models.Model):
             return f"{self.news.title[:30]} — {type_display}: {self.title[:30]}"
         return f"{self.news.title[:30]} — {type_display}"
 
-
 # ========== 02. КОНТЕНТ - ПРОДУКТЫ ==========
 
 class FeatureIcon(models.Model):
@@ -147,8 +143,6 @@ class FeatureIcon(models.Model):
     
     def __str__(self):
         return self.name
-
-
 
 class Product(models.Model):
     """Грузовики FAW"""
@@ -274,7 +268,6 @@ class Product(models.Model):
                     break
         return category_names
 
-
 class ProductParameter(models.Model):
     """Параметры грузовика"""
     CATEGORY_CHOICES = [
@@ -306,7 +299,6 @@ class ProductParameter(models.Model):
     
     def __str__(self):
         return f"{self.get_category_display()}: {self.text[:50]}"
-
 
 class ProductFeature(models.Model):
     """Характеристики с иконками"""
@@ -349,7 +341,6 @@ class ProductCardSpec(models.Model):
     def __str__(self):
         return self.value
 
-
 class ProductGallery(models.Model):
     """Галерея продукта"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery')
@@ -363,7 +354,6 @@ class ProductGallery(models.Model):
     
     def __str__(self):
         return f"Фото {self.order + 1}"
-
 
 # ========== 03. КОНТЕНТ - ДИЛЕРЫ ==========
 
@@ -404,7 +394,6 @@ class BecomeADealerPage(models.Model):
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
 
-
 class DealerRequirement(models.Model):
     """Требования к дилерам"""
     page = models.ForeignKey(
@@ -423,7 +412,6 @@ class DealerRequirement(models.Model):
     def __str__(self):
         return self.text[:50]
 
-
 class DealerService(models.Model):
     """Услуги дилеров"""
     name = models.CharField("Название", max_length=100, unique=True)
@@ -438,7 +426,6 @@ class DealerService(models.Model):
     
     def __str__(self):
         return self.name
-
 
 class Dealer(models.Model):
     """Дилеры FAW"""
@@ -484,7 +471,6 @@ class Dealer(models.Model):
     def __str__(self):
         # ✅ Улучшенный вывод для истории версий
         return f"{self.name} ({self.city})"
-
 
 # ========== 04. ЗАЯВКИ ==========
 
@@ -582,7 +568,6 @@ class ContactForm(models.Model):
     def __str__(self):
         return f"{self.name} - {self.phone} ({self.created_at.strftime('%d.%m.%Y')})"
 
-
 class BecomeADealerApplication(models.Model):
     """Заявки на дилерство"""
     name = models.CharField("ФИО", max_length=255)
@@ -613,7 +598,6 @@ class BecomeADealerApplication(models.Model):
         company = f" ({self.company_name})" if self.company_name else ""
         return f"{self.name}{company} - {self.region}"
 
-
 # ========== 05. ВАКАНСИИ ==========
 
 class Vacancy(models.Model):
@@ -640,7 +624,6 @@ class Vacancy(models.Model):
     def get_applications_count(self):
         return self.applications.count()
 
-
 class VacancyResponsibility(models.Model):
     """Обязанности вакансии"""
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='responsibilities')
@@ -656,7 +639,6 @@ class VacancyResponsibility(models.Model):
     def __str__(self):
         return self.title or self.text[:50]
 
-
 class VacancyRequirement(models.Model):
     """Требования к кандидату"""
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='requirements')
@@ -670,7 +652,6 @@ class VacancyRequirement(models.Model):
 
     def __str__(self):
         return self.text[:50]
-
 
 class VacancyCondition(models.Model):
     """Условия работы"""
@@ -686,7 +667,6 @@ class VacancyCondition(models.Model):
     def __str__(self):
         return self.text[:50]
 
-
 class VacancyIdealCandidate(models.Model):
     """Портрет идеального кандидата"""
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='ideal_candidates')
@@ -700,7 +680,6 @@ class VacancyIdealCandidate(models.Model):
 
     def __str__(self):
         return self.text[:50]
-
 
 class JobApplication(models.Model):
     """Заявки на вакансии"""
@@ -732,7 +711,6 @@ class JobApplication(models.Model):
         return round(self.resume.size / (1024 * 1024), 2) if self.resume else 0
 
 # ========== amoCRM ТОКЕНЫ ==========
-
 
 class AmoCRMToken(models.Model):
     """Хранение токенов доступа к amoCRM API"""

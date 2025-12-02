@@ -245,23 +245,30 @@ class ContactFormViewSet(viewsets.ModelViewSet):
         return queryset
     
     def create(self, request, *args, **kwargs):
-
-        
         try:
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             
             contact_form = serializer.save()
             
+            # Отправляем в amoCRM
             try:
                 from main.services.amocrm.lead_sender import LeadSender
                 LeadSender.send_lead(contact_form)
                 contact_form.refresh_from_db()
-                
-                    
             except Exception as amocrm_error:
                 logger.error(
                     f"Ошибка amoCRM для лида #{contact_form.id}: {str(amocrm_error)}", 
+                    exc_info=True
+                )
+            
+            # Отправляем в Telegram (ПОСЛЕ amoCRM)
+            try:
+                from main.services.telegram import TelegramNotificationSender
+                TelegramNotificationSender.send_lead_notification(contact_form)
+            except Exception as telegram_error:
+                logger.error(
+                    f"Ошибка Telegram для лида #{contact_form.id}: {str(telegram_error)}", 
                     exc_info=True
                 )
             

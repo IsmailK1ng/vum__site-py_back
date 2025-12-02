@@ -421,9 +421,14 @@ AMOCRM_FIELD_REGION = config('AMOCRM_FIELD_REGION', default='3027829', cast=int)
 AMOCRM_FIELD_PRODUCT = config('AMOCRM_FIELD_PRODUCT', default='3014844', cast=int) 
 AMOCRM_FIELD_FORMNAME = config('AMOCRM_FIELD_FORMNAME', default='2194359', cast=int)
 AMOCRM_FIELD_FORMID = config('AMOCRM_FIELD_FORMID', default='2194361', cast=int)
-AMOCRM_FIELD_REFERER = config('AMOCRM_FIELD_REFERER', default='3022633', cast=int)
+AMOCRM_FIELD_REFERER = config(' ', default='3022633', cast=int)
 AMOCRM_FIELD_UTM = config('AMOCRM_FIELD_UTM', default='3024889', cast=int)
 AMOCRM_FIELD_MESSAGE = config('AMOCRM_FIELD_MESSAGE', default='2944145', cast=int)
+
+# ========== Telegram Bot настройки ==========
+TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
+TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')
+
 #ЭТИ СТРОКИ для корректной работы за nginx/reverse proxy
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
