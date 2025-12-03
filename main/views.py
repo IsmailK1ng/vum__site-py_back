@@ -284,34 +284,6 @@ class ContactFormViewSet(viewsets.ModelViewSet):
                 'message': 'Xatolik yuz berdi.'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    @action(detail=False, methods=['get'])
-    def stats(self, request):
-        """Статистика по заявкам"""
-        try:
-            total = ContactForm.objects.count()
-            new = ContactForm.objects.filter(status='new').count()
-            in_process = ContactForm.objects.filter(status='in_process').count()
-            done = ContactForm.objects.filter(status='done').count()
-            
-            amocrm_sent = ContactForm.objects.filter(amocrm_status='sent').count()
-            amocrm_failed = ContactForm.objects.filter(amocrm_status='failed').count()
-            amocrm_pending = ContactForm.objects.filter(amocrm_status='pending').count()
-            
-            return Response({
-                'total': total,
-                'new': new,
-                'in_process': in_process,
-                'done': done,
-                'amocrm': {
-                    'sent': amocrm_sent,
-                    'failed': amocrm_failed,
-                    'pending': amocrm_pending
-                }
-            })
-        except Exception as e:
-            logger.error(f"Ошибка получения статистики: {str(e)}", exc_info=True)
-            return Response({'error': 'Internal error'}, status=500)
-
 
 class JobApplicationViewSet(viewsets.ModelViewSet):
     """API endpoint для приема заявок на вакансии"""

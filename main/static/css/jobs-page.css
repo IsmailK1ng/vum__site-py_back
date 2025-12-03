@@ -216,9 +216,9 @@ body[data-theme="dark"] .mxd-project-item__promo.open .vacancy-toggle-btn .arrow
 
 /* Тёмная тема */
 body[data-theme="dark"] .mxd-project-item__promo {
-    background: #23272f;
+    background: #161616;
     color: #f3f3f3;
-    border-color: #333a4d;
+    border-color: #000000;
 }
 
 body[data-theme="dark"] .mxd-project-item__name {
@@ -228,7 +228,7 @@ body[data-theme="dark"] .mxd-project-item__name {
 }
 
 body[data-theme="dark"] .vacancy-toggle-btn {
-    background: #23272f;
+    background: #161616;
     color: #ffffff;
     border-color: #ffffff;
 }

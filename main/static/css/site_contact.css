@@ -144,10 +144,6 @@ body[data-theme="dark"] .contact-detail__title {
     margin-bottom: 0;
 }
 
-p.t-caption {
-    line-height: 2.4;
-    font-weight: var(--fw-medium);
-}
 
 /* ===== МЕДИА-ЗАПРОСЫ ===== */
 
