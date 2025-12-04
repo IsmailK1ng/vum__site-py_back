@@ -1,0 +1,11 @@
+from django.core.management.base import BaseCommand
+from main.services.telegram.report_sender import TelegramReportSender
+
+
+class Command(BaseCommand):
+    help = 'Отправить еженедельный отчёт в Telegram'
+
+    def handle(self, *args, **options):
+        self.stdout.write("📊 Формирование еженедельного отчёта...")
+        TelegramReportSender.send_weekly_report()
+        self.stdout.write(self.style.SUCCESS("✅ Отчёт отправлен!"))

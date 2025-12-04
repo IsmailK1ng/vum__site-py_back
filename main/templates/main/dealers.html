@@ -279,7 +279,7 @@
             map.geoObjects.add(new ymaps.Polygon([uzbekistanBorder], {
                 hintContent: 'O\'zbekiston Respublikasi'
             }, {
-                strokeColor: '#0a2883',
+                strokeColor: '#000000',
                 strokeWidth: 2,
                 strokeOpacity: 0.8,
                 fillColor: 'rgba(231, 76, 60, 0.05)',
@@ -315,21 +315,21 @@
                 <img src="{% static 'images/dealers-icon/icon-info/location.png' %}" style="width:20px;height:20px;object-fit:contain" alt="location">
                 <div style="flex:1">
                     <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:2px">${translations.address}</div>
-                    <div style="font-size:13px;color:#1e293b;line-height:1.4">${dealer.address}</div>
+                    <div style="font-size:13px;color:#000000;line-height:1.4">${dealer.address}</div>
                 </div>
             </div>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
                 <img src="{% static 'images/dealers-icon/icon-info/call.png' %}" style="width:20px;height:20px;object-fit:contain" alt="phone">
                 <div style="flex:1">
                     <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:2px">${translations.phone}</div>
-                    <a href="tel:${dealer.phone}" style="font-size:14px;color:#0a2883;text-decoration:none;font-weight:600">${dealer.phone}</a>
+                    <a href="tel:${dealer.phone}" style="font-size:14px;color:#000000;text-decoration:none;font-weight:600">${dealer.phone}</a>
                 </div>
             </div>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
                 <img src="{% static 'images/dealers-icon/icon-info/clock.png' %}" style="width:20px;height:20px;object-fit:contain" alt="clock">
                 <div style="flex:1">
                     <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:2px">${translations.workingHours}</div>
-                    <div style="font-size:13px;color:#1e293b;line-height:1.4">${dealer.working_hours}</div>
+                    <div style="font-size:15px;color:#000000;line-height:1.4">${dealer.working_hours}</div>
                 </div>
             </div>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
@@ -337,11 +337,11 @@
                 <div style="flex:1">
                     <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:4px">${translations.services}</div>
                     <div style="display:flex;flex-wrap:wrap;gap:6px">${(dealer.services || []).map(s =>
-                `<span style="background:#ffffff;color:#000000;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500">${s}</span>`
+                `<span style="background:#ffffff;color:#000000;padding:0px;border-radius:6px;font-size:15px;font-weight:500">${s}</span>`
             ).join('')}</div>
                 </div>
             </div>
-            <button onclick="showDealerDetails(${dealer.id})" style="background:linear-gradient(135deg,#0a2883 0%,#1e40af 100%);color:white;border:none;padding:12px 20px;border-radius:10px;cursor:pointer;width:100%;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(10,40,131,0.3);transition:all 0.3s">${translations.detailsBtn}</button>
+            <button onclick="showDealerDetails(${dealer.id})" style="background:#000000;color:white;border:none;padding:12px 20px;border-radius:10px;cursor:pointer;width:100%;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(10,40,131,0.3);transition:all 0.3s">${translations.detailsBtn}</button>
         </div>
     `;
 
@@ -355,7 +355,7 @@
                 hintContent: `${dealer.name} - ${dealer.city}`
             }, {
                 iconLayout: ymaps.templateLayoutFactory.createClass(
-                    '<div style="width:44px;height:44px;border-radius:50%;background:white;border:3px solid #0a2883;box-shadow:0 4px 12px rgba(10,40,131,0.3);display:flex;align-items:center;justify-content:center;position:absolute;left:-22px;top:-22px;pointer-events:all;">' +
+                    '<div style="width:44px;height:44px;border-radius:50%;background:white;border:3px solid #000000;box-shadow:0 4px 12px rgba(10,40,131,0.3);display:flex;align-items:center;justify-content:center;position:absolute;left:-22px;top:-22px;pointer-events:all;">' +
                     '<img src="' + truckIconUrl + '" style="width:26px;height:26px;object-fit:contain;pointer-events:none;"/>' +
                     '</div>'
                 ),

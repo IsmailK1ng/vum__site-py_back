@@ -196,13 +196,6 @@
           style="text-decoration: none; color: inherit;">
           <div class="slide-header-row">
             <div class="slide-header__wrapper">
-              <div class="slide-avatar">
-                {% if news.author_photo %}
-                <img src="{{ news.author_photo.url }}" alt="{{ news.author.username }}" class="avatar-image">
-                {% else %}
-                <img src="{% static 'images/icon/_iiii176.png' %}" alt="VUM Logo" class="avatar-image">
-                {% endif %}
-              </div>
               <div class="slide-header">
                 <h3 class="slide-header__title">{{ news.title }}</h3>
               </div>

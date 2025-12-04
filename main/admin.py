@@ -344,12 +344,12 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     # ==================== ОТОБРАЖЕНИЕ ====================
     
     def product_display(self, obj):
-        """Отображение модели"""
-        if obj.product:
-            return format_html(
-                '<span style="color:#1976d2;padding:5px 10px;border-radius:6px;font-size:13px;font-weight:600;">{}</span>',
-                obj.product[:30]
-            )
+        if not obj.product:
+            return "—"
+        return format_html(
+            '<span style="color:#1976d2;font-weight:600;">{}</span>',
+            obj.product[:30]
+        )
         return format_html('<span style="color:#999;">—</span>')
     
     product_display.short_description = "Модель"
