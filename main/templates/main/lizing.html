@@ -134,7 +134,7 @@
 
         <!-- Leasing Calculator -->
         <section class="mxd-section">
-            <div class="mxd-hero-06">
+            <div class="mxd-hero-09">
                 <div class="mxd-hero-06__wrap loading-wrap">
                     <div class="mxd-hero-06__top">
                         <div class="mxd-hero-06__content">
@@ -175,10 +175,10 @@
                                         </label>
                                         <input type="text" class="lizing-input-field" id="downPaymentInput" value="120 000 000 so'm">
                                         <div class="lizing-slider-container">
-                                            <input type="range" class="lizing-slider" id="downPaymentSlider" min="30" max="60" value="40" step="1">
+                                            <input type="range" class="lizing-slider" id="downPaymentSlider" min="0"  max="60" value="40" step="1">
                                             <div class="lizing-slider-labels">
+                                                <span>0%</span>
                                                 <span>30%</span>
-                                                <span>45%</span>
                                                 <span>60%</span>
                                             </div>
                                         </div>
@@ -217,8 +217,8 @@
                                         {% else %}
                                         Financing Amount
                                         {% endif %}
+                                        <div class="lizing-result-value" id="financeAmount">180 900 000 so'm</div>
                                     </div>
-                                    <div class="lizing-result-value" id="financeAmount">180 900 000 so'm</div>
                                     
                                     <div class="lizing-payment-info">
                                         <div>
@@ -248,38 +248,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Documents Section -->
-                                    <div class="lizing-document-section">
-                                        <div class="lizing-document-label">
-                                            {% if LANGUAGE_CODE == 'uz' %}
-                                            Kerakli hujjatlar
-                                            {% elif LANGUAGE_CODE == 'ru' %}
-                                            Необходимые документы
-                                            {% else %}
-                                            Required Documents
-                                            {% endif %}
-                                            <span class="lizing-info-icon">?</span>
-                                        </div>
-                                        <button class="lizing-document-btn">
-                                            {% if LANGUAGE_CODE == 'uz' %}
-                                            Pasport
-                                            {% elif LANGUAGE_CODE == 'ru' %}
-                                            Паспорт
-                                            {% else %}
-                                            Passport
-                                            {% endif %}
-                                        </button>
-                                        <button class="lizing-document-btn">
-                                            {% if LANGUAGE_CODE == 'uz' %}
-                                            Daromad haqida ma'lumotnoma
-                                            {% elif LANGUAGE_CODE == 'ru' %}
-                                            Справка о доходах
-                                            {% else %}
-                                            Income Certificate
-                                            {% endif %}
-                                        </button>
-                                    </div>
-
                                     <div class="lizing-calculation-info">
                                         <div class="lizing-calculation-label">
                                             {% if LANGUAGE_CODE == 'uz' %}
@@ -291,19 +259,19 @@
                                             {% endif %}
                                             <span class="lizing-info-icon">?</span>
                                         </div>
+                                        <div class="lizing-buttons">
+                                            <button type="button" class="lizing-btn-secondary" id="detailsBtn">
+                                                {% if LANGUAGE_CODE == 'uz' %}
+                                                Lizing haqida batafsil
+                                                {% elif LANGUAGE_CODE == 'ru' %}
+                                                Подробнее о лизинге
+                                                {% else %}
+                                                Leasing Details
+                                                {% endif %}
+                                            </button>
+                                        </div>
                                     </div>
 
-                                    <div class="lizing-buttons">
-                                        <button type="button" class="lizing-btn-secondary" id="detailsBtn">
-                                            {% if LANGUAGE_CODE == 'uz' %}
-                                            Lizing haqida batafsil
-                                            {% elif LANGUAGE_CODE == 'ru' %}
-                                            Подробнее о лизинге
-                                            {% else %}
-                                            Leasing Details
-                                            {% endif %}
-                                        </button>
-                                    </div>
                                 </div>
                             </div>
                         </div>
