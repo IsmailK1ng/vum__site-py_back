@@ -25,9 +25,7 @@ admin.site.site_header = "Панель управления VUM"
 admin.site.site_title = "VUM Admin"
 admin.site.index_title = "Управление сайтами FAW"
 
-
 # ============ БАЗОВЫЕ МИКСИНЫ ============
-
 
 class ContentAdminMixin:
     """Миксин для контент-админов"""
@@ -75,7 +73,6 @@ class ContentAdminMixin:
         # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНОЕ ПРАВО на удаление
         model_name = self.model._meta.model_name
         return request.user.has_perm(f'main.delete_{model_name}')
-
 
 class LeadManagerMixin:
     """Миксин для лид-менеджеров"""
@@ -222,7 +219,6 @@ class CustomReversionMixin:
 
 # ============ НОВОСТИ ============
 
-
 class NewsBlockInline(TranslationStackedInline): 
     model = NewsBlock
     extra = 1
@@ -234,7 +230,6 @@ class NewsBlockInline(TranslationStackedInline):
             'all': ('css/news_block_custom.css',)  
             
         }
-
 
 @admin.register(News)
 class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
@@ -658,24 +653,20 @@ class VacancyResponsibilityInline(TranslationStackedInline):
     extra = 2
     fields = (('title', 'order'), 'text')
 
-
 class VacancyRequirementInline(TranslationTabularInline):
     model = VacancyRequirement
     extra = 3
     fields = ('text', 'order')
-
 
 class VacancyConditionInline(TranslationTabularInline):
     model = VacancyCondition
     extra = 3
     fields = ('text', 'order')
 
-
 class VacancyIdealCandidateInline(TranslationTabularInline):
     model = VacancyIdealCandidate
     extra = 3
     fields = ('text', 'order')
-
 
 @admin.register(Vacancy)
 class VacancyAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
@@ -711,7 +702,6 @@ class VacancyAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
             extra_context['show_recover_button'] = True
             extra_context['deleted_count'] = deleted_count
         return super().changelist_view(request, extra_context)
-
 
 @admin.register(JobApplication)
 class JobApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
@@ -755,7 +745,6 @@ class JobApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
         return format_html('<span style="color:orange;font-weight:bold;"> Новая</span>')
     is_processed_badge.short_description = 'Статус'
 
-
 # ============ ИКОНКИ ============
 
 @admin.register(FeatureIcon)
@@ -769,7 +758,6 @@ class FeatureIconAdmin(ContentAdminMixin, admin.ModelAdmin):
             return format_html('<img src="{}" width="30" height="30"/>', obj.icon.url)
         return "—"
     icon_preview.short_description = "Превью"
-
 
 # ============ ДИЛЕРЫ ============
 
@@ -809,7 +797,6 @@ class DealerServiceAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, 
             extra_context['show_recover_button'] = True
             extra_context['deleted_count'] = deleted_count
         return super().changelist_view(request, extra_context)
-
 
 @admin.register(Dealer)
 class DealerAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
@@ -874,7 +861,6 @@ class DealerRequirementInline(TranslationTabularInline):
     extra = 1
     fields = ('text', 'order')
 
-
 @admin.register(BecomeADealerPage)
 class BecomeADealerPageAdmin(ContentAdminMixin, TabbedTranslationAdmin):
     fieldsets = (
@@ -893,7 +879,6 @@ class BecomeADealerPageAdmin(ContentAdminMixin, TabbedTranslationAdmin):
         obj = BecomeADealerPage.get_instance()
         return self.changeform_view(request, str(obj.pk), '', extra_context)
 
-
 # ============ ЗАЯВКИ НА ДИЛЕРСТВО ============
 
 class BecomeADealerApplicationForm(forms.ModelForm):
@@ -908,7 +893,6 @@ class BecomeADealerApplicationForm(forms.ModelForm):
             self.fields['manager'].widget.can_change_related = False
             self.fields['manager'].widget.can_delete_related = False
             self.fields['manager'].widget.can_view_related = False
-
 
 @admin.register(BecomeADealerApplication)
 class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
@@ -977,7 +961,6 @@ class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
         return response
     
     export_to_excel.short_description = 'Экспорт в Excel'
-
 
 # ============ ПРОДУКТЫ ============
 
@@ -1070,12 +1053,10 @@ class ProductCategoriesForm(forms.ModelForm):
             instance.save()
         return instance
 
-
 class ProductParameterInline(TranslationTabularInline):
     model = ProductParameter
     extra = 1
     fields = ('category', 'text', 'order')
-
 
 class ProductFeatureInline(TranslationTabularInline):
     model = ProductFeature
@@ -1083,19 +1064,16 @@ class ProductFeatureInline(TranslationTabularInline):
     max_num = 8
     fields = ('icon', 'name', 'order')
 
-
 class ProductCardSpecInline(TranslationTabularInline):
     model = ProductCardSpec
     extra = 1
     max_num = 4
     fields = ('icon', 'value', 'order')
 
-
 class ProductGalleryInline(admin.TabularInline):
     model = ProductGallery
     extra = 1
     fields = ('image', 'order')
-
 
 @admin.register(Product)
 class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):

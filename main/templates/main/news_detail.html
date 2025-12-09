@@ -1,11 +1,13 @@
 {% load static %}
+{% load seo_tags %} 
 <!DOCTYPE html>
 <html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
 
 <head>
   <meta charset="UTF-8">
   <title>{{ news.title }} | VUM News</title>
-
+  {% hreflang_tags %}
+  {% canonical_url %}
   <meta name="description" content="{{ news.desc }}">
   <meta name="keywords" content="FAW Trucks, VUM, {{ news.title }}">
   <meta name="author" content="VUM">

@@ -1,6 +1,7 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
+from django.views.generic import TemplateView
 from . import views
+
 
 urlpatterns = [
     path('', views.index, name='home'),
@@ -16,5 +17,6 @@ urlpatterns = [
     path('dealers/', views.dealers, name='dealers'),
     path('jobs/', views.jobs, name='jobs'),
     path('api/log-js-error/', views.log_js_error, name='log_js_error'),
+    path('test-utm/', TemplateView.as_view(template_name='test-utm.html'), name='test_utm'),
 
 ]   

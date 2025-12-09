@@ -223,26 +223,34 @@ def set_language_get(request):
 
 class NewsViewSet(viewsets.ModelViewSet):
     """API endpoint для CRUD операций с новостями"""
-    queryset = News.objects.all().order_by('-created_at')
     serializer_class = NewsSerializer
     permission_classes = [AllowAny]
+    
+    def get_queryset(self):
+        return News.objects.select_related('author').prefetch_related('blocks').order_by('-created_at')
 
+
+from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.decorators import permission_classes
 
 class ContactFormViewSet(viewsets.ModelViewSet):
     """API для контактных форм FAW.UZ"""
     serializer_class = ContactFormSerializer
-    permission_classes = [AllowAny]
+    
+    # ✅ ИСПРАВЛЕНО: Разные права для разных методов
+    def get_permissions(self):
+        if self.action in ['create']:
+            # POST требует CSRF в headers
+            return [AllowAny()]
+        else:
+            # GET/PUT/DELETE только для админов
+            return [IsAdminUser()]
+    
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['status', 'priority', 'region', 'amocrm_status'] 
     search_fields = ['name', 'phone']
     ordering_fields = ['created_at', 'priority']
     
-    def get_queryset(self):
-        queryset = ContactForm.objects.all().order_by('-created_at')
-        status_filter = self.request.query_params.get('status', None)
-        if status_filter:
-            queryset = queryset.filter(status=status_filter)
-        return queryset
     
     def create(self, request, *args, **kwargs):
         try:
@@ -287,8 +295,11 @@ class ContactFormViewSet(viewsets.ModelViewSet):
 
 class JobApplicationViewSet(viewsets.ModelViewSet):
     """API endpoint для приема заявок на вакансии"""
-    queryset = JobApplication.objects.all().order_by('-created_at')
     serializer_class = JobApplicationSerializer
+    
+    def get_queryset(self):
+        """✅ Оптимизация: загружаем вакансию сразу"""
+        return JobApplication.objects.select_related('vacancy').order_by('-created_at')
     
     def get_permissions(self):
         if self.action == 'create':
@@ -320,7 +331,7 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
     def unprocessed(self, request):
         """Получить необработанные заявки"""
         try:
-            unprocessed = self.queryset.filter(is_processed=False)
+            unprocessed = self.get_queryset().filter(is_processed=False)
             serializer = self.get_serializer(unprocessed, many=True)
             return Response({
                 'count': unprocessed.count(),
@@ -354,15 +365,18 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         try:
             queryset = Product.objects.filter(is_active=True).prefetch_related(
-                'card_specs__icon',
-                'parameters',
-                'features__icon',
-                'gallery'
+                'card_specs__icon',   
+                'parameters',          
+                'features__icon',     
+                'gallery'             
             ).order_by('order', 'title')
             
             category = self.request.query_params.get('category', None)
             if category:
-                queryset = queryset.filter(category=category)
+                from django.db.models import Q
+                queryset = queryset.filter(
+                    Q(category=category) | Q(categories__icontains=category)
+                )
             
             return queryset
         except Exception as e:
@@ -373,7 +387,6 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return ProductDetailSerializer
         return ProductCardSerializer
-
 
 def products(request):
     """Страница со списком продуктов по категориям"""
@@ -468,12 +481,15 @@ def products(request):
 
 
 class DealerViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Dealer.objects.filter(is_active=True).prefetch_related('services').order_by('order', 'city')
+    """API для дилеров FAW"""
     serializer_class = DealerSerializer
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['city', 'services__slug']
     search_fields = ['name', 'city', 'address']
+    
+    def get_queryset(self):
+        return Dealer.objects.filter(is_active=True).prefetch_related('services').order_by('order', 'city')
 
 
 class DealerServiceViewSet(viewsets.ReadOnlyModelViewSet):

@@ -13,14 +13,46 @@ class ForceRussianMiddleware:
     
     def __call__(self, request):
         try:
+            # Admin всегда на русском
             if request.path.startswith('/admin/'):
                 translation.activate('ru')
                 request.LANGUAGE_CODE = 'ru'
-            else:
-                saved_language = request.session.get('_language')
-                cookie_language = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME, None)
+            
+            # ✅ API: определяем язык из URL
+            elif request.path.startswith('/api/'):
+                language = 'uz'  # default
                 
-                language = saved_language or cookie_language or 'uz'
+                # Проверяем префикс языка в URL
+                if '/api/uz/' in request.path:
+                    language = 'uz'
+                elif '/api/ru/' in request.path:
+                    language = 'ru'
+                elif '/api/en/' in request.path:
+                    language = 'en'
+                elif '/api/kg/' in request.path:
+                    saved_language = request.session.get('_language')
+                    cookie_language = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
+                    language = saved_language or cookie_language or 'ky'
+                
+                translation.activate(language)
+                request.LANGUAGE_CODE = language
+            
+            # ✅ Frontend: определяем язык из URL префикса
+            else:
+                language = 'uz'  # default
+                
+                # Проверяем языковой префикс
+                if request.path.startswith('/uz/'):
+                    language = 'uz'
+                elif request.path.startswith('/ru/'):
+                    language = 'ru'
+                elif request.path.startswith('/en/'):
+                    language = 'en'
+                else:
+                    # Fallback на session/cookie для старых URL
+                    saved_language = request.session.get('_language')
+                    cookie_language = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
+                    language = saved_language or cookie_language or 'uz'
                 
                 if language in [lang[0] for lang in settings.LANGUAGES]:
                     translation.activate(language)

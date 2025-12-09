@@ -1,4 +1,5 @@
 {% load static %}
+{% load seo_tags %} 
 <!DOCTYPE html>
 <html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
 
@@ -9,7 +10,8 @@
 
     <!-- Page Title -->
     <title>{% if LANGUAGE_CODE == 'uz' %}VUM Servis{% elif LANGUAGE_CODE == 'ru' %}Сервис VUM{% else %}VUM Service{%endif %} | FAW Trucks</title>
-
+    {% hreflang_tags %}
+    {% canonical_url %}
     <!-- Meta Tags -->
     <meta name="description"
         content="{% if LANGUAGE_CODE == 'uz' %}FAW Trucks servis xizmati O'zbekistonda - kafolat, texnik xizmat, ehtiyot qismlar{% elif LANGUAGE_CODE == 'ru' %}Сервисное обслуживание FAW Trucks в Узбекистане - гарантия, техобслуживание, запчасти{% else %}FAW Trucks service in Uzbekistan - warranty, maintenance, spare parts{% endif %}">

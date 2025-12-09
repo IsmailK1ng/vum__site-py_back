@@ -1,4 +1,5 @@
 {% load static %}
+{% load static seo_tags %}
 <!DOCTYPE html>
 <html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
 
@@ -7,6 +8,8 @@
 
   <!-- Page Title -->
   <title>VUMFAW tarixi</title>
+  {% hreflang_tags %}
+  {% canonical_url %}
 
   <!-- Meta Tags -->
   <meta name="description" content="Faw Trucks в Узбекистане">
@@ -1261,8 +1264,8 @@
   <script src="{% static 'js/libs.min.js' %}"></script>
   <!-- <script src="template/js/app.js"></script> -->
    <script src="{% static 'js/error-logger.js' %}"></script>
-  <script src="{% static 'js/faw.js' %}"></script>
   <script src="{% static 'js/about.js' %}"></script>
+  <script src="{% static 'js/faw.js' %}"></script>
   <script>
     // ========== МОДАЛЬНОЕ ОКНО ДЛЯ ИСТОРИИ ==========
     document.addEventListener('DOMContentLoaded', function () {
