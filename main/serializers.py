@@ -4,6 +4,7 @@ from rest_framework import serializers
 import logging
 
 logger = logging.getLogger('django')
+from main.serializers_base import LanguageSerializerMixin
 
 from .models import (
     News, NewsBlock, ContactForm, JobApplication, 
@@ -161,20 +162,20 @@ class ProductCardSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
     category_display = serializers.CharField(source='get_category_display', read_only=True)
     
-    # ✅ Новое поле
+
     all_categories = serializers.SerializerMethodField()
     
     class Meta:
         model = Product
         fields = [
             'id', 'title', 'slug', 'category', 'category_display',
-            'all_categories',  # ✅ добавили
+            'all_categories',  
             'image_url', 'card_specs', 'is_featured', 'order'
         ]
     
     def get_all_categories(self, obj):
         """Возвращает все категории продукта (основную + дополнительные)"""
-        categories = [obj.category]  # Основная категория
+        categories = [obj.category]  
         
         # Добавляем дополнительные
         if obj.categories:
@@ -205,7 +206,7 @@ class ProductCardSerializer(serializers.ModelSerializer):
         return None
 
 
-class ProductFeatureSerializer(serializers.ModelSerializer):
+class ProductFeatureSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
     """8 характеристик с иконками"""
     icon = FeatureIconSerializer(read_only=True)
     name = serializers.SerializerMethodField()
@@ -215,15 +216,8 @@ class ProductFeatureSerializer(serializers.ModelSerializer):
         fields = ['id', 'icon', 'name', 'order']
     
     def get_name(self, obj):
-        """Возвращаем name на нужном языке"""
-        request = self.context.get('request')
-        if request:
-            path = request.path
-            if '/uz/' in path:
-                return obj.name_uz or obj.name
-            elif '/en/' in path:
-                return obj.name_en or obj.name
-        return obj.name_ru or obj.name
+        lang = self.get_current_language()
+        return getattr(obj, f'name_{lang}', None) or obj.name
 
 
 class ProductGallerySerializer(serializers.ModelSerializer):
@@ -243,7 +237,7 @@ class ProductGallerySerializer(serializers.ModelSerializer):
         return None
 
 
-class ProductDetailSerializer(serializers.ModelSerializer):
+class ProductDetailSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
     """Детальная страница продукта"""
     card_specs = ProductCardSpecSerializer(many=True, read_only=True)
     spec_groups = serializers.SerializerMethodField()
@@ -269,17 +263,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     
     def get_all_categories(self, obj):
         """Возвращает все категории продукта с переводами"""
-        request = self.context.get('request')
-        language = 'ru'
-        
-        if request:
-            path = request.path
-            if '/uz/' in path:
-                language = 'uz'
-            elif '/ru/' in path:
-                language = 'ru'
-            elif '/en/' in path:
-                language = 'en'
+        language = self.get_current_language()
         
         # Получаем все категории
         categories = [obj.category]
@@ -302,29 +286,11 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         return result
     
     def get_title(self, obj):
-        """Название продукта на текущем языке"""
-        request = self.context.get('request')
-        if request:
-            path = request.path
-            if '/uz/' in path:
-                return obj.title_uz or obj.title
-            elif '/en/' in path:
-                return obj.title_en or obj.title
-        return obj.title_ru or obj.title
+        lang = self.get_current_language()  
+        return getattr(obj, f'title_{lang}', None) or obj.title
     
     def get_spec_groups(self, obj):
-        """Группируем параметры по категориям с переводом"""
-        request = self.context.get('request')
-        language = 'ru'
-        
-        if request:
-            path = request.path
-            if '/uz/' in path:
-                language = 'uz'
-            elif '/ru/' in path:
-                language = 'ru'
-            elif '/en/' in path:
-                language = 'en'
+        language = self.get_current_language()
         
         CATEGORY_TRANSLATIONS = {
             'ru': {
@@ -465,7 +431,7 @@ class BecomeADealerApplicationSerializer(serializers.ModelSerializer):
     
 # ========== СЕРИАЛИЗАТОР ДЛЯ ВАКАНСИЙ ==========
 
-class VacancySerializer(serializers.ModelSerializer):
+class VacancySerializer(LanguageSerializerMixin, serializers.ModelSerializer):
     """Вакансии с поддержкой переводов"""
     title = serializers.SerializerMethodField()
     short_description = serializers.SerializerMethodField()
@@ -483,28 +449,20 @@ class VacancySerializer(serializers.ModelSerializer):
             'is_active', 'created_at'
         ]
     
-    def get_language(self):
-        """Определяем текущий язык из запроса"""
-        request = self.context.get('request')
-        if request:
-            lang = request.session.get('_language') or request.COOKIES.get('django_language', 'uz')
-            return lang if lang in ['uz', 'ru', 'en'] else 'uz'
-        return 'uz'
-    
     def get_title(self, obj):
-        lang = self.get_language()
+        lang = self.get_current_language()  
         return getattr(obj, f'title_{lang}', None) or obj.title
     
     def get_short_description(self, obj):
-        lang = self.get_language()
+        lang = self.get_current_language()  
         return getattr(obj, f'short_description_{lang}', None) or obj.short_description or ''
     
     def get_contact_info(self, obj):
-        lang = self.get_language()
+        lang = self.get_current_language()  
         return getattr(obj, f'contact_info_{lang}', None) or obj.contact_info or ''
     
     def get_responsibilities(self, obj):
-        lang = self.get_language()
+        lang = self.get_current_language()  
         responsibilities = obj.responsibilities.all().order_by('order')
         return [
             {
@@ -516,7 +474,7 @@ class VacancySerializer(serializers.ModelSerializer):
         ]
     
     def get_requirements(self, obj):
-        lang = self.get_language()
+        lang = self.get_current_language()  
         requirements = obj.requirements.all().order_by('order')
         return [
             {
@@ -527,7 +485,7 @@ class VacancySerializer(serializers.ModelSerializer):
         ]
     
     def get_conditions(self, obj):
-        lang = self.get_language()
+        lang = self.get_current_language()  
         conditions = obj.conditions.all().order_by('order')
         return [
             {
@@ -538,7 +496,7 @@ class VacancySerializer(serializers.ModelSerializer):
         ]
     
     def get_ideal_candidates(self, obj):
-        lang = self.get_language()
+        lang = self.get_current_language()  
         candidates = obj.ideal_candidates.all().order_by('order')
         return [
             {

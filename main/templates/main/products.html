@@ -1,10 +1,13 @@
 {% load static %}
+{% load seo_tags %} 
 <!DOCTYPE html>
 <html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
 
 <head>
   <meta charset="UTF-8">
   <title>FAW Trucks - Modellar</title>
+  {% hreflang_tags %}
+  {% canonical_url %}
   <meta name="description" content="Faw Trucks в Узбекистане">
   <meta name="keywords" content="Faw Trucks в Узбекистане">
   <meta name="author" content="mix_design">

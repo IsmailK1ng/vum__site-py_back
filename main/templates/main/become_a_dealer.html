@@ -1,4 +1,5 @@
 {% load static %}
+{% load seo_tags %} 
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:'uz' }}" dir="ltr">
 
@@ -8,6 +9,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
     <title>{{ page_data.title }} | FAW Trucks Uzbekistan</title>
+    {% hreflang_tags %}
+    {% canonical_url %}
 
     <!-- SEO Meta -->
     <meta name="description" content="{% if LANGUAGE_CODE == 'uz' %}FAW Trucks dileri bo'lish - avtomobil texnikasini sotish va servis xizmatlari{% elif LANGUAGE_CODE == 'ru' %}Стать дилером FAW Trucks - продажа автомобильной техники и сервисные услуги{% else %}Become a FAW Trucks dealer - automotive sales and service{% endif %}" />
