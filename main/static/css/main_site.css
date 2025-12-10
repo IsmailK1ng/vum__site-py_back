@@ -2593,7 +2593,10 @@ body[data-theme="dark"] .btn-rotating .btn-rotating__text text {
   -webkit-backdrop-filter: blur(6px);
           backdrop-filter: blur(6px);
   color: var(--nl-white);
-  mix-blend-mode: difference;
+  background: white;
+  color: #000;
+  box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.4);
+  /* mix-blend-mode: difference; */
   font: normal var(--fw-regular) 2.2rem/1.5 var(--_font-accent);
   -webkit-transform: scale(1);
      -moz-transform: scale(1);
@@ -2615,6 +2618,11 @@ body[data-theme="dark"] .btn-rotating .btn-rotating__text text {
   position: relative;
   font-size: 2.2rem;
   overflow: hidden;
+}
+body[data-theme="dark"] .btn-to-top {
+  background: black;
+  color: #fff;
+  box-shadow: 0px 0px 8px 2px rgba(255, 255, 255, 0.4);
 }
 .no-touch .btn-to-top:hover {
   -webkit-transform: scale(1.04);

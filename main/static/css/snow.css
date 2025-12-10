@@ -11,8 +11,8 @@
     top: 0em;
     color: #ffffff;
     font-size: 1em;
-    text-shadow: 0 0 8px rgb(0, 136, 255), 0 0 16px rgb(0, 149, 255);
-    opacity: 0.6;
+    text-shadow: 0 0 4px rgb(122, 193, 255), 0 0 8px rgb(116, 197, 255);
+    opacity: 1;
     user-select: none;
     pointer-events: none;
     will-change: transform, opacity;
@@ -22,14 +22,11 @@
 @keyframes fall {
     0% {
         transform: translateY(-2em) translateX(0) rotate(0deg);
-        opacity: 0.5;
     }
     50% {
         transform: translateY(50vh) translateX(var(--drift)) rotate(var(--rotHalf));
-        opacity: 0.8;
     }
     100% {
         transform: translateY(110vh) translateX(calc(var(--drift)*2)) rotate(var(--rot));
-        opacity: 0.5;
     }
 }
