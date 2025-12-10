@@ -319,6 +319,19 @@
     <!-- Секция — превью блога (конец) -->
 
     <!-- Секция — слайдер FAW (начало) -->
+     <div class="col-12 col-xl-12 mxd-grid-item no-margin mxd-container">
+      <div class="mxd-section-title__hrtitle">
+        <h2 class="reveal-type ">
+          {% if LANGUAGE_CODE == 'uz' %}
+          Maxsus taklif
+          {% elif LANGUAGE_CODE == 'ru' %}
+          Специальное предложение
+          {% else %}
+          Special Offer
+          {% endif %}
+        </h2>
+      </div>
+    </div>
     <!-- Скрытый элемент с данными слайдера из Django -->
     <div id="slider-data" style="display: none;">{{ slider_products|safe }}</div>
     <!-- Секция — слайдер FAW (начало) -->
@@ -326,7 +339,7 @@
       <div class="mxd-container">
         <div class="mxd-block">
           <div class="faw-bg">
-            <img src="{% static 'images/slider-foto_img/bg-slider.jpg' %}" alt="FAW Slider Background"
+            <img src="{% static 'images/slider-foto_img/bg-slider.webp' %}" alt="FAW Slider Background"
               class="faw-bg-image">
           </div>
           <div class="faw-slider-container">
