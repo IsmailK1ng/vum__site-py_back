@@ -248,14 +248,14 @@ class ProductDetailSerializer(LanguageSerializerMixin, serializers.ModelSerializ
     category_display = serializers.CharField(source='get_category_display', read_only=True)
     title = serializers.SerializerMethodField()
     
-    # ✅ Новое поле
+   
     all_categories = serializers.SerializerMethodField()
     
     class Meta:
         model = Product
         fields = [
             'id', 'title', 'slug', 'category', 'category_display',
-            'all_categories',  # ✅ добавили
+            'all_categories', 
             'main_image_url', 'card_image_url',
             'card_specs', 'spec_groups', 'features', 'gallery',
             'is_active', 'is_featured', 'order'
