@@ -1,0 +1,64 @@
+<div class="charts-grid">
+    
+    <!-- Левая колонка -->
+    <div class="charts-column">
+        
+        <!-- График 1: Динамика по дням -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>📈 Динамика заявок по дням</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="chart-dynamics"></canvas>
+            </div>
+        </div>
+        
+        <!-- График 3: Топ моделей -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>🚗 Топ-10 популярных моделей</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="chart-models"></canvas>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- Правая колонка -->
+    <div class="charts-column">
+        
+        <!-- График 2: Источники трафика -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>🔗 Источники трафика</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="chart-sources"></canvas>
+            </div>
+        </div>
+        
+        <!-- График 4: Топ регионов -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>📍 Топ-5 регионов</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="chart-regions"></canvas>
+            </div>
+        </div>
+        
+    </div>
+    
+</div>
+
+<!-- Тепловая карта на всю ширину -->
+<div class="chart-card heatmap-card">
+    <div class="chart-header">
+        <h3>🔥 Тепловая карта: День × Час</h3>
+        <p class="chart-subtitle">Показывает когда больше всего заявок</p>
+    </div>
+    <div class="heatmap-container" id="heatmap-container">
+        <!-- Тепловая карта будет сгенерирована JS -->
+    </div>
+</div>

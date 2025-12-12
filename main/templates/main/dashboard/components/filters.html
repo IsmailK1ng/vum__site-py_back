@@ -1,0 +1,83 @@
+<div class="filters-panel">
+    <form id="dashboard-filters-form">
+        
+        <div class="filters-row">
+            <!-- Период -->
+            <div class="filter-group">
+                <label>📅 Период</label>
+                <div class="date-inputs">
+                    <input type="date" 
+                           name="date_from" 
+                           id="date_from" 
+                           {% if date_from %}value="{{ date_from }}"{% endif %}
+                           placeholder="От">
+                    <span class="date-separator">—</span>
+                    <input type="date" 
+                           name="date_to" 
+                           id="date_to" 
+                           {% if date_to %}value="{{ date_to }}"{% endif %}
+                           placeholder="До">
+                </div>
+            </div>
+            
+            <!-- Регион -->
+            <div class="filter-group">
+                <label>📍 Регион</label>
+                <select name="region" id="region">
+                    <option value="">Все регионы</option>
+                    {% for code, name in regions %}
+                    <option value="{{ code }}" {% if region == code %}selected{% endif %}>
+                        {{ name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Модель -->
+            <div class="filter-group">
+                <label>🚗 Модель</label>
+                <select name="product" id="product">
+                    <option value="">Все модели</option>
+                    {% for prod in products %}
+                    <option value="{{ prod }}" {% if product == prod %}selected{% endif %}>
+                        {{ prod }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Источник -->
+            <div class="filter-group">
+                <label>🔗 Источник</label>
+                <select name="source" id="source">
+                    <option value="">Все источники</option>
+                    <option value="google" {% if source == 'google' %}selected{% endif %}>Google</option>
+                    <option value="instagram" {% if source == 'instagram' %}selected{% endif %}>Instagram</option>
+                    <option value="facebook" {% if source == 'facebook' %}selected{% endif %}>Facebook</option>
+                    <option value="direct" {% if source == 'direct' %}selected{% endif %}>Прямые</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Кнопки действий -->
+        <div class="filters-actions">
+            <button type="submit" class="btn btn-primary" id="btn-apply">
+                🔄 Применить
+            </button>
+            <button type="button" class="btn btn-secondary" id="btn-reset">
+                ✕ Сбросить
+            </button>
+            
+            <!-- Кнопки экспорта -->
+            <a href="/admin/main/dashboard/export/excel/?date_from={{ date_from }}&date_to={{ date_to }}&region={{ region }}&product={{ product }}&source={{ source }}" 
+               class="btn btn-success">
+                📊 Excel
+            </a>
+            <a href="/admin/main/dashboard/export/word/?date_from={{ date_from }}&date_to={{ date_to }}&region={{ region }}&product={{ product }}&source={{ source }}" 
+               class="btn btn-info">
+                📄 Word
+            </a>
+        </div>
+        
+    </form>
+</div>

@@ -1,26 +1,63 @@
-from django.contrib import admin
-from django.utils.html import format_html
+# main/admin.py
+
+# ========== СТАНДАРТНАЯ БИБЛИОТЕКА ==========
+import json
+import logging
+import openpyxl
+import os
+from datetime import datetime, timedelta
+
+# ========== DJANGO CORE ==========
+from django.conf import settings
+from django.contrib import admin, messages
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Q, Max
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect
-from django.urls import path  
+from django.urls import path
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.utils.html import format_html
+from django.views.decorators.cache import never_cache
 from django import forms
-from django.http import HttpResponse, HttpResponseRedirect
-from django.contrib import messages
+
+# ========== DJANGO THIRD-PARTY ==========
 from modeltranslation.admin import TranslationTabularInline, TranslationStackedInline, TabbedTranslationAdmin
 from reversion.admin import VersionAdmin
 from reversion.models import Version
-from datetime import datetime
-from main.models import AmoCRMToken
-from main.services.amocrm.token_manager import TokenManager
+from openpyxl.styles import Font, PatternFill, Alignment
+
+# ========== ЛОКАЛЬНЫЕ ИМПОРТЫ ==========
 from .models import (
-    News, NewsBlock, ContactForm, Vacancy, 
-    VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
-    JobApplication, FeatureIcon, Product, ProductParameter, ProductFeature, 
-    ProductCardSpec, ProductGallery, DealerService, Dealer,
-    BecomeADealerPage, DealerRequirement, BecomeADealerApplication,
+    News, 
+    NewsBlock, 
+    ContactForm, 
+    Vacancy, 
+    VacancyResponsibility, 
+    VacancyRequirement, 
+    VacancyCondition, 
+    VacancyIdealCandidate,
+    JobApplication, 
+    FeatureIcon, 
+    Product, 
+    ProductParameter, 
+    ProductFeature, 
+    ProductCardSpec, 
+    ProductGallery, 
+    DealerService, 
+    Dealer,
+    BecomeADealerPage, 
+    DealerRequirement, 
+    BecomeADealerApplication,
+    AmoCRMToken,
+    Dashboard,
+    REGION_CHOICES
 )
-import openpyxl
+from main.services.amocrm.token_manager import TokenManager
 
+logger = logging.getLogger('django')
 
+# ========== НАСТРОЙКИ АДМИНКИ ==========
 admin.site.site_header = "Панель управления VUM"
 admin.site.site_title = "VUM Admin"
 admin.site.index_title = "Управление сайтами FAW"
@@ -150,9 +187,6 @@ class CustomReversionMixin:
         return custom_urls + urls
     
     def custom_recover_list_view(self, request):
-        """Кастомное представление для списка восстановления"""
-        from reversion.models import Version
-        from django.conf import settings
         
         opts = self.model._meta
         deleted_versions = Version.objects.get_deleted(self.model)
@@ -193,9 +227,6 @@ class CustomReversionMixin:
         return render(request, 'admin/reversion/recover_list.html', context)
     
     def recover_view(self, request, version_id):
-        from reversion.models import Version
-        from django.contrib import messages
-        from django.shortcuts import redirect
         
         opts = self.model._meta
         
@@ -288,7 +319,6 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
     
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        from reversion.models import Version
         deleted_count = Version.objects.get_deleted(self.model).count()
         if deleted_count > 0:
             extra_context['show_recover_button'] = True
@@ -406,8 +436,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     
     def retry_failed_leads(self, request, queryset):
         """Повторная отправка ошибочных заявок"""
-        from main.services.amocrm.lead_sender import LeadSender
-        import logging
         logger = logging.getLogger('django')
         
         failed_leads = queryset.filter(amocrm_status='failed')
@@ -445,7 +473,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     
     def export_to_excel(self, request, queryset):
         """Экспорт в Excel"""
-        import logging
         logger = logging.getLogger('django')
         
         try:
@@ -463,7 +490,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
             ]
             ws.append(headers)
             
-            from openpyxl.styles import Font, PatternFill, Alignment
             header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
             header_font = Font(bold=True, color='FFFFFF')
             
@@ -523,10 +549,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     
     def get_queryset(self, request):
         """Фильтрация queryset"""
-        from django.db.models import Q
-        from datetime import datetime
-        from django.utils import timezone
-        
         qs = super().get_queryset(request)
         
         # Поиск
@@ -611,7 +633,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         return super().changelist_view(request, extra_context)
 
     def get_urls(self):
-        from django.urls import path
         urls = super().get_urls()
         custom_urls = [
             path('<int:object_id>/quick-update/', self.admin_site.admin_view(self.quick_update_view), name='contactform_quick_update'),
@@ -696,7 +717,6 @@ class VacancyAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        from reversion.models import Version
         deleted_count = Version.objects.get_deleted(self.model).count()
         if deleted_count > 0:
             extra_context['show_recover_button'] = True
@@ -791,7 +811,6 @@ class DealerServiceAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, 
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        from reversion.models import Version
         deleted_count = Version.objects.get_deleted(self.model).count()
         if deleted_count > 0:
             extra_context['show_recover_button'] = True
@@ -847,7 +866,6 @@ class DealerAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedT
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        from reversion.models import Version
         deleted_count = Version.objects.get_deleted(self.model).count()
         if deleted_count > 0:
             extra_context['show_recover_button'] = True
@@ -933,7 +951,6 @@ class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
         headers = ['№', 'ФИО', 'Компания', 'Опыт', 'Регион', 'Телефон', 'Статус', 'Приоритет', 'Менеджер', 'Дата']
         ws.append(headers)
         
-        from openpyxl.styles import Font, PatternFill, Alignment
         header_fill = PatternFill(start_color='FF9800', end_color='FF9800', fill_type='solid')
         header_font = Font(bold=True, color='FFFFFF')
         
@@ -1179,7 +1196,6 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        from reversion.models import Version
         deleted_count = Version.objects.get_deleted(self.model).count()
         if deleted_count > 0:
             extra_context['show_recover_button'] = True
@@ -1199,7 +1215,6 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
     # ========== ОТОБРАЖЕНИЕ ==========
     def token_status(self, obj):
         """Статус токена"""
-        from django.utils import timezone
         
         if not obj.access_token:
             return format_html(
@@ -1227,7 +1242,6 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
     
     def time_left_display(self, obj):
         """Оставшееся время"""
-        from django.utils import timezone
         
         if not obj.expires_at:
             return "—"
@@ -1285,7 +1299,6 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
     
     # ========== МАРШРУТЫ ==========
     def get_urls(self):
-        from django.urls import path
         urls = super().get_urls()
         custom_urls = [
             path('refresh/', self.admin_site.admin_view(self.refresh_token_view), name='amocrm_refresh'),
@@ -1314,8 +1327,7 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
     
     def logs_view(self, request):
         """Показать логи ошибок amoCRM"""
-        import os
-        from django.conf import settings
+
         
         amocrm_log_path = os.path.join(settings.BASE_DIR, 'logs', 'amocrm.log')
         errors_log_path = os.path.join(settings.BASE_DIR, 'logs', 'errors.log')
@@ -1349,7 +1361,6 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
     
     def instructions_view(self, request):
         """Показать инструкцию"""
-        from django.utils import timezone
         
         token_obj = AmoCRMToken.get_instance()
         time_left_text = None
@@ -1381,3 +1392,157 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
             'time_left_text': time_left_text,
         }
         return render(request, 'main/amocrm_instructions.html', context)
+
+# ========== DASHBOARD ==========
+
+@admin.register(Dashboard)
+class DashboardAdmin(admin.ModelAdmin):
+    """
+    Dashboard для аналитики заявок
+    Отображается как отдельная вкладка в админке
+    """
+    
+    # ========== НАСТРОЙКИ ОТОБРАЖЕНИЯ ==========
+    
+    change_list_template = 'main/dashboard/dashboard.html'
+    
+    def has_add_permission(self, request):
+        """Запрещаем добавление"""
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        """Запрещаем удаление"""
+        return False
+    
+    def has_change_permission(self, request, obj=None):
+        """Запрещаем изменение, но разрешаем просмотр"""
+        return self.has_module_permission(request)
+    
+    def has_module_permission(self, request):
+        """Права доступа к Dashboard"""
+        if request.user.is_superuser:
+            return True
+        
+        # Проверяем группы
+        if request.user.groups.filter(name__in=['Главные админы', 'Лид-менеджеры']).exists():
+            return True
+        
+        # Проверяем индивидуальное право
+        return request.user.has_perm('main.view_dashboard')
+    
+    # ========== КАСТОМНЫЕ URL ==========
+    
+    def get_urls(self):
+        """Добавляем API endpoints"""
+        urls = super().get_urls()
+        custom_urls = [
+            path('api/data/', self.admin_site.admin_view(self.dashboard_api_data), name='dashboard_api_data'),
+            path('export/excel/', self.admin_site.admin_view(self.dashboard_export_excel), name='dashboard_export_excel'),
+            path('export/word/', self.admin_site.admin_view(self.dashboard_export_word), name='dashboard_export_word'),
+        ]
+        return custom_urls + urls
+    
+    # ========== VIEW ==========
+    
+    @method_decorator(never_cache)
+    def changelist_view(self, request, extra_context=None):
+        """Главная страница Dashboard"""
+        
+        
+        # Получаем параметры фильтров
+        date_from = request.GET.get('date_from', '')
+        date_to = request.GET.get('date_to', '')
+        region = request.GET.get('region', '')
+        product = request.GET.get('product', '')
+        source = request.GET.get('source', '')
+        
+
+        if not date_from or not date_to:
+            tz = timezone.get_current_timezone()
+            today = timezone.now().astimezone(tz)
+            date_from = today.strftime('%Y-%m-%d')
+            date_to = today.strftime('%Y-%m-%d')
+                
+        # Получаем список уникальных моделей
+        products = ContactForm.objects.exclude(
+            Q(product__isnull=True) | Q(product='')
+        ).values_list('product', flat=True).distinct().order_by('product')
+        
+        context = {
+            **self.admin_site.each_context(request),
+            'title': 'Аналитика заявок FAW',
+            'date_from': date_from,
+            'date_to': date_to,
+            'region': region,
+            'product': product,
+            'source': source,
+            'regions': REGION_CHOICES,
+            'products': list(products),
+        }
+        
+        if extra_context:
+            context.update(extra_context)
+        
+        return render(request, self.change_list_template, context)
+    
+    # ========== API ENDPOINTS ==========
+    
+    def dashboard_api_data(self, request):
+        """API для получения данных Dashboard"""
+
+        try:
+            # Параметры
+            date_from = request.GET.get('date_from')
+            date_to = request.GET.get('date_to')
+            region = request.GET.get('region', '')
+            product = request.GET.get('product', '')
+            source = request.GET.get('source', '')
+            
+            # Парсим даты
+            tz = timezone.get_current_timezone()
+            start_date = timezone.make_aware(datetime.strptime(date_from, '%Y-%m-%d'), tz)
+            end_date = timezone.make_aware(
+                datetime.strptime(date_to, '%Y-%m-%d').replace(hour=23, minute=59, second=59), 
+                tz
+            )
+            
+            # Queryset
+            qs = ContactForm.objects.filter(created_at__gte=start_date, created_at__lte=end_date)
+            
+            if region:
+                qs = qs.filter(region=region)
+            if product:
+                qs = qs.filter(product__icontains=product)
+            if source:
+                if source == 'direct':
+                    qs = qs.filter(Q(utm_data__isnull=True) | Q(utm_data=''))
+                else:
+                    qs = qs.filter(utm_data__icontains=f'"utm_source":"{source}"')
+            
+            # Аналитика
+            from main.services.dashboard.analytics import calculate_kpi
+            from main.services.dashboard.charts import get_chart_data
+            from main.services.dashboard.insights import generate_insights
+            
+            kpi = calculate_kpi(qs, start_date, end_date)
+            charts = get_chart_data(qs, start_date, end_date)
+            insights = generate_insights(qs, start_date, end_date)
+            
+            return JsonResponse({
+                'success': True,
+                'kpi': kpi,
+                'charts': charts,
+                'insights': insights,
+            })
+            
+        except Exception as e:
+            logger.error(f"Dashboard API error: {str(e)}", exc_info=True)
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    
+    def dashboard_export_excel(self, request):
+        """Экспорт в Excel (TODO)"""
+        return HttpResponse('Excel export - coming soon', content_type='text/plain')
+    
+    def dashboard_export_word(self, request):
+        """Экспорт в Word (TODO)"""
+        return HttpResponse('Word export - coming soon', content_type='text/plain')

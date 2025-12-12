@@ -1,30 +1,54 @@
 # main/views.py
 
+# ========== СТАНДАРТНАЯ БИБЛИОТЕКА ==========
+import json
+import logging
+from datetime import datetime, timedelta
+
+# ========== DJANGO CORE ==========
 from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Count, Q, Avg
+from django.db.models.functions import TruncHour, TruncDate
+from django.http import HttpResponseRedirect, HttpResponseForbidden, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.utils import translation
+from django.utils import translation, timezone
+
+# ========== DJANGO REST FRAMEWORK ==========
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import AllowAny, IsAdminUser
-from django.http import HttpResponseRedirect
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+
+# ========== ЛОКАЛЬНЫЕ ИМПОРТЫ ==========
 from .models import (
-    News, ContactForm, JobApplication, Vacancy, Product,
-    Dealer, DealerService, BecomeADealerPage, BecomeADealerApplication
+    News, 
+    ContactForm, 
+    JobApplication, 
+    Vacancy, 
+    Product,
+    Dealer, 
+    DealerService, 
+    BecomeADealerPage, 
+    BecomeADealerApplication,
+    REGION_CHOICES
 )
 from .serializers import (
-    NewsSerializer, ContactFormSerializer, JobApplicationSerializer, 
-    ProductCardSerializer, ProductDetailSerializer,
-    DealerSerializer, DealerServiceSerializer, 
-    BecomeADealerPageSerializer, BecomeADealerApplicationSerializer
+    NewsSerializer, 
+    ContactFormSerializer, 
+    JobApplicationSerializer, 
+    ProductCardSerializer, 
+    ProductDetailSerializer,
+    DealerSerializer, 
+    DealerServiceSerializer, 
+    BecomeADealerPageSerializer, 
+    BecomeADealerApplicationSerializer,
+    VacancySerializer
 )
-import logging
-import json
 
-
+# ========== LOGGER ==========
 logger = logging.getLogger('django')
 
 # === FRONTEND views === 
@@ -229,9 +253,6 @@ class NewsViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return News.objects.select_related('author').prefetch_related('blocks').order_by('-created_at')
 
-
-from rest_framework.permissions import AllowAny, IsAdminUser
-from rest_framework.decorators import permission_classes
 
 class ContactFormViewSet(viewsets.ModelViewSet):
     """API для контактных форм FAW.UZ"""
@@ -561,3 +582,118 @@ def log_js_error(request):
     except Exception as e:
         logger.error(f"Ошибка логирования JS ошибки: {str(e)}", exc_info=True)
         return Response({'status': 'error'}, status=500)
+
+# ========== DASHBOARD ==========
+
+
+@staff_member_required
+def dashboard_view(request):
+    """Главная страница Dashboard с аналитикой"""
+    
+    # Проверка прав доступа
+    if not request.user.is_superuser:
+        if not request.user.groups.filter(name__in=['Главные админы', 'Лид-менеджеры']).exists():
+            return HttpResponseForbidden('У вас нет доступа к этой странице')
+    
+    # Получаем параметры фильтров
+    date_from = request.GET.get('date_from', '')
+    date_to = request.GET.get('date_to', '')
+    region = request.GET.get('region', '')
+    product = request.GET.get('product', '')
+    source = request.GET.get('source', '')
+    
+    # Если дат нет — ставим последние 7 дней
+    if not date_from or not date_to:
+        tz = timezone.get_current_timezone()
+        end_date = timezone.now().astimezone(tz)
+        start_date = end_date - timedelta(days=7)
+        date_from = start_date.strftime('%Y-%m-%d')
+        date_to = end_date.strftime('%Y-%m-%d')
+    
+    # Формируем контекст
+    from main.models import REGION_CHOICES
+    
+    # Получаем список уникальных моделей
+    products = ContactForm.objects.exclude(
+        Q(product__isnull=True) | Q(product='')
+    ).values_list('product', flat=True).distinct().order_by('product')
+    
+    context = {
+        'date_from': date_from,
+        'date_to': date_to,
+        'region': region,
+        'product': product,
+        'source': source,
+        'regions': REGION_CHOICES,
+        'products': list(products),
+    }
+    
+    return render(request, 'main/dashboard/dashboard.html', context)
+
+
+@staff_member_required
+def dashboard_api_data(request):
+    """API endpoint для получения данных dashboard через AJAX"""
+    from django.http import JsonResponse
+    
+    try:
+        # Получаем параметры фильтров
+        date_from = request.GET.get('date_from')
+        date_to = request.GET.get('date_to')
+        region = request.GET.get('region', '')
+        product = request.GET.get('product', '')
+        source = request.GET.get('source', '')
+        
+        # Парсим даты
+        tz = timezone.get_current_timezone()
+        start_date = timezone.make_aware(datetime.strptime(date_from, '%Y-%m-%d'), tz)
+        end_date = timezone.make_aware(datetime.strptime(date_to, '%Y-%m-%d').replace(hour=23, minute=59, second=59), tz)
+        
+        # Базовый queryset
+        qs = ContactForm.objects.filter(
+            created_at__gte=start_date,
+            created_at__lte=end_date
+        )
+        
+        # Применяем фильтры
+        if region:
+            qs = qs.filter(region=region)
+        if product:
+            qs = qs.filter(product__icontains=product)
+        if source:
+            # Фильтр по источнику через utm_data
+            if source == 'direct':
+                qs = qs.filter(Q(utm_data__isnull=True) | Q(utm_data=''))
+            else:
+                qs = qs.filter(utm_data__icontains=f'"utm_source":"{source}"')
+        
+        # Вызываем функции из services/dashboard
+        from main.services.dashboard.analytics import calculate_kpi
+        from main.services.dashboard.charts import get_chart_data
+        
+        kpi = calculate_kpi(qs, start_date, end_date)
+        charts = get_chart_data(qs, start_date, end_date)
+        
+        return JsonResponse({
+            'success': True,
+            'kpi': kpi,
+            'charts': charts,
+        })
+        
+    except Exception as e:
+        logger.error(f"Ошибка dashboard API: {str(e)}", exc_info=True)
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+
+@staff_member_required
+def dashboard_export_excel(request):
+    """Экспорт dashboard в Excel"""
+    # TODO: Реализуем на следующем шаге
+    pass
+
+
+@staff_member_required
+def dashboard_export_word(request):
+    """Экспорт dashboard в Word"""
+    # TODO: Реализуем на следующем шаге
+    pass

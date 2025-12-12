@@ -1,11 +1,11 @@
 // main/static/js/utm-tracker.js
 // Production version - UTM tracking for FAW Trucks
 
-(function() {
+(function () {
     'use strict';
-    
+
     // Cookie read function
-    window.getCookie = function(name) {
+    window.getCookie = function (name) {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
         if (parts.length === 2) {

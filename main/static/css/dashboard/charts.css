@@ -1,0 +1,195 @@
+/* ==================== ГРАФИКИ ==================== */
+.charts-section {
+    margin-bottom: 24px;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.charts-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.chart-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.chart-card:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.chart-header {
+    margin-bottom: 20px;
+}
+
+.chart-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.chart-subtitle {
+    font-size: 13px;
+    color: var(--gray);
+    margin: 0;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+}
+
+.chart-container canvas {
+    max-height: 300px;
+}
+
+/* ==================== ТЕПЛОВАЯ КАРТА ==================== */
+.heatmap-card {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.heatmap-container {
+    overflow-x: auto;
+    padding: 16px 0;
+}
+
+.heatmap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.heatmap-table th,
+.heatmap-table td {
+    padding: 12px 8px;
+    text-align: center;
+    border: 1px solid var(--border);
+    min-width: 60px;
+}
+
+.heatmap-table th {
+    background: var(--gray-light);
+    font-weight: 700;
+    color: #4b5563;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.heatmap-table tbody th {
+    background: var(--gray-light);
+    font-weight: 600;
+    text-align: left;
+    position: sticky;
+    left: 0;
+    z-index: 5;
+}
+
+.heatmap-cell {
+    position: relative;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+}
+
+.heatmap-cell:hover {
+    transform: scale(1.1);
+    z-index: 100;
+    box-shadow: 0 0 0 2px var(--blue);
+}
+
+/* Цветовая градация */
+.heatmap-cell[data-intensity="0"] {
+    background: #f9fafb;
+    color: #9ca3af;
+}
+
+.heatmap-cell[data-intensity="1"] {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.heatmap-cell[data-intensity="2"] {
+    background: #93c5fd;
+    color: #1e3a8a;
+}
+
+.heatmap-cell[data-intensity="3"] {
+    background: #3b82f6;
+    color: white;
+}
+
+.heatmap-cell[data-intensity="4"] {
+    background: #1e40af;
+    color: white;
+}
+
+.heatmap-cell[data-intensity="5"] {
+    background: #1e3a8a;
+    color: white;
+    font-weight: 700;
+}
+
+/* Легенда для тепловой карты */
+.heatmap-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-color {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+}
+
+/* ==================== АДАПТИВНОСТЬ ==================== */
+@media (max-width: 1200px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 200px;
+    }
+    
+    .heatmap-table {
+        font-size: 10px;
+    }
+    
+    .heatmap-table th,
+    .heatmap-table td {
+        padding: 8px 4px;
+        min-width: 40px;
+    }
+}

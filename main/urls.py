@@ -18,5 +18,10 @@ urlpatterns = [
     path('jobs/', views.jobs, name='jobs'),
     path('api/log-js-error/', views.log_js_error, name='log_js_error'),
     path('test-utm/', TemplateView.as_view(template_name='test-utm.html'), name='test_utm'),
-
-]   
+    
+    # ========== DASHBOARD ==========
+    path('admin/dashboard/', views.dashboard_view, name='admin_dashboard'),
+    path('admin/dashboard/api/data/', views.dashboard_api_data, name='dashboard_api_data'),
+    path('admin/dashboard/export/excel/', views.dashboard_export_excel, name='dashboard_export_excel'),
+    path('admin/dashboard/export/word/', views.dashboard_export_word, name='dashboard_export_word'),
+]

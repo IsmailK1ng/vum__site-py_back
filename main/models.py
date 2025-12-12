@@ -756,3 +756,22 @@ class AmoCRMToken(models.Model):
         
         # Обновляем за 1 час до истечения
         return timezone.now() + timedelta(hours=1) >= self.expires_at
+
+# ========== DASHBOARD (прокси-модель для админки) ==========
+
+class Dashboard(models.Model):
+    """
+    Заглушка для отображения Dashboard в админке Django.
+    Это не настоящая таблица, используется только для меню.
+    """
+    
+    class Meta:
+        managed = False  # Django не создаёт таблицу в БД
+        verbose_name = " Dashboard"
+        verbose_name_plural = " Аналитика Dashboard"
+        
+        # Указываем на несуществующую таблицу
+        db_table = 'dashboard_proxy_table'
+        
+        # ✅ ДОБАВЛЯЕМ default_permissions для управления правами
+        default_permissions = ('view',)  # Только право на просмотр
