@@ -52,8 +52,12 @@
                 <select name="source" id="source">
                     <option value="">Все источники</option>
                     <option value="google" {% if source == 'google' %}selected{% endif %}>Google</option>
+                    <option value="yandex" {% if source == 'yandex' %}selected{% endif %}>Яндекс</option>
                     <option value="instagram" {% if source == 'instagram' %}selected{% endif %}>Instagram</option>
                     <option value="facebook" {% if source == 'facebook' %}selected{% endif %}>Facebook</option>
+                    <option value="telegram" {% if source == 'telegram' %}selected{% endif %}>Telegram</option>
+                    <option value="tiktok" {% if source == 'tiktok' %}selected{% endif %}>TikTok</option>
+                    <option value="youtube" {% if source == 'youtube' %}selected{% endif %}>YouTube</option>
                     <option value="direct" {% if source == 'direct' %}selected{% endif %}>Прямые</option>
                 </select>
             </div>

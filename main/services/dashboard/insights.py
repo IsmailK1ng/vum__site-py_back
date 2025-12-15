@@ -110,8 +110,12 @@ def _analyze_sources(queryset, total_leads, good, problems, recommendations):
     
     sources = {
         'google': {'count': 0, 'amocrm': 0},
+        'yandex': {'count': 0, 'amocrm': 0},
         'instagram': {'count': 0, 'amocrm': 0},
         'facebook': {'count': 0, 'amocrm': 0},
+        'telegram': {'count': 0, 'amocrm': 0},
+        'tiktok': {'count': 0, 'amocrm': 0},
+        'youtube': {'count': 0, 'amocrm': 0},
     }
     
     for lead in queryset:
@@ -123,10 +127,18 @@ def _analyze_sources(queryset, total_leads, good, problems, recommendations):
                 key = None
                 if 'google' in source:
                     key = 'google'
-                elif 'instagram' in source or 'ig' in source:
+                elif 'yandex' in source or source == 'yd':
+                    key = 'yandex'
+                elif source in ['ig', 'instagram']:
                     key = 'instagram'
-                elif 'facebook' in source or 'fb' in source:
+                elif source in ['fb', 'facebook']:
                     key = 'facebook'
+                elif 'telegram' in source or source == 'tg':
+                    key = 'telegram'
+                elif 'tiktok' in source or source == 'tt':
+                    key = 'tiktok'
+                elif 'youtube' in source or source == 'yt':
+                    key = 'youtube'
                 
                 if key:
                     sources[key]['count'] += 1
@@ -134,6 +146,31 @@ def _analyze_sources(queryset, total_leads, good, problems, recommendations):
                         sources[key]['amocrm'] += 1
             except:
                 pass
+    
+    # Анализируем каждый источник
+    source_names = {
+        'google': 'Google Ads',
+        'yandex': 'Яндекс Директ',
+        'instagram': 'Instagram',
+        'facebook': 'Facebook',
+        'telegram': 'Telegram Ads',
+        'tiktok': 'TikTok',
+        'youtube': 'YouTube',
+    }
+    
+    for source, data in sources.items():
+        if data['count'] > 0:
+            conversion = round(data['amocrm'] / data['count'] * 100, 1)
+            percent = round(data['count'] / total_leads * 100, 1)
+            
+            source_name = source_names.get(source, source)
+            
+            if conversion >= 90:
+                good.append(f"{source_name} — отличная конверсия {conversion}%")
+                recommendations.append(f"Масштабировать {source_name} (+20-30% бюджета)")
+            elif conversion < 80:
+                problems.append(f"{source_name} — низкая конверсия {conversion}% (ниже среднего)")
+                recommendations.append(f"Оптимизировать креативы и таргетинг для {source_name}")
     
     # Анализируем каждый источник
     for source, data in sources.items():

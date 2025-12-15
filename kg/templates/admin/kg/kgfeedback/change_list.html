@@ -2,8 +2,32 @@
 {% load i18n static %}
 
 {% block object-tools-items %}
+    {# 📊 КНОПКА СТАТИСТИКИ (в правом верхнем углу) #}
+    {% if stats_button_html %}
+    <li>
+        <a href="/admin/kg/stats/" target="_blank" style="
+            background: linear-gradient(306deg, #000000, #002b9b, #1e57eb);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 43, 155, 0.2);
+        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 43, 155, 0.3)';"
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0, 43, 155, 0.2)';">
+            📊 Статистика заявок
+        </a>
+    </li>
+    {% endif %}
+
     {{ block.super }}
     
+    {# 🗑️ КНОПКА ВОССТАНОВЛЕНИЯ #}
     {% if show_recover_button %}
     <li>
         <a href="recover/" style="

@@ -101,7 +101,7 @@ class KGFeedbackViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED
         )
     
-    @action(detail=False, methods=['get'], permission_classes=[IsSuperUser])
+    @action(detail=False, methods=['get'], permission_classes=[IsAdminUser])
     def statistics(self, request):
         """Статистика с фильтрами"""
         from datetime import timedelta
@@ -264,11 +264,15 @@ class KGFeedbackQuickUpdateViewSet(viewsets.ViewSet):
 
 @staff_member_required
 def kg_stats_dashboard(request):
-    if not request.user.is_superuser:
+    # ✅ ДОСТУП: суперюзеры + группы + право просмотра заявок
+    if not (request.user.is_superuser or 
+            request.user.groups.filter(name__in=['Главные админы', 'Лиды KG', 'Лиды UZ+KG']).exists() or
+            request.user.has_perm('kg.view_kgfeedback')):  # 👈 Используем встроенное право
+        
         from django.http import HttpResponseForbidden
         return HttpResponseForbidden(
             '<h1 style="text-align:center; margin-top:100px; color:#dc3545;">'
-            '🚫 Доступ запрещён<br><small>Только для суперпользователей</small>'
+            '🚫 Доступ запрещён<br><small>Только для администраторов и лид-менеджеров</small>'
             '</h1>'
         )
     

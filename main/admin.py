@@ -1,12 +1,5 @@
 # main/admin.py
 
-import json
-import logging
-import openpyxl
-import os
-from datetime import datetime, timedelta
-
-# ========== DJANGO CORE ==========
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -18,7 +11,6 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.html import format_html
 from django.views.decorators.cache import never_cache
-from urllib.parse import unquote
 from django import forms
 
 # ========== DJANGO THIRD-PARTY ==========
@@ -26,6 +18,14 @@ from modeltranslation.admin import TranslationTabularInline, TranslationStackedI
 from reversion.admin import VersionAdmin
 from reversion.models import Version
 from openpyxl.styles import Font, PatternFill, Alignment
+
+# ========== PYTHON STANDARD LIBRARY ==========
+import json
+import logging
+import openpyxl
+import os
+from datetime import datetime, timedelta
+from urllib.parse import unquote
 
 # ========== ЛОКАЛЬНЫЕ ИМПОРТЫ ==========
 from .models import (
@@ -54,6 +54,9 @@ from .models import (
     REGION_CHOICES
 )
 from main.services.amocrm.token_manager import TokenManager
+from main.services.dashboard.analytics import calculate_kpi
+from main.services.dashboard.charts import get_chart_data
+from main.services.dashboard.insights import generate_insights
 
 logger = logging.getLogger('django')
 
@@ -1391,10 +1394,7 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
 
 @admin.register(Dashboard)
 class DashboardAdmin(admin.ModelAdmin):
-    """
-    Dashboard для аналитики заявок
-    Отображается как отдельная вкладка в админке
-    """
+
     
     # ========== НАСТРОЙКИ ОТОБРАЖЕНИЯ ==========
     
@@ -1450,7 +1450,6 @@ class DashboardAdmin(admin.ModelAdmin):
     def changelist_view(self, request, extra_context=None):
         """Главная страница Dashboard"""
         
-        from urllib.parse import unquote
         
         date_from = request.GET.get('date_from', '')
         date_to = request.GET.get('date_to', '')
@@ -1511,12 +1510,19 @@ class DashboardAdmin(admin.ModelAdmin):
                 if source == 'direct':
                     qs = qs.filter(Q(utm_data__isnull=True) | Q(utm_data=''))
                 else:
-                    qs = qs.filter(utm_data__icontains=f'"utm_source":"{source}"')
+                    source_map = {
+                        'google': 'google',
+                        'yandex': 'yandex',
+                        'instagram': 'ig',
+                        'facebook': 'fb',
+                        'telegram': 'telegram',
+                        'tiktok': 'tiktok',
+                        'youtube': 'youtube',
+                    }
+                    real_source = source_map.get(source, source)
 
-            from main.services.dashboard.analytics import calculate_kpi
-            from main.services.dashboard.charts import get_chart_data
-            from main.services.dashboard.insights import generate_insights
-            
+                    qs = qs.filter(utm_data__icontains=f'"utm_source":"{real_source}"')
+
             kpi = calculate_kpi(qs, start_date, end_date)
             charts = get_chart_data(qs, start_date, end_date)
             insights = generate_insights(qs, start_date, end_date)
@@ -1560,8 +1566,6 @@ class DashboardAdmin(admin.ModelAdmin):
                 else:
                     qs = qs.filter(utm_data__icontains=f'"utm_source":"{source}"')
             
-            from main.services.dashboard.analytics import calculate_kpi
-            from main.services.dashboard.charts import get_chart_data
             
             kpi = calculate_kpi(qs, start_date, end_date)
             charts = get_chart_data(qs, start_date, end_date)

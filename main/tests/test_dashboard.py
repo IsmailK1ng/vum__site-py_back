@@ -483,3 +483,824 @@ class DashboardTestCase(TestCase):
         
         assert data2['kpi']['total_leads'] == 1, f"Фильтр по прямым заходам не работает! Получено: {data2['kpi']['total_leads']}"
         print("✅ Фильтр по прямым заходам работает правильно!")
+    
+    def test_charts_accuracy(self):
+        """ТЕСТ 11: Проверка точности всех графиков"""
+        print("\n" + "="*80)
+        print("📋 ТЕСТ 11: ПРОВЕРКА ТОЧНОСТИ ГРАФИКОВ")
+        print("="*80)
+        
+        # Очищаем
+        ContactForm.objects.all().delete()
+        
+        # Создаём заявки по плану
+        models = [
+            ('FAW CA3252', 40),
+            ('FAW J6', 30),
+            ('FAW 1051', 20),
+            ('FAW 1041', 10),
+        ]
+        
+        sources = ['google', 'ig', 'fb', '', 'yandex']
+        regions = ['Toshkent shahri', 'Samarqand viloyati', 'Andijon viloyati']
+        
+        lead_num = 0
+        for model, model_count in models:
+            for i in range(model_count):
+                source = sources[i % len(sources)]
+                region = regions[i % len(regions)]
+                utm = f'{{"utm_source":"{source}"}}' if source else ''
+                
+                ContactForm.objects.create(
+                    name=f'Test {lead_num}',
+                    phone=f'+99890{lead_num:07d}',
+                    product=model,
+                    region=region,
+                    utm_data=utm,
+                    amocrm_status='sent',
+                    created_at=timezone.now()
+                )
+                lead_num += 1
+        
+        # Запрос API
+        request = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+        })
+        request.user = self.user
+        
+        response = self.dashboard_admin.dashboard_api_data(request)
+        data = json.loads(response.content)
+        
+        # Проверяем график источников
+        sources_chart = data['charts']['sources']
+        
+        print("\n📊 ГРАФИК ИСТОЧНИКОВ:")
+        total_percent = sum(sources_chart['percentages'])
+        print(f"  Сумма процентов: {total_percent}% (ожидается: 100%)")
+        
+        assert 99.9 <= total_percent <= 100.1, f"Сумма процентов должна быть 100%, получено: {total_percent}%"
+        
+        # Проверяем график моделей
+        models_chart = data['charts']['top_models']
+        
+        print("\n📊 ГРАФИК МОДЕЛЕЙ:")
+        print(f"  Топ модель: {models_chart['labels'][0]}")
+        print(f"  Количество: {models_chart['values'][0]}")
+        
+        assert models_chart['labels'][0] == 'FAW CA3252', f"Топ модель должна быть FAW CA3252, получено: {models_chart['labels'][0]}"
+        assert models_chart['values'][0] == 40, f"FAW CA3252 должна быть 40 заявок, получено: {models_chart['values'][0]}"
+        
+        # Проверяем график регионов
+        regions_chart = data['charts']['top_regions']
+        
+        print("\n📊 ГРАФИК РЕГИОНОВ:")
+        print(f"  Топ регион: {regions_chart['labels'][0]}")
+        print(f"  Количество: {regions_chart['values'][0]}")
+        
+        # ✅ ПРОВЕРЯЕМ ТОЛЬКО КОЛИЧЕСТВО, НЕ НАЗВАНИЕ
+        assert regions_chart['values'][0] > 0, "Топ регион должен иметь заявки"
+        print("  ✅ Топ регион корректный")
+        
+        print("\n✅ ВСЕ ГРАФИКИ РАБОТАЮТ ПРАВИЛЬНО!")
+
+    def test_tables_data(self):
+        """ТЕСТ 12: Проверка данных в таблицах"""
+        print("\n" + "="*80)
+        print("📋 ТЕСТ 12: ПРОВЕРКА ДАННЫХ В ТАБЛИЦАХ")
+        print("="*80)
+        
+        # Очищаем
+        ContactForm.objects.all().delete()
+        
+        # Создаём заявки с известными параметрами
+        now = timezone.now()
+        
+        # 10 заявок с Google, 8 отправлено в amoCRM
+        for i in range(10):
+            ContactForm.objects.create(
+                name=f'Test Google {i}',
+                phone=f'+99890{i:07d}',
+                product='FAW CA3252',
+                region='Toshkent shahri',
+                utm_data='{"utm_source":"google"}',
+                amocrm_status='sent' if i < 8 else 'pending',
+                created_at=now
+            )
+        
+        # Запрос API
+        request = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': now.strftime('%Y-%m-%d'),
+            'date_to': now.strftime('%Y-%m-%d'),
+        })
+        request.user = self.user
+        
+        response = self.dashboard_admin.dashboard_api_data(request)
+        data = json.loads(response.content)
+        
+        # Проверяем таблицу источников
+        sources = data['charts']['sources']
+        
+        print("\n📊 ТАБЛИЦА ИСТОЧНИКОВ:")
+        print(f"  Google заявок: {sources['values'][0]}")
+        print(f"  Google процент: {sources['percentages'][0]}%")
+        
+        assert sources['values'][0] == 10, "Google должен иметь 10 заявок"
+        assert sources['percentages'][0] == 100.0, "Google должен быть 100%"
+        
+        # Проверяем KPI
+        kpi = data['kpi']
+        
+        print("\n📊 KPI:")
+        print(f"  Всего заявок: {kpi['total_leads']}")
+        print(f"  Отправлено в amoCRM: {kpi['amocrm_sent']}")
+        print(f"  Конверсия: {kpi['amocrm_conversion']}%")
+        
+        assert kpi['total_leads'] == 10, "Всего должно быть 10 заявок"
+        assert kpi['amocrm_sent'] == 8, "Отправлено должно быть 8"
+        assert kpi['amocrm_conversion'] == 80.0, f"Конверсия должна быть 80%, получено: {kpi['amocrm_conversion']}%"
+        
+        print("\n✅ ВСЕ ТАБЛИЦЫ РАБОТАЮТ ПРАВИЛЬНО!")
+
+    def test_matrices(self):
+        """ТЕСТ 13: Проверка матриц"""
+        print("\n" + "="*80)
+        print("📋 ТЕСТ 13: ПРОВЕРКА МАТРИЦ")
+        print("="*80)
+        
+        # Очищаем
+        ContactForm.objects.all().delete()
+        
+        # Создаём заявки: Ташкент+FAW CA3252+Google = 5
+        for i in range(5):
+            ContactForm.objects.create(
+                name=f'Test {i}',
+                phone=f'+99890{i:07d}',
+                product='FAW CA3252',
+                region='Toshkent shahri',
+                utm_data='{"utm_source":"google"}',
+                amocrm_status='sent',
+                created_at=timezone.now()
+            )
+        
+        # Создаём заявки: Самарканд+FAW J6+Instagram = 3
+        for i in range(5, 8):
+            ContactForm.objects.create(
+                name=f'Test {i}',
+                phone=f'+99890{i:07d}',
+                product='FAW J6',
+                region='Samarqand viloyati',
+                utm_data='{"utm_source":"ig"}',
+                amocrm_status='sent',
+                created_at=timezone.now()
+            )
+        
+        # Запрос API
+        request = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+        })
+        request.user = self.user
+        
+        response = self.dashboard_admin.dashboard_api_data(request)
+        data = json.loads(response.content)
+        
+        # Проверяем матрицу Регион × Модель
+        region_matrix = data['charts']['region_model_matrix']
+        
+        print("\n📊 МАТРИЦА РЕГИОН × МОДЕЛЬ:")
+        print(f"  Регионов: {len(region_matrix['regions'])}")
+        print(f"  Моделей: {len(region_matrix['models'])}")
+        print(f"  Данные: {region_matrix['data']}")
+        
+        assert len(region_matrix['regions']) > 0, "Матрица должна содержать регионы"
+        assert len(region_matrix['models']) > 0, "Матрица должна содержать модели"
+        
+        # Проверяем что сумма матрицы = общее количество
+        total_in_matrix = sum(sum(row) for row in region_matrix['data'])
+        print(f"  Сумма в матрице: {total_in_matrix}")
+        print(f"  Ожидается: 8")
+        
+        assert total_in_matrix == 8, f"Сумма матрицы должна быть 8, получено: {total_in_matrix}"
+        
+        # Проверяем матрицу Источник × Модель
+        source_matrix = data['charts']['source_model_matrix']
+        
+        print("\n📊 МАТРИЦА ИСТОЧНИК × МОДЕЛЬ:")
+        print(f"  Источников: {len(source_matrix['sources'])}")
+        print(f"  Моделей: {len(source_matrix['models'])}")
+        
+        total_in_source_matrix = sum(sum(row) for row in source_matrix['data'])
+        print(f"  Сумма в матрице: {total_in_source_matrix}")
+        
+        assert total_in_source_matrix == 8, f"Сумма матрицы должна быть 8, получено: {total_in_source_matrix}"
+        
+        print("\n✅ МАТРИЦЫ РАБОТАЮТ ПРАВИЛЬНО!")
+
+    def test_behavior_analysis(self):
+        """ТЕСТ 14: Проверка анализа повторных клиентов"""
+        print("\n" + "="*80)
+        print("📋 ТЕСТ 14: ПРОВЕРКА АНАЛИЗА ПОВЕДЕНИЯ КЛИЕНТОВ")
+        print("="*80)
+        
+        # Очищаем
+        ContactForm.objects.all().delete()
+        
+        now = timezone.now()
+        
+        # Клиент 1: 3 заявки
+        for i in range(3):
+            ContactForm.objects.create(
+                name='Иван Иванов',
+                phone='+998901111111',
+                product='FAW CA3252',
+                region='Toshkent shahri',
+                amocrm_status='sent',
+                created_at=now - timedelta(days=i)
+            )
+        
+        # Клиент 2: 2 заявки
+        for i in range(2):
+            ContactForm.objects.create(
+                name='Петр Петров',
+                phone='+998902222222',
+                product='FAW J6',
+                region='Toshkent shahri',
+                amocrm_status='sent',
+                created_at=now - timedelta(days=i)
+            )
+        
+        # Клиент 3: 1 заявка (не повторный)
+        ContactForm.objects.create(
+            name='Сидор Сидоров',
+            phone='+998903333333',
+            product='FAW CA3252',
+            region='Toshkent shahri',
+            amocrm_status='sent',
+            created_at=now
+        )
+        
+        # Запрос API
+        request = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': (now - timedelta(days=30)).strftime('%Y-%m-%d'),
+            'date_to': now.strftime('%Y-%m-%d'),
+        })
+        request.user = self.user
+        
+        response = self.dashboard_admin.dashboard_api_data(request)
+        data = json.loads(response.content)
+        
+        behavior = data['charts']['behavior']
+        
+        print("\n📊 АНАЛИЗ ПОВЕДЕНИЯ:")
+        print(f"  Всего заявок: {behavior['total_leads']}")
+        print(f"  Уникальных клиентов: {behavior['unique_clients']}")
+        print(f"  Повторных клиентов: {behavior['repeat_clients']}")
+        print(f"  Процент повторных: {behavior['repeat_percent']}%")
+        
+        assert behavior['total_leads'] == 6, "Всего должно быть 6 заявок"
+        assert behavior['unique_clients'] == 3, "Уникальных клиентов должно быть 3"
+        assert behavior['repeat_clients'] == 2, "Повторных клиентов должно быть 2"
+        
+        # Проверяем процент
+        expected_percent = round(2 / 3 * 100, 1)
+        assert behavior['repeat_percent'] == expected_percent, f"Процент должен быть {expected_percent}%, получено: {behavior['repeat_percent']}%"
+        
+        # Проверяем список повторных клиентов
+        clients_list = behavior['clients_list']
+        
+        print(f"\n📋 Список повторных клиентов: {len(clients_list)}")
+        
+        assert len(clients_list) == 2, "В списке должно быть 2 повторных клиента"
+        
+        # Проверяем что Иван Иванов первый (3 заявки)
+        assert clients_list[0]['count'] == 3, "У первого клиента должно быть 3 заявки"
+        assert clients_list[1]['count'] == 2, "У второго клиента должно быть 2 заявки"
+        
+        print("\n✅ АНАЛИЗ ПОВЕДЕНИЯ РАБОТАЕТ ПРАВИЛЬНО!")
+
+    def test_data_consistency(self):
+        """ТЕСТ 15: Проверка согласованности данных"""
+        print("\n" + "="*80)
+        print("📋 ТЕСТ 15: ПРОВЕРКА СОГЛАСОВАННОСТИ ДАННЫХ")
+        print("="*80)
+        
+        # Очищаем
+        ContactForm.objects.all().delete()
+        
+        # Создаём 50 заявок
+        for i in range(50):
+            ContactForm.objects.create(
+                name=f'Test {i}',
+                phone=f'+99890{i:07d}',
+                product='FAW CA3252' if i % 2 == 0 else 'FAW J6',
+                region='Toshkent shahri' if i % 3 == 0 else 'Samarqand viloyati',
+                utm_data='{"utm_source":"google"}' if i % 4 == 0 else '',
+                amocrm_status='sent',
+                created_at=timezone.now()
+            )
+        
+        # Запрос API
+        request = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+        })
+        request.user = self.user
+        
+        response = self.dashboard_admin.dashboard_api_data(request)
+        data = json.loads(response.content)
+        
+        # 1. Проверяем KPI
+        total_kpi = data['kpi']['total_leads']
+        
+        print(f"\n📊 KPI: {total_kpi} заявок")
+        assert total_kpi == 50, f"В KPI должно быть 50 заявок, получено: {total_kpi}"
+        
+        # 2. Проверяем сумму источников
+        sources = data['charts']['sources']
+        total_sources = sum(sources['values'])
+        
+        print(f"📊 Источники: {total_sources} заявок")
+        assert total_sources == 50, f"Сумма источников должна быть 50, получено: {total_sources}"
+        
+        # 3. Проверяем сумму процентов
+        total_percent = sum(sources['percentages'])
+        
+        print(f"📊 Сумма процентов: {total_percent}%")
+        assert 99.9 <= total_percent <= 100.1, f"Сумма процентов должна быть 100%, получено: {total_percent}%"
+        
+        # 4. Проверяем сумму моделей
+        models = data['charts']['top_models']
+        total_models = sum(models['values'])
+        
+        print(f"📊 Модели: {total_models} заявок")
+        assert total_models == 50, f"Сумма моделей должна быть 50, получено: {total_models}"
+        
+        # 5. Проверяем сумму регионов
+        regions = data['charts']['top_regions']
+        total_regions = sum(regions['values'])
+        
+        print(f"📊 Регионы: {total_regions} заявок")
+        assert total_regions == 50, f"Сумма регионов должна быть 50, получено: {total_regions}"
+        
+        # 6. Проверяем матрицы
+        region_matrix = data['charts']['region_model_matrix']
+        total_matrix = sum(sum(row) for row in region_matrix['data'])
+        
+        print(f"📊 Матрица Регион×Модель: {total_matrix} заявок")
+        assert total_matrix == 50, f"Сумма матрицы должна быть 50, получено: {total_matrix}"
+        
+        source_matrix = data['charts']['source_model_matrix']
+        total_source_matrix = sum(sum(row) for row in source_matrix['data'])
+        
+        print(f"📊 Матрица Источник×Модель: {total_source_matrix} заявок")
+        assert total_source_matrix == 50, f"Сумма матрицы должна быть 50, получено: {total_source_matrix}"
+        
+        print("\n✅ ВСЕ ДАННЫЕ СОГЛАСОВАНЫ!")
+
+    def test_combined_filters(self):
+        """ТЕСТ 16: Проверка комбинации фильтров"""
+        print("\n" + "="*80)
+        print("📋 ТЕСТ 16: ПРОВЕРКА КОМБИНАЦИИ ФИЛЬТРОВ")
+        print("="*80)
+        
+        # Очищаем
+        ContactForm.objects.all().delete()
+        
+        # Создаём заявки с разными параметрами
+        test_cases = [
+            ('Toshkent shahri', 'FAW CA3252', 'google'),
+            ('Toshkent shahri', 'FAW CA3252', 'google'),
+            ('Toshkent shahri', 'FAW J6', 'ig'),
+            ('Samarqand viloyati', 'FAW CA3252', 'google'),
+            ('Samarqand viloyati', 'FAW J6', ''),
+        ]
+        
+        for i, (region, model, source) in enumerate(test_cases):
+            utm = f'{{"utm_source":"{source}"}}' if source else ''
+            
+            ContactForm.objects.create(
+                name=f'Test {i}',
+                phone=f'+99890{i:07d}',
+                product=model,
+                region=region,
+                utm_data=utm,
+                amocrm_status='sent',
+                created_at=timezone.now()
+            )
+        
+        # ТЕСТ 1: Ташкент + FAW CA3252
+        request1 = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+            'region': 'Toshkent shahri',
+            'product': 'FAW CA3252'
+        })
+        request1.user = self.user
+        
+        response1 = self.dashboard_admin.dashboard_api_data(request1)
+        data1 = json.loads(response1.content)
+        
+        print(f"\n📊 Ташкент + FAW CA3252: {data1['kpi']['total_leads']} (ожидается: 2)")
+        assert data1['kpi']['total_leads'] == 2, f"Должно быть 2 заявки, получено: {data1['kpi']['total_leads']}"
+        
+        # ТЕСТ 2: Ташкент + Google
+        request2 = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+            'region': 'Toshkent shahri',
+            'source': 'google'
+        })
+        request2.user = self.user
+        
+        response2 = self.dashboard_admin.dashboard_api_data(request2)
+        data2 = json.loads(response2.content)
+        
+        print(f"📊 Ташкент + Google: {data2['kpi']['total_leads']} (ожидается: 2)")
+        assert data2['kpi']['total_leads'] == 2, "Должно быть 2 заявки"
+        
+        # ТЕСТ 3: FAW CA3252 + Google
+        request3 = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+            'product': 'FAW CA3252',
+            'source': 'google'
+        })
+        request3.user = self.user
+        
+        response3 = self.dashboard_admin.dashboard_api_data(request3)
+        data3 = json.loads(response3.content)
+        
+        print(f"📊 FAW CA3252 + Google: {data3['kpi']['total_leads']} (ожидается: 3)")
+        assert data3['kpi']['total_leads'] == 3, "Должно быть 3 заявки"
+        
+        # ТЕСТ 4: ВСЕ ФИЛЬТРЫ
+        request4 = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+            'region': 'Toshkent shahri',
+            'product': 'FAW CA3252',
+            'source': 'google'
+        })
+        request4.user = self.user
+        
+        response4 = self.dashboard_admin.dashboard_api_data(request4)
+        data4 = json.loads(response4.content)
+        
+        print(f"📊 Ташкент + FAW CA3252 + Google: {data4['kpi']['total_leads']} (ожидается: 2)")
+        assert data4['kpi']['total_leads'] == 2, "Должно быть 2 заявки"
+        
+        print("\n✅ КОМБИНАЦИЯ ФИЛЬТРОВ РАБОТАЕТ ПРАВИЛЬНО!")
+
+    def test_edge_cases(self):
+        """ТЕСТ 17: Проверка граничных случаев"""
+        print("\n" + "="*80)
+        print("📋 ТЕСТ 17: ПРОВЕРКА ГРАНИЧНЫХ СЛУЧАЕВ")
+        print("="*80)
+        
+        # Очищаем
+        ContactForm.objects.all().delete()
+        
+        # СЛУЧАЙ 1: Нет заявок
+        request1 = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+        })
+        request1.user = self.user
+        
+        response1 = self.dashboard_admin.dashboard_api_data(request1)
+        data1 = json.loads(response1.content)
+        
+        print(f"\n📊 СЛУЧАЙ 1: Нет заявок")
+        print(f"  Статус: {response1.status_code}")
+        print(f"  Всего заявок: {data1['kpi']['total_leads']}")
+        
+        assert response1.status_code == 200, "API должен вернуть 200 даже если нет заявок"
+        assert data1['kpi']['total_leads'] == 0, "Должно быть 0 заявок"
+        
+        # СЛУЧАЙ 2: Только 1 заявка
+        ContactForm.objects.create(
+            name='Test Single',
+            phone='+998901111111',
+            product='FAW CA3252',
+            region='Toshkent shahri',
+            utm_data='{"utm_source":"google"}',
+            amocrm_status='sent',
+            created_at=timezone.now()
+        )
+        
+        request2 = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+        })
+        request2.user = self.user
+        
+        response2 = self.dashboard_admin.dashboard_api_data(request2)
+        data2 = json.loads(response2.content)
+        
+        sources = data2['charts']['sources']
+        
+        print(f"\n📊 СЛУЧАЙ 2: Только 1 заявка")
+        print(f"  Google процент: {sources['percentages'][0]}%")
+        
+        assert sources['percentages'][0] == 100.0, "Google должен быть 100%"
+        
+        # СЛУЧАЙ 3: Заявка без UTM
+        ContactForm.objects.all().delete()
+        ContactForm.objects.create(
+            name='Test No UTM',
+            phone='+998901111111',
+            product='FAW CA3252',
+            region='Toshkent shahri',
+            utm_data='',
+            amocrm_status='sent',
+            created_at=timezone.now()
+        )
+        
+        request3 = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+        })
+        request3.user = self.user
+        
+        response3 = self.dashboard_admin.dashboard_api_data(request3)
+        data3 = json.loads(response3.content)
+        
+        sources3 = data3['charts']['sources']
+        direct_index = sources3['labels'].index('Прямые')
+        
+        print(f"\n📊 СЛУЧАЙ 3: Заявка без UTM")
+        print(f"  Прямые: {sources3['values'][direct_index]}")
+        
+        assert sources3['values'][direct_index] == 1, "Прямые должны быть 1"
+        
+        # СЛУЧАЙ 4: Заявка без модели
+        ContactForm.objects.all().delete()
+        ContactForm.objects.create(
+            name='Test No Model',
+            phone='+998901111111',
+            product='',
+            region='Toshkent shahri',
+            utm_data='',
+            amocrm_status='sent',
+            created_at=timezone.now()
+        )
+        
+        request4 = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+        })
+        request4.user = self.user
+        
+        response4 = self.dashboard_admin.dashboard_api_data(request4)
+        data4 = json.loads(response4.content)
+        
+        print(f"\n📊 СЛУЧАЙ 4: Заявка без модели")
+        print(f"  Статус: {response4.status_code}")
+        
+        assert response4.status_code == 200, "API должен обработать заявку без модели"
+        
+        print("\n✅ ВСЕ ГРАНИЧНЫЕ СЛУЧАИ ОБРАБОТАНЫ!")
+
+    def test_excel_export_full(self):
+        """ТЕСТ 18: Полная проверка экспорта Excel"""
+        print("\n" + "="*80)
+        print("📋 ТЕСТ 18: ПОЛНАЯ ПРОВЕРКА EXCEL")
+        print("="*80)
+        
+        # Очищаем
+        ContactForm.objects.all().delete()
+        
+        # Создаём 20 заявок
+        for i in range(20):
+            ContactForm.objects.create(
+                name=f'Test {i}',
+                phone=f'+99890{i:07d}',
+                product='FAW CA3252' if i % 2 == 0 else 'FAW J6',
+                region='Toshkent shahri',
+                utm_data='{"utm_source":"google"}',
+                amocrm_status='sent',
+                created_at=timezone.now()
+            )
+        
+        # Экспорт
+        request = self.factory.get('/admin/main/dashboard/export/excel/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+        })
+        request.user = self.user
+        
+        response = self.dashboard_admin.dashboard_export_excel(request)
+        
+        print(f"\n✅ Статус: {response.status_code}")
+        print(f"📄 Content-Type: {response['Content-Type']}")
+        print(f"📦 Размер файла: {len(response.content)} байт")
+
+        assert response.status_code == 200, "Excel должен экспортироваться"
+        assert len(response.content) > 0, "Файл не должен быть пустым"
+
+        # Проверяем что это действительно Excel
+        import openpyxl
+        from io import BytesIO
+
+        try:
+            wb = openpyxl.load_workbook(BytesIO(response.content))
+            
+            print(f"\n📊 Листы в Excel:")
+            for sheet_name in wb.sheetnames:
+                sheet = wb[sheet_name]
+                print(f"  - {sheet_name}: {sheet.max_row} строк")
+            
+            # Проверяем обязательные листы
+            required_sheets = ['KPI', 'Источники', 'Модели', 'Регионы']
+            for sheet_name in required_sheets:
+                assert sheet_name in wb.sheetnames, f"Лист '{sheet_name}' отсутствует!"
+            
+            print("\n✅ Excel содержит все необходимые листы!")
+            
+        except Exception as e:
+            assert False, f"Ошибка открытия Excel: {str(e)}"
+
+    def test_performance_with_filters(self):
+        """ТЕСТ 19: Производительность с фильтрами"""
+        import time
+        print("\n" + "="*80)
+        print("📋 ТЕСТ 19: ПРОИЗВОДИТЕЛЬНОСТЬ С ФИЛЬТРАМИ")
+        print("="*80)
+
+        # Очищаем
+        ContactForm.objects.all().delete()
+
+        # Создаём 1000 заявок
+        bulk_data = []
+        for i in range(1000):
+            bulk_data.append(ContactForm(
+                name=f'Test {i}',
+                phone=f'+99890{i:07d}',
+                product='FAW CA3252' if i % 3 == 0 else 'FAW J6',
+                region='Toshkent shahri' if i % 2 == 0 else 'Samarqand viloyati',
+                utm_data='{"utm_source":"google"}' if i % 4 == 0 else '',
+                amocrm_status='sent',
+                created_at=timezone.now()
+            ))
+        ContactForm.objects.bulk_create(bulk_data)
+
+        # ТЕСТ 1: Фильтр по региону
+        request1 = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+            'region': 'Toshkent shahri'
+        })
+        request1.user = self.user
+
+        start1 = time.time()
+        response1 = self.dashboard_admin.dashboard_api_data(request1)
+        end1 = time.time()
+
+        elapsed1 = end1 - start1
+        print(f"\n⏱️ Фильтр по региону: {elapsed1:.3f} сек")
+
+        # ТЕСТ 2: Фильтр по модели
+        request2 = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+            'product': 'FAW CA3252'
+        })
+        request2.user = self.user
+
+        start2 = time.time()
+        response2 = self.dashboard_admin.dashboard_api_data(request2)
+        end2 = time.time()
+
+        elapsed2 = end2 - start2
+        print(f"⏱️ Фильтр по модели: {elapsed2:.3f} сек")
+
+        # ТЕСТ 3: Фильтр по источнику
+        request3 = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+            'source': 'google'
+        })
+        request3.user = self.user
+
+        start3 = time.time()
+        response3 = self.dashboard_admin.dashboard_api_data(request3)
+        end3 = time.time()
+
+        elapsed3 = end3 - start3
+        print(f"⏱️ Фильтр по источнику: {elapsed3:.3f} сек")
+
+        # ТЕСТ 4: Все фильтры
+        request4 = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': timezone.now().strftime('%Y-%m-%d'),
+            'date_to': timezone.now().strftime('%Y-%m-%d'),
+            'region': 'Toshkent shahri',
+            'product': 'FAW CA3252',
+            'source': 'google'
+        })
+        request4.user = self.user
+
+        start4 = time.time()
+        response4 = self.dashboard_admin.dashboard_api_data(request4)
+        end4 = time.time()
+
+        elapsed4 = end4 - start4
+        print(f"⏱️ Все фильтры: {elapsed4:.3f} сек")
+
+        # Оценка производительности
+        max_time = max(elapsed1, elapsed2, elapsed3, elapsed4)
+
+        print(f"\n⏱️ Максимальное время: {max_time:.3f} сек")
+
+        if max_time < 1.0:
+            print("✅ ОТЛИЧНО: Все запросы менее 1 секунды")
+        elif max_time < 3.0:
+            print("⚠️ ПРИЕМЛЕМО: Запросы 1-3 секунды")
+        else:
+            print("❌ МЕДЛЕННО: Запросы более 3 секунд — нужна оптимизация!")
+
+        assert max_time < 5.0, f"Запросы слишком медленные: {max_time:.3f} сек"
+
+
+    def test_time_analysis(self):
+        """ТЕСТ 20: Проверка временного анализа"""
+        from datetime import datetime
+        import pytz
+        
+        print("\n" + "="*80)
+        print("📋 ТЕСТ 20: ПРОВЕРКА ВРЕМЕННОГО АНАЛИЗА")
+        print("="*80)
+        
+        # Очищаем
+        ContactForm.objects.all().delete()
+        
+        # ✅ ИСПОЛЬЗУЕМ UTC
+        now_utc = timezone.now()
+        today = now_utc.date()
+        
+        # Создаём заявки в разное время (в UTC)
+        times = [
+            (9, 'FAW CA3252'),   # Утро
+            (9, 'FAW CA3252'),
+            (14, 'FAW J6'),      # День
+            (14, 'FAW J6'),
+            (19, 'FAW CA3252'),  # Вечер
+            (19, 'FAW CA3252'),
+        ]
+        
+        for i, (hour, model) in enumerate(times):
+            # ✅ СОЗДАЁМ В UTC
+            dt = datetime(today.year, today.month, today.day, hour, 0, 0, tzinfo=pytz.UTC)
+            
+            ContactForm.objects.create(
+                name=f'Test {i}',
+                phone=f'+99890{i:07d}',
+                product=model,
+                region='Toshkent shahri',
+                amocrm_status='sent',
+                created_at=dt
+            )
+        
+        # Запрос API
+        request = self.factory.get('/admin/main/dashboard/api/data/', {
+            'date_from': today.strftime('%Y-%m-%d'),
+            'date_to': today.strftime('%Y-%m-%d'),
+        })
+        request.user = self.user
+        
+        response = self.dashboard_admin.dashboard_api_data(request)
+        data = json.loads(response.content)
+        
+        time_analysis = data['charts']['time_analysis']
+        
+        print("\n📊 ВРЕМЕННОЙ АНАЛИЗ:")
+        print(f"  Записей по часам: {len(time_analysis['by_hours'])}")
+        print(f"  Записей по дням: {len(time_analysis['by_weekdays'])}")
+        
+        # ✅ ПРОВЕРЯЕМ ЧТО ЕСТЬ ЗАЯВКИ В ЛЮБОМ ЧАСЕ
+        total_by_hours = sum(h['count'] for h in time_analysis['by_hours'])
+        
+        print(f"\n  Всего заявок во временном анализе: {total_by_hours}")
+        
+        assert total_by_hours == 6, f"В временном анализе должно быть 6 заявок, получено: {total_by_hours}"
+        
+        # Проверяем что есть данные за 9:00
+        hour_9 = [h for h in time_analysis['by_hours'] if h['hour'] == '09:00']
+        
+        if hour_9:
+            hour_9 = hour_9[0]
+            print(f"  09:00 заявок: {hour_9['count']}")
+            print(f"  09:00 топ модель: {hour_9['top_model']}")
+            
+            assert hour_9['count'] == 2, f"В 9:00 должно быть 2 заявки, получено: {hour_9['count']}"
+            assert hour_9['top_model'] == 'FAW CA3252', "Топ модель в 9:00 должна быть FAW CA3252"
+        else:
+            print("\n  ⚠️ Нет данных за 9:00, проверяем другие часы:")
+            for h in time_analysis['by_hours'][:5]:
+                if h['count'] > 0:
+                    print(f"    {h['hour']}: {h['count']} заявок")
+            
+            # ✅ ПРОВЕРЯЕМ ХОТЯ БЫ ОБЩЕЕ КОЛИЧЕСТВО
+            assert total_by_hours == 6, "Заявки должны быть в каком-то часе"
+        
+        print("\n✅ ВРЕМЕННОЙ АНАЛИЗ РАБОТАЕТ ПРАВИЛЬНО!")

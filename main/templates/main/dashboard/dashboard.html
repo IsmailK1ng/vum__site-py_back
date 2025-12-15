@@ -1,28 +1,37 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Аналитика заявок VUM</title>
-    
+
     <!-- Подключаем стили админки Django -->
     <link rel="stylesheet" href="{% static 'admin/css/base.css' %}">
     <link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
 
-        <!-- Google Fonts -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-        <!-- Наши кастомные стили -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+        rel="stylesheet">
+    <!-- Наши кастомные стили -->
+    <!-- Универсальный favicon -->
+    <link rel="icon" href="{% static 'images/logo/logo-vum.png' %}" />
+    <!-- Для Apple устройств -->
+    <link rel="apple-touch-icon" href="{% static 'images/logo/logo-vum.png' %}">
+
 
     <link rel="stylesheet" href="{% static 'css/dashboard/main.css' %}">
     <link rel="stylesheet" href="{% static 'css/dashboard/charts.css' %}">
     <link rel="stylesheet" href="{% static 'css/dashboard/tables.css' %}">
-    
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
+
 <body class="dashboard-body">
 
     <!-- Хедер с навигацией -->
@@ -43,25 +52,25 @@
 
     <!-- Основной контейнер -->
     <div class="dashboard-container">
-        
+
         <!-- БЛОК 1: ФИЛЬТРЫ -->
         {% include 'main/dashboard/components/filters.html' %}
-        
+
         <!-- БЛОК 2: KPI МЕТРИКИ -->
         <div id="kpi-cards" class="kpi-section">
             {% include 'main/dashboard/components/kpi_cards.html' %}
         </div>
-        
+
         <!-- БЛОК 3: ГРАФИКИ -->
         <div id="charts-section" class="charts-section">
             {% include 'main/dashboard/components/charts.html' %}
         </div>
-        
+
         <!-- БЛОК 4: ТАБЛИЦЫ -->
         <div id="tables-section" class="tables-section">
             {% include 'main/dashboard/components/tables.html' %}
         </div>
-        
+
         <!-- БЛОК 5: ИНСАЙТЫ -->
         <div id="insights-section" class="insights-section">
             <div class="insights-card">
@@ -71,7 +80,7 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 
     <!-- Подключаем скрипты -->
@@ -79,10 +88,10 @@
     <script src="{% static 'js/dashboard/filters.js' %}"></script>
     <script src="{% static 'js/dashboard/charts.js' %}"></script>
     <script src="{% static 'js/dashboard/api.js' %}"></script>
-    
+
     <script>
         // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Передаём начальные параметры из Django
             const initialFilters = {
                 date_from: '{{ date_from }}',
@@ -91,10 +100,11 @@
                 product: '{{ product }}',
                 source: '{{ source }}'
             };
-            
+
             // Инициализируем Dashboard
             DashboardApp.init(initialFilters);
         });
     </script>
 </body>
+
 </html>

@@ -481,7 +481,12 @@ class KGFeedbackAdmin(LeadManagerMixin, admin.ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        if request.user.is_superuser or request.user.groups.filter(name='Главные админы').exists():
+        
+
+        if (request.user.is_superuser or 
+            request.user.groups.filter(name__in=['Главные админы', 'Лиды KG', 'Лиды UZ+KG']).exists() or
+            request.user.has_perm('kg.view_kgfeedback')): 
+            
             extra_context['stats_button_html'] = format_html(
                 '<div style="margin-bottom: 20px;">'
                 '<a href="/admin/kg/stats/" target="_blank" style="'
@@ -492,8 +497,9 @@ class KGFeedbackAdmin(LeadManagerMixin, admin.ModelAdmin):
                 'box-shadow: 0 4px 12px rgba(0, 43, 155, 0.2);" '
                 'onmouseover="this.style.transform=\'translateY(-2px)\'; this.style.boxShadow=\'0 6px 20px rgba(0, 43, 155, 0.3)\';" '
                 'onmouseout="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'0 4px 12px rgba(0, 43, 155, 0.2)\';">'
-                ' Статистика заявок</a></div>'
+                '📊 Статистика заявок</a></div>'
             )
+        
         return super().changelist_view(request, extra_context)
 
     def vehicle_display(self, obj):

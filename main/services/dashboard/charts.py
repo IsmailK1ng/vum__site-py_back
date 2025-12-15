@@ -11,12 +11,6 @@ import json
 def _get_source_from_utm(lead):
     """
     Определяет источник трафика из UTM данных
-    
-    Args:
-        lead: объект ContactForm
-    
-    Returns:
-        str: 'google', 'instagram', 'facebook', 'direct', 'other'
     """
     if not lead.utm_data or lead.utm_data == '':
         return 'direct'
@@ -27,10 +21,18 @@ def _get_source_from_utm(lead):
         
         if 'google' in source:
             return 'google'
-        elif 'instagram' in source or 'ig' in source:
+        elif source in ['ig', 'instagram']:
             return 'instagram'
-        elif 'facebook' in source or 'fb' in source:
+        elif source in ['fb', 'facebook']:
             return 'facebook'
+        elif 'yandex' in source or source == 'yd':
+            return 'yandex'
+        elif 'telegram' in source or source == 'tg':
+            return 'telegram'
+        elif 'tiktok' in source or source == 'tt':
+            return 'tiktok'
+        elif 'youtube' in source or source == 'yt':
+            return 'youtube'
         else:
             return 'other'
     except:
@@ -118,10 +120,47 @@ def _get_sources_data(queryset):
     
     sources = {
         'google': 0,
+        'yandex': 0,
         'instagram': 0,
         'facebook': 0,
+        'telegram': 0,
+        'tiktok': 0,
+        'youtube': 0,
         'direct': 0,
         'other': 0
+    }
+    
+
+    for lead in queryset:
+        source_key = _get_source_from_utm(lead)
+        sources[source_key] += 1
+    
+    total = sum(sources.values())
+    
+    return {
+        'labels': ['Google', 'Яндекс', 'Instagram', 'Facebook', 'Telegram', 'TikTok', 'YouTube','Прямые', 'Другие'],
+        'values': [
+            sources['google'],
+            sources['yandex'],
+            sources['instagram'],
+            sources['facebook'],
+            sources['telegram'],
+            sources['tiktok'],
+            sources['youtube'],
+            sources['direct'],
+            sources['other']
+        ],
+        'percentages': [
+            round(sources['google'] / total * 100, 1) if total > 0 else 0,
+            round(sources['yandex'] / total * 100, 1) if total > 0 else 0,
+            round(sources['instagram'] / total * 100, 1) if total > 0 else 0,
+            round(sources['facebook'] / total * 100, 1) if total > 0 else 0,
+            round(sources['telegram'] / total * 100, 1) if total > 0 else 0,
+            round(sources['tiktok'] / total * 100, 1) if total > 0 else 0,
+            round(sources['youtube'] / total * 100, 1) if total > 0 else 0,
+            round(sources['direct'] / total * 100, 1) if total > 0 else 0,
+            round(sources['other'] / total * 100, 1) if total > 0 else 0,
+        ]
     }
     
     # ✅ ИСПОЛЬЗУЕМ ВСПОМОГАТЕЛЬНУЮ ФУНКЦИЮ
@@ -383,21 +422,29 @@ def get_source_model_matrix(queryset):
     """Матрица Источник × Модель"""
     matrix = {
         'Google': {},
+        'Яндекс': {},
         'Instagram': {},
         'Facebook': {},
+        'Telegram': {},
+        'TikTok': {},
+        'YouTube': {},
         'Прямые': {},
         'Другие': {}
     }
     
     source_map = {
         'google': 'Google',
+        'yandex': 'Яндекс',
         'instagram': 'Instagram',
         'facebook': 'Facebook',
+        'telegram': 'Telegram',
+        'tiktok': 'TikTok',
+        'youtube': 'YouTube',
         'direct': 'Прямые',
         'other': 'Другие'
     }
     
-    # ✅ ИСПОЛЬЗУЕМ ВСПОМОГАТЕЛЬНУЮ ФУНКЦИЮ
+
     for lead in queryset:
         product = lead.product or 'Не указано'
         source_key = _get_source_from_utm(lead)

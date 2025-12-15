@@ -2,30 +2,30 @@
 
 const DashboardCharts = {
     charts: {},
-    
+
     /**
      * Инициализация
      */
-    init: function() {
+    init: function () {
         console.log('Charts: Инициализация...');
-        
+
         // Настройки Chart.js по умолчанию
         Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
         Chart.defaults.font.size = 13;
         Chart.defaults.color = '#6b7280';
-        
+
         console.log('Charts: Готов!');
     },
-    
+
     /**
      * Отрисовать все графики
      */
-    renderAll: function(data) {
+    renderAll: function (data) {
         console.log('Charts: Отрисовка всех графиков...', data);
-        
+
         // Уничтожаем старые графики
         this.destroyAll();
-        
+
         // Отрисовываем новые
         this.renderDynamics(data.dynamics);
         this.renderSources(data.sources);
@@ -33,11 +33,11 @@ const DashboardCharts = {
         this.renderRegions(data.top_regions);
         this.renderHeatmap(data.heatmap);
     },
-    
+
     /**
      * Уничтожить все графики
      */
-    destroyAll: function() {
+    destroyAll: function () {
         Object.keys(this.charts).forEach(key => {
             if (this.charts[key]) {
                 this.charts[key].destroy();
@@ -45,14 +45,14 @@ const DashboardCharts = {
         });
         this.charts = {};
     },
-    
+
     /**
      * График: Динамика по дням
      */
-    renderDynamics: function(data) {
+    renderDynamics: function (data) {
         const ctx = document.getElementById('chart-dynamics');
         if (!ctx) return;
-        
+
         this.charts.dynamics = new Chart(ctx, {
             type: 'line',
             data: {
@@ -119,7 +119,7 @@ const DashboardCharts = {
                             size: 13
                         },
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 return context.dataset.label + ': ' + context.parsed.y + ' заявок';
                             }
                         }
@@ -144,14 +144,14 @@ const DashboardCharts = {
             }
         });
     },
-    
+
     /**
      * График: Источники трафика (круговая диаграмма)
      */
-    renderSources: function(data) {
+    renderSources: function (data) {
         const ctx = document.getElementById('chart-sources');
         if (!ctx) return;
-        
+
         this.charts.sources = new Chart(ctx, {
             type: 'doughnut',
             data: {
@@ -159,11 +159,15 @@ const DashboardCharts = {
                 datasets: [{
                     data: data.values,
                     backgroundColor: [
-                        '#1e57eb', // Google - синий
-                        '#e4405f', // Instagram - розовый
-                        '#1877f2', // Facebook - синий FB
-                        '#10b981', // Прямые - зелёный
-                        '#f59e0b'  // Другие - оранжевый
+                        '#0062ffff', // Google - синий Google
+                        '#ff0000ff', // Яндекс - красный
+                        '#7a0c20ff', // Instagram - розовый
+                        '#3566a7ff', // Facebook - синий FB
+                        '#5a5a5aff', // Telegram - голубой
+                        '#000000', // TikTok - чёрный
+                        '#ff00005b', // YouTube - красный
+                        '#10B981', // Прямые - зелёный
+                        '#F59E0B'  // Другие - оранжевый
                     ],
                     borderWidth: 2,
                     borderColor: '#fff',
@@ -184,7 +188,7 @@ const DashboardCharts = {
                                 size: 13,
                                 weight: 600
                             },
-                            generateLabels: function(chart) {
+                            generateLabels: function (chart) {
                                 const data = chart.data;
                                 return data.labels.map((label, i) => {
                                     const value = data.datasets[0].data[i];
@@ -203,7 +207,7 @@ const DashboardCharts = {
                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
                         padding: 12,
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 const label = context.label || '';
                                 const value = context.parsed;
                                 const total = context.dataset.data.reduce((a, b) => a + b, 0);
@@ -217,14 +221,14 @@ const DashboardCharts = {
             }
         });
     },
-    
+
     /**
      * График: Топ моделей (горизонтальная диаграмма)
      */
-    renderModels: function(data) {
+    renderModels: function (data) {
         const ctx = document.getElementById('chart-models');
         if (!ctx) return;
-        
+
         this.charts.models = new Chart(ctx, {
             type: 'bar',
             data: {
@@ -251,7 +255,7 @@ const DashboardCharts = {
                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
                         padding: 12,
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 const value = context.parsed.x;
                                 const index = context.dataIndex;
                                 const percent = data.percentages[index];
@@ -284,14 +288,14 @@ const DashboardCharts = {
             }
         });
     },
-    
+
     /**
      * График: Топ регионов (столбчатая диаграмма)
      */
-    renderRegions: function(data) {
+    renderRegions: function (data) {
         const ctx = document.getElementById('chart-regions');
         if (!ctx) return;
-        
+
         this.charts.regions = new Chart(ctx, {
             type: 'bar',
             data: {
@@ -322,7 +326,7 @@ const DashboardCharts = {
                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
                         padding: 12,
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 const value = context.parsed.y;
                                 const index = context.dataIndex;
                                 const percent = data.percentages[index];
@@ -355,31 +359,31 @@ const DashboardCharts = {
             }
         });
     },
-    
+
     /**
      * Тепловая карта: День × Час
      */
-    renderHeatmap: function(data) {
+    renderHeatmap: function (data) {
         const container = document.getElementById('heatmap-container');
         if (!container) return;
-        
+
         // Создаём HTML таблицу
         let html = '<table class="heatmap-table"><thead><tr><th></th>';
-        
+
         // Заголовки часов
         data.hours.forEach(hour => {
             html += `<th>${hour}</th>`;
         });
         html += '</tr></thead><tbody>';
-        
+
         // Строки с днями
         data.data.forEach((row, dayIndex) => {
             html += `<tr><th>${data.weekdays[dayIndex]}</th>`;
-            
+
             row.forEach((value, hourIndex) => {
                 // Определяем интенсивность (0-5)
                 const intensity = Math.min(5, Math.floor((value / data.max_value) * 5));
-                
+
                 html += `<td class="heatmap-cell" 
                             data-intensity="${intensity}" 
                             data-day="${data.weekdays[dayIndex]}" 
@@ -388,12 +392,12 @@ const DashboardCharts = {
                             ${value > 0 ? value : ''}
                         </td>`;
             });
-            
+
             html += '</tr>';
         });
-        
+
         html += '</tbody></table>';
-        
+
         // Добавляем легенду
         html += `
             <div class="heatmap-legend">
@@ -420,7 +424,7 @@ const DashboardCharts = {
                 </div>
             </div>
         `;
-        
+
         container.innerHTML = html;
     }
 };
