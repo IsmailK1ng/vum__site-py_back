@@ -7,13 +7,13 @@
   <meta charset="UTF-8">
 
   <!-- Page Title -->
-  <title>VUMFAW tarixi</title>
+  <title>{% if LANGUAGE_CODE == 'uz' %}VUMFAW tarixi{% elif LANGUAGE_CODE == 'ru' %}История VUMFAW{% else %}VUMFAW History{% endif %}</title>
   {% hreflang_tags %}
   {% canonical_url %}
 
   <!-- Meta Tags -->
-  <meta name="description" content="Faw Trucks в Узбекистане">
-  <meta name="keywords" content="Faw Trucks в Узбекистане">
+  <meta name="description" content="{% if LANGUAGE_CODE == 'uz' %}Faw Trucks O'zbekistonda{% elif LANGUAGE_CODE == 'ru' %}Faw Trucks в Узбекистане{% else %}Faw Trucks in Uzbekistan{% endif %}">
+  <meta name="keywords" content="{% if LANGUAGE_CODE == 'uz' %}Faw Trucks O'zbekistonda{% elif LANGUAGE_CODE == 'ru' %}Faw Trucks в Узбекистане{% else %}Faw Trucks in Uzbekistan{% endif %}">
   <meta name="author" content="mix_design">
 
   <!-- Viewport Meta-->
@@ -22,63 +22,52 @@
 
   <!-- Универсальный favicon -->
   <link rel="icon" href="{% static 'images/logo/logo-vum.png' %}" />
-  <!-- Для Apple устройств -->
   <link rel="apple-touch-icon" href="{% static 'images/logo/logo-vum.png' %}">
 
   <!-- Facebook Metadata Start -->
   <meta property="og:image:height" content="1200">
   <meta property="og:image:width" content="1200">
-  <meta property="og:title" content="Faw Trucks в Узбекистане">
-  <meta property="og:description" content="Faw Trucks в Узбекистане">
+  <meta property="og:title" content="{% if LANGUAGE_CODE == 'uz' %}Faw Trucks O'zbekistonda{% elif LANGUAGE_CODE == 'ru' %}Faw Trucks в Узбекистане{% else %}Faw Trucks in Uzbekistan{% endif %}">
+  <meta property="og:description" content="{% if LANGUAGE_CODE == 'uz' %}Faw Trucks O'zbekistonda{% elif LANGUAGE_CODE == 'ru' %}Faw Trucks в Узбекистане{% else %}Faw Trucks in Uzbekistan{% endif %}">
   <meta property="og:url" content="https://mixdesign.dev/themeforest/rayo">
   <meta property="og:image" content="https://mixdesign.dev/themeforest/rayo/img/og-image.jpg">
   <!-- Facebook Metadata End -->
 
-  <!-- Google Tag Manager Xurshid 1 chi kod -->
+  <!-- Google Tag Manager -->
   <script>(function (w, d, s, l, i) {
-      w[l] = w[l] || []; w[l].push({
-        'gtm.start':
-          new Date().getTime(), event: 'gtm.js'
-      }); var f = d.getElementsByTagName(s)[0],
-        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+      w[l] = w[l] || []; w[l].push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
+      var f = d.getElementsByTagName(s)[0], j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+      j.async = true; j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+      f.parentNode.insertBefore(j, f);
     })(window, document, 'script', 'dataLayer', 'GTM-M33GWKMW');</script>
-  <!-- End Google Tag Manager Xurshid 1 chi kod-->
 
-  <!-- Meta Pixel Code Xurshid 2 chi kod-->
+  <!-- Meta Pixel Code -->
   <script>
     !function (f, b, e, v, n, t, s) {
       if (f.fbq) return; n = f.fbq = function () {
-        n.callMethod ?
-          n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+        n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments)
       };
       if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
       n.queue = []; t = b.createElement(e); t.async = !0;
       t.src = v; s = b.getElementsByTagName(e)[0];
       s.parentNode.insertBefore(t, s)
-    }(window, document, 'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
+    }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '2271244510044933');
     fbq('track', 'PageView');
   </script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2271244510044933&ev=PageView&noscript=1" /></noscript>
 
-  <noscript><img height="1" width="1" style="display:none"
-      src="https://www.facebook.com/tr?id=2271244510044933&ev=PageView&noscript=1" /></noscript>
-  <!-- End Meta Pixel Code  Xurshid 2 chi kod-->
-
-  <!-- amoCRM Pixel для автораспределения -->
-  <script type="text/javascript" id="amo_pixel_identifier_js" async="async"
-    src="https://piper.amocrm.ru/pixel/js/identifier/pixel_identifier.js"></script>
+  <!-- amoCRM Pixel -->
+  <script type="text/javascript" id="amo_pixel_identifier_js" async="async" src="https://piper.amocrm.ru/pixel/js/identifier/pixel_identifier.js"></script>
   <script>
     window.AMOPIXEL_IDENTIFIER_PARAMS = window.AMOPIXEL_IDENTIFIER_PARAMS || {};
     window.AMOPIXEL_IDENTIFIER_PARAMS.onload = function (pixel_identifier) {
       var visitor_uid = pixel_identifier.getVisitorUid();
-      if (visitor_uid) {
-        sessionStorage.setItem('amo_visitor_uid', visitor_uid);
-      }
+      if (visitor_uid) { sessionStorage.setItem('amo_visitor_uid', visitor_uid); }
     };
   </script>
-  <!-- Template Styles Start -->
+
+  <!-- Template Styles -->
   <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
@@ -86,138 +75,106 @@
   <link rel="stylesheet" type="text/css" href="{% static 'css/breadcrumbs.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'css/site_about.css' %}">
 
-
-  <!-- Template Styles End -->
-
-  <!-- Custom Browser Color Start -->
+  <!-- Custom Browser Color -->
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
   <meta name="msapplication-navbutton-color" content="#161616">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <!-- Custom Browser Color End -->
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400;600;700&family=Funnel+Sans:wght@400;600;700&display=swap');
-
-    html {
-      font-family: var(--_font-default);
-    }
-
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    a,
-    .mxd-logo__text,
-    .btn-caption {
-      font-family: var(--_font-accent);
-    }
+    html { font-family: var(--_font-default); }
+    h1, h2, h3, h4, h5, h6, a, .mxd-logo__text, .btn-caption { font-family: var(--_font-accent); }
   </style>
 </head>
 
 <body>
-
   <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
-      style="display:none;visibility:hidden"></iframe></noscript>
-  <!-- End Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-  <!-- Loader Start -->
+  <!-- Loader -->
   <div id="loader" style="display: none;" class="loader">
     <div class="loader__wrapper">
       <div class="loader__content">
-        <div class="loader__count">
-          <span class="count__text">0</span>
-          <!-- <span class="count__percent">%</span> -->
-        </div>
+        <div class="loader__count"><span class="count__text">0</span></div>
       </div>
     </div>
   </div>
-  <!-- Loader End -->
-  <!-- Меню и шапка (начало) -->
+
   {% include 'main/includes/header.html' %}
-  <!-- Меню и шапка (конец) -->
-  <!-- Page Content Start -->
-  <div class="mxd-block loading-wrap">
-  </div>
-  <!-- Хлебные крошки -->
+
+  <div class="mxd-block loading-wrap"></div>
+
+  <!-- Breadcrumbs -->
   <div class="mxd-section-filter pre-grid">
     <div class="mxd-section-filter__inner animate-card-3">
       <div class="mxd-grid-item-1">
         <div class="section-filter">
           <div aria-label="breadcrumb">
             <ol class="breadcrumb-ol">
-              <li><a href="{% url 'home' %}">Bosh sahifa</a></li>
-              <li class="active"><a href="{% url 'about' %}">VUM FAW tarixi </a></li>
+              <li><a href="{% url 'home' %}">{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}</a></li>
+              <li class="active"><a href="{% url 'about' %}">{% if LANGUAGE_CODE == 'uz' %}VUM FAW tarixi{% elif LANGUAGE_CODE == 'ru' %}История VUM FAW{% else %}VUM FAW History{% endif %}</a></li>
             </ol>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <!-- Parallax video banner start -->
+
+  <!-- Parallax video banner -->
   <div class="mxd-section padding-grid-pre-pinned">
     <div class="mxd-container">
       <div class="mxd-divider" id="parallax-divider">
         <div class="mxd-divider__video">
-          <video class="video parallax-video" preload="auto" autoplay="autoplay" loop="loop" muted="muted"
-            data-parallax="true">
+          <video class="video parallax-video" preload="auto" autoplay="autoplay" loop="loop" muted="muted" data-parallax="true">
             <source type="video/mp4" src="{% static 'videos/banner.mp4' %}">
           </video>
           <div class="text-overlay">
-            <div class="pw-text-style-overline">Innovatsiyalar 2025</div>
+            <div class="pw-text-style-overline">{% if LANGUAGE_CODE == 'uz' %}Innovatsiyalar 2025{% elif LANGUAGE_CODE == 'ru' %}Инновации 2025{% else %}Innovations 2025{% endif %}</div>
             <h1 class="pw-text-style-hl--xl">VUM <strong>FAW</strong></h1>
             <p class="pw-text-style-intro">
-              Jahon darajasidagi texnologiyalar – O‘zbekistonning yuragida.<br>
-              Yuk transportining kelajagini bugunoq yaratamiz.
+              {% if LANGUAGE_CODE == 'uz' %}Jahon darajasidagi texnologiyalar – O'zbekistonning yuragida.<br>Yuk transportining kelajagini bugunoq yaratamiz.
+              {% elif LANGUAGE_CODE == 'ru' %}Мировые технологии – в сердце Узбекистана.<br>Создаём будущее грузового транспорта уже сегодня.
+              {% else %}World-class technologies – in the heart of Uzbekistan.<br>Creating the future of freight transport today.{% endif %}
             </p>
             <div class="stats-bar">
               <div class="stat-item">
                 <span class="stat-value">70+</span>
-                <span class="stat-label">Yillik tajriba</span>
+                <span class="stat-label">{% if LANGUAGE_CODE == 'uz' %}Yillik tajriba{% elif LANGUAGE_CODE == 'ru' %}Лет опыта{% else %}Years of Experience{% endif %}</span>
               </div>
               <div class="stat-item">
                 <span class="stat-value">180</span>
-                <span class="stat-label">Mamlakatlar</span>
+                <span class="stat-label">{% if LANGUAGE_CODE == 'uz' %}Mamlakatlar{% elif LANGUAGE_CODE == 'ru' %}Стран{% else %}Countries{% endif %}</span>
               </div>
               <div class="stat-item">
                 <span class="stat-value">6M+</span>
-                <span class="stat-label">Yuk mashinalari</span>
+                <span class="stat-label">{% if LANGUAGE_CODE == 'uz' %}Yuk mashinalari{% elif LANGUAGE_CODE == 'ru' %}Грузовиков{% else %}Trucks{% endif %}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
-
     </div>
   </div>
-  <!-- Parallax video banner end -->
 
-  <!-- Title after video start -->
+  <!-- Title after video -->
   <div class="title-after-video">
     <div class="faw-history-title fade-in">
-      <h2 class="reveal-type ">FAW TRUCKS Tarixi</h2>
+      <h2 class="reveal-type">{% if LANGUAGE_CODE == 'uz' %}FAW TRUCKS Tarixi{% elif LANGUAGE_CODE == 'ru' %}История FAW TRUCKS{% else %}FAW TRUCKS History{% endif %}</h2>
     </div>
-
     <div class="mxd-hero-00__bottom">
       <div class="hero-00-manifest loading__fade">
-        <p class="mxd-manifest reveal-type ">
-          FAW — dunyoda eng ko‘p sotuvga ega og‘ir yuk mashinalari brendi! Xitoyda avtomobilsozlikning birinchi qadami
-          sifatida 1956-yilda tashkil etilgan FAW o‘zining 60 yillik tarixida 8 zavod qurgan, 57 global hamkorlik
-          o‘rnatgan va 80 dan ortiq davlatda mahsulotlarini sotmoqda. 2019-yilda 3,5 million avtomobil ishlab chiqarib,
-          88,6 milliard dollar daromad va 6,3 milliard dollar foyda olgan FAW dunyoda 87-o‘rinni egalladi. Brend qiymati
-          10,8 milliard dollarni oshdi!
-          2001-yilda dunyodagi eng yaxshi tijorat avtomobillari brendi unvoni bilan taqdirlangan FAW,
-          2017-2019-yillarda Xitoyda va dunyoda og‘ir yuk mashinalari bo‘yicha birinchi o‘rinni qo‘lga kiritdi.
-          Bugun FAW — Xitoyning birinchi va dunyodagi yetakchi avtomobilsozlik kompaniyasi sifatida namoyon bo‘lmoqda!
+        <p class="mxd-manifest reveal-type">
+          {% if LANGUAGE_CODE == 'uz' %}FAW — dunyoda eng ko'p sotuvga ega og'ir yuk mashinalari brendi! Xitoyda avtomobilsozlikning birinchi qadami sifatida 1956-yilda tashkil etilgan FAW o'zining 60 yillik tarixida 8 zavod qurgan, 57 global hamkorlik o'rnatgan va 80 dan ortiq davlatda mahsulotlarini sotmoqda. 2019-yilda 3,5 million avtomobil ishlab chiqarib, 88,6 milliard dollar daromad va 6,3 milliard dollar foyda olgan FAW dunyoda 87-o'rinni egalladi. Brend qiymati 10,8 milliard dollarni oshdi! 2001-yilda dunyodagi eng yaxshi tijorat avtomobillari brendi unvoni bilan taqdirlangan FAW, 2017-2019-yillarda Xitoyda va dunyoda og'ir yuk mashinalari bo'yicha birinchi o'rinni qo'lga kiritdi. Bugun FAW — Xitoyning birinchi va dunyodagi yetakchi avtomobilsozlik kompaniyasi sifatida namoyon bo'lmoqda!
+          {% elif LANGUAGE_CODE == 'ru' %}FAW — бренд тяжёлых грузовиков с самыми высокими продажами в мире! Основанная в 1956 году как первый шаг автомобилестроения в Китае, FAW за 60 лет построила 8 заводов, установила 57 глобальных партнёрств и продаёт продукцию в более чем 80 странах. В 2019 году FAW произвела 3,5 млн автомобилей с доходом $88,6 млрд и прибылью $6,3 млрд, заняв 87-е место в мире. Стоимость бренда превысила $10,8 млрд! В 2001 году FAW удостоена звания лучшего бренда коммерческих автомобилей, а в 2017-2019 годах заняла первое место по продажам тяжёлых грузовиков в Китае и мире. Сегодня FAW — первая и ведущая автомобилестроительная компания Китая!
+          {% else %}FAW is the world's best-selling heavy truck brand! Founded in 1956 as China's first step in automobile manufacturing, FAW has built 8 factories, established 57 global partnerships, and sells products in over 80 countries. In 2019, FAW produced 3.5 million vehicles, earning $88.6 billion in revenue and $6.3 billion in profit, ranking 87th globally. Brand value exceeded $10.8 billion! Awarded as the world's best commercial vehicle brand in 2001, FAW ranked first in heavy truck sales in China and worldwide from 2017-2019. Today, FAW stands as China's first and the world's leading automobile company!{% endif %}
         </p>
       </div>
     </div>
   </div>
   <!-- Title after video end -->
-  <!-- Block - Marquee Images Two Lines Start -->
+<!-- Block - Marquee Images Two Lines Start -->
   <div class="mxd-block">
     <div id="modal" class="modal">
       <div class="modal-content">
@@ -237,11 +194,8 @@
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>15 iyul 1953 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW tarixida ulkan bosqich — birinchi avtomobil zavodi poydevoriga asosiy tamal toshi qo‘yildi. Bu
-                  voqea yangi davrning boshlanishi bo‘ldi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}15 iyul 1953 yil{% elif LANGUAGE_CODE == 'ru' %}15 июля 1953 года{% else %}July 15, 1953{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW tarixida ulkan bosqich — birinchi avtomobil zavodi poydevoriga asosiy tamal toshi qo'yildi. Bu voqea yangi davrning boshlanishi bo'ldi.{% elif LANGUAGE_CODE == 'ru' %}Важная веха в истории FAW — заложен краеугольный камень первого автомобильного завода. Это событие ознаменовало начало новой эры.{% else %}A major milestone in FAW history — the cornerstone of the first automobile factory was laid. This event marked the beginning of a new era.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/1.webp' %}" alt="Image">
@@ -252,10 +206,8 @@
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>13 iyul 1956 yil</strong></div>
-                <span class="mxd-section text">
-                  Yig‘uv liniyasidan FAW CA10 to‘rt tonnalik tijorat yuk mashinasining birinchi modeli chiqdi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}13 iyul 1956 yil{% elif LANGUAGE_CODE == 'ru' %}13 июля 1956 года{% else %}July 13, 1956{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Yig'uv liniyasidan FAW CA10 to'rt tonnalik tijorat yuk mashinasining birinchi modeli chiqdi.{% elif LANGUAGE_CODE == 'ru' %}С конвейера сошла первая модель четырёхтонного коммерческого грузовика FAW CA10.{% else %}The first model of the four-ton FAW CA10 commercial truck rolled off the assembly line.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/2.webp' %}" alt="Image">
@@ -266,10 +218,8 @@
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>12 may 1958 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW birinchi yengil avtomobil modelini ishlab chiqardi, u afsonaviy Hongqi’ning ajdodiga aylandi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}12 may 1958 yil{% elif LANGUAGE_CODE == 'ru' %}12 мая 1958 года{% else %}May 12, 1958{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW birinchi yengil avtomobil modelini ishlab chiqardi, u afsonaviy Hongqi'ning ajdodiga aylandi.{% elif LANGUAGE_CODE == 'ru' %}FAW выпустила первую модель легкового автомобиля, ставшего предшественником легендарного Hongqi.{% else %}FAW produced its first passenger car model, which became the predecessor of the legendary Hongqi.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/3.webp' %}" alt="Image">
@@ -280,10 +230,8 @@
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>1 avgust 1958 yil</strong></div>
-                <span class="mxd-section text">
-                  Birinchi “Hongqi” lyuks klassidagi sedan taqdim etildi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}1 avgust 1958 yil{% elif LANGUAGE_CODE == 'ru' %}1 августа 1958 года{% else %}August 1, 1958{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Birinchi "Hongqi" lyuks klassidagi sedan taqdim etildi.{% elif LANGUAGE_CODE == 'ru' %}Представлен первый седан класса люкс «Hongqi».{% else %}The first luxury sedan "Hongqi" was introduced.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/3.1.webp' %}" alt="Image">
@@ -294,265 +242,224 @@
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>21 fevral 1972 yil</strong></div>
-                <span class="mxd-section text">
-                  1972 yilda AQSH prezidenti Richard Niksonning Xitoyga tarixiy tashrifi chog‘ida prezident limuzini
-                  Hongqi uning safarlari uchun tanlandi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}21 fevral 1972 yil{% elif LANGUAGE_CODE == 'ru' %}21 февраля 1972 года{% else %}February 21, 1972{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}1972 yilda AQSH prezidenti Richard Niksonning Xitoyga tarixiy tashrifi chog'ida prezident limuzini Hongqi uning safarlari uchun tanlandi.{% elif LANGUAGE_CODE == 'ru' %}Во время исторического визита президента США Ричарда Никсона в Китай президентский лимузин Hongqi был выбран для его поездок.{% else %}During US President Richard Nixon's historic visit to China, the Hongqi presidential limousine was chosen for his travels.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/4.webp' %}" alt="Image">
           </a>
         </div>
-        <!-- item -->
+        <!-- 5 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>15 iyul 1986 yil</strong></div>
-                <span class="mxd-section text">
-                  Standart kabinali ikkinchi avlod tijorat yuk mashinalari ishlab chiqarilishi boshlandi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}15 iyul 1986 yil{% elif LANGUAGE_CODE == 'ru' %}15 июля 1986 года{% else %}July 15, 1986{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Standart kabinali ikkinchi avlod tijorat yuk mashinalari ishlab chiqarilishi boshlandi.{% elif LANGUAGE_CODE == 'ru' %}Началось производство коммерческих грузовиков второго поколения со стандартной кабиной.{% else %}Production of second-generation commercial trucks with standard cabin began.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/5.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 6 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>17 may 1988 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW Group va Volkswagen AG AUDI 100 sedanlarini import qilish va qo‘shma yig‘ish bo‘yicha kelishuvni
-                  imzoladi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}17 may 1988 yil{% elif LANGUAGE_CODE == 'ru' %}17 мая 1988 года{% else %}May 17, 1988{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW Group va Volkswagen AG AUDI 100 sedanlarini import qilish va qo'shma yig'ish bo'yicha kelishuvni imzoladi.{% elif LANGUAGE_CODE == 'ru' %}FAW Group и Volkswagen AG подписали соглашение об импорте и совместной сборке седанов AUDI 100.{% else %}FAW Group and Volkswagen AG signed an agreement on importing and joint assembly of AUDI 100 sedans.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/6.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 7 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>8 fevral 1991 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW-Volkswagen Automobile Co. Ltd. kompaniyasi tashkil etildi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}8 fevral 1991 yil{% elif LANGUAGE_CODE == 'ru' %}8 февраля 1991 года{% else %}February 8, 1991{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW-Volkswagen Automobile Co. Ltd. kompaniyasi tashkil etildi.{% elif LANGUAGE_CODE == 'ru' %}Основана компания FAW-Volkswagen Automobile Co. Ltd.{% else %}FAW-Volkswagen Automobile Co. Ltd. was established.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/7.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 8 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>15 iyul 1996 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW o‘zining yangi o‘rta yuk ko‘taruvchi tijorat yuk mashinalarini taqdim etdi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}15 iyul 1996 yil{% elif LANGUAGE_CODE == 'ru' %}15 июля 1996 года{% else %}July 15, 1996{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW o'zining yangi o'rta yuk ko'taruvchi tijorat yuk mashinalarini taqdim etdi.{% elif LANGUAGE_CODE == 'ru' %}FAW представила свои новые коммерческие грузовики средней грузоподъёмности.{% else %}FAW introduced its new medium-duty commercial trucks.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/8.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 9 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>9 mart 2002 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW Group va Mazda Motor Corporation Mazda 6 sedanini ishlab chiqarish bo‘yicha texnik hamkorlik
-                  to‘g‘risida kelishuv imzoladi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}9 mart 2002 yil{% elif LANGUAGE_CODE == 'ru' %}9 марта 2002 года{% else %}March 9, 2002{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW Group va Mazda Motor Corporation Mazda 6 sedanini ishlab chiqarish bo'yicha texnik hamkorlik to'g'risida kelishuv imzoladi.{% elif LANGUAGE_CODE == 'ru' %}FAW Group и Mazda Motor Corporation подписали соглашение о техническом сотрудничестве по производству седана Mazda 6.{% else %}FAW Group and Mazda Motor Corporation signed a technical cooperation agreement for producing the Mazda 6 sedan.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/9.1.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 10 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>29 avgust 2002 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW Group va Toyota Motor Corporation strategik va uzoq muddatli hamkorlikni yo‘lga qo‘yish bo‘yicha
-                  kelishuv imzoladi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}29 avgust 2002 yil{% elif LANGUAGE_CODE == 'ru' %}29 августа 2002 года{% else %}August 29, 2002{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW Group va Toyota Motor Corporation strategik va uzoq muddatli hamkorlikni yo'lga qo'yish bo'yicha kelishuv imzoladi.{% elif LANGUAGE_CODE == 'ru' %}FAW Group и Toyota Motor Corporation подписали соглашение о стратегическом долгосрочном сотрудничестве.{% else %}FAW Group and Toyota Motor Corporation signed an agreement on strategic long-term cooperation.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/9.webp' %}" alt="Image">
           </a>
         </div>
+     <!-- 11 item продолжение -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>18 yanvar 2003 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW Wuxi Engine bo‘linmasi og‘ir yuk mashinalari uchun elektron boshqaruvga ega CA6DL turkumidagi 4
-                  klapanli dvigatelni taqdim etdi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}18 yanvar 2003 yil{% elif LANGUAGE_CODE == 'ru' %}18 января 2003 года{% else %}January 18, 2003{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW Wuxi Engine bo'linmasi og'ir yuk mashinalari uchun elektron boshqaruvga ega CA6DL turkumidagi 4 klapanli dvigatelni taqdim etdi.{% elif LANGUAGE_CODE == 'ru' %}Подразделение FAW Wuxi Engine представило 4-клапанный двигатель серии CA6DL с электронным управлением для тяжёлых грузовиков.{% else %}FAW Wuxi Engine division introduced the 4-valve CA6DL series engine with electronic control for heavy trucks.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/10.2.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 12 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>18 yanvar 2003 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW Group’ning yuk mashinalari ishlab chiqarish bo‘linmasi FAW Jiefang Truck Co. Ltd nomi bilan qayta
-                  tashkil etildi. Bu orqali kompaniyaning barcha tijorat yuk mashinalari bo‘linmalari yagona, yanada
-                  barqaror va foydaga yo‘naltirilgan, zamonaviy korporativ boshqaruv tizimiga ega tashkilotga
-                  birlashtirildi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}18 yanvar 2003 yil{% elif LANGUAGE_CODE == 'ru' %}18 января 2003 года{% else %}January 18, 2003{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW Group'ning yuk mashinalari ishlab chiqarish bo'linmasi FAW Jiefang Truck Co. Ltd nomi bilan qayta tashkil etildi.{% elif LANGUAGE_CODE == 'ru' %}Подразделение FAW Group по производству грузовиков было реорганизовано под названием FAW Jiefang Truck Co. Ltd.{% else %}FAW Group's truck manufacturing division was reorganized as FAW Jiefang Truck Co. Ltd.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/10.1.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 13 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>9 aprel 2003 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW Group va Toyota Motor Corporation Xitoyda to‘rtta Toyota modeli — Corolla, Crown, Land Cruiser
-                  Prado va gibrid Prius’ni qo‘shma ishlab chiqarish bo‘yicha kelishuv imzoladi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}9 aprel 2003 yil{% elif LANGUAGE_CODE == 'ru' %}9 апреля 2003 года{% else %}April 9, 2003{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW Group va Toyota Motor Corporation Xitoyda to'rtta Toyota modeli — Corolla, Crown, Land Cruiser Prado va gibrid Prius'ni qo'shma ishlab chiqarish bo'yicha kelishuv imzoladi.{% elif LANGUAGE_CODE == 'ru' %}FAW Group и Toyota Motor Corporation подписали соглашение о совместном производстве в Китае четырёх моделей Toyota — Corolla, Crown, Land Cruiser Prado и гибридного Prius.{% else %}FAW Group and Toyota Motor Corporation signed an agreement for joint production of four Toyota models in China — Corolla, Crown, Land Cruiser Prado and hybrid Prius.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/10.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 14 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>7 dekabr 2004 yil</strong></div>
-                <span class="mxd-section text">
-                  Germaniya kansleri Gerxard Shreder $1,1 milliardlik qiymatga ega bo‘lgan FAW-Volkswagen’ning ikkinchi
-                  zavodining tantanali ochilish marosimida ishtirok etdi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}7 dekabr 2004 yil{% elif LANGUAGE_CODE == 'ru' %}7 декабря 2004 года{% else %}December 7, 2004{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Germaniya kansleri Gerxard Shreder $1,1 milliardlik qiymatga ega bo'lgan FAW-Volkswagen'ning ikkinchi zavodining tantanali ochilish marosimida ishtirok etdi.{% elif LANGUAGE_CODE == 'ru' %}Канцлер Германии Герхард Шрёдер принял участие в торжественном открытии второго завода FAW-Volkswagen стоимостью $1,1 млрд.{% else %}German Chancellor Gerhard Schröder attended the grand opening of FAW-Volkswagen's second plant worth $1.1 billion.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/11.1.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 15 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>15 iyul 2004 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW o‘zining yangi ilg‘or J5P og‘ir yuk mashinalari seriyasini taqdim etdi, u tortuvchi mashinalar,
-                  bortsiz yuk mashinalari va maxsus texnikalarni o‘z ichiga oladi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}15 iyul 2004 yil{% elif LANGUAGE_CODE == 'ru' %}15 июля 2004 года{% else %}July 15, 2004{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW o'zining yangi ilg'or J5P og'ir yuk mashinalari seriyasini taqdim etdi.{% elif LANGUAGE_CODE == 'ru' %}FAW представила свою новую передовую серию тяжёлых грузовиков J5P.{% else %}FAW introduced its new advanced J5P heavy truck series.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/11.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 16 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>15 yanvar 2005 yil</strong></div>
-                <span class="mxd-section text">
-                  Changchun zavodidagi konveyerdan FAW ning birinchi J5M og‘ir yuk mashinasi chiqarildi va u FAW tijorat
-                  yuk mashinalarining beshinchi avlodi bo‘ldi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}15 yanvar 2005 yil{% elif LANGUAGE_CODE == 'ru' %}15 января 2005 года{% else %}January 15, 2005{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Changchun zavodidagi konveyerdan FAW ning birinchi J5M og'ir yuk mashinasi chiqarildi.{% elif LANGUAGE_CODE == 'ru' %}С конвейера завода в Чанчуне сошёл первый тяжёлый грузовик FAW J5M.{% else %}The first FAW J5M heavy truck rolled off the assembly line at the Changchun plant.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/12.1.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 17 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>26 may 2005 yil</strong></div>
-                <span class="mxd-section text">
-                  Yangi zavod – Volkswagen FAW Engine (Dalian) Co. Ltd. qurilishi boshlandi. Loyihaning qiymati 194 mln
-                  dollar bo‘lib, yiliga 300 000 dona dvigatel ishlab chiqarish rejalashtirilgan.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}26 may 2005 yil{% elif LANGUAGE_CODE == 'ru' %}26 мая 2005 года{% else %}May 26, 2005{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Yangi zavod – Volkswagen FAW Engine (Dalian) Co. Ltd. qurilishi boshlandi. Loyihaning qiymati 194 mln dollar.{% elif LANGUAGE_CODE == 'ru' %}Началось строительство нового завода Volkswagen FAW Engine (Dalian) Co. Ltd. Стоимость проекта — $194 млн.{% else %}Construction of a new plant Volkswagen FAW Engine (Dalian) Co. Ltd. began. Project value — $194 million.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/12.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 18 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>16 oktaybr 2006 yil</strong></div>
-                <span class="mxd-section text">
-                  Dalian Diesel Engine – FAW Jiefang Truck Co. Ltd.ning bo‘limi, quvvati 160 dan 300 ot kuchigacha
-                  bo‘lgan Deutz Euro 3 1013 va 2012 dizel dvigatellarini ishlab chiqara boshladi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}16 oktabr 2006 yil{% elif LANGUAGE_CODE == 'ru' %}16 октября 2006 года{% else %}October 16, 2006{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Dalian Diesel Engine quvvati 160 dan 300 ot kuchigacha bo'lgan Deutz Euro 3 dizel dvigatellarini ishlab chiqara boshladi.{% elif LANGUAGE_CODE == 'ru' %}Dalian Diesel Engine начал производство дизельных двигателей Deutz Euro 3 мощностью от 160 до 300 л.с.{% else %}Dalian Diesel Engine began producing Deutz Euro 3 diesel engines with power from 160 to 300 hp.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/13.2.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 19 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>18 avgust 2006 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW Group o‘zining yangi jozibador va qudratli «lyuks» toifasidagi Besturn sedanini taqdim etdi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}18 avgust 2006 yil{% elif LANGUAGE_CODE == 'ru' %}18 августа 2006 года{% else %}August 18, 2006{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW Group o'zining yangi «lyuks» toifasidagi Besturn sedanini taqdim etdi.{% elif LANGUAGE_CODE == 'ru' %}FAW Group представила свой новый седан класса люкс Besturn.{% else %}FAW Group introduced its new luxury sedan Besturn.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/13.1.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 20 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>15 dekabr 2006 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW Wuxi Diesel Engine bo‘limi yuqori quvvatli 4 klapanli CA6DN seriyali dvigatelni taqdim etdi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}15 dekabr 2006 yil{% elif LANGUAGE_CODE == 'ru' %}15 декабря 2006 года{% else %}December 15, 2006{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW Wuxi Diesel Engine bo'limi yuqori quvvatli 4 klapanli CA6DN seriyali dvigatelni taqdim etdi.{% elif LANGUAGE_CODE == 'ru' %}Подразделение FAW Wuxi Diesel Engine представило мощный 4-клапанный двигатель серии CA6DN.{% else %}FAW Wuxi Diesel Engine division introduced the powerful 4-valve CA6DN series engine.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/13.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 21 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title">
-                  <strong>15 iyul 2007 yil</strong>
-                </div>
-                <span class="mxd-section text">
-                  FAW uzoq masofali yuk tashishlar uchun mo‘ljallangan yangi ilg‘or Yevropa sinfidagi J6P og‘ir
-                  tortuvchi yuk mashinasini ishlab chiqarishni boshladi. Bu to‘liq Xitoyda loyihalashtirilgan birinchi
-                  og‘ir tortuvchi mashina hisoblanadi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}15 iyul 2007 yil{% elif LANGUAGE_CODE == 'ru' %}15 июля 2007 года{% else %}July 15, 2007{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW uzoq masofali yuk tashishlar uchun mo'ljallangan yangi ilg'or Yevropa sinfidagi J6P og'ir tortuvchi yuk mashinasini ishlab chiqarishni boshladi.{% elif LANGUAGE_CODE == 'ru' %}FAW начала производство нового передового тягача европейского класса J6P для дальних перевозок.{% else %}FAW began production of the new advanced European-class J6P heavy truck for long-distance transportation.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/14.1.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 22 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>12 iyul 2007 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW uzoq masofali yuk tashishlar uchun mo‘ljallangan yangi ilg‘or Yevropa sinfidagi J6P og‘ir
-                  tortuvchi yuk mashinasini ishlab chiqarishni boshladi. Bu to‘liq Xitoyda loyihalashtirilgan birinchi
-                  og‘ir tortuvchi mashina hisoblanadi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}12 iyul 2007 yil{% elif LANGUAGE_CODE == 'ru' %}12 июля 2007 года{% else %}July 12, 2007{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Bu to'liq Xitoyda loyihalashtirilgan birinchi og'ir tortuvchi mashina hisoblanadi.{% elif LANGUAGE_CODE == 'ru' %}Это первый тяжёлый тягач, полностью спроектированный в Китае.{% else %}This was the first heavy truck completely designed in China.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/14.webp' %}" alt="Image">
@@ -561,252 +468,217 @@
       </div>
       <!-- bottom line -->
       <div class="marquee__bottom">
-        <!-- item -->
+        <!-- 1 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>22 aprel 2008 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW o‘zining tijorat yuk mashinalari uchun mo‘ljallangan, elektron boshqaruvga ega va katta silindr
-                  diametriga ega 11 litrli CA6DM seriyali tejamkor dvigatelini taqdim etdi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}22 aprel 2008 yil{% elif LANGUAGE_CODE == 'ru' %}22 апреля 2008 года{% else %}April 22, 2008{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW o'zining tijorat yuk mashinalari uchun mo'ljallangan 11 litrli CA6DM seriyali tejamkor dvigatelini taqdim etdi.{% elif LANGUAGE_CODE == 'ru' %}FAW представила экономичный 11-литровый двигатель серии CA6DM для коммерческих грузовиков.{% else %}FAW introduced its economical 11-liter CA6DM series engine for commercial trucks.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/15.webp' %}" alt="Image">
           </a>
         </div>
-        <!-- item -->
+        <!-- 2 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>14 yanvar 2011 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW guruhiga 2010 yilda noyob «J6» seriyasi va yangi dizel dvigatellar oilasini ishlab chiqgani uchun
-                  davlat texnik taraqqiyot mukofoti – «Mashinasozlik sohasidagi yuqori texnologik ishlanmalar» taqdim
-                  etildi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}14 yanvar 2011 yil{% elif LANGUAGE_CODE == 'ru' %}14 января 2011 года{% else %}January 14, 2011{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW guruhiga «J6» seriyasi va yangi dizel dvigatellar oilasini ishlab chiqgani uchun davlat texnik taraqqiyot mukofoti taqdim etildi.{% elif LANGUAGE_CODE == 'ru' %}Группе FAW вручена государственная премия за технический прогресс за разработку серии J6 и нового семейства дизельных двигателей.{% else %}FAW Group was awarded the state technical progress prize for developing the J6 series and new diesel engine family.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/16.webp' %}" alt="Image">
           </a>
         </div>
-        <!-- item -->
+        <!-- 3 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>21 mart 2016 yil</strong></div>
-                <span class="mxd-section text">
-                  Xitoyning Qingdao shahrida “Kuchlarni birlashtirib, kelajakni yaratamiz” mavzusida birinchi yillik
-                  xalqaro dilerlar konferensiyasi o‘tkazildi. Konferensiyada 70 dan ortiq dilerlar va 30 ta turli
-                  mamlakat vakillari ishtirok etdi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}21 mart 2016 yil{% elif LANGUAGE_CODE == 'ru' %}21 марта 2016 года{% else %}March 21, 2016{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Xitoyning Qingdao shahrida birinchi yillik xalqaro dilerlar konferensiyasi o'tkazildi. 70 dan ortiq dilerlar va 30 ta mamlakat vakillari ishtirok etdi.{% elif LANGUAGE_CODE == 'ru' %}В городе Циндао (Китай) прошла первая ежегодная международная конференция дилеров. Участвовали более 70 дилеров и представители 30 стран.{% else %}The first annual international dealer conference was held in Qingdao, China. Over 70 dealers and representatives from 30 countries attended.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/17.webp' %}" alt="Image">
           </a>
         </div>
-        <!-- item -->
+        <!-- 4 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong>16 dekabr 2017 yil</strong></div>
-                <span class="mxd-section text">
-                  2017 yil noyabr oyida FAW guruhi yillik rejalashtirilgan ko‘rsatkichlarni oshirib, yangi rekordlar
-                  o‘rnatdi. Changchun zavodida oylik ishlab chiqarish 13 500 donadan oshdi, Qingdao zavodi esa yillik
-                  quvvatini 124 476 dona bilan oshib chiqdi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}16 dekabr 2017 yil{% elif LANGUAGE_CODE == 'ru' %}16 декабря 2017 года{% else %}December 16, 2017{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}2017 yil noyabr oyida FAW guruhi yillik rejalashtirilgan ko'rsatkichlarni oshirib, yangi rekordlar o'rnatdi.{% elif LANGUAGE_CODE == 'ru' %}В ноябре 2017 года группа FAW превысила годовые плановые показатели и установила новые рекорды.{% else %}In November 2017, FAW Group exceeded annual planned targets and set new records.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/18.webp' %}" alt="Image">
           </a>
         </div>
-        <!-- item -->
+        <!-- 5 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong> 2018 yil</strong></div>
-                <span class="mxd-section text">
-                  Og‘ir texnika ichki bozorda va dunyo bo‘yicha bir marka mahsuloti sotuv hajmi bo‘yicha birinchi
-                  o‘rinni egalladi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}2018 yil{% elif LANGUAGE_CODE == 'ru' %}2018 год{% else %}2018{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Og'ir texnika ichki bozorda va dunyo bo'yicha bir marka mahsuloti sotuv hajmi bo'yicha birinchi o'rinni egalladi.{% elif LANGUAGE_CODE == 'ru' %}Тяжёлая техника заняла первое место по объёму продаж одного бренда на внутреннем рынке и в мире.{% else %}Heavy equipment ranked first in single-brand sales volume domestically and worldwide.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/19.webp' %}" alt="Image">
           </a>
         </div>
-        <!-- item -->
+        <!-- 6 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong> 2018 yil</strong></div>
-                <span class="mxd-section text">
-                  7 millioninchi yuk mashinasi yig‘ish liniyasidan tushdi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}2018 yil{% elif LANGUAGE_CODE == 'ru' %}2018 год{% else %}2018{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}7 millioninchi yuk mashinasi yig'ish liniyasidan tushdi.{% elif LANGUAGE_CODE == 'ru' %}С конвейера сошёл 7-миллионный грузовик.{% else %}The 7 millionth truck rolled off the assembly line.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/19.1.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 7 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong> 2018 yil</strong></div>
-                <span class="mxd-section text">
-                  Daromad oldingi davrga nisbatan 26,4% ga oshdi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}2018 yil{% elif LANGUAGE_CODE == 'ru' %}2018 год{% else %}2018{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Daromad oldingi davrga nisbatan 26,4% ga oshdi.{% elif LANGUAGE_CODE == 'ru' %}Доход увеличился на 26,4% по сравнению с предыдущим периодом.{% else %}Revenue increased by 26.4% compared to the previous period.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/19.2.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 8 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong> 2019 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW J6 seriyasidan 1 million dona avtomobil sotildi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}2019 yil{% elif LANGUAGE_CODE == 'ru' %}2019 год{% else %}2019{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW J6 seriyasidan 1 million dona avtomobil sotildi.{% elif LANGUAGE_CODE == 'ru' %}Продано 1 миллион автомобилей серии FAW J6.{% else %}1 million vehicles of the FAW J6 series were sold.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/20.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 9 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong> 2019 yil</strong></div>
-                <span class="mxd-section text">
-                  3,46 million dona avtomobil sotildi, daromad 600 milliard RMB ga yetdi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}2019 yil{% elif LANGUAGE_CODE == 'ru' %}2019 год{% else %}2019{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}3,46 million dona avtomobil sotildi, daromad 600 milliard RMB ga yetdi.{% elif LANGUAGE_CODE == 'ru' %}Продано 3,46 млн автомобилей, доход достиг 600 млрд юаней.{% else %}3.46 million vehicles sold, revenue reached 600 billion RMB.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/20.1.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 10 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong> 2020 yil</strong></div>
-                <span class="mxd-section text">
-                  Qayta tashkil etish va fond birjalariga chiqish.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}2020 yil{% elif LANGUAGE_CODE == 'ru' %}2020 год{% else %}2020{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Qayta tashkil etish va fond birjalariga chiqish.{% elif LANGUAGE_CODE == 'ru' %}Реорганизация и выход на фондовые биржи.{% else %}Reorganization and stock exchange listing.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/21.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 11 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong> 2020 yil</strong></div>
-                <span class="mxd-section text">
-                  Xitoyning eng muhim kompaniyalari reytingida 9-o‘rinni egallaydi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}2020 yil{% elif LANGUAGE_CODE == 'ru' %}2020 год{% else %}2020{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Xitoyning eng muhim kompaniyalari reytingida 9-o'rinni egallaydi.{% elif LANGUAGE_CODE == 'ru' %}Занимает 9-е место в рейтинге важнейших компаний Китая.{% else %}Ranked 9th among China's most important companies.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/21.1.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 12 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong> 2020 yil</strong></div>
-                <span class="mxd-section text">
-                  Xitoy Xalq Respublikasi raisi Si Tszinpin FAW korporatsiyasiga tashrif buyurdi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}2020 yil{% elif LANGUAGE_CODE == 'ru' %}2020 год{% else %}2020{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Xitoy Xalq Respublikasi raisi Si Tszinpin FAW korporatsiyasiga tashrif buyurdi.{% elif LANGUAGE_CODE == 'ru' %}Председатель КНР Си Цзиньпин посетил корпорацию FAW.{% else %}Chinese President Xi Jinping visited FAW Corporation.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/21.2.webp' %}" alt="Image">
           </a>
         </div>
+       <!-- 13 item продолжение -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong> 2021 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW TRUCKS yuqori intellektli zavodi ishga tushirildi: maydoni 55 ming kv.m, yillik quvvati 50 000
-                  avtomobil.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}2021 yil{% elif LANGUAGE_CODE == 'ru' %}2021 год{% else %}2021{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW TRUCKS yuqori intellektli zavodi ishga tushirildi: maydoni 55 ming kv.m, yillik quvvati 50 000 avtomobil.{% elif LANGUAGE_CODE == 'ru' %}Запущен высокоинтеллектуальный завод FAW TRUCKS: площадь 55 тыс. кв.м, годовая мощность 50 000 автомобилей.{% else %}FAW TRUCKS high-tech plant launched: area 55,000 sq.m, annual capacity 50,000 vehicles.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/22.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 14 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong> 2021 yil</strong></div>
-                <span class="mxd-section text">
-                  Fortune Global 500 reytingida 66-o‘rinda, jami daromadi $101 mlrd.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}2021 yil{% elif LANGUAGE_CODE == 'ru' %}2021 год{% else %}2021{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Fortune Global 500 reytingida 66-o'rinda, jami daromadi $101 mlrd.{% elif LANGUAGE_CODE == 'ru' %}66-е место в рейтинге Fortune Global 500, общий доход $101 млрд.{% else %}Ranked 66th in Fortune Global 500, total revenue $101 billion.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/22.1.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 15 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong> 2022 yil</strong></div>
-                <span class="mxd-section text">
-                  Fortune Global 500 reytingida 79-o‘rinda, daromadi 109,4 mlrd $.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}2022 yil{% elif LANGUAGE_CODE == 'ru' %}2022 год{% else %}2022{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}Fortune Global 500 reytingida 79-o'rinda, daromadi $109,4 mlrd.{% elif LANGUAGE_CODE == 'ru' %}79-е место в рейтинге Fortune Global 500, доход $109,4 млрд.{% else %}Ranked 79th in Fortune Global 500, revenue $109.4 billion.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/23.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 16 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong> 2022 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW Trucks tortuvchi yuk mashinalari Xitoyda 17 yil ketma-ket sotuv bo‘yicha yetakchi hisoblanadi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}2022 yil{% elif LANGUAGE_CODE == 'ru' %}2022 год{% else %}2022{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW Trucks tortuvchi yuk mashinalari Xitoyda 17 yil ketma-ket sotuv bo'yicha yetakchi hisoblanadi.{% elif LANGUAGE_CODE == 'ru' %}Тягачи FAW Trucks — лидеры продаж в Китае 17 лет подряд.{% else %}FAW Trucks tractors have been sales leaders in China for 17 consecutive years.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/23.1.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 17 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong> 2023 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW Group tijorat avtomobillari bo‘limi yangi va noyob mahsulotlar ishlab chiqaruvchi, jahon
-                  darajasidagi ixtisoslashgan namoyishkor korxona sifatida tanlandi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}2023 yil{% elif LANGUAGE_CODE == 'ru' %}2023 год{% else %}2023{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW Group tijorat avtomobillari bo'limi jahon darajasidagi ixtisoslashgan namoyishkor korxona sifatida tanlandi.{% elif LANGUAGE_CODE == 'ru' %}Подразделение коммерческих автомобилей FAW Group выбрано как специализированное демонстрационное предприятие мирового уровня.{% else %}FAW Group's commercial vehicle division was selected as a world-class specialized demonstration enterprise.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/24.webp' %}" alt="Image">
           </a>
         </div>
+        <!-- 18 item -->
         <div class="marquee__item image">
           <a class="marquee__link" href="#">
             <div class="marquee__overlay">
               <div class="marquee__text">
-                <div class="history-section-elemet_title"><strong> 2023 yil</strong></div>
-                <span class="mxd-section text">
-                  FAW Jiefang brendi qiymati 107,8 mlrd yuanga yetib, Xitoy tijorat avtomobillari bozorida 11 yil
-                  ketma-ket birinchi o‘rinda turadi.
-                </span>
+                <div class="history-section-elemet_title"><strong>{% if LANGUAGE_CODE == 'uz' %}2023 yil{% elif LANGUAGE_CODE == 'ru' %}2023 год{% else %}2023{% endif %}</strong></div>
+                <span class="mxd-section text">{% if LANGUAGE_CODE == 'uz' %}FAW Jiefang brendi qiymati 107,8 mlrd yuanga yetib, Xitoy tijorat avtomobillari bozorida 11 yil ketma-ket birinchi o'rinda turadi.{% elif LANGUAGE_CODE == 'ru' %}Стоимость бренда FAW Jiefang достигла 107,8 млрд юаней — первое место на рынке коммерческих автомобилей Китая 11 лет подряд.{% else %}FAW Jiefang brand value reached 107.8 billion yuan — first place in China's commercial vehicle market for 11 consecutive years.{% endif %}</span>
               </div>
             </div>
             <img src="{% static 'images/history/24.1.webp' %}" alt="Image">
@@ -820,162 +692,65 @@
   <!-- Section - Statistics Simple Start -->
   <div class="mxd-section padding-default">
     <div class="mxd-container grid-container">
-      <!-- Block - Statistics Cards Start -->
       <div class="mxd-block">
         <div class="mxd-stats-simple">
           <div class="container-fluid p-0">
             <div class="faw-quantity-title">
-              <h2 class="reveal-type ">FAW TRUCKS natijalari</h2>
+              <h2 class="reveal-type">{% if LANGUAGE_CODE == 'uz' %}FAW TRUCKS natijalari{% elif LANGUAGE_CODE == 'ru' %}Результаты FAW TRUCKS{% else %}FAW TRUCKS Results{% endif %}</h2>
             </div>
             <div class="row g-0 mxd-stats-simple">
-              <!-- item -->
+              <!-- item 1 -->
               <div class="col-12 col-lg-3 mxd-stats-simple__item mxd-grid-item">
                 <div class="mxd-stats-simple__inner animate-card-4">
-                  <!-- counter -->
                   <div class="mxd-counter">
                     <p id="stats-counter-1" class="mxd-stats-number mxd-stats-simple__counter">0</p>
                   </div>
-                  <!-- image -->
                   <img class="mxd-stats-simple__image" src="{% static 'images/icon/globus_metal.png' %}" alt="Icon">
-
-                  <!-- description -->
-                  <p class="mxd-stats-simple__descr t-140 t-bright">Dunyo bo‘ylab<br>mamnun mijozlar</p>
+                  <p class="mxd-stats-simple__descr t-140 t-bright">{% if LANGUAGE_CODE == 'uz' %}Dunyo bo'ylab<br>mamnun mijozlar{% elif LANGUAGE_CODE == 'ru' %}Довольных клиентов<br>по всему миру{% else %}Satisfied customers<br>worldwide{% endif %}</p>
                 </div>
               </div>
-              <!-- item -->
+              <!-- item 2 -->
               <div class="col-12 col-lg-3 mxd-stats-simple__item mxd-grid-item">
                 <div class="mxd-stats-simple__inner animate-card-4">
-                  <!-- counter -->
                   <div class="mxd-counter">
                     <p id="stats-counter-2" class="mxd-stats-number mxd-stats-simple__counter">0</p>
                   </div>
-                  <!-- image -->
                   <img class="mxd-stats-simple__image" src="{% static 'images/icon/inovation_meta.png' %}" alt="Icon">
-                  <!-- description -->
-                  <p class="mxd-stats-simple__descr t-140 t-bright"><br>Yangi innovatsion loyihalar</p>
+                  <p class="mxd-stats-simple__descr t-140 t-bright">{% if LANGUAGE_CODE == 'uz' %}<br>Yangi innovatsion loyihalar{% elif LANGUAGE_CODE == 'ru' %}<br>Новых инновационных проектов{% else %}<br>New innovative projects{% endif %}</p>
                 </div>
               </div>
-              <!-- item -->
+              <!-- item 3 -->
               <div class="col-12 col-lg-3 mxd-stats-simple__item mxd-grid-item">
                 <div class="mxd-stats-simple__inner animate-card-4">
-                  <!-- counter -->
                   <div class="mxd-counter">
                     <p id="stats-counter-3" class="mxd-stats-number mxd-stats-simple__counter">0</p>
                   </div>
-                  <!-- image -->
-                  <img class="mxd-stats-simple__image"
-                    src="{% static 'images/icon/8cf13721-5670-42e3-9cb7-db36b5402d48.png' %}" alt="Icon">
-                  <!-- description -->
-                  <p class="mxd-stats-simple__descr t-140 t-bright">Yillik professional tajriba</p>
+                  <img class="mxd-stats-simple__image" src="{% static 'images/icon/8cf13721-5670-42e3-9cb7-db36b5402d48.png' %}" alt="Icon">
+                  <p class="mxd-stats-simple__descr t-140 t-bright">{% if LANGUAGE_CODE == 'uz' %}Yillik professional tajriba{% elif LANGUAGE_CODE == 'ru' %}Лет профессионального опыта{% else %}Years of professional experience{% endif %}</p>
                 </div>
               </div>
-              <!-- item -->
+              <!-- item 4 -->
               <div class="col-12 col-lg-3 mxd-stats-simple__item mxd-grid-item">
                 <div class="mxd-stats-simple__inner animate-card-4">
-                  <!-- counter -->
                   <div class="mxd-counter">
                     <p id="stats-counter-4" class="mxd-stats-number mxd-stats-simple__counter">0</p>
                   </div>
-                  <!-- image -->
                   <img class="mxd-stats-simple__image" src="{% static 'images/icon/cup.png' %}" alt="Icon">
-                  <!-- description -->
-                  <p class="mxd-stats-simple__descr t-140 t-bright">Muvaffaqiyatli yakunlangan loyihalar</p>
+                  <p class="mxd-stats-simple__descr t-140 t-bright">{% if LANGUAGE_CODE == 'uz' %}Muvaffaqiyatli yakunlangan loyihalar{% elif LANGUAGE_CODE == 'ru' %}Успешно завершённых проектов{% else %}Successfully completed projects{% endif %}</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <!-- Block - Statistics Cards End -->
     </div>
   </div>
   <!-- Section - Statistics Simple End -->
-
-  <!-- <div class="mxd-section padding-pre-title">
-    <div class="mxd-container grid-container">
-      <div class="faw-safe-title">
-        <h2 class="reveal-type ">Bizga ishonishadi</h2>
-      </div>
-      <div class="mxd-block">
-        <div class="mxd-partners-cards">
-          <div class="container-fluid p-0">
-            <div class="row g-0">
-       
-              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
-                <a class="mxd-partners-cards__inner" href="#0">
-                  <div class="mxd-partners-cards__logo">
-                    <img src="{% static 'images/logo-brends/safia.png' %}" alt="Partner Logo">
-                  </div>
-                </a>
-              </div>
-
-              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
-                <a class="mxd-partners-cards__inner" href="#0">
-                  <div class="mxd-partners-cards__logo">
-                    <img src="{% static 'images/logo-brends/audi.png' %}" alt="Partner Logo">
-                  </div>
-                </a>
-              </div>
-
-              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
-                <a class="mxd-partners-cards__inner" href="#0">
-                  <div class="mxd-partners-cards__logo">
-                    <img src="{% static 'images/logo-brends/transport-vazirligi.png' %}" alt="Partner Logo">
-                  </div>
-                </a>
-              </div>
-
-              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
-                <a class="mxd-partners-cards__inner" href="#0">
-                  <div class="mxd-partners-cards__logo">
-                    <img src="{% static 'images/logo-brends/silkroad.png' %}" alt="Partner Logo">
-                  </div>
-                </a>
-              </div>
-
-              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
-                <a class="mxd-partners-cards__inner" href="#0">
-                  <div class="mxd-partners-cards__logo">
-                    <img src="{% static 'images/logo-brends/mazda.png' %}" alt="Partner Logo">
-                  </div>
-                </a>
-              </div>
-
-              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
-                <a class="mxd-partners-cards__inner" href="#0">
-                  <div class="mxd-partners-cards__logo">
-                    <img src="{% static 'images/logo-brends/korzinka.png' %}" alt="Partner Logo">
-                  </div>
-                </a>
-              </div>
-
-              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
-                <a class="mxd-partners-cards__inner" href="#0">
-                  <div class="mxd-partners-cards__logo">
-                    <img src="{% static 'images/logo-brends/Coca-Cola.png' %}" alt="Partner Logo">
-                  </div>
-                </a>
-              </div>
-
-              <div class="col-12 col-md-6 col-xl-3 mxd-partners-cards__item mxd-grid-item animate-card-4">
-                <a class="mxd-partners-cards__inner" href="#0">
-                  <div class="mxd-partners-cards__logo">
-                    <img src="{% static 'images/logo-brends/volkswagen.png' %}" alt="Partner Logo">
-                  </div>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div> -->
-
   
-  <div class="mxd-section padding-grid-pre-mtext">
+<div class="mxd-section padding-grid-pre-mtext">
     <div class="mxd-container no-padding-container">
       <div class="faw-commet-title">
-        <h2 class="reveal-type ">Mijozlarimiz fikrlari</h2>
+        <h2 class="reveal-type">{% if LANGUAGE_CODE == 'uz' %}Mijozlarimiz fikrlari{% elif LANGUAGE_CODE == 'ru' %}Отзывы наших клиентов{% else %}Customer Reviews{% endif %}</h2>
       </div>
       <!-- Block - Testimonials Slider #01 with Section Title Start -->
       <div class="mxd-block">
@@ -991,20 +766,18 @@
                       <div class="row g-0">
                         <div class="col-12 mxd-grid-item no-margin">
                           <div class="mxd-section-title__title ">
-                            <h2 class="reveal-type">Vum Faw </h2>
+                            <h2 class="reveal-type">Vum Faw</h2>
                           </div>
                         </div>
                         <div class="col-12 mxd-grid-item no-margin">
                           <div class="mxd-section-title__descr">
-                            <p class="">Biz faqat avtomobil ishlab chiqaruvchilar emasmiz — biz sizning
-                              ishonchli hamkorlaringizmiz. Gapimizga ishonibgina qolmang, FAW mijozlarining biz bilan
-                              ishlash haqidagi fikrlarini ko‘ring.</p>
+                            <p>{% if LANGUAGE_CODE == 'uz' %}Biz faqat avtomobil ishlab chiqaruvchilar emasmiz — biz sizning ishonchli hamkorlaringizmiz. Gapimizga ishonibgina qolmang, FAW mijozlarining biz bilan ishlash haqidagi fikrlarini ko'ring.{% elif LANGUAGE_CODE == 'ru' %}Мы не просто производители автомобилей — мы ваши надёжные партнёры. Не верьте нам на слово — посмотрите отзывы клиентов FAW о работе с нами.{% else %}We are not just car manufacturers — we are your reliable partners. Don't just take our word for it — see what FAW customers say about working with us.{% endif %}</p>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <!-- Section Title Start -->
+                  <!-- Section Title End -->
                 </div>
               </div>
               <!-- Additional Container End -->
@@ -1017,7 +790,7 @@
                 <div class="swiper-testimonials">
                   <!-- additional required wrapper -->
                   <div class="swiper-wrapper">
-                    <!-- single slide -->
+                    <!-- single slide 1 -->
                     <div class="swiper-slide">
                       <div class="mxd-testimonials-card bg-base-tint radius-m">
                         <div class="mxd-testimonials-card__content">
@@ -1027,16 +800,11 @@
                             </div>
                             <div class="mxd-testimonials-card__author">
                               <h5 class="mxd-testimonials-card__name ">Karimjonov Avazjon</h5>
-                              <p class="mxd-testimonials-card__position t-small ">Tadbirkor
-                              </p>
+                              <p class="mxd-testimonials-card__position t-small">{% if LANGUAGE_CODE == 'uz' %}Tadbirkor{% elif LANGUAGE_CODE == 'ru' %}Предприниматель{% else %}Entrepreneur{% endif %}</p>
                             </div>
                           </div>
                           <div class="mxd-testimonials-card__text">
-                            <p class="">Avval Xitoy mashinasidan biroz cho‘chib olgandim, lekin olish
-                              nasib qildi va oldim.
-                              Mashina kutilganidan ham yaxshi chiqdi — juda chaqqon, mustahkam va haydashda juda qulay.
-                              Ramalari og‘ir yuklarni ko‘tarishga mo‘ljallangani ham ko‘nglimni to‘liq joyiga qo‘ydi.
-                              Tanlovimdan juda mamnunman!</p>
+                            <p>{% if LANGUAGE_CODE == 'uz' %}Avval Xitoy mashinasidan biroz cho'chib olgandim, lekin olish nasib qildi va oldim. Mashina kutilganidan ham yaxshi chiqdi — juda chaqqon, mustahkam va haydashda juda qulay. Ramalari og'ir yuklarni ko'tarishga mo'ljallangani ham ko'nglimni to'liq joyiga qo'ydi. Tanlovimdan juda mamnunman!{% elif LANGUAGE_CODE == 'ru' %}Сначала немного сомневался насчёт китайской машины, но всё же решился и купил. Машина оказалась даже лучше, чем ожидал — очень манёвренная, прочная и удобная в управлении. Рама рассчитана на тяжёлые грузы, что меня полностью успокоило. Очень доволен своим выбором!{% else %}At first I was a bit hesitant about a Chinese truck, but I decided to buy it. The truck turned out even better than expected — very maneuverable, sturdy and comfortable to drive. The frame is designed for heavy loads, which completely reassured me. Very happy with my choice!{% endif %}</p>
                           </div>
                           <div class="mxd-testimonials-card__video ">
                             <div class="video-container">
@@ -1049,9 +817,8 @@
                         </div>
                       </div>
                     </div>
-                    <!-- single slide -->
 
-                    <!-- single slide -->
+                    <!-- single slide 2 -->
                     <div class="swiper-slide">
                       <div class="mxd-testimonials-card bg-base-tint radius-m">
                         <div class="mxd-testimonials-card__content">
@@ -1061,14 +828,11 @@
                             </div>
                             <div class="mxd-testimonials-card__author">
                               <h5 class="mxd-testimonials-card__name ">Karimjonov Avazjon</h5>
-                              <p class="mxd-testimonials-card__position t-small ">Fura haydovchisi
-                              </p>
+                              <p class="mxd-testimonials-card__position t-small">{% if LANGUAGE_CODE == 'uz' %}Fura haydovchisi{% elif LANGUAGE_CODE == 'ru' %}Водитель фуры{% else %}Truck Driver{% endif %}</p>
                             </div>
                           </div>
                           <div class="mxd-testimonials-card__text">
-                            <p class="">Men, Karimjonov Avazjon, to'rt yildan beri Sofiyada haydovchilik
-                              bilan shug'ullanaman va hozirda Faw Tiger V sovutgichli avtomobilini boshqaraman.
-                              Ushbu avtomobilni bir yil avval Sofiyada xarid qildi.</p>
+                            <p>{% if LANGUAGE_CODE == 'uz' %}Men, Karimjonov Avazjon, to'rt yildan beri Sofiyada haydovchilik bilan shug'ullanaman va hozirda Faw Tiger V sovutgichli avtomobilini boshqaraman. Ushbu avtomobilni bir yil avval Sofiyada xarid qildim.{% elif LANGUAGE_CODE == 'ru' %}Я, Каримджонов Авазджон, уже четыре года работаю водителем в компании Sofia и сейчас управляю рефрижератором Faw Tiger V. Этот автомобиль я приобрёл год назад в Sofia.{% else %}I, Karimjonov Avazjon, have been working as a driver at Sofia company for four years and currently drive a Faw Tiger V refrigerator truck. I purchased this vehicle a year ago at Sofia.{% endif %}</p>
                           </div>
                           <div class="mxd-testimonials-card__video ">
                             <div class="video-container">
@@ -1081,7 +845,8 @@
                         </div>
                       </div>
                     </div>
-                    <!-- single slide -->
+
+                    <!-- single slide 3 -->
                     <div class="swiper-slide">
                       <div class="mxd-testimonials-card bg-base-tint radius-m">
                         <div class="mxd-testimonials-card__content">
@@ -1091,14 +856,11 @@
                             </div>
                             <div class="mxd-testimonials-card__author">
                               <h5 class="mxd-testimonials-card__name ">Karimjonov Avazjon</h5>
-                              <p class="mxd-testimonials-card__position t-small ">Sofia haydovchisi
-                              </p>
+                              <p class="mxd-testimonials-card__position t-small">{% if LANGUAGE_CODE == 'uz' %}Sofia haydovchisi{% elif LANGUAGE_CODE == 'ru' %}Водитель Sofia{% else %}Sofia Driver{% endif %}</p>
                             </div>
                           </div>
                           <div class="mxd-testimonials-card__text">
-                            <p class="">Men, Karimjonov Avazjon, to'rt yildan beri Sofiyada haydovchilik
-                              bilan shug'ullanaman va hozirda Faw Tiger V sovutgichli avtomobilini boshqaraman.
-                              Ushbu avtomobilni bir yil avval Sofiyada xarid qildi.</p>
+                            <p>{% if LANGUAGE_CODE == 'uz' %}Men, Karimjonov Avazjon, to'rt yildan beri Sofiyada haydovchilik bilan shug'ullanaman va hozirda Faw Tiger V sovutgichli avtomobilini boshqaraman. Ushbu avtomobilni bir yil avval Sofiyada xarid qildim.{% elif LANGUAGE_CODE == 'ru' %}Я, Каримджонов Авазджон, уже четыре года работаю водителем в компании Sofia и сейчас управляю рефрижератором Faw Tiger V. Этот автомобиль я приобрёл год назад в Sofia.{% else %}I, Karimjonov Avazjon, have been working as a driver at Sofia company for four years and currently drive a Faw Tiger V refrigerator truck. I purchased this vehicle a year ago at Sofia.{% endif %}</p>
                           </div>
                           <div class="mxd-testimonials-card__video ">
                             <div class="video-container">
@@ -1131,11 +893,11 @@
           </div>
         </div>
       </div>
-      <!-- Block - Testimonials Slider #01 with Section Title Start -->
+      <!-- Block - Testimonials Slider End -->
     </div>
   </div>
 
-  <!-- Section - Experience Start -->
+ <!-- Section - Experience Start -->
   <div class="mxd-section padding-grid-pre-pinned">
     <div class="mxd-container grid-container">
 
@@ -1153,88 +915,66 @@
                       <div class="row g-0">
                         <div class="col-12 mxd-grid-item no-margin">
                           <div class="mxd-section-title__title ">
-                            <h2 class="reveal-type">VUM tarixi </h2>
+                            <h2 class="reveal-type">{% if LANGUAGE_CODE == 'uz' %}VUM tarixi{% elif LANGUAGE_CODE == 'ru' %}История VUM{% else %}VUM History{% endif %}</h2>
                           </div>
                         </div>
                         <div class="col-12 mxd-grid-item no-margin">
                           <div class="mxd-section-title__descr">
-                            <p class="">VUM avtomobil zavodi – bu zamonaviy ishlab chiqarish korxonasi
-                              bo‘lib, O‘zbekistonda FAW brendi ostida yuqori sifatli yuk avtomobillarini ishlab
-                              chiqarishga ixtisoslashgan.
-                              VUM zavodi Andijon shahrida joylashgan bo‘lib, Zavodning umumiy maydoni 14 750 m² bo‘lib,
-                              zamonaviy
-                              texnologik uskunalar bilan jihozlangan va yiliga 3000 dona
-                              yuk avtomobili ishlab chiqarish quvvatiga ega. Dastlab ishlab
-                              chiqarilayotgan model — FAW Tiger V seriyasidir.</p>
+                            <p>{% if LANGUAGE_CODE == 'uz' %}VUM avtomobil zavodi – bu zamonaviy ishlab chiqarish korxonasi bo'lib, O'zbekistonda FAW brendi ostida yuqori sifatli yuk avtomobillarini ishlab chiqarishga ixtisoslashgan. VUM zavodi Andijon shahrida joylashgan bo'lib, Zavodning umumiy maydoni 14 750 m² bo'lib, zamonaviy texnologik uskunalar bilan jihozlangan va yiliga 3000 dona yuk avtomobili ishlab chiqarish quvvatiga ega. Dastlab ishlab chiqarilayotgan model — FAW Tiger V seriyasidir.{% elif LANGUAGE_CODE == 'ru' %}Автомобильный завод VUM — это современное производственное предприятие, специализирующееся на выпуске высококачественных грузовых автомобилей под брендом FAW в Узбекистане. Завод VUM расположен в городе Андижан. Общая площадь завода составляет 14 750 м², он оснащён современным технологическим оборудованием и имеет производственную мощность 3000 грузовых автомобилей в год. Первоначально выпускаемая модель — серия FAW Tiger V.{% else %}VUM automobile plant is a modern manufacturing enterprise specializing in producing high-quality trucks under the FAW brand in Uzbekistan. VUM plant is located in Andijan city. The total area of the plant is 14,750 m², equipped with modern technological equipment and has a production capacity of 3,000 trucks per year. The initially produced model is the FAW Tiger V series.{% endif %}</p>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <!-- Section Title Start -->
+                  <!-- Section Title End -->
 
                 </div>
               </div>
               <div class="col-12 col-xl-7 mxd-pinned-universal__scroll">
                 <div class="mxd-pinned-universal__scroll-inner mxd-grid-item no-margin">
                   <div class="mxd-res-list">
-                    <!-- item -->
+                    <!-- item 1 -->
                     <div class="mxd-res-list__item">
                       <div class="mxd-res-list__divider "></div>
                       <div class="mxd-res-list__content">
                         <div class="mxd-res-list__data">
                           <div class="mxd-res-list__title">
-                            <h4 class="">VUM kompaniyasi</h4>
+                            <h4>{% if LANGUAGE_CODE == 'uz' %}VUM kompaniyasi{% elif LANGUAGE_CODE == 'ru' %}Компания VUM{% else %}VUM Company{% endif %}</h4>
                           </div>
                           <div class="mxd-res-list__descr">
-                            <p class="">VUM kompaniyasi 2018-yilda tashkil etilgan bo‘lib,
-                              2022-yilda China FAW Group Co., Ltd bilan rasmiy
-                              dilerlik shartnomasi imzolandi.</p>
+                            <p>{% if LANGUAGE_CODE == 'uz' %}VUM kompaniyasi 2018-yilda tashkil etilgan bo'lib, 2022-yilda China FAW Group Co., Ltd bilan rasmiy dilerlik shartnomasi imzolandi.{% elif LANGUAGE_CODE == 'ru' %}Компания VUM была основана в 2018 году, а в 2022 году был подписан официальный дилерский договор с China FAW Group Co., Ltd.{% else %}VUM company was founded in 2018, and in 2022 an official dealership agreement was signed with China FAW Group Co., Ltd.{% endif %}</p>
                           </div>
                         </div>
-                        <!-- <div class="mxd-res-list__year">
-                          <p class="">1 fevral 2018</p>
-                        </div> -->
                       </div>
                       <div class="mxd-res-list__divider "></div>
                     </div>
-                    <!-- item -->
+                    <!-- item 2 -->
                     <div class="mxd-res-list__item">
                       <div class="mxd-res-list__divider "></div>
                       <div class="mxd-res-list__content">
                         <div class="mxd-res-list__data">
                           <div class="mxd-res-list__title">
-                            <h4 class="">Andijon shahrida</h4>
+                            <h4>{% if LANGUAGE_CODE == 'uz' %}Andijon shahrida{% elif LANGUAGE_CODE == 'ru' %}В городе Андижан{% else %}In Andijan City{% endif %}</h4>
                           </div>
                           <div class="mxd-res-list__descr">
-                            <p class="">Andijon shahrida VUM tomonidan FAW zavodi
-                              qurilib, dastlab N2 toifasidagi yuk avtomobillari
-                              ishlab chiqarilishi yo‘lga qo‘yildi.</p>
+                            <p>{% if LANGUAGE_CODE == 'uz' %}Andijon shahrida VUM tomonidan FAW zavodi qurilib, dastlab N2 toifasidagi yuk avtomobillari ishlab chiqarilishi yo'lga qo'yildi.{% elif LANGUAGE_CODE == 'ru' %}В городе Андижан компанией VUM был построен завод FAW, где началось производство грузовых автомобилей категории N2.{% else %}In Andijan city, VUM built the FAW plant where production of N2 category trucks was launched.{% endif %}</p>
                           </div>
                         </div>
-                        <!-- <div class="mxd-res-list__year">
-                          <p class="">1 fevral 2018</p>
-                        </div> -->
                       </div>
                       <div class="mxd-res-list__divider "></div>
                     </div>
-                    <!-- item -->
+                    <!-- item 3 -->
                     <div class="mxd-res-list__item">
                       <div class="mxd-res-list__divider "></div>
                       <div class="mxd-res-list__content">
                         <div class="mxd-res-list__data">
                           <div class="mxd-res-list__title">
-                            <h4 class="">2024-yil yakunlariga ko‘ra</h4>
+                            <h4>{% if LANGUAGE_CODE == 'uz' %}2024-yil yakunlariga ko'ra{% elif LANGUAGE_CODE == 'ru' %}По итогам 2024 года{% else %}By the End of 2024{% endif %}</h4>
                           </div>
                           <div class="mxd-res-list__descr">
-                            <p class="">2024-yil yakunlariga ko‘ra,
-                              “FAW Trucks”
-                              markasidagi 1000 ga yaqin texnika sotildi.</p>
+                            <p>{% if LANGUAGE_CODE == 'uz' %}2024-yil yakunlariga ko'ra, "FAW Trucks" markasidagi 1000 ga yaqin texnika sotildi.{% elif LANGUAGE_CODE == 'ru' %}По итогам 2024 года продано около 1000 единиц техники марки FAW Trucks.{% else %}By the end of 2024, about 1,000 units of FAW Trucks equipment were sold.{% endif %}</p>
                           </div>
                         </div>
-                        <!-- <div class="mxd-res-list__year">
-                          <p class="">1 fevral 2018</p>
-                        </div> -->
                       </div>
                       <div class="mxd-res-list__divider "></div>
                     </div>
@@ -1245,7 +985,7 @@
           </div>
         </div>
       </div>
-      <!-- Block - Stack Universal Pinned Block with Section Title Start -->
+      <!-- Block - Stack Universal Pinned Block with Section Title End -->
 
     </div>
   </div>
