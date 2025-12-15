@@ -17,7 +17,10 @@ const DashboardApp = {
         DashboardAPI.init();
         DashboardCharts.init();
 
-        // Загружаем данные
+        // ✅ ЗАГРУЖАЕМ СПИСОК ПРОДУКТОВ
+        DashboardAPI.loadProducts();
+
+        // ВСЕГДА ЗАГРУЖАЕМ ДАННЫЕ ЧЕРЕЗ AJAX
         this.loadData();
 
         // Инициализируем вкладки таблиц
@@ -520,32 +523,32 @@ const DashboardApp = {
     },
 
     /**
-     * Поведение клиентов
-     */
+    * Поведение клиентов
+    */
     renderBehaviorData: function (behavior) {
         // Статистика
         const statsContainer = document.getElementById('behavior-stats');
         if (statsContainer) {
             statsContainer.innerHTML = `
-            <div class="behavior-stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value">${behavior.total_leads}</div>
-                    <div class="stat-label">Всего заявок</div>
+                <div class="behavior-stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${behavior.total_leads}</div>
+                        <div class="stat-label">Всего заявок</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${behavior.unique_clients}</div>
+                        <div class="stat-label">Уникальных клиентов</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${behavior.repeat_clients}</div>
+                        <div class="stat-label">Повторных обращений</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${behavior.repeat_percent}%</div>
+                        <div class="stat-label">Процент повторных</div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value">${behavior.unique_clients}</div>
-                    <div class="stat-label">Уникальных клиентов</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${behavior.repeat_clients}</div>
-                    <div class="stat-label">Повторных обращений</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${behavior.repeat_percent}%</div>
-                    <div class="stat-label">Процент повторных</div>
-                </div>
-            </div>
-        `;
+            `;
         }
 
         // Таблица повторных клиентов
@@ -554,23 +557,91 @@ const DashboardApp = {
             if (behavior.clients_list.length === 0) {
                 transitionsBody.innerHTML = '<tr><td colspan="3">Нет повторных клиентов</td></tr>';
             } else {
-                let html = '';
-                behavior.clients_list.forEach(client => {
-                    html += `
-                    <tr>
-                        <td><strong>${client.name}</strong><br><small>${client.phone}</small></td>
-                        <td>${client.count} заявок<br><small>${client.models}</small></td>
-                        <td>${client.interval_days} дней<br><small>Последняя: ${client.last_date}</small></td>
-                    </tr>
-                `;
-                });
-                transitionsBody.innerHTML = html;
+                // Сохраняем данные для пагинации
+                this._behaviorClients = behavior.clients_list;
+                this._behaviorCurrentPage = 0;
+                this._behaviorPageSize = 20;
+
+                // Отрисовываем первые 20
+                this.renderBehaviorPage(0);
+
+                // Добавляем кнопку "Показать ещё"
+                if (behavior.clients_list.length > 20) {
+                    const btnRow = document.createElement('tr');
+                    btnRow.id = 'behavior-load-more-row';
+                    btnRow.innerHTML = `
+                        <td colspan="3" style="text-align:center;padding:20px;">
+                            <button id="behavior-load-more" class="btn btn-primary">
+                                📥 Показать ещё 20 клиентов (осталось: ${behavior.clients_list.length - 20})
+                            </button>
+                        </td>
+                    `;
+                    transitionsBody.appendChild(btnRow);
+
+                    // Обработчик кнопки
+                    document.getElementById('behavior-load-more').addEventListener('click', () => {
+                        this.loadMoreBehaviorClients();
+                    });
+                }
             }
         }
 
         console.log('Поведение клиентов: отрисовано');
     },
 
+    /**
+    * Отрисовка страницы клиентов
+    */
+    renderBehaviorPage: function (page) {
+        const tbody = document.getElementById('table-transitions-body');
+        if (!tbody) return;
+
+        const start = page * this._behaviorPageSize;
+        const end = start + this._behaviorPageSize;
+        const clients = this._behaviorClients.slice(start, end);
+
+        let html = '';
+        clients.forEach(client => {
+            html += `
+                <tr>
+                    <td><strong>${client.name}</strong><br><small>${client.phone}</small></td>
+                    <td>${client.count} заявок<br><small>${client.models}</small></td>
+                    <td>${client.interval_days} дней<br><small>Последняя: ${client.last_date}</small></td>
+                </tr>
+            `;
+        });
+
+        // Добавляем строки (не заменяем!)
+        const loadMoreRow = document.getElementById('behavior-load-more-row');
+        if (loadMoreRow) {
+            loadMoreRow.insertAdjacentHTML('beforebegin', html);
+        } else {
+            tbody.innerHTML += html;
+        }
+    },
+
+    /**
+    * Загрузить ещё клиентов
+    */
+    loadMoreBehaviorClients: function () {
+        this._behaviorCurrentPage++;
+        this.renderBehaviorPage(this._behaviorCurrentPage);
+
+        // Обновляем кнопку
+        const remaining = this._behaviorClients.length - ((this._behaviorCurrentPage + 1) * this._behaviorPageSize);
+
+        if (remaining <= 0) {
+            // Убираем кнопку если всё показано
+            const btnRow = document.getElementById('behavior-load-more-row');
+            if (btnRow) btnRow.remove();
+        } else {
+            // Обновляем текст кнопки
+            const btn = document.getElementById('behavior-load-more');
+            if (btn) {
+                btn.textContent = `📥 Показать ещё 20 клиентов (осталось: ${remaining})`;
+            }
+        }
+    },
     /**
      * Показать индикаторы загрузки
      */

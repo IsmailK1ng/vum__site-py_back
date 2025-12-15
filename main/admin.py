@@ -1,6 +1,5 @@
 # main/admin.py
 
-# ========== СТАНДАРТНАЯ БИБЛИОТЕКА ==========
 import json
 import logging
 import openpyxl
@@ -19,6 +18,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.html import format_html
 from django.views.decorators.cache import never_cache
+from urllib.parse import unquote
 from django import forms
 
 # ========== DJANGO THIRD-PARTY ==========
@@ -70,13 +70,13 @@ class ContentAdminMixin:
         if request.user.is_superuser:
             return True
         
-        # Проверяем группы
+
         if request.user.groups.filter(
             name__in=['Главные админы', 'Контент-админы', 'Контент UZ', 'Контент UZ+KG']
         ).exists():
             return True
         
-        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНЫЕ ПРАВА (любое право на просмотр контента)
+
         content_models = [
             'news', 'product', 'vacancy', 'dealer', 'dealerservice', 
             'featureicon', 'becomeadealerpage'
@@ -96,7 +96,7 @@ class ContentAdminMixin:
         ).exists():
             return True
         
-        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНОЕ ПРАВО на изменение ЭТОЙ модели
+
         model_name = self.model._meta.model_name
         return request.user.has_perm(f'main.change_{model_name}')
     
@@ -106,8 +106,7 @@ class ContentAdminMixin:
         
         if request.user.groups.filter(name='Главные админы').exists():
             return True
-        
-        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНОЕ ПРАВО на удаление
+
         model_name = self.model._meta.model_name
         return request.user.has_perm(f'main.delete_{model_name}')
 
@@ -117,13 +116,13 @@ class LeadManagerMixin:
         if request.user.is_superuser:
             return True
         
-        # Проверяем группы
+
         if request.user.groups.filter(
             name__in=['Главные админы', 'Лид-менеджеры', 'Лиды UZ', 'Лиды UZ+KG']
         ).exists():
             return True
         
-        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНЫЕ ПРАВА (любое право на просмотр заявок)
+
         lead_models = ['contactform', 'jobapplication', 'becomeadealerapplication']
         for model in lead_models:
             if request.user.has_perm(f'main.view_{model}'):
@@ -132,7 +131,7 @@ class LeadManagerMixin:
         return False
     
     def has_add_permission(self, request):
-        return False  # Заявки создаются только с фронта
+        return False 
     
     def has_delete_permission(self, request, obj=None):
         if request.user.is_superuser:
@@ -141,7 +140,7 @@ class LeadManagerMixin:
         if request.user.groups.filter(name='Главные админы').exists():
             return True
         
-        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНОЕ ПРАВО на удаление
+
         model_name = self.model._meta.model_name
         return request.user.has_perm(f'main.delete_{model_name}')
         
@@ -332,7 +331,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     change_list_template = 'main/contactform/change_list.html'
     preserve_filters = True
     
-    # Оптимизация
+
     list_select_related = ['manager']
     list_per_page = 50
     show_full_result_count = False
@@ -558,8 +557,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
                 Q(phone__icontains=search_query) | 
                 Q(amocrm_lead_id__icontains=search_query)
             )
-        
-        # Фильтры
+
         if status := request.GET.get('status', '').strip():
             qs = qs.filter(status=status)
         
@@ -575,7 +573,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         if product := request.GET.get('product', '').strip():
             qs = qs.filter(product__icontains=product)
         
-        # Даты
+
         if date_from := request.GET.get('date_from', '').strip():
             try:
                 parsed_date = datetime.strptime(date_from, '%Y-%m-%d')
@@ -607,7 +605,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
                 """Убираем date_from и date_to из lookup параметров"""
                 lookup_params = super().get_filters_params(params)
                 
-                # Удаляем наши кастомные параметры из lookup
+
                 lookup_params.pop('date_from', None)
                 lookup_params.pop('date_to', None)
                 
@@ -981,7 +979,7 @@ class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
 
 # ============ ПРОДУКТЫ ============
 
-# КАСТОМНЫЙ ФИЛЬТР ДЛЯ КАТЕГОРИЙ
+
 class ProductCategoryFilter(admin.SimpleListFilter):
     """Фильтр по категориям с учетом основной и дополнительных"""
     title = 'категория'
@@ -1010,33 +1008,30 @@ class ProductCategoriesForm(forms.ModelForm):
     selected_categories = forms.MultipleChoiceField(
         choices=Product.CATEGORY_CHOICES,
         widget=forms.CheckboxSelectMultiple,
-        required=True,  # ✅ Обязательно выбрать хотя бы одну
+        required=True, 
         label="Категории",
         help_text="Выберите одну или несколько категорий, в которых будет отображаться продукт"
     )
     
     class Meta:
         model = Product
-        # ✅ Исключаем старые поля из формы
         exclude = ['category', 'categories']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # ✅ Предзаполняем выбранные категории
+
         if self.instance.pk:
             selected = []
-            
-            # Добавляем основную категорию
+
             if self.instance.category:
                 selected.append(self.instance.category)
             
-            # Добавляем дополнительные категории
+
             if self.instance.categories:
                 additional = [cat.strip() for cat in self.instance.categories.split(',') if cat.strip()]
                 selected.extend(additional)
-            
-            # Убираем дубликаты
+
             selected = list(dict.fromkeys(selected))
             
             self.fields['selected_categories'].initial = selected
@@ -1053,14 +1048,14 @@ class ProductCategoriesForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         
-        # ✅ Получаем выбранные категории
+
         selected = self.cleaned_data.get('selected_categories', [])
         
         if selected:
-            # Первая категория становится основной
+
             instance.category = selected[0]
             
-            # Остальные категории идут в дополнительные
+
             if len(selected) > 1:
                 instance.categories = ','.join(selected[1:])
             else:
@@ -1094,7 +1089,7 @@ class ProductGalleryInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
-    form = ProductCategoriesForm  # ✅ Используем кастомную форму
+    form = ProductCategoriesForm 
     
     list_display = ['thumbnail', 'title', 'all_categories_display', 'is_active', 'is_featured', 'slider_order', 'order']
     list_filter = [ProductCategoryFilter, 'is_active', 'is_featured'] 
@@ -1112,7 +1107,7 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
         ('Основная информация', {
             'fields': (
                 ('title', 'slug'), 
-                'selected_categories',  # ✅ Единый чеклист категорий
+                'selected_categories',  
                 ('order', 'is_active', 'is_featured'), 
                 ('main_image', 'card_image')
             )
@@ -1140,15 +1135,14 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
         return "—"
     thumbnail.short_description = "Фото"
     
-    # ✅ Обновленный метод для отображения ВСЕХ категорий
+
     def all_categories_display(self, obj):
         """Отображение всех категорий продукта"""
         categories = obj.get_all_categories()
         
         if not categories:
             return "—"
-        
-        # Получаем названия категорий
+
         category_names = []
         for cat_slug in categories:
             for slug, name in Product.CATEGORY_CHOICES:
@@ -1157,16 +1151,16 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
                     break
         
         if category_names:
-            # Первая категория - основная (синий цвет)
+
             tags = []
             for idx, name in enumerate(category_names):
                 if idx == 0:
-                    # Основная категория
+
                     tags.append(
                         f'<span style="background:#1976d2;color:white;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;">{name}</span>'
                     )
                 else:
-                    # Дополнительные категории
+
                     tags.append(
                         f'<span style="background:#d3ecff;color:#006ad3;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:400;">{name}</span>'
                     )
@@ -1423,24 +1417,32 @@ class DashboardAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return True
         
-        # Проверяем группы
         if request.user.groups.filter(name__in=['Главные админы', 'Лид-менеджеры']).exists():
             return True
         
-        # Проверяем индивидуальное право
         return request.user.has_perm('main.view_dashboard')
     
     # ========== КАСТОМНЫЕ URL ==========
     
     def get_urls(self):
-        """Добавляем API endpoints"""
         urls = super().get_urls()
         custom_urls = [
             path('api/data/', self.admin_site.admin_view(self.dashboard_api_data), name='dashboard_api_data'),
+            path('api/products/', self.admin_site.admin_view(self.get_products_api), name='dashboard_api_products'),
             path('export/excel/', self.admin_site.admin_view(self.dashboard_export_excel), name='dashboard_export_excel'),
-            path('export/word/', self.admin_site.admin_view(self.dashboard_export_word), name='dashboard_export_word'),
         ]
         return custom_urls + urls
+
+    def get_products_api(self, request):
+        """API для получения списка продуктов"""
+        products = ContactForm.objects.exclude(
+            Q(product__isnull=True) | Q(product='')
+        ).values_list('product', flat=True).distinct().order_by('product')
+        
+        return JsonResponse({
+            'success': True,
+            'products': list(products)
+        })
     
     # ========== VIEW ==========
     
@@ -1448,36 +1450,31 @@ class DashboardAdmin(admin.ModelAdmin):
     def changelist_view(self, request, extra_context=None):
         """Главная страница Dashboard"""
         
+        from urllib.parse import unquote
         
-        # Получаем параметры фильтров
         date_from = request.GET.get('date_from', '')
         date_to = request.GET.get('date_to', '')
-        region = request.GET.get('region', '')
-        product = request.GET.get('product', '')
+        region = unquote(request.GET.get('region', '')) if request.GET.get('region') else ''
+        product = unquote(request.GET.get('product', '')) if request.GET.get('product') else ''
         source = request.GET.get('source', '')
         
-
         if not date_from or not date_to:
             tz = timezone.get_current_timezone()
             today = timezone.now().astimezone(tz)
             date_from = today.strftime('%Y-%m-%d')
             date_to = today.strftime('%Y-%m-%d')
-                
-        # Получаем список уникальных моделей
-        products = ContactForm.objects.exclude(
-            Q(product__isnull=True) | Q(product='')
-        ).values_list('product', flat=True).distinct().order_by('product')
+        
         
         context = {
             **self.admin_site.each_context(request),
-            'title': 'Аналитика заявок FAW',
+            'title': 'Аналитика заявок VUM',
             'date_from': date_from,
             'date_to': date_to,
             'region': region,
             'product': product,
             'source': source,
             'regions': REGION_CHOICES,
-            'products': list(products),
+            'products': [],  
         }
         
         if extra_context:
@@ -1491,22 +1488,19 @@ class DashboardAdmin(admin.ModelAdmin):
         """API для получения данных Dashboard"""
 
         try:
-            # Параметры
             date_from = request.GET.get('date_from')
             date_to = request.GET.get('date_to')
             region = request.GET.get('region', '')
             product = request.GET.get('product', '')
             source = request.GET.get('source', '')
-            
-            # Парсим даты
+
             tz = timezone.get_current_timezone()
             start_date = timezone.make_aware(datetime.strptime(date_from, '%Y-%m-%d'), tz)
             end_date = timezone.make_aware(
                 datetime.strptime(date_to, '%Y-%m-%d').replace(hour=23, minute=59, second=59), 
                 tz
             )
-            
-            # Queryset
+
             qs = ContactForm.objects.filter(created_at__gte=start_date, created_at__lte=end_date)
             
             if region:
@@ -1518,8 +1512,7 @@ class DashboardAdmin(admin.ModelAdmin):
                     qs = qs.filter(Q(utm_data__isnull=True) | Q(utm_data=''))
                 else:
                     qs = qs.filter(utm_data__icontains=f'"utm_source":"{source}"')
-            
-            # Аналитика
+
             from main.services.dashboard.analytics import calculate_kpi
             from main.services.dashboard.charts import get_chart_data
             from main.services.dashboard.insights import generate_insights
@@ -1540,9 +1533,145 @@ class DashboardAdmin(admin.ModelAdmin):
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
     
     def dashboard_export_excel(self, request):
-        """Экспорт в Excel (TODO)"""
-        return HttpResponse('Excel export - coming soon', content_type='text/plain')
-    
-    def dashboard_export_word(self, request):
-        """Экспорт в Word (TODO)"""
-        return HttpResponse('Word export - coming soon', content_type='text/plain')
+        """Экспорт Dashboard в Excel"""
+        try:
+            date_from = request.GET.get('date_from')
+            date_to = request.GET.get('date_to')
+            region = request.GET.get('region', '')
+            product = request.GET.get('product', '')
+            source = request.GET.get('source', '')
+            
+            tz = timezone.get_current_timezone()
+            start_date = timezone.make_aware(datetime.strptime(date_from, '%Y-%m-%d'), tz)
+            end_date = timezone.make_aware(
+                datetime.strptime(date_to, '%Y-%m-%d').replace(hour=23, minute=59, second=59), 
+                tz
+            )
+            
+            qs = ContactForm.objects.filter(created_at__gte=start_date, created_at__lte=end_date)
+            
+            if region:
+                qs = qs.filter(region=region)
+            if product:
+                qs = qs.filter(product__icontains=product)
+            if source:
+                if source == 'direct':
+                    qs = qs.filter(Q(utm_data__isnull=True) | Q(utm_data=''))
+                else:
+                    qs = qs.filter(utm_data__icontains=f'"utm_source":"{source}"')
+            
+            from main.services.dashboard.analytics import calculate_kpi
+            from main.services.dashboard.charts import get_chart_data
+            
+            kpi = calculate_kpi(qs, start_date, end_date)
+            charts = get_chart_data(qs, start_date, end_date)
+            
+            wb = openpyxl.Workbook()
+            
+            # ========== ЛИСТ 1: KPI ==========
+            ws_kpi = wb.active
+            ws_kpi.title = "KPI"
+            
+            # Заголовки
+            ws_kpi['A1'] = 'Аналитика Dashboard FAW'
+            ws_kpi['A1'].font = Font(bold=True, size=16)
+            ws_kpi['A2'] = f'Период: {date_from} — {date_to}'
+            
+            # Данные
+            ws_kpi['A4'] = 'Метрика'
+            ws_kpi['B4'] = 'Значение'
+            ws_kpi['A4'].font = Font(bold=True)
+            ws_kpi['B4'].font = Font(bold=True)
+            
+            ws_kpi['A5'] = 'Всего заявок'
+            ws_kpi['B5'] = kpi['total_leads']
+            
+            ws_kpi['A6'] = 'Отправлено в amoCRM'
+            ws_kpi['B6'] = kpi['amocrm_sent']
+            
+            ws_kpi['A7'] = 'Конверсия amoCRM'
+            ws_kpi['B7'] = f"{kpi['amocrm_conversion']}%"
+            
+            ws_kpi['A8'] = 'Ср. время ответа'
+            ws_kpi['B8'] = f"{kpi['avg_response_time']} мин"
+            
+            ws_kpi['A9'] = 'Тренд'
+            ws_kpi['B9'] = f"{kpi['trend']['value']}% ({kpi['trend']['direction']})"
+            
+            # ========== ЛИСТ 2: ИСТОЧНИКИ ==========
+            ws_sources = wb.create_sheet("Источники")
+            ws_sources.append(['Источник', 'Заявок', '%'])
+            
+            for i, label in enumerate(charts['sources']['labels']):
+                ws_sources.append([
+                    label,
+                    charts['sources']['values'][i],
+                    f"{charts['sources']['percentages'][i]}%"
+                ])
+            
+            # ========== ЛИСТ 3: МОДЕЛИ ==========
+            ws_models = wb.create_sheet("Модели")
+            ws_models.append(['Модель', 'Заявок', '%'])
+            
+            for i, label in enumerate(charts['top_models']['labels']):
+                ws_models.append([
+                    label,
+                    charts['top_models']['values'][i],
+                    f"{charts['top_models']['percentages'][i]}%"
+                ])
+            
+            # ========== ЛИСТ 4: РЕГИОНЫ ==========
+            ws_regions = wb.create_sheet("Регионы")
+            ws_regions.append(['Регион', 'Заявок', '%'])
+            
+            for i, label in enumerate(charts['top_regions']['labels']):
+                ws_regions.append([
+                    label,
+                    charts['top_regions']['values'][i],
+                    f"{charts['top_regions']['percentages'][i]}%"
+                ])
+            
+            # ========== ЛИСТ 5: ВРЕМЕННОЙ АНАЛИЗ ==========
+            ws_time = wb.create_sheet("Временной анализ")
+            ws_time.append(['Час', 'Заявок', '%', 'Топ модель'])
+            
+            for item in charts['time_analysis']['by_hours']:
+                ws_time.append([
+                    item['hour'],
+                    item['count'],
+                    f"{item['percent']}%",
+                    item['top_model']
+                ])
+            
+            # ========== ЛИСТ 6: ПОВТОРНЫЕ КЛИЕНТЫ ==========
+            ws_behavior = wb.create_sheet("Повторные клиенты")
+            ws_behavior.append(['Имя', 'Телефон', 'Заявок', 'Модели', 'Интервал (дней)', 'Последняя заявка'])
+            
+            for client in charts['behavior']['clients_list']:
+                ws_behavior.append([
+                    client['name'],
+                    client['phone'],
+                    client['count'],
+                    client['models'],
+                    client['interval_days'],
+                    client['last_date']
+                ])
+            
+            # Стилизация всех листов
+            for ws in wb:
+                for cell in ws[1]:
+                    cell.font = Font(bold=True)
+                    cell.fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
+                    cell.font = Font(bold=True, color='FFFFFF')
+            
+            # Возвращаем файл
+            response = HttpResponse(
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            response['Content-Disposition'] = f'attachment; filename="dashboard_faw_{date_from}_{date_to}.xlsx"'
+            wb.save(response)
+            
+            return response
+            
+        except Exception as e:
+            return HttpResponse(f'Ошибка экспорта: {str(e)}', content_type='text/plain', status=500)

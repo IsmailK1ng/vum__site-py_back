@@ -6,8 +6,40 @@ from datetime import datetime, timedelta
 import json
 
 
-def get_chart_data(queryset, start_date, end_date):
+# ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
 
+def _get_source_from_utm(lead):
+    """
+    Определяет источник трафика из UTM данных
+    
+    Args:
+        lead: объект ContactForm
+    
+    Returns:
+        str: 'google', 'instagram', 'facebook', 'direct', 'other'
+    """
+    if not lead.utm_data or lead.utm_data == '':
+        return 'direct'
+    
+    try:
+        utm = json.loads(lead.utm_data)
+        source = utm.get('utm_source', '').lower()
+        
+        if 'google' in source:
+            return 'google'
+        elif 'instagram' in source or 'ig' in source:
+            return 'instagram'
+        elif 'facebook' in source or 'fb' in source:
+            return 'facebook'
+        else:
+            return 'other'
+    except:
+        return 'other'
+
+
+# ========== ГЛАВНАЯ ФУНКЦИЯ ==========
+
+def get_chart_data(queryset, start_date, end_date):
     """
     Подготавливает данные для всех графиков
     """
@@ -18,7 +50,6 @@ def get_chart_data(queryset, start_date, end_date):
     top_regions = _get_top_regions(queryset)
     heatmap = _get_heatmap_data(queryset)
     
-
     time_analysis = get_time_analysis(queryset)
     utm_campaigns = get_utm_campaigns(queryset)
     referer_data = get_referer_data(queryset)
@@ -32,7 +63,6 @@ def get_chart_data(queryset, start_date, end_date):
         'top_models': top_models,
         'top_regions': top_regions,
         'heatmap': heatmap,
-        
         'time_analysis': time_analysis,
         'utm_campaigns': utm_campaigns,
         'referer_data': referer_data,
@@ -41,17 +71,18 @@ def get_chart_data(queryset, start_date, end_date):
         'behavior': behavior,
     }
 
+
+# ========== ГРАФИКИ ==========
+
 def _get_dynamics_data(queryset, start_date, end_date):
     """Динамика заявок по дням с сравнением"""
     
-    # Текущий период (по дням)
     current_data = queryset.annotate(
         date=TruncDate('created_at')
     ).values('date').annotate(
         count=Count('id')
     ).order_by('date')
     
-    # Преобразуем в список для фронта
     labels = []
     values = []
     
@@ -59,7 +90,7 @@ def _get_dynamics_data(queryset, start_date, end_date):
         labels.append(item['date'].strftime('%d.%m'))
         values.append(item['count'])
     
-    # Предыдущий период для сравнения
+    # Предыдущий период
     period_days = (end_date - start_date).days + 1
     prev_start = start_date - timedelta(days=period_days)
     prev_end = start_date - timedelta(days=1)
@@ -93,24 +124,10 @@ def _get_sources_data(queryset):
         'other': 0
     }
     
+    # ✅ ИСПОЛЬЗУЕМ ВСПОМОГАТЕЛЬНУЮ ФУНКЦИЮ
     for lead in queryset:
-        if not lead.utm_data or lead.utm_data == '':
-            sources['direct'] += 1
-        else:
-            try:
-                utm = json.loads(lead.utm_data)
-                source = utm.get('utm_source', '').lower()
-                
-                if 'google' in source:
-                    sources['google'] += 1
-                elif 'instagram' in source or 'ig' in source:
-                    sources['instagram'] += 1
-                elif 'facebook' in source or 'fb' in source:
-                    sources['facebook'] += 1
-                else:
-                    sources['other'] += 1
-            except:
-                sources['other'] += 1
+        source_key = _get_source_from_utm(lead)
+        sources[source_key] += 1
     
     total = sum(sources.values())
     
@@ -163,7 +180,6 @@ def _get_top_regions(queryset):
     
     total = queryset.count()
     
-    # Получаем названия регионов
     from main.models import REGION_CHOICES
     region_dict = dict(REGION_CHOICES)
     
@@ -183,16 +199,13 @@ def _get_top_regions(queryset):
 def _get_heatmap_data(queryset):
     """Тепловая карта: час × день недели"""
     
-    # Инициализируем матрицу 7 дней × 24 часа
     heatmap = [[0 for _ in range(24)] for _ in range(7)]
     
-    # Заполняем данными
     for lead in queryset:
         hour = lead.created_at.hour
-        weekday = lead.created_at.weekday()  # 0=ПН, 6=ВС
+        weekday = lead.created_at.weekday()
         heatmap[weekday][hour] += 1
     
-    # Находим максимум для нормализации
     max_value = max(max(row) for row in heatmap) if heatmap else 1
     
     return {
@@ -202,17 +215,16 @@ def _get_heatmap_data(queryset):
         'hours': [f'{h:02d}:00' for h in range(24)]
     }
 
-# ========== НОВЫЕ ФУНКЦИИ ДЛЯ ТАБЛИЦ ==========
+
+# ========== ТАБЛИЦЫ ==========
 
 def get_time_analysis(queryset):
     """Анализ по времени: часы и дни недели"""
     
-    # По часам
     hours_data = {}
     for hour in range(24):
         hours_data[hour] = {'count': 0, 'models': {}}
     
-    # По дням недели
     weekdays_data = {}
     for day in range(7):
         weekdays_data[day] = {'count': 0, 'hours': {}}
@@ -223,16 +235,14 @@ def get_time_analysis(queryset):
         hour = lead.created_at.hour
         weekday = lead.created_at.weekday()
         
-        # Часы
         hours_data[hour]['count'] += 1
         if lead.product:
             hours_data[hour]['models'][lead.product] = hours_data[hour]['models'].get(lead.product, 0) + 1
         
-        # Дни
         weekdays_data[weekday]['count'] += 1
         weekdays_data[weekday]['hours'][hour] = weekdays_data[weekday]['hours'].get(hour, 0) + 1
     
-    # Форматируем для фронта
+    # По часам
     hours_list = []
     for hour in range(24):
         data = hours_data[hour]
@@ -243,9 +253,10 @@ def get_time_analysis(queryset):
             'count': data['count'],
             'percent': round(data['count'] / total * 100, 1) if total > 0 else 0,
             'top_model': top_model,
-            'avg_time': 11  # Заглушка (реальное время ответа можно добавить позже)
+            'avg_time': 11  # Заглушка
         })
     
+    # По дням недели
     weekday_names = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье']
     weekdays_list = []
     
@@ -295,10 +306,8 @@ def get_utm_campaigns(queryset):
         except:
             pass
     
-    # Сортируем по количеству
     campaigns_list = sorted(campaigns.values(), key=lambda x: x['count'], reverse=True)
-    
-    return campaigns_list[:20]  # Топ-20
+    return campaigns_list[:20]
 
 
 def get_referer_data(queryset):
@@ -309,7 +318,6 @@ def get_referer_data(queryset):
         if not lead.referer:
             referer = 'Прямой заход'
         else:
-            # Извлекаем домен из URL
             try:
                 from urllib.parse import urlparse
                 parsed = urlparse(lead.referer)
@@ -321,7 +329,6 @@ def get_referer_data(queryset):
     
     total = sum(referers.values())
     
-    # Форматируем
     referers_list = []
     for referer, count in sorted(referers.items(), key=lambda x: x[1], reverse=True):
         referers_list.append({
@@ -330,7 +337,7 @@ def get_referer_data(queryset):
             'percent': round(count / total * 100, 1) if total > 0 else 0
         })
     
-    return referers_list[:10]  # Топ-10
+    return referers_list[:10]
 
 
 def get_region_model_matrix(queryset):
@@ -348,7 +355,7 @@ def get_region_model_matrix(queryset):
         
         matrix[region][product] = matrix[region].get(product, 0) + 1
     
-    # Получаем топ-5 моделей
+    # Топ-5 моделей
     all_products = {}
     for lead in queryset:
         product = lead.product or 'Не указано'
@@ -357,7 +364,6 @@ def get_region_model_matrix(queryset):
     top_products = sorted(all_products.items(), key=lambda x: x[1], reverse=True)[:5]
     top_products_names = [p[0] for p in top_products]
     
-    # Форматируем матрицу
     result = {
         'regions': list(matrix.keys()),
         'models': top_products_names,
@@ -383,29 +389,21 @@ def get_source_model_matrix(queryset):
         'Другие': {}
     }
     
+    source_map = {
+        'google': 'Google',
+        'instagram': 'Instagram',
+        'facebook': 'Facebook',
+        'direct': 'Прямые',
+        'other': 'Другие'
+    }
+    
+    # ✅ ИСПОЛЬЗУЕМ ВСПОМОГАТЕЛЬНУЮ ФУНКЦИЮ
     for lead in queryset:
         product = lead.product or 'Не указано'
+        source_key = _get_source_from_utm(lead)
+        source_name = source_map[source_key]
         
-        # Определяем источник
-        if not lead.utm_data or lead.utm_data == '':
-            source = 'Прямые'
-        else:
-            try:
-                utm = json.loads(lead.utm_data)
-                utm_source = utm.get('utm_source', '').lower()
-                
-                if 'google' in utm_source:
-                    source = 'Google'
-                elif 'instagram' in utm_source or 'ig' in utm_source:
-                    source = 'Instagram'
-                elif 'facebook' in utm_source or 'fb' in utm_source:
-                    source = 'Facebook'
-                else:
-                    source = 'Другие'
-            except:
-                source = 'Другие'
-        
-        matrix[source][product] = matrix[source].get(product, 0) + 1
+        matrix[source_name][product] = matrix[source_name].get(product, 0) + 1
     
     # Топ-5 моделей
     all_products = {}
@@ -416,7 +414,6 @@ def get_source_model_matrix(queryset):
     top_products = sorted(all_products.items(), key=lambda x: x[1], reverse=True)[:5]
     top_products_names = [p[0] for p in top_products]
     
-    # Форматируем
     result = {
         'sources': list(matrix.keys()),
         'models': top_products_names,
@@ -435,7 +432,6 @@ def get_source_model_matrix(queryset):
 def get_behavior_data(queryset):
     """Поведение клиентов (повторные обращения)"""
     
-    # Группируем по телефону
     phones = {}
     for lead in queryset:
         phone = lead.phone
@@ -443,25 +439,19 @@ def get_behavior_data(queryset):
             phones[phone] = []
         phones[phone].append(lead)
     
-    # Статистика
     total_leads = queryset.count()
     unique_clients = len(phones)
     repeat_clients = sum(1 for leads in phones.values() if len(leads) > 1)
     
-    # Список повторных клиентов
     repeat_clients_list = []
     
     for phone, leads in phones.items():
         if len(leads) < 2:
             continue
         
-        # Сортируем по дате
         leads_sorted = sorted(leads, key=lambda x: x.created_at)
-        
-        # Собираем модели
         models = [lead.product or 'Не указано' for lead in leads_sorted]
         
-        # Интервал между первой и последней заявкой
         first_date = leads_sorted[0].created_at
         last_date = leads_sorted[-1].created_at
         interval_days = (last_date - first_date).days
@@ -475,7 +465,6 @@ def get_behavior_data(queryset):
             'last_date': last_date.strftime('%d.%m.%Y')
         })
     
-    # Сортируем по количеству заявок
     repeat_clients_list.sort(key=lambda x: x['count'], reverse=True)
     
     return {
@@ -483,5 +472,5 @@ def get_behavior_data(queryset):
         'unique_clients': unique_clients,
         'repeat_clients': repeat_clients,
         'repeat_percent': round(repeat_clients / unique_clients * 100, 1) if unique_clients > 0 else 0,
-        'clients_list': repeat_clients_list[:20]  # Топ-20
+        'clients_list': repeat_clients_list[:100]
     }

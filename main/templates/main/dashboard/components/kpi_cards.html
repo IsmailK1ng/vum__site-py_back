@@ -1,8 +1,12 @@
+{% load static %}
+
 <div class="kpi-grid">
     
     <!-- Карточка 1: Всего заявок -->
     <div class="kpi-card">
-        <div class="kpi-icon">📥</div>
+        <div class="kpi-icon">
+            <img src="{% static 'images/admins-icon/icon-dashboard/lead.webp' %}" alt="Leads">
+        </div>
         <div class="kpi-content">
             <div class="kpi-label">Всего заявок</div>
             <div class="kpi-value" id="kpi-total">—</div>
@@ -12,7 +16,9 @@
     
     <!-- Карточка 2: Конверсия amoCRM -->
     <div class="kpi-card">
-        <div class="kpi-icon">🎯</div>
+        <div class="kpi-icon">
+            <img src="{% static 'images/admins-icon/icon-dashboard/conversion.webp' %}" alt="Conversion">
+        </div>
         <div class="kpi-content">
             <div class="kpi-label">Конверсия amoCRM</div>
             <div class="kpi-value" id="kpi-conversion">—</div>
@@ -22,7 +28,9 @@
     
     <!-- Карточка 3: Средняя скорость -->
     <div class="kpi-card">
-        <div class="kpi-icon">⚡</div>
+        <div class="kpi-icon">
+            <img src="{% static 'images/admins-icon/icon-dashboard/speed.webp' %}" alt="Speed">
+        </div>
         <div class="kpi-content">
             <div class="kpi-label">Средняя скорость</div>
             <div class="kpi-value" id="kpi-speed">—</div>
@@ -30,9 +38,11 @@
         </div>
     </div>
     
-    <!-- Карточка 4: Тренд -->
+    <!-- Карточка 4: Динамика -->
     <div class="kpi-card">
-        <div class="kpi-icon trend-icon" id="trend-icon">📈</div>
+        <div class="kpi-icon">
+            <img src="{% static 'images/admins-icon/icon-dashboard/dynamica.webp' %}" alt="Dynamics" id="trend-icon-img">
+        </div>
         <div class="kpi-content">
             <div class="kpi-label">Динамика</div>
             <div class="kpi-value trend-value" id="kpi-trend">—</div>

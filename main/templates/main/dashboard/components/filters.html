@@ -1,10 +1,12 @@
+{% load static %}
+
 <div class="filters-panel">
     <form id="dashboard-filters-form">
         
         <div class="filters-row">
             <!-- Период -->
             <div class="filter-group">
-                <label>📅 Период</label>
+                <label>Период</label>
                 <div class="date-inputs">
                     <input type="date" 
                            name="date_from" 
@@ -22,7 +24,7 @@
             
             <!-- Регион -->
             <div class="filter-group">
-                <label>📍 Регион</label>
+                <label>Регион</label>
                 <select name="region" id="region">
                     <option value="">Все регионы</option>
                     {% for code, name in regions %}
@@ -35,20 +37,18 @@
             
             <!-- Модель -->
             <div class="filter-group">
-                <label>🚗 Модель</label>
+                <label>Модель</label>
                 <select name="product" id="product">
                     <option value="">Все модели</option>
-                    {% for prod in products %}
-                    <option value="{{ prod }}" {% if product == prod %}selected{% endif %}>
-                        {{ prod }}
-                    </option>
-                    {% endfor %}
+                    {% if product %}
+                    <option value="{{ product }}" selected>{{ product }}</option>
+                    {% endif %}
                 </select>
             </div>
-            
+
             <!-- Источник -->
             <div class="filter-group">
-                <label>🔗 Источник</label>
+                <label>Источник</label>
                 <select name="source" id="source">
                     <option value="">Все источники</option>
                     <option value="google" {% if source == 'google' %}selected{% endif %}>Google</option>
@@ -57,25 +57,20 @@
                     <option value="direct" {% if source == 'direct' %}selected{% endif %}>Прямые</option>
                 </select>
             </div>
-        </div>
         
         <!-- Кнопки действий -->
         <div class="filters-actions">
             <button type="submit" class="btn btn-primary" id="btn-apply">
-                🔄 Применить
+                Применить
             </button>
             <button type="button" class="btn btn-secondary" id="btn-reset">
-                ✕ Сбросить
+                Сбросить
             </button>
             
-            <!-- Кнопки экспорта -->
-            <a href="/admin/main/dashboard/export/excel/?date_from={{ date_from }}&date_to={{ date_to }}&region={{ region }}&product={{ product }}&source={{ source }}" 
+            <!-- Кнопка экспорта -->
+            <a href="/admin/main/dashboard/export/excel/?date_from={{ date_from }}&date_to={{ date_to }}&region={{ region|urlencode }}&product={{ product|urlencode }}&source={{ source }}" 
                class="btn btn-success">
-                📊 Excel
-            </a>
-            <a href="/admin/main/dashboard/export/word/?date_from={{ date_from }}&date_to={{ date_to }}&region={{ region }}&product={{ product }}&source={{ source }}" 
-               class="btn btn-info">
-                📄 Word
+                Excel
             </a>
         </div>
         

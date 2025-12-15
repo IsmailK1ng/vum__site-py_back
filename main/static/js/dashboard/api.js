@@ -1,23 +1,65 @@
 // main/static/js/dashboard/api.js
 
 const DashboardAPI = {
-    
+
     /**
      * Инициализация
      */
-    init: function() {
+    init: function () {
         console.log('API: Инициализация...');
-        
+
         // Получаем CSRF токен
         this.csrfToken = this.getCSRFToken();
-        
+
         console.log('API: Готов!');
     },
-    
+    /**
+     * Загрузить список продуктов
+     */
+    loadProducts: function () {
+        fetch('/admin/main/dashboard/api/products/')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('product');
+                if (select && data.products) {
+                    // ✅ СОХРАНЯЕМ ТЕКУЩЕЕ ЗНАЧЕНИЕ
+                    const currentValue = select.value;
+
+                    // ✅ НЕ ТРОГАЕМ ПЕРВУЮ ОПЦИЮ "Все модели"
+                    // Удаляем только старые продукты (если есть)
+                    while (select.options.length > 1) {
+                        select.remove(1);
+                    }
+
+                    // Добавляем новые продукты
+                    data.products.forEach(product => {
+                        const option = document.createElement('option');
+                        option.value = product;
+                        option.textContent = product;
+
+                        // ✅ ВОССТАНАВЛИВАЕМ ВЫБРАННОЕ ЗНАЧЕНИЕ
+                        if (product === currentValue) {
+                            option.selected = true;
+                        }
+
+                        select.appendChild(option);
+                    });
+
+                    // ✅ ЕСЛИ БЫЛО ВЫБРАНО ЗНАЧЕНИЕ — ВОССТАНАВЛИВАЕМ
+                    if (currentValue) {
+                        select.value = currentValue;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки продуктов:', error);
+            });
+    },
+
     /**
      * Получить CSRF токен
      */
-    getCSRFToken: function() {
+    getCSRFToken: function () {
         const cookies = document.cookie.split(';');
         for (let cookie of cookies) {
             const [name, value] = cookie.trim().split('=');
@@ -27,15 +69,15 @@ const DashboardAPI = {
         }
         return null;
     },
-    
+
     /**
      * Получить данные Dashboard
      */
-    getData: function(filters) {
+    getData: function (filters) {
         return new Promise((resolve, reject) => {
             const params = new URLSearchParams(filters);
             const url = `/admin/main/dashboard/api/data/?${params}`;
-            
+
             fetch(url, {
                 method: 'GET',
                 headers: {
@@ -44,78 +86,23 @@ const DashboardAPI = {
                 },
                 credentials: 'same-origin'
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // Генерируем инсайты на основе данных
-                    data.insights = this.generateInsights(data.kpi, data.charts);
-                    resolve(data);
-                } else {
-                    reject(new Error(data.error || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                console.error('API Error:', error);
-                reject(error);
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        resolve(data);
+                    } else {
+                        reject(new Error(data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('API Error:', error);
+                    reject(error);
+                });
         });
-    },
-    
-    /**
-     * Генерация инсайтов (временная функция, потом перенесём на backend)
-     */
-    generateInsights: function(kpi, charts) {
-        const insights = {
-            good: [],
-            problems: [],
-            recommendations: []
-        };
-        
-        // Анализ конверсии
-        if (kpi.amocrm_conversion >= 90) {
-            insights.good.push(`Отличная конверсия в amoCRM — ${kpi.amocrm_conversion}%`);
-        } else if (kpi.amocrm_conversion < 80) {
-            insights.problems.push(`Низкая конверсия в amoCRM — ${kpi.amocrm_conversion}% (ниже среднего)`);
-            insights.recommendations.push('Проверить качество лидов и настройки интеграции с amoCRM');
-        }
-        
-        // Анализ тренда
-        if (kpi.trend.direction === 'up') {
-            insights.good.push(`Позитивная динамика: +${kpi.trend.value}% к предыдущему периоду`);
-        } else if (kpi.trend.direction === 'down') {
-            insights.problems.push(`Падение заявок: ${kpi.trend.value}% к предыдущему периоду`);
-            insights.recommendations.push('Усилить маркетинговые активности');
-        }
-        
-        // Анализ источников
-        if (charts.sources && charts.sources.values) {
-            const maxSource = Math.max(...charts.sources.values);
-            const maxIndex = charts.sources.values.indexOf(maxSource);
-            const sourceName = charts.sources.labels[maxIndex];
-            const percent = charts.sources.percentages[maxIndex];
-            
-            if (percent > 50) {
-                insights.problems.push(`Высокая зависимость от ${sourceName} (${percent}%)`);
-                insights.recommendations.push('Диверсифицировать источники трафика');
-            } else {
-                insights.good.push(`${sourceName} — основной источник (${percent}%)`);
-            }
-        }
-        
-        // Анализ моделей
-        if (charts.top_models && charts.top_models.labels.length > 0) {
-            const topModel = charts.top_models.labels[0];
-            const topPercent = charts.top_models.percentages[0];
-            
-            insights.good.push(`${topModel} — самая популярная модель (${topPercent}%)`);
-            insights.recommendations.push(`Запустить дополнительную кампанию для ${topModel}`);
-        }
-        
-        return insights;
     }
 };
