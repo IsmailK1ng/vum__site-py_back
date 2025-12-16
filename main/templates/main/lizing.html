@@ -63,6 +63,226 @@
     <meta name="theme-color" content="#161616" media="(prefers-color-scheme: dark)">
     <meta name="msapplication-navbutton-color" content="#161616">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Стили для модальных окон -->
+    <style>
+        .faw-modal {
+            display: none !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .faw-modal.active {
+            display: flex !important;
+        }
+
+        .faw-modal__overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1;
+        }
+
+        .faw-modal__content {
+            position: relative;
+            z-index: 2;
+            background: white;
+            border-radius: 8px;
+            padding: 40px;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .faw-modal__close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            transition: color 0.2s;
+            z-index: 3;
+        }
+
+        .faw-modal__close:hover {
+            color: #000;
+        }
+
+        .faw-modal__header {
+            margin-bottom: 25px;
+        }
+
+        .faw-modal__title {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+        }
+
+        .faw-modal__subtitle {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .faw-modal__form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .faw-form__group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .faw-form__input,
+        .faw-form__select,
+        .faw-form__textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .faw-form__input:focus,
+        .faw-form__select:focus,
+        .faw-form__textarea:focus {
+            outline: none;
+            border-color: #333;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .faw-form__submit {
+            padding: 12px 20px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+
+        .faw-form__submit:hover {
+            background: #555;
+        }
+
+        .faw-form__status {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            text-align: center;
+            transition: opacity 0.3s;
+        }
+
+        .faw-form__status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .faw-form__status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .faw-form__status.hidden {
+            display: none;
+        }
+
+        .faw-form__status.show {
+            display: block;
+            opacity: 1;
+        }
+
+        [data-theme="dark"] .faw-modal__content {
+            background: #222;
+            color: #fff;
+        }
+
+        [data-theme="dark"] .faw-modal__close {
+            color: #ccc;
+        }
+
+        [data-theme="dark"] .faw-form__input,
+        [data-theme="dark"] .faw-form__select,
+        [data-theme="dark"] .faw-form__textarea {
+            background: #333;
+            color: #fff;
+            border-color: #444;
+        }
+
+        [data-theme="dark"] .faw-form__submit {
+            background: #666;
+        }
+
+        [data-theme="dark"] .faw-modal__subtitle {
+            color: #bbb;
+        }
+
+        #downloadPdfBtn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #downloadPdfBtn:hover {
+            background: #555;
+        }
+
+        [data-theme="dark"] #downloadPdfBtn {
+            background: #666;
+        }
+
+        [data-theme="dark"] #downloadPdfBtn:hover {
+            background: #888;
+        }
+    </style>
 </head>
 
 <body>
@@ -425,7 +645,7 @@
                         </h3>
                         <ul class="conditions-list">
                             {% if LANGUAGE_CODE == 'uz' %}
-                            <li>Minimal dastlabki to'lov - 30%</li>
+                            <li>Minimal dastlabki to'lov - 0%</li>
                             <li>Maksimal lizing muddati - 60 oy</li>
                             <li>Texnikaning har qanday holatda bo'lishi mumkin</li>
                             <li>Kredit tarixisiz ham rasm qilish mumkin</li>
@@ -434,7 +654,7 @@
                             <li>Lizing tugagandan keyin texnika sizniki bo'ladi</li>
                             <li>Kasko sug'urta majburiy</li>
                             {% elif LANGUAGE_CODE == 'ru' %}
-                            <li>Минимальный первоначальный взнос - 30%</li>
+                            <li>Минимальный первоначальный взнос - 0%</li>
                             <li>Максимальный срок лизинга - 60 месяцев</li>
                             <li>Техника может быть в любом состоянии</li>
                             <li>Возможно оформление без кредитной истории</li>
@@ -443,7 +663,7 @@
                             <li>По окончании лизинга техника становится вашей</li>
                             <li>Страхование КАСКО обязательно</li>
                             {% else %}
-                            <li>Minimum down payment - 30%</li>
+                            <li>Minimum down payment - 0%</li>
                             <li>Maximum lease term - 60 months</li>
                             <li>Vehicle can be in any condition</li>
                             <li>Processing without credit history possible</li>
@@ -454,8 +674,186 @@
                             {% endif %}
                         </ul>
                     </div>
+
+                    <!-- Download PDF Button -->
+                    <div class="modal-actions" style="margin-top: 30px; text-align: center; border-top: 1px solid #e0e0e0; padding-top: 20px;">
+                        <button id="downloadPdfBtn" class="btn btn-anim btn-default slide-right-up" style="cursor: pointer;">
+                            <i class="ph ph-download"></i>
+                            {% if LANGUAGE_CODE == 'uz' %}
+                            Tahlilni PDF orqali yuklab olish
+                            {% elif LANGUAGE_CODE == 'ru' %}
+                            Скачать разбор в PDF
+                            {% else %}
+                            Download Analysis as PDF
+                            {% endif %}
+                        </button>
+                    </div>
+
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для формы контакта по лизингу -->
+    <div id="lizing-modal" class="faw-modal">
+        <div class="faw-modal__overlay"></div>
+        <div class="faw-modal__content">
+            <button class="faw-modal__close" aria-label="Закрыть">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+
+            <div class="faw-modal__header">
+                <h2 class="faw-modal__title">
+                    {% if LANGUAGE_CODE == 'ru' %}Приобрести по лизингу
+                    {% elif LANGUAGE_CODE == 'en' %}Acquire by Leasing
+                    {% else %}Lizing orqali sotib olish{% endif %}
+                </h2>
+                <p class="faw-modal__subtitle">
+                    {% if LANGUAGE_CODE == 'ru' %}
+                    Вы готовы приобрести грузовой автомобиль FAW по лизингу? Оставьте свои контактные данные, и наши специалисты по лизингу помогут вам выбрать оптимальные условия финансирования и быстро оформить все необходимые документы.
+                    {% elif LANGUAGE_CODE == 'en' %}
+                    Ready to acquire a FAW truck through leasing? Leave your contact details and our leasing specialists will help you choose the best financing terms and quickly process all necessary documents.
+                    {% else %}
+                    Siz FAW yuk mashinasini lizing orqali sotib olishga tayyormisiz? Aloqa ma'lumotlaringizni qoldiring, va bizning lizing mutaxassislari sizga eng yaxshi moliyaviy shartlarni tanlashda yordam beradilар va kerakli hujjatlarni tez orada rasmiylashtiradi.
+                    {% endif %}
+                </p>
+            </div>
+
+            <form class="faw-modal__form" id="lizing-contact-form">
+                {% csrf_token %}
+                <input type="hidden" name="project_name" value="FAW Trucks - Лизинг">
+                <input type="hidden" name="admin_email" value="info@fawtrucks.uz">
+                <input type="hidden" name="form_subject" value="Заявка на лизинг FAW">
+                <input type="hidden" name="product" value="FAW Trucks - Лизинг">
+
+                <div class="faw-form__group">
+                    <input type="text" name="Name" class="faw-form__input" 
+                        {% if LANGUAGE_CODE == 'uz' %}
+                        placeholder="Ismingiz*"
+                        {% elif LANGUAGE_CODE == 'en' %}
+                        placeholder="Your Name*"
+                        {% else %}
+                        placeholder="Ваше имя*"
+                        {% endif %}
+                        required>
+                </div>
+
+                <div class="faw-form__group">
+                    <select name="Region" class="faw-form__select" required>
+                        <option value="" disabled selected>
+                            {% if LANGUAGE_CODE == 'ru' %}Выберите регион*
+                            {% elif LANGUAGE_CODE == 'en' %}Select Region*
+                            {% else %}Viloyatni tanlang*{% endif %}
+                        </option>
+                        <option value="Toshkent shahri">
+                            {% if LANGUAGE_CODE == 'ru' %}г. Ташкент
+                            {% elif LANGUAGE_CODE == 'en' %}Tashkent City
+                            {% else %}Toshkent shahri{% endif %}
+                        </option>
+                        <option value="Andijon viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Андижанская область
+                            {% elif LANGUAGE_CODE == 'en' %}Andijan Region
+                            {% else %}Andijon viloyati{% endif %}
+                        </option>
+                        <option value="Buxoro viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Бухарская область
+                            {% elif LANGUAGE_CODE == 'en' %}Bukhara Region
+                            {% else %}Buxoro viloyati{% endif %}
+                        </option>
+                        <option value="Fargʻona viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Ферганская область
+                            {% elif LANGUAGE_CODE == 'en' %}Fergana Region
+                            {% else %}Fargʻona viloyati{% endif %}
+                        </option>
+                        <option value="Jizzax viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Джизакская область
+                            {% elif LANGUAGE_CODE == 'en' %}Jizzakh Region
+                            {% else %}Jizzax viloyati{% endif %}
+                        </option>
+                        <option value="Xorazm viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Хорезмская область
+                            {% elif LANGUAGE_CODE == 'en' %}Khorezm Region
+                            {% else %}Xorazm viloyati{% endif %}
+                        </option>
+                        <option value="Namangan viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Наманганская область
+                            {% elif LANGUAGE_CODE == 'en' %}Namangan Region
+                            {% else %}Namangan viloyati{% endif %}
+                        </option>
+                        <option value="Navoiy viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Навоийская область
+                            {% elif LANGUAGE_CODE == 'en' %}Navoiy Region
+                            {% else %}Navoiy viloyati{% endif %}
+                        </option>
+                        <option value="Qashqadaryo viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Кашкадарьинская область
+                            {% elif LANGUAGE_CODE == 'en' %}Kashkadarya Region
+                            {% else %}Qashqadaryo viloyati{% endif %}
+                        </option>
+                        <option value="Samarqand viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Самаркандская область
+                            {% elif LANGUAGE_CODE == 'en' %}Samarkand Region
+                            {% else %}Samarqand viloyati{% endif %}
+                        </option>
+                        <option value="Sirdaryo viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Сырдарьинская область
+                            {% elif LANGUAGE_CODE == 'en' %}Sirdaryo Region
+                            {% else %}Sirdaryo viloyati{% endif %}
+                        </option>
+                        <option value="Surxondaryo viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Сурхандарьинская область
+                            {% elif LANGUAGE_CODE == 'en' %}Surkhandarya Region
+                            {% else %}Surxondaryo viloyati{% endif %}
+                        </option>
+                        <option value="Toshkent viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Ташкентская область
+                            {% elif LANGUAGE_CODE == 'en' %}Tashkent Region
+                            {% else %}Toshkent viloyati{% endif %}
+                        </option>
+                        <option value="Qoraqalpog'iston Respublikasi">
+                            {% if LANGUAGE_CODE == 'ru' %}Республика Каракалпакстан
+                            {% elif LANGUAGE_CODE == 'en' %}Republic of Karakalpakstan
+                            {% else %}Qoraqalpog'iston Respublikasi{% endif %}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="faw-form__group">
+                    <input type="tel" name="phone" class="faw-form__input" placeholder="+998 (__) ___-__-__"
+                        id="lizingPhoneInput" pattern="[+]*[0-9\s\-\(\)]*" data-default="+998" required>
+                </div>
+
+                <div class="faw-form__group">
+                    <textarea name="Message" class="faw-form__textarea"
+                        {% if LANGUAGE_CODE == 'uz' %}
+                        placeholder="Qanday yuk mashinasiga lizing orqali qiziqasiz?*"
+                        {% elif LANGUAGE_CODE == 'en' %}
+                        placeholder="What truck model are you interested in leasing?*"
+                        {% else %}
+                        placeholder="Какой грузовик FAW вас интересует по лизингу?*"
+                        {% endif %}
+                        rows="4" required></textarea>
+                </div>
+
+                <div class="faw-form__group">
+                    <button type="submit" class="faw-form__submit">
+                        <span>
+                            {% if LANGUAGE_CODE == 'ru' %}Отправить заявку
+                            {% elif LANGUAGE_CODE == 'en' %}Submit Request
+                            {% else %}Arizani yubor{% endif %}
+                        </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <line x1="7" y1="17" x2="17" y2="7"></line>
+                            <polyline points="7 7 17 7 17 17"></polyline>
+                        </svg>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -826,6 +1224,208 @@
 
     // Initialize
     updateFromSliders();
+
+    // ============ ОБРАБОТКА СКАЧИВАНИЯ PDF И ФОРМЫ ЛИЗИНГА ============
+    // Выполняем код сразу или после загрузки всех элементов
+    function initLizingModal() {
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+        const lizingModal = document.getElementById('lizing-modal');
+        const lizingModalClose = document.querySelector('#lizing-modal .faw-modal__close');
+        const lizingModalOverlay = document.querySelector('#lizing-modal .faw-modal__overlay');
+        const lizingContactForm = document.getElementById('lizing-contact-form');
+        const lizingPhoneInput = document.getElementById('lizingPhoneInput');
+        let lizingIsSubmitting = false;
+
+        console.log('=== Initializing lizing modal ===');
+        console.log('downloadPdfBtn exists:', !!downloadPdfBtn);
+        console.log('lizingModal exists:', !!lizingModal);
+        console.log('lizingModalClose exists:', !!lizingModalClose);
+        console.log('lizingModalOverlay exists:', !!lizingModalOverlay);
+        console.log('lizingContactForm exists:', !!lizingContactForm);
+        console.log('lizingPhoneInput exists:', !!lizingPhoneInput);
+
+        if (!downloadPdfBtn || !lizingModal) {
+            console.error('❌ PDF button or modal not found - initialization aborted');
+            return;
+        }
+
+        console.log('✅ All elements found - initializing handlers');
+
+        function openLizingModal() {
+            console.log('📖 Opening lizing modal');
+            console.log('Before: modal classes:', lizingModal.className);
+            lizingModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            console.log('After: modal classes:', lizingModal.className);
+            console.log('Modal display:', window.getComputedStyle(lizingModal).display);
+        }
+
+        function closeLizingModal() {
+            console.log('📖 Closing lizing modal');
+            lizingModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Кнопка скачивания PDF
+        downloadPdfBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            console.log('🔘 PDF button clicked!');
+            openLizingModal();
+        });
+
+        console.log('✅ PDF button click handler attached');
+
+        // Закрытие модального окна
+        if (lizingModalClose) {
+            lizingModalClose.addEventListener('click', function (e) {
+                console.log('✖️ Close button clicked');
+                closeLizingModal();
+            });
+            console.log('✅ Close button handler attached');
+        }
+        if (lizingModalOverlay) {
+            lizingModalOverlay.addEventListener('click', function (e) {
+                console.log('✖️ Overlay clicked');
+                closeLizingModal();
+            });
+            console.log('✅ Overlay click handler attached');
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && lizingModal?.classList.contains('active')) {
+                console.log('✖️ Escape key pressed');
+                closeLizingModal();
+            }
+        });
+        console.log('✅ Escape key handler attached');
+
+        // Форматирование телефона
+        if (lizingPhoneInput) {
+            lizingPhoneInput.addEventListener("input", (e) => {
+                let value = e.target.value.replace(/\D/g, "");
+                if (!value.startsWith("998")) value = "998" + value;
+                if (value.length > 12) value = value.slice(0, 12);
+
+                let formatted = "+998 ";
+                if (value.length > 3) formatted += "(" + value.slice(3, 5);
+                if (value.length >= 5) formatted += ") " + value.slice(5, 8);
+                if (value.length >= 8) formatted += "-" + value.slice(8, 10);
+                if (value.length >= 10) formatted += "-" + value.slice(10, 12);
+
+                e.target.value = formatted;
+            });
+            console.log('✅ Phone formatting handler attached');
+        }
+
+        // Обработка формы лизинга
+        if (lizingContactForm) {
+            lizingContactForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                console.log('📤 Form submitted');
+                if (lizingIsSubmitting) return;
+                lizingIsSubmitting = true;
+
+                const phone = lizingPhoneInput.value.replace(/\D/g, "");
+                if (phone.length !== 12) {
+                    console.warn('⚠️ Invalid phone number:', lizingPhoneInput.value);
+                    showLizingStatus("❌ Iltimos, telefon raqamingizni to'liq kiriting.", "error");
+                    lizingIsSubmitting = false;
+                    return;
+                }
+
+                const formData = {
+                    name: lizingContactForm.Name.value,
+                    region: lizingContactForm.Region.value,
+                    phone: lizingPhoneInput.value,
+                    product: 'FAW Trucks - Лизинг',
+                    message: lizingContactForm.Message.value || '',
+                    referer: document.referrer || window.location.href,
+                    utm_data: window.getUTMData ? JSON.stringify(window.getUTMData()) : '{}',
+                    visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null
+                };
+
+                console.log('📊 Form data:', formData);
+
+                try {
+                    console.log('📤 Sending POST request to /api/uz/contact/');
+                    const response = await fetch("/api/uz/contact/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": lizingContactForm.querySelector("[name=csrfmiddlewaretoken]").value,
+                        },
+                        body: JSON.stringify(formData),
+                    });
+
+                    console.log('📨 Response status:', response.status);
+                    const data = await response.json();
+                    console.log('📨 Response data:', data);
+
+                    if (response.ok) {
+                        console.log('✅ Form sent successfully');
+                        (window.dataLayer = window.dataLayer || []).push({
+                            event: "leasing_form_submitted"
+                        });
+
+                        showLizingStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
+                        
+                        // Здесь можно добавить функцию для реального скачивания PDF
+                        // generateAndDownloadPDF();
+                        
+                        lizingContactForm.reset();
+
+                        setTimeout(() => {
+                            closeLizingModal();
+                        }, 2000);
+                    } else if (response.status === 400) {
+                        console.error('❌ Validation errors from API:', data.errors || data);
+                        throw new Error(`Validation error: ${JSON.stringify(data.errors || data.message)}`);
+                    } else {
+                        throw new Error(`API Error ${response.status}: ${data.message || 'Unknown error'}`);
+                    }
+                } catch (err) {
+                    console.error("❌ Form error:", err);
+                    showLizingStatus("❌ Xatolik yuz berdi. Iltimos, qayta urinib ko'ring.", "error");
+                } finally {
+                    lizingIsSubmitting = false;
+                }
+            });
+            console.log('✅ Form submit handler attached');
+        }
+
+        function showLizingStatus(message, type = "success") {
+            let statusBlock = lizingContactForm.querySelector('.faw-form__status');
+            if (!statusBlock) {
+                statusBlock = document.createElement('div');
+                statusBlock.className = 'faw-form__status hidden';
+                const statusText = document.createElement('p');
+                statusText.className = 'faw-form__status-text';
+                statusBlock.appendChild(statusText);
+                lizingContactForm.prepend(statusBlock);
+            }
+
+            const statusText = statusBlock.querySelector('.faw-form__status-text') || statusBlock;
+            statusText.textContent = message;
+            statusBlock.className = `faw-form__status ${type} show`;
+            statusBlock.classList.remove("hidden");
+
+            setTimeout(() => {
+                statusBlock.classList.remove("show");
+                setTimeout(() => statusBlock.classList.add("hidden"), 400);
+            }, 4000);
+        }
+
+        console.log('=== Lizing modal initialization complete! ===');
+    }
+
+    // Инициализация при загрузке DOM или сразу если он уже загружен
+    if (document.readyState === 'loading') {
+        console.log('DOM loading, attaching DOMContentLoaded listener');
+        document.addEventListener('DOMContentLoaded', initLizingModal);
+    } else {
+        console.log('DOM already loaded, initializing immediately');
+        initLizingModal();
+    }
 </script>
 </body>
 </html>

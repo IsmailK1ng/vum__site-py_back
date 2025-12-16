@@ -49,11 +49,35 @@ class ContactFormSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'created_at', 'status_display', 'priority_display', 'region_display']
     
+    def validate_referer(self, value):
+        """Валидация referer - может быть пустым или относительным URL"""
+        if value and len(value) > 500:
+            raise serializers.ValidationError("Referer слишком длинный (макс 500 символов)")
+        return value
+    
     def validate_visitor_uid(self, value):
         """Валидация visitor_uid от amoCRM Pixel"""
         if value:
             if not (value.replace('-', '').replace('_', '').isalnum() and len(value) <= 100):
                 raise serializers.ValidationError("Невалидный visitor_uid")
+        return value
+    
+    def validate_utm_data(self, value):
+        """Валидация utm_data - может быть строкой или объектом"""
+        if value:
+            if isinstance(value, dict):
+                # Преобразуем объект в JSON строку
+                import json
+                return json.dumps(value, ensure_ascii=False)
+            elif isinstance(value, str):
+                # Проверяем что это валидный JSON если это объект в строке
+                if value.strip().startswith('{'):
+                    try:
+                        import json
+                        json.loads(value)
+                    except json.JSONDecodeError:
+                        raise serializers.ValidationError("utm_data должно быть валидным JSON")
+                return value
         return value
     
     def create(self, validated_data):

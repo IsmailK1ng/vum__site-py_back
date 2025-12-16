@@ -276,15 +276,24 @@ class ContactFormViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         try:
             serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
+            
+            if not serializer.is_valid():
+                logger.warning(f"Validation errors in ContactForm: {serializer.errors}")
+                return Response({
+                    'success': False,
+                    'message': 'Validation error',
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
             
             contact_form = serializer.save()
+            logger.info(f"✅ ContactForm created: #{contact_form.id}")
             
             # Отправляем в amoCRM
             try:
                 from main.services.amocrm.lead_sender import LeadSender
                 LeadSender.send_lead(contact_form)
                 contact_form.refresh_from_db()
+                logger.info(f"✅ Lead sent to amoCRM: #{contact_form.id}")
             except Exception as amocrm_error:
                 logger.error(
                     f"Ошибка amoCRM для лида #{contact_form.id}: {str(amocrm_error)}", 
@@ -295,6 +304,7 @@ class ContactFormViewSet(viewsets.ModelViewSet):
             try:
                 from main.services.telegram import TelegramNotificationSender
                 TelegramNotificationSender.send_lead_notification(contact_form)
+                logger.info(f"✅ Telegram notification sent: #{contact_form.id}")
             except Exception as telegram_error:
                 logger.error(
                     f"Ошибка Telegram для лида #{contact_form.id}: {str(telegram_error)}", 
@@ -306,11 +316,18 @@ class ContactFormViewSet(viewsets.ModelViewSet):
                 'message': 'Xabar yuborildi!'
             }, status=status.HTTP_201_CREATED)
             
-        except Exception as e:
-            logger.error(f"Критическая ошибка создания формы: {str(e)}", exc_info=True)
+        except serializers.ValidationError as e:
+            logger.warning(f"Validation error: {e.detail}")
             return Response({
                 'success': False,
-                'message': 'Xatolik yuz berdi.'
+                'message': 'Validation error',
+                'errors': e.detail
+            }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error(f"❌ Критическая ошибка создания формы: {str(e)}", exc_info=True)
+            return Response({
+                'success': False,
+                'message': 'Internal server error'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 

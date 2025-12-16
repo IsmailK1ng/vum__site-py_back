@@ -489,7 +489,7 @@ class ContactForm(models.Model):
     )
     
     
-    referer = models.URLField(
+    referer = models.CharField(
         "Referer (откуда пришёл)",
         max_length=500,
         blank=True,

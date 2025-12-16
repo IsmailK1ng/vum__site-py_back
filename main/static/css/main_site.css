@@ -9738,7 +9738,8 @@ form textarea:required:valid {
     }
 
     .btn-mobile-icon {
-      display: none;
+      /* display: none; */
+      width: 100% !important;
     }
 
     * {
