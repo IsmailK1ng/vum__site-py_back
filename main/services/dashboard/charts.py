@@ -3,6 +3,7 @@
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDate, ExtractHour, ExtractWeekDay
 from datetime import datetime, timedelta
+from django.utils import timezone as django_tz
 import json
 
 
@@ -10,33 +11,56 @@ import json
 
 def _get_source_from_utm(lead):
     """
-    Определяет источник трафика из UTM данных
+    Определяет источник трафика из UTM данных ИЛИ REFERER
     """
-    if not lead.utm_data or lead.utm_data == '':
-        return 'direct'
+    # 1. ПРОВЕРЯЕМ UTM (ПРИОРИТЕТ)
+    if lead.utm_data and lead.utm_data != '':
+        try:
+            utm = json.loads(lead.utm_data)
+            source = utm.get('utm_source', '').lower()
+            
+            if 'google' in source:
+                return 'google'
+            elif source in ['ig', 'instagram']:
+                return 'instagram'
+            elif source in ['fb', 'facebook']:
+                return 'facebook'
+            elif 'yandex' in source or source == 'yd':
+                return 'yandex'
+            elif 'telegram' in source or source == 'tg':
+                return 'telegram'
+            elif 'tiktok' in source or source == 'tt':
+                return 'tiktok'
+            elif 'youtube' in source or source == 'yt':
+                return 'youtube'
+            else:
+                return 'other'
+        except:
+            pass  # Если ошибка парсинга — проверяем referer
     
-    try:
-        utm = json.loads(lead.utm_data)
-        source = utm.get('utm_source', '').lower()
+    # 2. ПРОВЕРЯЕМ REFERER (ЕСЛИ НЕТ UTM)
+    if lead.referer and lead.referer != '':
+        referer_lower = lead.referer.lower()
         
-        if 'google' in source:
-            return 'google'
-        elif source in ['ig', 'instagram']:
-            return 'instagram'
-        elif source in ['fb', 'facebook']:
+        if 'facebook.com' in referer_lower or 'm.facebook.com' in referer_lower:
             return 'facebook'
-        elif 'yandex' in source or source == 'yd':
+        elif 'instagram.com' in referer_lower:
+            return 'instagram'
+        elif 'google.com' in referer_lower or 'google.' in referer_lower:
+            return 'google'
+        elif 'yandex' in referer_lower:
             return 'yandex'
-        elif 'telegram' in source or source == 'tg':
+        elif 'telegram' in referer_lower or 't.me' in referer_lower:
             return 'telegram'
-        elif 'tiktok' in source or source == 'tt':
+        elif 'tiktok.com' in referer_lower:
             return 'tiktok'
-        elif 'youtube' in source or source == 'yt':
+        elif 'youtube.com' in referer_lower or 'youtu.be' in referer_lower:
             return 'youtube'
         else:
             return 'other'
-    except:
-        return 'other'
+    
+    # 3. НИ UTM, НИ REFERER — ПРЯМОЙ ЗАХОД
+    return 'direct'
 
 
 # ========== ГЛАВНАЯ ФУНКЦИЯ ==========
@@ -51,10 +75,9 @@ def get_chart_data(queryset, start_date, end_date):
     top_models = _get_top_models(queryset)
     top_regions = _get_top_regions(queryset)
     heatmap = _get_heatmap_data(queryset)
-    
     time_analysis = get_time_analysis(queryset)
     utm_campaigns = get_utm_campaigns(queryset)
-    referer_data = get_referer_data(queryset)
+    referer_data = _get_referer_data(queryset)  
     region_model_matrix = get_region_model_matrix(queryset)
     source_model_matrix = get_source_model_matrix(queryset)
     behavior = get_behavior_data(queryset)
@@ -134,11 +157,11 @@ def _get_sources_data(queryset):
     for lead in queryset:
         source_key = _get_source_from_utm(lead)
         sources[source_key] += 1
-    
+
     total = sum(sources.values())
-    
+
     return {
-        'labels': ['Google', 'Яндекс', 'Instagram', 'Facebook', 'Telegram', 'TikTok', 'YouTube','Прямые', 'Другие'],
+        'labels': ['Google', 'Яндекс', 'Instagram', 'Facebook', 'Telegram', 'TikTok', 'YouTube', 'Прямые', 'Другие'],
         'values': [
             sources['google'],
             sources['yandex'],
@@ -163,32 +186,6 @@ def _get_sources_data(queryset):
         ]
     }
     
-    # ✅ ИСПОЛЬЗУЕМ ВСПОМОГАТЕЛЬНУЮ ФУНКЦИЮ
-    for lead in queryset:
-        source_key = _get_source_from_utm(lead)
-        sources[source_key] += 1
-    
-    total = sum(sources.values())
-    
-    return {
-        'labels': ['Google', 'Instagram', 'Facebook', 'Прямые', 'Другие'],
-        'values': [
-            sources['google'],
-            sources['instagram'],
-            sources['facebook'],
-            sources['direct'],
-            sources['other']
-        ],
-        'percentages': [
-            round(sources['google'] / total * 100, 1) if total > 0 else 0,
-            round(sources['instagram'] / total * 100, 1) if total > 0 else 0,
-            round(sources['facebook'] / total * 100, 1) if total > 0 else 0,
-            round(sources['direct'] / total * 100, 1) if total > 0 else 0,
-            round(sources['other'] / total * 100, 1) if total > 0 else 0,
-        ]
-    }
-
-
 def _get_top_models(queryset):
     """Топ-10 популярных моделей"""
     
@@ -241,9 +238,11 @@ def _get_heatmap_data(queryset):
     heatmap = [[0 for _ in range(24)] for _ in range(7)]
     
     for lead in queryset:
-        hour = lead.created_at.hour
-        weekday = lead.created_at.weekday()
-        heatmap[weekday][hour] += 1
+        # Конвертируем UTC в локальное время
+        local_time = lead.created_at.astimezone(django_tz.get_current_timezone())
+        hour = local_time.hour  
+        weekday = local_time.weekday()
+        heatmap[weekday][hour] += 1  
     
     max_value = max(max(row) for row in heatmap) if heatmap else 1
     
@@ -271,8 +270,10 @@ def get_time_analysis(queryset):
     total = queryset.count()
     
     for lead in queryset:
-        hour = lead.created_at.hour
-        weekday = lead.created_at.weekday()
+        # Конвертируем UTC в локальное время
+        local_time = lead.created_at.astimezone(django_tz.get_current_timezone())
+        hour = local_time.hour 
+        weekday = local_time.weekday()
         
         hours_data[hour]['count'] += 1
         if lead.product:
@@ -348,36 +349,56 @@ def get_utm_campaigns(queryset):
     campaigns_list = sorted(campaigns.values(), key=lambda x: x['count'], reverse=True)
     return campaigns_list[:20]
 
-
-def get_referer_data(queryset):
-    """Данные Referer"""
+def _get_referer_data(queryset):
+    """
+    Распределение по источникам перехода (Referer)
+    """
     referers = {}
+    total = queryset.count()
     
     for lead in queryset:
-        if not lead.referer:
-            referer = 'Прямой заход'
-        else:
-            try:
-                from urllib.parse import urlparse
-                parsed = urlparse(lead.referer)
-                referer = parsed.netloc or 'unknown'
-            except:
-                referer = 'unknown'
+        # Определяем источник через нашу функцию
+        source_key = _get_source_from_utm(lead)
         
-        referers[referer] = referers.get(referer, 0) + 1
+        # Группируем по источнику
+        if source_key == 'direct':
+            referer_name = 'Прямой заход'
+        elif source_key == 'google':
+            referer_name = 'Google'
+        elif source_key == 'facebook':
+            referer_name = 'Facebook'
+        elif source_key == 'instagram':
+            referer_name = 'Instagram'
+        elif source_key == 'yandex':
+            referer_name = 'Яндекс'
+        elif source_key == 'telegram':
+            referer_name = 'Telegram'
+        elif source_key == 'tiktok':
+            referer_name = 'TikTok'
+        elif source_key == 'youtube':
+            referer_name = 'YouTube'
+        else:
+            # Если "other" — показываем реальный referer
+            if lead.referer and lead.referer != '':
+                referer_name = lead.referer[:50]  # Обрезаем длинные URL
+            else:
+                referer_name = 'Другие'
+        
+        referers[referer_name] = referers.get(referer_name, 0) + 1
     
-    total = sum(referers.values())
+    # Сортируем по убыванию
+    sorted_referers = sorted(referers.items(), key=lambda x: x[1], reverse=True)
     
-    referers_list = []
-    for referer, count in sorted(referers.items(), key=lambda x: x[1], reverse=True):
-        referers_list.append({
+    result = []
+    for referer, count in sorted_referers[:10]:  # Топ-10
+        percent = round(count / total * 100, 1) if total > 0 else 0
+        result.append({
             'referer': referer,
             'count': count,
-            'percent': round(count / total * 100, 1) if total > 0 else 0
+            'percent': percent
         })
     
-    return referers_list[:10]
-
+    return result
 
 def get_region_model_matrix(queryset):
     """Матрица Регион × Модель"""
