@@ -632,49 +632,6 @@
                         </div>
                     </div>
 
-                    <!-- Conditions -->
-                    <div class="conditions-section">
-                        <h3 class="conditions-title">
-                            {% if LANGUAGE_CODE == 'uz' %}
-                            Lizing shartlari
-                            {% elif LANGUAGE_CODE == 'ru' %}
-                            Условия лизинга
-                            {% else %}
-                            Leasing Terms
-                            {% endif %}
-                        </h3>
-                        <ul class="conditions-list">
-                            {% if LANGUAGE_CODE == 'uz' %}
-                            <li>Minimal dastlabki to'lov - 0%</li>
-                            <li>Maksimal lizing muddati - 60 oy</li>
-                            <li>Texnikaning har qanday holatda bo'lishi mumkin</li>
-                            <li>Kredit tarixisiz ham rasm qilish mumkin</li>
-                            <li>Tez rasmiylashtirish (1-2 kun)</li>
-                            <li>Muddatdan oldin to'lash imkoniyati</li>
-                            <li>Lizing tugagandan keyin texnika sizniki bo'ladi</li>
-                            <li>Kasko sug'urta majburiy</li>
-                            {% elif LANGUAGE_CODE == 'ru' %}
-                            <li>Минимальный первоначальный взнос - 0%</li>
-                            <li>Максимальный срок лизинга - 60 месяцев</li>
-                            <li>Техника может быть в любом состоянии</li>
-                            <li>Возможно оформление без кредитной истории</li>
-                            <li>Быстрое оформление (1-2 дня)</li>
-                            <li>Возможность досрочного погашения</li>
-                            <li>По окончании лизинга техника становится вашей</li>
-                            <li>Страхование КАСКО обязательно</li>
-                            {% else %}
-                            <li>Minimum down payment - 0%</li>
-                            <li>Maximum lease term - 60 months</li>
-                            <li>Vehicle can be in any condition</li>
-                            <li>Processing without credit history possible</li>
-                            <li>Fast processing (1-2 days)</li>
-                            <li>Early payment option</li>
-                            <li>Vehicle becomes yours after lease ends</li>
-                            <li>CASCO insurance mandatory</li>
-                            {% endif %}
-                        </ul>
-                    </div>
-
                     <!-- Download PDF Button -->
                     <div class="modal-actions" style="margin-top: 30px; text-align: center; border-top: 1px solid #e0e0e0; padding-top: 20px;">
                         <button id="downloadPdfBtn" class="btn btn-anim btn-default slide-right-up" style="cursor: pointer;">
@@ -862,6 +819,10 @@
     <script src="{% static 'js/app.js' %}"></script>
     <script src="{% static 'js/error-logger.js' %}"></script>
     <script src="{% static 'js/faw.js' %}"></script>
+    <!-- jsPDF для генерации PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
 
     <!-- Scroll Script -->
     <script>
@@ -1369,8 +1330,8 @@
 
                         showLizingStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
                         
-                        // Здесь можно добавить функцию для реального скачивания PDF
-                        // generateAndDownloadPDF();
+                        // Генерируем и скачиваем PDF с данными лизинга
+                        generateAndDownloadLizingPDF();
                         
                         lizingContactForm.reset();
 
@@ -1417,6 +1378,377 @@
 
         console.log('=== Lizing modal initialization complete! ===');
     }
+
+// ============ ЗАГРУЗКА ШРИФТА И ГЕНЕРАЦИЯ PDF ============
+
+// Функция для загрузки шрифта и конвертации в base64
+async function loadFont(url) {
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    let binary = '';
+    for (let i = 0; i < uint8Array.length; i++) {
+        binary += String.fromCharCode(uint8Array[i]);
+    }
+    return btoa(binary);
+}
+
+// Основная функция генерации PDF
+async function generateAndDownloadLizingPDF() {
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+
+        // Загружаем шрифт Roboto с поддержкой кириллицы
+        const fontUrl = 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Regular.ttf';
+        
+        try {
+            const fontBase64 = await loadFont(fontUrl);
+            doc.addFileToVFS('Roboto-Regular.ttf', fontBase64);
+            doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+            doc.setFont('Roboto');
+        } catch (fontError) {
+            console.warn('Font loading failed, using default font:', fontError);
+            doc.setFont('helvetica');
+        }
+
+        const amount = parseInt(amountSlider.value);
+        const downPaymentPercent = parseInt(downPaymentSlider.value);
+        const term = parseInt(termSlider.value);
+
+        const result = calculateLeasing(amount, downPaymentPercent, term);
+        const schedule = generatePaymentSchedule(
+            result.totalAmount,
+            result.monthlyPayment,
+            result.annualRate,
+            term
+        );
+
+        const today = new Date().toLocaleDateString('ru-RU');
+
+        // Переплата
+        const overpayment = result.totalPayment - result.totalAmount;
+        const overpaymentPercent = ((overpayment / result.totalAmount) * 100).toFixed(1);
+
+        // Тексты в зависимости от языка
+        const texts = {
+            ru: {
+                dealer: 'Официальный дилер в Узбекистане',
+                title: 'РАСЧЁТ ЛИЗИНГА',
+                date: 'Дата',
+                monthlyPayment: 'Ежемесячный платёж',
+                currency: 'сум',
+                parameter: 'Параметр',
+                value: 'Значение',
+                vehiclePrice: 'Стоимость техники',
+                downPayment: 'Первоначальный взнос',
+                financingAmount: 'Сумма финансирования',
+                leaseTerm: 'Срок лизинга',
+                months: 'мес',
+                interestRate: 'Процентная ставка',
+                perYear: 'годовых',
+                totalPayments: 'Сумма всех платежей',
+                interestPaid: 'Переплата (проценты)',
+                totalWithDown: 'Общая сумма с взносом',
+                conditions: 'Условия лизинга',
+                cond1: 'Минимальный взнос - от 0%',
+                cond2: 'Максимальный срок - 60 месяцев',
+                cond3: 'Быстрое оформление (1-2 дня)',
+                cond4: 'Досрочное погашение',
+                cond5: 'Техника становится вашей',
+                cond6: 'Без кредитной истории',
+                cond7: 'КАСКО обязательно',
+                cond8: 'Индивидуальный подход',
+                scheduleTitle: 'График ежемесячных платежей',
+                term: 'Срок',
+                rate: 'Ставка',
+                principal: 'Основной долг',
+                interest: 'Проценты',
+                payment: 'Платёж',
+                balance: 'Остаток',
+                total: 'ИТОГО',
+                warning: 'Важно:',
+                warningText: 'Данный расчёт является предварительным. Уточняйте условия у менеджера.',
+                page: 'Стр.'
+            },
+            uz: {
+                dealer: "O'zbekistondagi rasmiy dilyer",
+                title: 'LIZING HISOBLASH',
+                date: 'Sana',
+                monthlyPayment: "Oylik to'lov",
+                currency: "so'm",
+                parameter: 'Parametr',
+                value: 'Qiymati',
+                vehiclePrice: 'Texnika narxi',
+                downPayment: "Dastlabki to'lov",
+                financingAmount: 'Moliyalashtirish summasi',
+                leaseTerm: 'Lizing muddati',
+                months: 'oy',
+                interestRate: 'Foiz stavkasi',
+                perYear: 'yillik',
+                totalPayments: "Jami to'lovlar",
+                interestPaid: "Qo'shimcha (foizlar)",
+                totalWithDown: 'Umumiy summa',
+                conditions: 'Lizing shartlari',
+                cond1: "Minimal to'lov - 0% dan",
+                cond2: 'Maksimal muddat - 60 oy',
+                cond3: 'Tez rasmiylashtirish (1-2 kun)',
+                cond4: "Muddatidan oldin to'lash",
+                cond5: "Texnika sizniki bo'ladi",
+                cond6: 'Kredit tarixisiz',
+                cond7: "KASKO sug'urta majburiy",
+                cond8: 'Individual yondashuv',
+                scheduleTitle: "Oylik to'lovlar jadvali",
+                term: 'Muddat',
+                rate: 'Stavka',
+                principal: 'Asosiy qarz',
+                interest: 'Foizlar',
+                payment: "To'lov",
+                balance: 'Qoldiq',
+                total: 'JAMI',
+                warning: 'Muhim:',
+                warningText: "Ushbu hisob-kitob dastlabki. Yakuniy shartlarni menejer bilan aniqlang.",
+                page: 'Sahifa'
+            },
+            en: {
+                dealer: 'Official Dealer in Uzbekistan',
+                title: 'LEASING CALCULATION',
+                date: 'Date',
+                monthlyPayment: 'Monthly Payment',
+                currency: 'UZS',
+                parameter: 'Parameter',
+                value: 'Value',
+                vehiclePrice: 'Vehicle Price',
+                downPayment: 'Down Payment',
+                financingAmount: 'Financing Amount',
+                leaseTerm: 'Lease Term',
+                months: 'months',
+                interestRate: 'Interest Rate',
+                perYear: 'per year',
+                totalPayments: 'Total Payments',
+                interestPaid: 'Interest Paid',
+                totalWithDown: 'Total with Down Payment',
+                conditions: 'Leasing Terms',
+                cond1: 'Minimum down payment - from 0%',
+                cond2: 'Maximum term - 60 months',
+                cond3: 'Fast processing (1-2 days)',
+                cond4: 'Early repayment option',
+                cond5: 'Vehicle becomes yours',
+                cond6: 'No credit history required',
+                cond7: 'CASCO insurance mandatory',
+                cond8: 'Individual approach',
+                scheduleTitle: 'Monthly Payment Schedule',
+                term: 'Term',
+                rate: 'Rate',
+                principal: 'Principal',
+                interest: 'Interest',
+                payment: 'Payment',
+                balance: 'Balance',
+                total: 'TOTAL',
+                warning: 'Important:',
+                warningText: 'This calculation is preliminary. Please confirm terms with our manager.',
+                page: 'Page'
+            }
+        };
+
+        const txt = texts[LANGUAGE_CODE] || texts.ru;
+
+        /* ================= HEADER ================= */
+        doc.setFillColor(26, 58, 82);
+        doc.rect(0, 0, 210, 28, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(22);
+        doc.text('VUM/FAW TRUCKS', 105, 14, { align: 'center' });
+
+        doc.setFontSize(10);
+        doc.text(txt.dealer, 105, 20, { align: 'center' });
+        
+        doc.setFontSize(8);
+        doc.text('faw.uz | +998 (55) 508-60-60', 105, 25, { align: 'center' });
+
+        /* ================= TITLE ================= */
+        doc.setTextColor(26, 58, 82);
+        doc.setFontSize(16);
+        doc.text(txt.title, 105, 38, { align: 'center' });
+
+        doc.setFontSize(9);
+        doc.setTextColor(128, 128, 128);
+        doc.text(`${txt.date}: ${today}`, 105, 44, { align: 'center' });
+
+        /* ================= MONTHLY PAYMENT BOX ================= */
+        doc.setFillColor(26, 58, 82);
+        doc.roundedRect(20, 50, 170, 28, 3, 3, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(10);
+        doc.text(txt.monthlyPayment, 105, 59, { align: 'center' });
+
+        doc.setFontSize(24);
+        doc.text(`${formatNumber(result.monthlyPayment)} ${txt.currency}`, 105, 70, { align: 'center' });
+
+        /* ================= PARAMETERS TABLE ================= */
+        doc.setTextColor(0, 0, 0);
+
+        doc.autoTable({
+            startY: 88,
+            theme: 'striped',
+            styles: { 
+                fontSize: 10, 
+                cellPadding: 4,
+                font: 'Roboto'
+            },
+            headStyles: {
+                fillColor: [26, 58, 82],
+                textColor: 255
+            },
+            columnStyles: {
+                0: { cellWidth: 90 },
+                1: { cellWidth: 80, halign: 'right' }
+            },
+            head: [[txt.parameter, txt.value]],
+            body: [
+                [txt.vehiclePrice, `${formatNumber(result.carPrice)} ${txt.currency}`],
+                [txt.downPayment, `${formatNumber(result.initialPayment)} ${txt.currency} (${downPaymentPercent}%)`],
+                [txt.financingAmount, `${formatNumber(result.totalAmount)} ${txt.currency}`],
+                [txt.leaseTerm, `${term} ${txt.months}`],
+                [txt.interestRate, `${(result.annualRate * 100).toFixed(1)}% ${txt.perYear}`],
+                [txt.totalPayments, `${formatNumber(result.totalPayment)} ${txt.currency}`],
+                [txt.interestPaid, `${formatNumber(overpayment)} ${txt.currency} (${overpaymentPercent}%)`],
+                [txt.totalWithDown, `${formatNumber(result.totalPayment + result.initialPayment)} ${txt.currency}`]
+            ]
+        });
+
+        /* ================= CONDITIONS ================= */
+        let y = doc.lastAutoTable.finalY + 10;
+        
+        doc.setFillColor(248, 249, 250);
+        doc.rect(20, y, 170, 32, 'F');
+        
+        doc.setFillColor(26, 58, 82);
+        doc.rect(20, y, 3, 32, 'F');
+        
+        doc.setTextColor(26, 58, 82);
+        doc.setFontSize(11);
+        doc.text(txt.conditions, 28, y + 7);
+        
+        doc.setFontSize(8);
+        doc.setTextColor(80, 80, 80);
+        
+        const conds1 = [txt.cond1, txt.cond2, txt.cond3, txt.cond4];
+        const conds2 = [txt.cond5, txt.cond6, txt.cond7, txt.cond8];
+        
+        let condY = y + 13;
+        conds1.forEach(c => { doc.text('• ' + c, 28, condY); condY += 5; });
+        
+        condY = y + 13;
+        conds2.forEach(c => { doc.text('• ' + c, 110, condY); condY += 5; });
+
+        /* ================= PAGE 2 - SCHEDULE ================= */
+        doc.addPage();
+
+        doc.setFillColor(26, 58, 82);
+        doc.rect(0, 0, 210, 18, 'F');
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(14);
+        doc.text('FAW TRUCKS', 20, 12);
+        
+        doc.setFontSize(10);
+        doc.text(txt.scheduleTitle, 190, 12, { align: 'right' });
+
+        doc.setTextColor(26, 58, 82);
+        doc.setFontSize(14);
+        doc.text(txt.scheduleTitle, 105, 28, { align: 'center' });
+        
+        doc.setFontSize(9);
+        doc.setTextColor(128, 128, 128);
+        doc.text(`${txt.term}: ${term} ${txt.months} | ${txt.rate}: ${(result.annualRate * 100).toFixed(1)}%`, 105, 34, { align: 'center' });
+
+        /* ================= SCHEDULE TABLE ================= */
+        const totalPrincipal = schedule.reduce((s, p) => s + p.principalPayment, 0);
+        const totalInterest = schedule.reduce((s, p) => s + p.interestPayment, 0);
+
+        doc.autoTable({
+            startY: 40,
+            theme: 'grid',
+            styles: { 
+                fontSize: 8, 
+                cellPadding: 2,
+                font: 'Roboto',
+                halign: 'right'
+            },
+            headStyles: {
+                fillColor: [26, 58, 82],
+                textColor: 255,
+                halign: 'center'
+            },
+            columnStyles: {
+                0: { halign: 'center', cellWidth: 12 }
+            },
+            head: [['#', txt.principal, txt.interest, txt.payment, txt.balance]],
+            body: [
+                ...schedule.map(p => [
+                    p.month,
+                    formatNumber(p.principalPayment),
+                    formatNumber(p.interestPayment),
+                    formatNumber(p.monthlyPayment),
+                    formatNumber(p.remainingDebt)
+                ]),
+                // Итоговая строка
+                [
+                    { content: txt.total, styles: { fillColor: [26, 58, 82], textColor: 255, fontStyle: 'bold', halign: 'center' } },
+                    { content: formatNumber(totalPrincipal), styles: { fillColor: [26, 58, 82], textColor: 255, fontStyle: 'bold' } },
+                    { content: formatNumber(totalInterest), styles: { fillColor: [26, 58, 82], textColor: 255, fontStyle: 'bold' } },
+                    { content: formatNumber(result.totalPayment), styles: { fillColor: [26, 58, 82], textColor: 255, fontStyle: 'bold' } },
+                    { content: '0', styles: { fillColor: [26, 58, 82], textColor: 255, fontStyle: 'bold' } }
+                ]
+            ],
+            didParseCell: function(data) {
+                if (data.row.index === schedule.length - 1 && data.row.section === 'body') {
+                    data.cell.styles.fillColor = [232, 244, 253];
+                }
+            }
+        });
+
+        /* ================= WARNING ================= */
+        const warnY = doc.lastAutoTable.finalY + 8;
+        
+        doc.setFillColor(255, 243, 205);
+        doc.rect(20, warnY, 170, 12, 'F');
+        
+        doc.setFillColor(255, 193, 7);
+        doc.rect(20, warnY, 3, 12, 'F');
+        
+        doc.setTextColor(133, 100, 4);
+        doc.setFontSize(8);
+        doc.text(`${txt.warning} ${txt.warningText}`, 28, warnY + 7);
+
+        /* ================= FOOTER ================= */
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            
+            doc.setFillColor(26, 58, 82);
+            doc.rect(0, 287, 210, 10, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(8);
+            doc.text(
+                `VUM/FAW TRUCKS | faw.uz | +998 (55) 508-60-60 | ${txt.page} ${i}/${pageCount}`,
+                105, 293, { align: 'center' }
+            );
+        }
+
+        /* ================= SAVE ================= */
+        doc.save(`FAW-Lizing-${term}m-${Date.now()}.pdf`);
+        console.log('✅ PDF generated successfully');
+
+    } catch (err) {
+        console.error('❌ PDF generation error:', err);
+        alert('Ошибка при создании PDF. Попробуйте ещё раз.');
+    }
+}
 
     // Инициализация при загрузке DOM или сразу если он уже загружен
     if (document.readyState === 'loading') {
