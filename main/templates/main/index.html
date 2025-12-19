@@ -523,7 +523,13 @@
                         <div class="container-fluid p-0">
                           <div class="row gx-0">
                             <div class="col-12 mxd-grid-item ">
+                              {% if LANGUAGE_CODE == 'uz' %}
                               <input type="text" name="name" placeholder="Ismingiz*" required>
+                              {% elif LANGUAGE_CODE == 'ru' %}
+                              <input type="text" name="name" placeholder="Ваше имя*" required>
+                              {% else %}
+                              <input type="text" name="name" placeholder="Your Name*" required>
+                              {% endif %}
                             </div>
                             <div class="col-12 mxd-grid-item ">
                               <select name="region" required>
@@ -585,8 +591,13 @@
                                 pattern="[+]*[0-9\s\-\(\)]*" data-default="+998" required>
                             </div>
                             <div class="col-12 mxd-grid-item ">
-                              <textarea name="message"
-                                placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*"></textarea>
+                              {% if LANGUAGE_CODE == 'uz' %}
+                              <textarea name="message" placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*"></textarea>
+                              {% elif LANGUAGE_CODE == 'ru' %}
+                              <textarea name="message" placeholder="Какой грузовик вас интересует? Дополнительные вопросы*"></textarea>
+                              {% else %}
+                              <textarea name="message" placeholder="Which truck are you interested in? Additional questions*"></textarea>
+                              {% endif %}
                             </div>
                             <div class="col-12 mxd-grid-item ">
                               <button class="btn btn-anim btn-default btn-large btn-opposite slide-right-up shimmer-btn"

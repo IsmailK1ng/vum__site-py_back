@@ -9737,11 +9737,6 @@ form textarea:required:valid {
         height: 24vh;
     }
 
-    .btn-mobile-icon {
-      /* display: none; */
-      width: 100% !important;
-    }
-
     * {
       padding: 0;
     }
