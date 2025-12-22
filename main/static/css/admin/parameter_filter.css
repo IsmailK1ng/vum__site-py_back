@@ -1,0 +1,79 @@
+/**
+ * Стили для фильтра параметров
+ */
+
+/* Контейнер фильтра */
+.parameter-filter-container {
+    transition: all 0.3s ease;
+}
+
+.parameter-filter-container:hover {
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Селект фильтра */
+#param-category-filter {
+    transition: all 0.2s ease;
+}
+
+#param-category-filter:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+#param-category-filter:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+}
+
+/* Кнопка добавления */
+#add-param-btn:hover {
+    background: #059669 !important;
+    transform: translateY(-1px);
+}
+
+/* Анимация скрытия/показа строк */
+#productparameter_set-group .dynamic-productparameter_set,
+#parameters-group .dynamic-parameters {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+#productparameter_set-group .dynamic-productparameter_set[style*="display: none"],
+#parameters-group .dynamic-parameters[style*="display: none"] {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+/* Подсветка категории в строке */
+#productparameter_set-group select[name$="-category"],
+#parameters-group select[name$="-category"] {
+    font-weight: 600;
+    background: #f0f9ff;
+    border: 2px solid #3b82f6;
+    border-radius: 4px;
+}
+
+/* Счётчик параметров */
+#param-count {
+    background: rgba(255,255,255,0.2);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 768px) {
+    .parameter-filter-container {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 10px !important;
+    }
+    
+    #param-category-filter {
+        width: 100%;
+    }
+    
+    #add-param-btn {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+}

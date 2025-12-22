@@ -982,38 +982,30 @@ class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
 
 # ============ ПРОДУКТЫ ============
 
-
 class ProductCategoryFilter(admin.SimpleListFilter):
-    """Фильтр по категориям с учетом основной и дополнительных"""
+    """Фильтр по категориям"""
     title = 'категория'
     parameter_name = 'category_filter'
     
     def lookups(self, request, model_admin):
-        """Возвращаем все доступные категории"""
         return Product.CATEGORY_CHOICES
     
     def queryset(self, request, queryset):
-        """Фильтруем по основной И дополнительным категориям"""
         if self.value():
-            from django.db.models import Q
-            
-            # Ищем продукты где:
-            # 1. Основная категория совпадает
-            # 2. ИЛИ категория есть в дополнительных (через LIKE)
             return queryset.filter(
                 Q(category=self.value()) | 
                 Q(categories__contains=self.value())
             )
         return queryset
 
+
 class ProductCategoriesForm(forms.ModelForm):
-    """Форма с множественным выбором категорий"""
     selected_categories = forms.MultipleChoiceField(
         choices=Product.CATEGORY_CHOICES,
         widget=forms.CheckboxSelectMultiple,
         required=True, 
         label="Категории",
-        help_text="Выберите одну или несколько категорий, в которых будет отображаться продукт"
+        help_text="Выберите категории продукта"
     )
     
     class Meta:
@@ -1022,80 +1014,77 @@ class ProductCategoriesForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
-
         if self.instance.pk:
             selected = []
-
             if self.instance.category:
                 selected.append(self.instance.category)
-            
-
             if self.instance.categories:
                 additional = [cat.strip() for cat in self.instance.categories.split(',') if cat.strip()]
                 selected.extend(additional)
-
-            selected = list(dict.fromkeys(selected))
-            
-            self.fields['selected_categories'].initial = selected
+            self.fields['selected_categories'].initial = list(dict.fromkeys(selected))
     
     def clean_selected_categories(self):
-        """Валидация: должна быть выбрана хотя бы одна категория"""
         categories = self.cleaned_data.get('selected_categories', [])
-        
         if not categories:
             raise forms.ValidationError("Выберите хотя бы одну категорию")
-        
         return categories
     
     def save(self, commit=True):
         instance = super().save(commit=False)
-        
-
         selected = self.cleaned_data.get('selected_categories', [])
-        
         if selected:
-
             instance.category = selected[0]
-            
-
-            if len(selected) > 1:
-                instance.categories = ','.join(selected[1:])
-            else:
-                instance.categories = ''
-        
+            instance.categories = ','.join(selected[1:]) if len(selected) > 1 else ''
         if commit:
             instance.save()
         return instance
 
+
 class ProductParameterInline(TranslationTabularInline):
+    """Параметры с фильтрацией по категории"""
     model = ProductParameter
-    extra = 1
+    extra = 0
     fields = ('category', 'text', 'order')
+    verbose_name = "Параметр"
+    verbose_name_plural = "📋 Параметры (выберите категорию для фильтрации)"
+    
+    class Media:
+        js = ('js/admin/parameter_filter.js',)
+        css = {'all': ('css/admin/parameter_filter.css',)}
+
 
 class ProductFeatureInline(TranslationTabularInline):
     model = ProductFeature
-    extra = 1
+    extra = 0
     max_num = 8
     fields = ('icon', 'name', 'order')
+    verbose_name = "Характеристика"
+    verbose_name_plural = "🔹 Характеристики с иконками"
+
 
 class ProductCardSpecInline(TranslationTabularInline):
     model = ProductCardSpec
-    extra = 1
+    extra = 0
     max_num = 4
     fields = ('icon', 'value', 'order')
+    verbose_name = "Спецификация"
+    verbose_name_plural = "📄 Характеристики карточки"
+
 
 class ProductGalleryInline(admin.TabularInline):
     model = ProductGallery
     extra = 1
     fields = ('image', 'order')
+    verbose_name = "Фото"
+    verbose_name_plural = "🖼️ Галерея"
+
 
 @admin.register(Product)
 class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
-    form = ProductCategoriesForm 
+    form = ProductCategoriesForm
     
     list_display = ['thumbnail', 'title', 'all_categories_display', 'is_active', 'is_featured', 'slider_order', 'order']
-    list_filter = [ProductCategoryFilter, 'is_active', 'is_featured'] 
+    list_filter = [ProductCategoryFilter, 'is_active', 'is_featured']
     search_fields = ['title', 'slug']
     list_editable = ['is_active', 'is_featured', 'slider_order', 'order']
     prepopulated_fields = {'slug': ('title',)}
@@ -1104,14 +1093,13 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
     
     list_per_page = 15
     show_full_result_count = False
-    list_select_related = []
     
     fieldsets = (
         ('Основная информация', {
             'fields': (
-                ('title', 'slug'), 
-                'selected_categories',  
-                ('order', 'is_active', 'is_featured'), 
+                ('title', 'slug'),
+                'selected_categories',
+                ('order', 'is_active', 'is_featured'),
                 ('main_image', 'card_image')
             )
         }),
@@ -1137,58 +1125,36 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
             )
         return "—"
     thumbnail.short_description = "Фото"
-    
 
     def all_categories_display(self, obj):
-        """Отображение всех категорий продукта"""
         categories = obj.get_all_categories()
-        
         if not categories:
             return "—"
-
         category_names = []
         for cat_slug in categories:
             for slug, name in Product.CATEGORY_CHOICES:
                 if slug == cat_slug:
                     category_names.append(name)
                     break
-        
         if category_names:
-
             tags = []
             for idx, name in enumerate(category_names):
                 if idx == 0:
-
-                    tags.append(
-                        f'<span style="background:#1976d2;color:white;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;">{name}</span>'
-                    )
+                    tags.append(f'<span style="background:#1976d2;color:white;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;">{name}</span>')
                 else:
-
-                    tags.append(
-                        f'<span style="background:#d3ecff;color:#006ad3;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:400;">{name}</span>'
-                    )
-            
+                    tags.append(f'<span style="background:#d3ecff;color:#006ad3;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:400;">{name}</span>')
             return format_html(' '.join(tags))
         return "—"
-    
     all_categories_display.short_description = "Категории"
     
     def add_to_slider(self, request, queryset):
-        """Добавить выбранные продукты в слайдер"""
         updated = queryset.update(is_featured=True)
-        self.message_user(
-            request, 
-            f'✅ {updated} продуктов добавлено в главный слайдер'
-        )
-    add_to_slider.short_description = '⭐ Добавить в главный слайдер'
+        self.message_user(request, f'✅ {updated} продуктов добавлено в слайдер')
+    add_to_slider.short_description = '⭐ Добавить в слайдер'
     
     def remove_from_slider(self, request, queryset):
-        """Убрать выбранные продукты из слайдера"""
         updated = queryset.update(is_featured=False)
-        self.message_user(
-            request, 
-            f'❌ {updated} продуктов убрано из слайдера'
-        )
+        self.message_user(request, f'❌ {updated} продуктов убрано из слайдера')
     remove_from_slider.short_description = '❌ Убрать из слайдера'
 
     def changelist_view(self, request, extra_context=None):
@@ -1197,13 +1163,51 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
         if deleted_count > 0:
             extra_context['show_recover_button'] = True
             extra_context['deleted_count'] = deleted_count
-        
-        # Добавляем информацию о слайдере
         featured_count = Product.objects.filter(is_featured=True, is_active=True).count()
         extra_context['featured_count'] = featured_count
         extra_context['show_slider_info'] = True
-        
         return super().changelist_view(request, extra_context)
+    
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                'api/parameter-suggestions/',
+                self.admin_site.admin_view(self.parameter_suggestions_api),
+                name='parameter_suggestions_api'
+            ),
+        ]
+        return custom_urls + urls
+
+    def parameter_suggestions_api(self, request):
+        """API для получения подсказок параметров по категории"""
+        category = request.GET.get('category', '')
+        
+        if not category:
+            return JsonResponse({'suggestions': []})
+        
+        # Получаем уникальные параметры для категории
+        from django.db.models import Count
+        
+        suggestions = ProductParameter.objects.filter(
+            category=category
+        ).values('text').annotate(
+            usage_count=Count('id')
+        ).order_by('-usage_count')[:20]
+        
+        result = []
+        seen = set()
+        
+        for item in suggestions:
+            text = item['text']
+            if text and text not in seen:
+                seen.add(text)
+                result.append({
+                    'text': text,
+                    'count': item['usage_count']
+                })
+        
+        return JsonResponse({'suggestions': result})
 
 @admin.register(AmoCRMToken)
 class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
