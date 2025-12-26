@@ -60,6 +60,9 @@
     <!-- Цвет браузера -->
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
+    
+    <!-- Google reCAPTCHA v3 -->
+     <script src="https://www.google.com/recaptcha/api.js?render=6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow"></script>
 
     <!-- amoCRM Pixel для автораспределения -->
     <script type="text/javascript" id="amo_pixel_identifier_js" async="async"
@@ -512,8 +515,7 @@
     <!-- Подключение Product Detail JS -->
     <script src="{% static 'js/product_detail.js' %}"></script>
 
-    <script>
-
+<script>
         // ============ ОБРАБОТКА ФОРМЫ ============
         let isSubmitting = false;
 
@@ -604,21 +606,27 @@
                     return;
                 }
 
-                const productField = document.getElementById('product-field');
-                const utmData = window.getUTMData();
-
-                const formData = {
-                    name: contactForm.Name.value,
-                    region: contactForm.Region.value,
-                    phone: phoneInput.value,
-                    product: productField?.value || '',
-                    message: contactForm.Message.value || '',
-                    referer: document.referrer || window.location.href,
-                    utm_data: utmData,
-                    visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null
-                };
-
                 try {
+                    // ============ ПОЛУЧАЕМ ТОКЕН reCAPTCHA ============
+                    const recaptchaToken = await grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', {
+                        action: 'contact_form'
+                    });
+
+                    const productField = document.getElementById('product-field');
+                    const utmData = window.getUTMData();
+
+                    const formData = {
+                        name: contactForm.Name.value,
+                        region: contactForm.Region.value,
+                        phone: phoneInput.value,
+                        product: productField?.value || '',
+                        message: contactForm.Message.value || '',
+                        referer: window.location.href,
+                        utm_data: utmData,
+                        visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null,
+                        recaptcha_token: recaptchaToken
+                    };
+
                     const response = await fetch("/api/uz/contact/", {
                         method: "POST",
                         headers: {
@@ -696,7 +704,6 @@
             });
         });
     </script>
-
 </body>
 
 </html>

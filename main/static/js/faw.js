@@ -38,7 +38,7 @@ function initFAWCounters() {
       });
     }
   });
-} 
+}
 
 // --------------------------------------------- //
 // FAW Image Slider Functionality
@@ -750,14 +750,14 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
-      const formData = {
-        name: document.getElementById('dealer_name')?.value || '',
-        company_name: document.getElementById('dealer_company')?.value || '',
-        experience_years: parseInt(document.getElementById('dealer_experience')?.value) || null,
-        region: document.getElementById('dealer_region')?.value || '',
-        phone: '+' + phoneValue,
-        message: document.getElementById('dealer_message')?.value || ''
-      };
+      // Проверка сообщения
+      const messageInput = document.getElementById('dealer_message');
+      const messageValue = messageInput ? messageInput.value.trim() : '';
+      if (!messageValue) {
+        alert('Iltimos, xabar yozing');
+        messageInput?.focus();
+        return;
+      }
 
       const btn = this.querySelector('button[type="submit"]');
       if (!btn) return;
@@ -767,6 +767,23 @@ document.addEventListener('DOMContentLoaded', function () {
       btn.innerHTML = '<span class="btn-caption">Yuborilmoqda...</span>';
 
       try {
+        // ============ ПОЛУЧАЕМ ТОКЕН reCAPTCHA ============
+        const recaptchaToken = await grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', {
+          action: 'become_dealer'
+        });
+
+        const formData = {
+          name: document.getElementById('dealer_name')?.value || '',
+          company_name: document.getElementById('dealer_company')?.value || '',
+          experience_years: parseInt(document.getElementById('dealer_experience')?.value) || null,
+          region: document.getElementById('dealer_region')?.value || '',
+          phone: '+' + phoneValue,
+          message: messageValue,
+          recaptcha_token: recaptchaToken  // ← ТОКЕН КАПЧИ
+        };
+
+        console.log('📤 Отправляем данные:', formData);
+
         const response = await fetch('/api/uz/dealer-applications/', {
           method: 'POST',
           headers: {
@@ -777,6 +794,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         const data = await response.json();
+        console.log('📨 Ответ сервера:', data);
 
         if (response.ok) {
           const replyDiv = document.querySelector('.form__reply');
@@ -787,14 +805,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
           this.reset();
           if (phoneInput) phoneInput.value = '+998 ';
+          alert('Arizangiz qabul qilindi!');
 
         } else {
           throw new Error(data.message || 'Xatolik yuz berdi');
         }
       } catch (error) {
+        console.error('❌ Form error:', error);
         window.logJSError('Dealer form submission error: ' + error.message, {
           file: 'faw-scripts.js',
-          formData: formData
+          formData: {
+            name: document.getElementById('dealer_name')?.value,
+            phone: '+' + phoneValue,
+            region: document.getElementById('dealer_region')?.value
+          }
         });
         alert('Xatolik yuz berdi. Iltimos qaytadan urinib ko\'ring.');
       }

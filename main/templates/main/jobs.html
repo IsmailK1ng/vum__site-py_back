@@ -80,8 +80,10 @@
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
     <meta name="msapplication-navbutton-color" content="#161616">
+    
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Google reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow"></script>
 </head>
 
 <body>
@@ -533,6 +535,72 @@
             }, false);
         })();
     </script>
+    <script>
+    // reCAPTCHA для формы вакансий
+    (function() {
+        const jobForm = document.getElementById('job-application-form');
+        if (!jobForm) return;
+
+        const originalSubmitHandler = jobForm.onsubmit;
+
+        jobForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const submitBtn = jobForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn ? submitBtn.textContent : '';
+            
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '{% if LANGUAGE_CODE == "uz" %}Yuborilmoqda...{% elif LANGUAGE_CODE == "ru" %}Отправка...{% else %}Sending...{% endif %}';
+            }
+
+            try {
+                // ============ ПОЛУЧАЕМ ТОКЕН reCAPTCHA ============
+                const recaptchaToken = await grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', {
+                    action: 'job_application'
+                });
+
+                const formData = new FormData(jobForm);
+                formData.append('recaptcha_token', recaptchaToken);  // ← ТОКЕН
+
+                const response = await fetch('/api/job-applications/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const successDiv = document.getElementById('form-success');
+                    if (successDiv) {
+                        successDiv.style.display = 'block';
+                        successDiv.textContent = data.message || '{% if LANGUAGE_CODE == "uz" %}Rezyume yuborildi!{% elif LANGUAGE_CODE == "ru" %}Резюме отправлено!{% else %}Resume sent!{% endif %}';
+                    }
+                    jobForm.reset();
+                    
+                    // Скрываем success через 5 секунд
+                    setTimeout(() => {
+                        if (successDiv) successDiv.style.display = 'none';
+                    }, 5000);
+                } else {
+                    throw new Error(data.message || 'Error');
+                }
+            } catch (error) {
+                console.error('Job form error:', error);
+                alert('{% if LANGUAGE_CODE == "uz" %}Xatolik yuz berdi{% elif LANGUAGE_CODE == "ru" %}Произошла ошибка{% else %}An error occurred{% endif %}');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+            }
+        });
+    })();
+</script>
 </body>
 
 </html>

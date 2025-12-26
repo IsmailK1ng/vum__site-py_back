@@ -63,7 +63,9 @@
     <meta name="theme-color" content="#161616" media="(prefers-color-scheme: dark)">
     <meta name="msapplication-navbutton-color" content="#161616">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+    
+    <!-- Google reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow"></script>
     <!-- Стили для модальных окон -->
     <style>
         .faw-modal {
@@ -1294,20 +1296,26 @@
                     return;
                 }
 
-                const formData = {
-                    name: lizingContactForm.Name.value,
-                    region: lizingContactForm.Region.value,
-                    phone: lizingPhoneInput.value,
-                    product: 'FAW Trucks - Лизинг',
-                    message: lizingContactForm.Message.value || '',
-                    referer: document.referrer || window.location.href,
-                    utm_data: window.getUTMData ? JSON.stringify(window.getUTMData()) : '{}',
-                    visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null
-                };
-
-                console.log('📊 Form data:', formData);
-
                 try {
+                    // ============ ПОЛУЧАЕМ ТОКЕН reCAPTCHA ============
+                    const recaptchaToken = await grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', {
+                        action: 'contact_form'
+                    });
+
+                    const formData = {
+                        name: lizingContactForm.Name.value,
+                        region: lizingContactForm.Region.value,
+                        phone: lizingPhoneInput.value,
+                        product: 'FAW Trucks - Лизинг',
+                        message: lizingContactForm.Message.value || '',
+                        referer: window.location.href,
+                        utm_data: window.getUTMData ? JSON.stringify(window.getUTMData()) : '{}',
+                        visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null,
+                        recaptcha_token: recaptchaToken  // ← ТОКЕН
+                    };
+
+                    console.log('📊 Form data:', formData);
+
                     console.log('📤 Sending POST request to /api/uz/contact/');
                     const response = await fetch("/api/uz/contact/", {
                         method: "POST",

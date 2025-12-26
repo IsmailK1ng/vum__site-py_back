@@ -87,6 +87,10 @@
     <meta name="msapplication-navbutton-color" content="#161616" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <!-- reCAPTCHA v3 -->
+     <script src="https://www.google.com/recaptcha/api.js?render=6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow"></script>
+
 </head>
 
 <body>
@@ -383,7 +387,6 @@
                 e.target.value = formatted;
             });
 
-            // Form Submit
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
                 if (isSubmitting) return;
@@ -396,19 +399,25 @@
                     return;
                 }
 
-                const utmData = window.getUTMData();
-
-                const formData = {
-                    name: form.name.value,
-                    region: form.region.value,
-                    phone: phoneInput.value,
-                    message: form.message.value || '',
-                    referer: document.referrer || window.location.href,
-                    utm_data: utmData,
-                    visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null
-                };
-
                 try {
+                    // ============ ПОЛУЧАЕМ ТОКЕН reCAPTCHA ============
+                    const recaptchaToken = await grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', {
+                        action: 'contact_form'
+                    });
+
+                    const utmData = window.getUTMData();
+
+                    const formData = {
+                        name: form.name.value,
+                        region: form.region.value,
+                        phone: phoneInput.value,
+                        message: form.message.value || '',
+                        referer: window.location.href,
+                        utm_data: utmData,
+                        visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null,
+                        recaptcha_token: recaptchaToken  
+                    };
+
                     const response = await fetch("/api/" + currentLang + "/contact/", {
                         method: "POST",
                         headers: {

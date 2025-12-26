@@ -433,3 +433,10 @@ TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
+
+# ========== Google reCAPTCHA v3 ==========
+RECAPTCHA_ENABLED = config('RECAPTCHA_ENABLED', default=False, cast=bool)
+RECAPTCHA_SITE_KEY = config('RECAPTCHA_SITE_KEY', default='')
+RECAPTCHA_SECRET_KEY = config('RECAPTCHA_SECRET_KEY', default='')
+RECAPTCHA_SCORE_THRESHOLD = config('RECAPTCHA_SCORE_THRESHOLD', default=0.5, cast=float)
+RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'

@@ -95,6 +95,10 @@
   <meta name="msapplication-navbutton-color" content="#161616">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Google reCAPTCHA v3 -->
+  <script src="https://www.google.com/recaptcha/api.js?render=6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow"></script>
+  
   <!-- Цвет браузера (конец) -->
   <style>
     * {
@@ -780,7 +784,7 @@
    <script src="{% static 'js/snow.js' %}"></script>
 
   <!-- Мобильный фикс: надёжно отключаем инлайн-стили параллакса для маленьких экранов -->
-  <script>
+<script>
     (function () {
       var observer = null;
 
@@ -890,7 +894,7 @@
       }, 500);
     })();
 
-    // ============ ОБРАБОТКА ФОРМЫ (ПОСЛЕ ФУНКЦИЙ!) ============
+    // ============ ОБРАБОТКА ФОРМЫ ============
     let isSubmitting = false;
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -927,19 +931,25 @@
           return;
         }
 
-        const utmData = window.getUTMData();
-
-        const formData = {
-          name: form.name.value,
-          region: form.region.value,
-          phone: phoneInput.value,
-          message: form.message.value || '',
-          referer: document.referrer || window.location.href,
-          utm_data: utmData,
-          visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null
-        };
-
         try {
+          // ============ ПОЛУЧАЕМ ТОКЕН reCAPTCHA ============
+          const recaptchaToken = await grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', {
+            action: 'contact_form'
+          });
+
+          const utmData = window.getUTMData();
+
+          const formData = {
+            name: form.name.value,
+            region: form.region.value,
+            phone: phoneInput.value,
+            message: form.message.value || '',
+            referer: window.location.href,
+            utm_data: utmData,
+            visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null,
+            recaptcha_token: recaptchaToken
+          };
+
           const response = await fetch("/api/uz/contact/", {
             method: "POST",
             headers: {
@@ -982,19 +992,20 @@
       }
     });
 
+    // Lazy loading изображений
     document.addEventListener('DOMContentLoaded', () => {
-    const images = document.querySelectorAll('img[data-src]');
-    const imageObserver = new IntersectionObserver((entries) => {
+      const images = document.querySelectorAll('img[data-src]');
+      const imageObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src;
-                imageObserver.unobserve(img);
-            }
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            img.src = img.dataset.src;
+            imageObserver.unobserve(img);
+          }
         });
+      });
+      images.forEach(img => imageObserver.observe(img));
     });
-    images.forEach(img => imageObserver.observe(img));
-});
   </script>
   <!-- Load Scripts End -->
 
