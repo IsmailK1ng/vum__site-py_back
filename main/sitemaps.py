@@ -1,12 +1,25 @@
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
+from django.utils import timezone
 from .models import Product, News, Vacancy
 
-class StaticPagesSitemap(Sitemap):
-    """Статические страницы"""
+class LanguageSpecificSitemap(Sitemap):
+    """Базовый класс для языковых sitemap"""
     protocol = 'https'
-    priority = 1.0
-    changefreq = 'weekly'
+    
+    def __init__(self, language):
+        self.language = language
+        super().__init__()
+    
+    def _get_url_prefix(self):
+        """Префикс для URL в зависимости от языка"""
+        if self.language == 'uz':
+            return ''  # узбекский - без префикса (/)
+        return f'/{self.language}'  # ru -> /ru/, en -> /en/
+
+
+class StaticPagesSitemap(LanguageSpecificSitemap):
+    """Статические страницы для конкретного языка"""
     
     def items(self):
         return [
@@ -23,61 +36,66 @@ class StaticPagesSitemap(Sitemap):
         ]
     
     def location(self, item):
-        return reverse(item)
+        prefix = self._get_url_prefix()
+        if item == 'home':
+            return f'{prefix}/' if prefix else '/'
+        
+        # Для остальных страниц
+        base_url = reverse(item)
+        return f'{prefix}{base_url}'
+    
+    def lastmod(self, item):
+        return timezone.now()
 
 
-class ProductsSitemap(Sitemap):
-    """Все модели грузовиков"""
-    protocol = 'https'
-    changefreq = "monthly"
-    priority = 0.9
+class ProductsSitemap(LanguageSpecificSitemap):
+    """Товары для конкретного языка"""
     
     def items(self):
         return Product.objects.filter(is_active=True)
     
+    def location(self, obj):
+        prefix = self._get_url_prefix()
+        return f'{prefix}/products/{obj.slug}/'
+    
     def lastmod(self, obj):
         return obj.updated_at
-    
-    def location(self, obj):
-        return f'/products/{obj.slug}/'
 
 
-class NewsSitemap(Sitemap):
-    """Все новости"""
-    protocol = 'https'
-    changefreq = "weekly"
-    priority = 0.7
+class NewsSitemap(LanguageSpecificSitemap):
+    """Новости для конкретного языка"""
     
     def items(self):
         return News.objects.filter(is_active=True)
     
+    def location(self, obj):
+        prefix = self._get_url_prefix()
+        return f'{prefix}/news/{obj.slug}/'
+    
     def lastmod(self, obj):
         return obj.updated_at
-    
-    def location(self, obj):
-        return f'/news/{obj.slug}/'
 
 
-class VacancySitemap(Sitemap):
-    """Все вакансии"""
-    protocol = 'https'
-    changefreq = "monthly"
-    priority = 0.6
+class VacancySitemap(LanguageSpecificSitemap):
+    """Вакансии для конкретного языка"""
     
     def items(self):
         return Vacancy.objects.filter(is_active=True)
     
+    def location(self, obj):
+        prefix = self._get_url_prefix()
+        return f'{prefix}/jobs/'
+    
     def lastmod(self, obj):
         return obj.updated_at
-    
-    def location(self, obj):
-        return '/jobs/'
 
 
-# ========== ЭКСПОРТ ==========
-sitemaps = {
-    'static': StaticPagesSitemap,
-    'products': ProductsSitemap,
-    'news': NewsSitemap,
-    'vacancies': VacancySitemap,
-}
+# ========== ЭКСПОРТ ДЛЯ КАЖДОГО ЯЗЫКА ==========
+def get_sitemaps_for_language(language):
+    """Создает sitemap для конкретного языка"""
+    return {
+        'static': StaticPagesSitemap(language),
+        'products': ProductsSitemap(language),
+        'news': NewsSitemap(language),
+        'vacancies': VacancySitemap(language),
+    }
