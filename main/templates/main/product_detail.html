@@ -487,6 +487,11 @@
                             <polyline points="7 7 17 7 17 17"></polyline>
                         </svg>
                     </button>
+                    <p class="faw-form__submit-note" style="text-align: center; font-size: 1.5rem;">
+                        {% if LANGUAGE_CODE == 'ru' %}Нажимая на кнопку, вы даете согласие на обработку персональных данных.
+                        {% elif LANGUAGE_CODE == 'en' %}By clicking the button, you consent to the processing of personal data.
+                        {% else %}Tugmani bosish orqali siz shaxsiy ma'lumotlarni qayta ishlashga rozilik bildirasiz.{% endif %}
+                    </p>
                 </div>
             </form>
         </div>

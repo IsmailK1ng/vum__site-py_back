@@ -328,6 +328,11 @@
                                                                     {% elif LANGUAGE_CODE == 'en' %}Submit Resume
                                                                     {% else %}Rezyumeni yuborish{% endif %}
                                                                 </button>
+                                                                <p class="submit-note" style="text-align: left; font-size: 1.5rem;">
+                                                                    {% if LANGUAGE_CODE == 'ru' %}Нажимая на кнопку, вы даете согласие на обработку персональных данных.
+                                                                    {% elif LANGUAGE_CODE == 'en' %}By clicking the button, you consent to the processing of personal data.
+                                                                    {% else %}Tugmani bosish orqali siz shaxsiy ma'lumotlarni qayta ishlashga rozilik bildirasiz.{% endif %}
+                                                                </p>
                                                                 <div class="form-success" id="form-success"
                                                                     style="color:green;font-size:1.1em;margin-top:1em;display:none;">
                                                                     {% if LANGUAGE_CODE == 'ru' %}Резюме успешно отправлено!

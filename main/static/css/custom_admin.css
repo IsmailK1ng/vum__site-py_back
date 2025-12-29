@@ -105,3 +105,45 @@
 [class*=sidebar-dark-] .sidebar a {
     color: #ffffff;
 }
+
+/* Увеличиваем ширину списков прав */
+.selector {
+    width: 100% !important;
+}
+
+.selector-available,
+.selector-chosen {
+    width: 48% !important;
+}
+
+/* Увеличиваем высоту */
+.selector select {
+    height: 400px !important;
+}
+
+/* Главное — показывать ВЕСЬ текст */
+.selector option {
+    white-space: normal !important;
+    word-break: break-word;
+    padding: 4px 6px;
+}
+
+/* Увеличиваем шрифт */
+.selector select {
+    font-size: 18px;
+}
+
+.text-left {
+    flex: 0 0 20%;
+}
+
+.field-user_permissions,
+.field-groups {
+    flex: 0 0 80%;
+    max-width: 100%;
+}
+
+#права-доступа-tab .field-groups .row,
+#права-доступа-tab .field-user_permissions .row {
+    flex-direction: column;
+}
