@@ -4,6 +4,9 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve
+from django.contrib.sitemaps.views import sitemap
+from main.sitemaps import sitemaps
 from django.conf.urls.i18n import i18n_patterns
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from kg.views import kg_stats_dashboard
@@ -15,6 +18,8 @@ admin.site.index_title = "Админ панель VUM Site"
 
 # ========== БАЗОВЫЕ РОУТЫ (без языка) ==========
 urlpatterns = [
+    path('robots.txt', serve, {'document_root': settings.BASE_DIR / 'main' / 'static', 'path': 'robots.txt'}),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('admin/kg/stats/', kg_stats_dashboard, name='kg-stats'),
     path('admin/', admin.site.urls),
     path('set-language/', set_language_get, name='set_language'),

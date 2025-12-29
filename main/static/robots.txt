@@ -1,0 +1,3 @@
+User-agent: *
+Host: https://faw.uz
+Sitemap: https://faw.uz/sitemap.xml
