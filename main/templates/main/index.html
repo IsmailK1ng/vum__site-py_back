@@ -126,7 +126,7 @@
   }
   </script>
 
-  <!-- Schema.org WebSite Markup -->
+  <!-- Schema.org WebSite Markup with Navigation -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -136,7 +136,59 @@
     "publisher": {
       "@type": "Organization",
       "name": "Van Universal Motors"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "{{ request.scheme }}://{{ request.get_host }}/products/?search={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
     }
+  }
+  </script>
+
+  <!-- Schema.org SiteNavigationElement -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SiteNavigationElement",
+        "name": "{% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}",
+        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'dealers' %}"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "name": "{% if LANGUAGE_CODE == 'uz' %}Yangiliklar{% elif LANGUAGE_CODE == 'ru' %}Новости{% else %}News{% endif %}",
+        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'news' %}"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "name": "{% if LANGUAGE_CODE == 'uz' %}Modellar{% elif LANGUAGE_CODE == 'ru' %}Модели{% else %}Models{% endif %}",
+        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'products' %}"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "name": "{% if LANGUAGE_CODE == 'uz' %}Kompaniya haqida{% elif LANGUAGE_CODE == 'ru' %}О компании{% else %}About{% endif %}",
+        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'about' %}"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "name": "{% if LANGUAGE_CODE == 'uz' %}Lizing{% elif LANGUAGE_CODE == 'ru' %}Лизинг{% else %}Leasing{% endif %}",
+        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'lizing' %}"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "name": "{% if LANGUAGE_CODE == 'uz' %}Servis{% elif LANGUAGE_CODE == 'ru' %}Сервис{% else %}Service{% endif %}",
+        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'services' %}"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "name": "{% if LANGUAGE_CODE == 'uz' %}Bog'lanish{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %}",
+        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'contact' %}"
+      }
+    ]
   }
   </script>
 

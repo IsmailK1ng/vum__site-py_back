@@ -48,13 +48,23 @@
 
 ### 5. **WebSite** - информация о сайте
 - **Файл:** `main/templates/main/index.html`
-- **Тип разметки:** WebSite
+- **Тип разметки:** WebSite с SearchAction
 - **Включает:**
   - Название сайта
   - URL
   - Издатель
+  - Поисковая строка (SearchAction) для продуктов
+- **Документация:** https://developers.google.com/search/docs/appearance/structured-data/sitelinks-searchbox
 
-### 6. **ItemList** - каталог продуктов
+### 6. **SiteNavigationElement** - навигация сайта
+- **Файл:** `main/templates/main/index.html`
+- **Тип разметки:** SiteNavigationElement
+- **Включает:**
+  - Все основные разделы: Дилеры, Новости, Модели, О компании, Лизинг, Сервис, Контакты
+  - Помогает Google понимать структуру навигации и показывать правильные sitelinks в поиске
+- **Документация:** https://schema.org/SiteNavigationElement
+
+### 7. **ItemList** - каталог продуктов
 - **Файлы:**
   - `main/templates/main/products.html` (контейнер + хлебные крошки)
   - `main/static/js/production.js` (генерация через JS)
@@ -66,7 +76,7 @@
 - **Примечание:** Разметка генерируется динамически после загрузки продуктов из API
 - **Документация:** https://developers.google.com/search/docs/appearance/structured-data/carousel
 
-### 7. **ItemList (News)** - каталог новостей
+### 8. **ItemList (News)** - каталог новостей
 - **Файл:** `main/templates/main/news.html`
 - **Тип разметки:** ItemList с вложенными NewsArticle
 - **Включает:**
@@ -75,7 +85,7 @@
   - Хлебные крошки
 - **Документация:** https://developers.google.com/search/docs/appearance/structured-data/article
 
-### 8. **JobPosting** - вакансии
+### 9. **JobPosting** - вакансии
 - **Файл:** `main/templates/main/jobs.html`
 - **Тип разметки:** ItemList с вложенными JobPosting
 - **Включает:**
@@ -86,7 +96,7 @@
   - Хлебные крошки
 - **Документация:** https://developers.google.com/search/docs/appearance/structured-data/job-posting
 
-### 9. **LocalBusiness** - дилеры
+### 10. **LocalBusiness** - дилеры
 - **Файл:** `main/templates/main/dealers.html`
 - **Тип разметки:** ItemList с вложенными LocalBusiness
 - **Включает:**
@@ -97,7 +107,7 @@
   - Хлебные крошки
 - **Документация:** https://developers.google.com/search/docs/appearance/structured-data/local-business
 
-### 10. **AboutPage** - о компании
+### 11. **AboutPage** - о компании
 - **Файл:** `main/templates/main/about.html`
 - **Тип разметки:** AboutPage с Organization
 - **Включает:**
@@ -107,7 +117,7 @@
   - Хлебные крошки
 - **Документация:** https://schema.org/AboutPage
 
-### 11. **ContactPage** - контакты
+### 12. **ContactPage** - контакты
 - **Файл:** `main/templates/main/contact.html`
 - **Тип разметки:** ContactPage с Organization
 - **Включает:**
