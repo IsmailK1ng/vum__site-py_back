@@ -89,6 +89,64 @@
   <meta name="msapplication-navbutton-color" content="#161616">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Schema.org Article Markup -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": "{{ news.title }}",
+    "description": "{{ news.desc }}",
+    "image": {% if news.preview_image %}"{{ request.scheme }}://{{ request.get_host }}{{ news.preview_image.url }}"{% else %}[]{% endif %},
+    "datePublished": "{{ news.created_at|date:'c' }}",
+    "dateModified": "{{ news.updated_at|date:'c' }}",
+    "author": {
+      "@type": "Person",
+      "name": "{% if news.author %}{{ news.author.get_full_name|default:news.author.username }}{% else %}VUM{% endif %}"{% if news.author_photo %},
+      "image": "{{ request.scheme }}://{{ request.get_host }}{{ news.author_photo.url }}"{% endif %}
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Van Universal Motors",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/logo-vum.png' %}"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "{{ request.build_absolute_uri }}"
+    }
+  }
+  </script>
+
+  <!-- Schema.org BreadcrumbList Markup -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "{{ breadcrumbs.home }}",
+        "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ breadcrumbs.news }}",
+        "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'news' %}"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "{{ breadcrumbs.current }}",
+        "item": "{{ request.build_absolute_uri }}"
+      }
+    ]
+  }
+  </script>
 </head>
 
 <body>

@@ -279,8 +279,8 @@
 
 /* ===== HOVER ЭФФЕКТЫ ===== */
 .mxd-card-grid:hover .slide-content {
-    filter: blur(2px);
-    opacity: 0.4;
+    /* filter: blur(2px); */
+    opacity: 0.99;
 }
 
 .mxd-card-grid:hover .mxd-card:hover .slide-content {

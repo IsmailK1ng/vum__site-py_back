@@ -75,6 +75,61 @@
   <meta name="msapplication-navbutton-color" content="#161616">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Schema.org ItemList for News -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "{% if LANGUAGE_CODE == 'uz' %}VUM Yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Новости VUM{% else %}VUM News{% endif %}",
+    "itemListElement": [
+      {% for news in news_list %}
+      {
+        "@type": "ListItem",
+        "position": {{ forloop.counter }},
+        "item": {
+          "@type": "NewsArticle",
+          "headline": "{{ news.title }}",
+          "description": "{{ news.desc }}",
+          "image": {% if news.preview_image %}"{{ request.scheme }}://{{ request.get_host }}{{ news.preview_image.url }}"{% else %}""{% endif %},
+          "datePublished": "{{ news.created_at|date:'c' }}",
+          "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'news_detail' news.slug %}",
+          "publisher": {
+            "@type": "Organization",
+            "name": "Van Universal Motors",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/logo-vum.png' %}"
+            }
+          }
+        }
+      }{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ]
+  }
+  </script>
+
+  <!-- Schema.org BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}",
+        "item": "{{ request.scheme }}://{{ request.get_host }}/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{% if LANGUAGE_CODE == 'uz' %}Yangiliklar{% elif LANGUAGE_CODE == 'ru' %}Новости{% else %}News{% endif %}",
+        "item": "{{ request.build_absolute_uri }}"
+      }
+    ]
+  }
+  </script>
 </head>
 
 <body>

@@ -82,6 +82,58 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+  <!-- Schema.org Organization (AboutPage) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "{% if LANGUAGE_CODE == 'uz' %}VUM Haqida{% elif LANGUAGE_CODE == 'ru' %}О VUM{% else %}About VUM{% endif %}",
+    "description": "{% if LANGUAGE_CODE == 'uz' %}Van Universal Motors (VUM) — O'zbekistonda FAW tijorat texnikasining rasmiy ishlab chiqaruvchisi{% elif LANGUAGE_CODE == 'ru' %}Van Universal Motors (VUM) является официальным производителем коммерческих автомобилей FAW в Узбекистане{% else %}Van Universal Motors (VUM) is the official manufacturer of FAW commercial vehicles in Uzbekistan{% endif %}",
+    "mainEntity": {
+      "@type": "Organization",
+      "name": "Van Universal Motors",
+      "alternateName": "VUM",
+      "url": "{{ request.scheme }}://{{ request.get_host }}",
+      "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/logo-vum.png' %}",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "{% if LANGUAGE_CODE == 'uz' %}Abdulla Qahhor ko'chasi, 2B{% elif LANGUAGE_CODE == 'ru' %}улица Абдулла Каххар, 2B{% else %}Abdulla Kahhar Street, 2B{% endif %}",
+        "addressLocality": "{% if LANGUAGE_CODE == 'uz' %}Toshkent{% elif LANGUAGE_CODE == 'ru' %}Ташкент{% else %}Tashkent{% endif %}",
+        "addressRegion": "{% if LANGUAGE_CODE == 'uz' %}Yakkasaroy tumani{% elif LANGUAGE_CODE == 'ru' %}район Яккасарай{% else %}Yakkasaray District{% endif %}",
+        "addressCountry": "UZ"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+998-55-508-60-60",
+        "contactType": "customer service",
+        "email": "info@faw.uz"
+      }
+    }
+  }
+  </script>
+
+  <!-- Schema.org BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}",
+        "item": "{{ request.scheme }}://{{ request.get_host }}/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{% if LANGUAGE_CODE == 'uz' %}Biz haqimizda{% elif LANGUAGE_CODE == 'ru' %}О нас{% else %}About Us{% endif %}",
+        "item": "{{ request.build_absolute_uri }}"
+      }
+    ]
+  }
+  </script>
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400;600;700&family=Funnel+Sans:wght@400;600;700&display=swap');
     html { font-family: var(--_font-default); }

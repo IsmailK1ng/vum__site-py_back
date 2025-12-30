@@ -98,7 +98,48 @@
 
   <!-- Google reCAPTCHA v3 -->
   <script src="https://www.google.com/recaptcha/api.js?render=6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow"></script>
-  
+
+  <!-- Schema.org Organization Markup -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Van Universal Motors",
+    "alternateName": "VUM",
+    "url": "{{ request.scheme }}://{{ request.get_host }}",
+    "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/logo-vum.png' %}",
+    "description": "{% if LANGUAGE_CODE == 'uz' %}Van Universal Motors (VUM) — O'zbekistonda FAW tijorat texnikasining rasmiy ishlab chiqaruvchisi{% elif LANGUAGE_CODE == 'ru' %}Van Universal Motors (VUM) является официальным производителем коммерческих автомобилей FAW в Узбекистане{% else %}Van Universal Motors (VUM) is the official manufacturer of FAW commercial vehicles in Uzbekistan{% endif %}",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "{% if LANGUAGE_CODE == 'uz' %}Abdulla Qahhor ko'chasi, 2B{% elif LANGUAGE_CODE == 'ru' %}улица Абдулла Каххар, 2B{% else %}Abdulla Kahhar Street, 2B{% endif %}",
+      "addressLocality": "{% if LANGUAGE_CODE == 'uz' %}Toshkent{% elif LANGUAGE_CODE == 'ru' %}Ташкент{% else %}Tashkent{% endif %}",
+      "addressRegion": "{% if LANGUAGE_CODE == 'uz' %}Yakkasaroy tumani{% elif LANGUAGE_CODE == 'ru' %}район Яккасарай{% else %}Yakkasaray District{% endif %}",
+      "addressCountry": "UZ"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+998-55-508-60-60",
+      "contactType": "customer service",
+      "email": "info@faw.uz"
+    },
+    "sameAs": []
+  }
+  </script>
+
+  <!-- Schema.org WebSite Markup -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "FAW Trucks Uzbekistan",
+    "url": "{{ request.scheme }}://{{ request.get_host }}",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Van Universal Motors"
+    }
+  }
+  </script>
+
   <!-- Цвет браузера (конец) -->
   <style>
     * {

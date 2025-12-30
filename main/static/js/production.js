@@ -332,6 +332,7 @@ class ProductsManager {
 
       this.renderCards();
       this.createPagination();
+      this.generateSchemaMarkup();
       this.hideLoader();
 
     } catch (error) {
@@ -344,6 +345,41 @@ class ProductsManager {
         });
       }
       this.showError(error.message);
+    }
+  }
+
+  generateSchemaMarkup() {
+    const baseUrl = `${window.location.protocol}//${window.location.host}`;
+
+    // ItemList Schema для каталога продуктов
+    const itemListSchema = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": this.currentCategory ? this.getCategoryData(this.currentCategory)?.title || "FAW Products" : "FAW Products",
+      "itemListElement": this.filteredProducts.slice(0, 20).map((product, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": {
+          "@type": "Product",
+          "name": product.title,
+          "image": product.main_image_url ? `${baseUrl}${product.main_image_url}` : "",
+          "url": `${baseUrl}/products/${product.slug}/`,
+          "brand": {
+            "@type": "Brand",
+            "name": "FAW"
+          },
+          "manufacturer": {
+            "@type": "Organization",
+            "name": "Van Universal Motors"
+          }
+        }
+      }))
+    };
+
+    // Вставляем разметку в DOM
+    const schemaEl = document.getElementById('products-schema');
+    if (schemaEl) {
+      schemaEl.textContent = JSON.stringify(itemListSchema, null, 2);
     }
   }
 
