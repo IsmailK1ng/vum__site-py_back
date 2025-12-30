@@ -1,5 +1,4 @@
 from django.contrib.sitemaps import Sitemap
-from django.urls import reverse
 from django.utils import timezone
 from .models import Product, News, Vacancy
 
@@ -14,42 +13,39 @@ class LanguageSpecificSitemap(Sitemap):
     def _get_url_prefix(self):
         """Префикс для URL в зависимости от языка"""
         if self.language == 'uz':
-            return ''  # узбекский - без префикса (/)
-        return f'/{self.language}'  # ru -> /ru/, en -> /en/
+            return ''
+        return f'/{self.language}'
 
 
 class StaticPagesSitemap(LanguageSpecificSitemap):
-    """Статические страницы для конкретного языка"""
+    """Статические страницы"""
     
     def items(self):
         return [
-            'home',
-            'about',
-            'contact',
-            'services',
-            'products',
-            'become_a_dealer',
-            'lizing',
-            'news',
-            'dealers',
-            'jobs',
+            ('home', '/'),
+            ('about', '/about/'),
+            ('contact', '/contact/'),
+            ('services', '/services/'),
+            ('products', '/products/'),
+            ('become_a_dealer', '/become-a-dealer/'),
+            ('lizing', '/lizing/'),
+            ('news', '/news/'),
+            ('dealers', '/dealers/'),
+            ('jobs', '/jobs/'),
         ]
     
     def location(self, item):
+        name, path = item
         prefix = self._get_url_prefix()
-        if item == 'home':
-            return f'{prefix}/' if prefix else '/'
-        
-        # Для остальных страниц
-        base_url = reverse(item)
-        return f'{prefix}{base_url}'
+        return f'{prefix}{path}'
     
     def lastmod(self, item):
-        return timezone.now()
+        from datetime import datetime
+        return datetime.now(timezone.get_current_timezone())
 
 
 class ProductsSitemap(LanguageSpecificSitemap):
-    """Товары для конкретного языка"""
+    """Товары"""
     
     def items(self):
         return Product.objects.filter(is_active=True)
@@ -59,11 +55,15 @@ class ProductsSitemap(LanguageSpecificSitemap):
         return f'{prefix}/products/{obj.slug}/'
     
     def lastmod(self, obj):
-        return obj.updated_at
+        from datetime import datetime, time
+        if isinstance(obj.updated_at, datetime):
+            return obj.updated_at
+        # Если это DateField, добавляем время
+        return datetime.combine(obj.updated_at, time.min, tzinfo=timezone.get_current_timezone())
 
 
 class NewsSitemap(LanguageSpecificSitemap):
-    """Новости для конкретного языка"""
+    """Новости"""
     
     def items(self):
         return News.objects.filter(is_active=True)
@@ -73,11 +73,14 @@ class NewsSitemap(LanguageSpecificSitemap):
         return f'{prefix}/news/{obj.slug}/'
     
     def lastmod(self, obj):
-        return obj.updated_at
+        from datetime import datetime, time
+        if isinstance(obj.updated_at, datetime):
+            return obj.updated_at
+        return datetime.combine(obj.updated_at, time.min, tzinfo=timezone.get_current_timezone())
 
 
 class VacancySitemap(LanguageSpecificSitemap):
-    """Вакансии для конкретного языка"""
+    """Вакансии"""
     
     def items(self):
         return Vacancy.objects.filter(is_active=True)
@@ -87,10 +90,12 @@ class VacancySitemap(LanguageSpecificSitemap):
         return f'{prefix}/jobs/'
     
     def lastmod(self, obj):
-        return obj.updated_at
+        from datetime import datetime, time
+        if isinstance(obj.updated_at, datetime):
+            return obj.updated_at
+        return datetime.combine(obj.updated_at, time.min, tzinfo=timezone.get_current_timezone())
 
 
-# ========== ЭКСПОРТ ДЛЯ КАЖДОГО ЯЗЫКА ==========
 def get_sitemaps_for_language(language):
     """Создает sitemap для конкретного языка"""
     return {
