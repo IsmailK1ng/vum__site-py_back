@@ -3,7 +3,7 @@ from .models import (
     News, NewsBlock, Vacancy, 
     VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
     Product, ProductFeature, ProductCardSpec, ProductParameter,
-    DealerService, Dealer, BecomeADealerPage, DealerRequirement, FeatureIcon,
+    DealerService, Dealer, BecomeADealerPage, DealerRequirement, Promotion
 )
 
 
@@ -89,3 +89,9 @@ class BecomeADealerPageTranslationOptions(TranslationOptions):
 @register(DealerRequirement)
 class DealerRequirementTranslationOptions(TranslationOptions):
     fields = ('text',)
+
+
+@register(Promotion)
+class PromotionTranslationOptions(TranslationOptions):
+    fields = ('title', 'description', 'button_text')
+    required_languages = ()

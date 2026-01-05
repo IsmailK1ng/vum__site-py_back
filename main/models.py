@@ -775,3 +775,42 @@ class Dashboard(models.Model):
         
         # ✅ ДОБАВЛЯЕМ default_permissions для управления правами
         default_permissions = ('view',)  # Только право на просмотр
+
+class Promotion(models.Model):
+    """Акции и специальные предложения"""
+    title = models.CharField(max_length=200, verbose_name=_("Заголовок"))
+    description = models.TextField(verbose_name=_("Описание"))
+    image = models.ImageField(upload_to='promotions/', blank=True, null=True, verbose_name=_("Изображение"))
+    link = models.URLField(blank=True, null=True, verbose_name=_("Ссылка"))
+    button_text = models.CharField(max_length=50, default="Batafsil", verbose_name=_("Текст кнопки"))
+    
+    is_active = models.BooleanField(default=True, verbose_name=_("Активна"))
+    show_on_homepage = models.BooleanField(default=True, verbose_name=_("Показывать на главной"))
+    
+    start_date = models.DateTimeField(default=timezone.now, verbose_name=_("Дата начала"))
+    end_date = models.DateTimeField(blank=True, null=True, verbose_name=_("Дата окончания"))
+    
+    priority = models.IntegerField(default=0, verbose_name=_("Приоритет"), 
+                                   help_text=_("Чем выше число, тем выше в списке"))
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Создано"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Обновлено"))
+    
+    class Meta:
+        verbose_name = _("Акция")
+        verbose_name_plural = _("Акции")
+        ordering = ['-priority', '-created_at']
+    
+    def __str__(self):
+        return self.title
+    
+    def is_valid(self):
+        """Проверка актуальности акции"""
+        now = timezone.now()
+        if not self.is_active:
+            return False
+        if self.end_date and self.end_date < now:
+            return False
+        if self.start_date > now:
+            return False
+        return True

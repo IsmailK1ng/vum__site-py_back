@@ -9,6 +9,7 @@ from .views import (
     DealerViewSet,
     DealerServiceViewSet,
     BecomeADealerPageViewSet,
+    PromotionViewSet,
     BecomeADealerApplicationViewSet
 )
 
@@ -21,7 +22,7 @@ router.register(r'dealers', DealerViewSet, basename='dealers')
 router.register(r'dealer-services', DealerServiceViewSet, basename='dealer-services')
 router.register(r'become-dealer-page', BecomeADealerPageViewSet, basename='become-dealer-page')
 router.register(r'dealer-applications', BecomeADealerApplicationViewSet, basename='dealer-applications')
-
+router.register(r'promotions', PromotionViewSet, basename='promotions') 
 
 urlpatterns = [
     path('uz/', include(router.urls)),

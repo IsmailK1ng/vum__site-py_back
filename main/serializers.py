@@ -10,7 +10,7 @@ from .models import (
     News, NewsBlock, ContactForm, JobApplication, 
     Product, FeatureIcon, ProductCardSpec, ProductParameter, ProductFeature, ProductGallery,  
     DealerService, Dealer, BecomeADealerPage, BecomeADealerApplication,
-    Vacancy, VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate
+    Vacancy, Promotion, VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate
 )
 
 
@@ -529,3 +529,40 @@ class VacancySerializer(LanguageSerializerMixin, serializers.ModelSerializer):
             } 
             for item in candidates
         ]
+
+from .models import Promotion
+from main.serializers_base import LanguageSerializerMixin
+
+class PromotionSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
+    """Сериализатор акций с поддержкой языков"""
+    title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    button_text = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Promotion
+        fields = [
+            'id', 'title', 'description', 'image_url', 
+            'link', 'button_text', 'priority', 'start_date', 'end_date'
+        ]
+    
+    def get_title(self, obj):
+        lang = self.get_current_language()
+        return getattr(obj, f'title_{lang}', None) or obj.title
+    
+    def get_description(self, obj):
+        lang = self.get_current_language()
+        return getattr(obj, f'description_{lang}', None) or obj.description
+    
+    def get_button_text(self, obj):
+        lang = self.get_current_language()
+        return getattr(obj, f'button_text_{lang}', None) or obj.button_text
+    
+    def get_image_url(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None

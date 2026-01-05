@@ -33,6 +33,7 @@ from .models import (
     DealerService, 
     BecomeADealerPage, 
     BecomeADealerApplication,
+    Promotion,
     REGION_CHOICES
 )
 from .serializers import (
@@ -45,6 +46,7 @@ from .serializers import (
     DealerServiceSerializer, 
     BecomeADealerPageSerializer, 
     BecomeADealerApplicationSerializer,
+    PromotionSerializer,
     VacancySerializer
 )
 
@@ -744,3 +746,18 @@ def dashboard_export_word(request):
     """Экспорт dashboard в Word"""
     # TODO: Реализуем на следующем шаге
     pass
+
+class PromotionViewSet(viewsets.ReadOnlyModelViewSet):
+    """API для получения активных акций"""
+    serializer_class = PromotionSerializer
+    permission_classes = [AllowAny]
+    
+    def get_queryset(self):
+        now = timezone.now()
+        return Promotion.objects.filter(
+            is_active=True,
+            show_on_homepage=True,
+            start_date__lte=now
+        ).filter(
+            Q(end_date__isnull=True) | Q(end_date__gte=now)
+        ).order_by('-priority', '-created_at')

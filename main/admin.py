@@ -7,6 +7,7 @@ from django.db.models import Q, Max
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect
 from django.urls import path
+from django.utils.translation import gettext_lazy as _ 
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.html import format_html
@@ -51,6 +52,7 @@ from .models import (
     BecomeADealerApplication,
     AmoCRMToken,
     Dashboard,
+    Promotion,
     REGION_CHOICES
 )
 from main.services.amocrm.token_manager import TokenManager
@@ -1683,3 +1685,102 @@ class DashboardAdmin(admin.ModelAdmin):
             
         except Exception as e:
             return HttpResponse(f'Ошибка экспорта: {str(e)}', content_type='text/plain', status=500)
+        
+# ============ АКЦИИ ============
+@admin.register(Promotion)
+class PromotionAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
+    list_display = ['image_preview', 'title', 'is_active', 'show_on_homepage', 'priority', 
+                    'start_date', 'end_date', 'status_badge', 'action_buttons']
+    list_editable = ['is_active', 'show_on_homepage', 'priority']
+    list_filter = ['is_active', 'show_on_homepage', 'start_date', 'end_date']
+    search_fields = ['title', 'description', 'title_uz', 'title_ru', 'title_en',
+                     'description_uz', 'description_ru', 'description_en']
+    date_hierarchy = 'start_date'
+    history_latest_first = True
+    readonly_fields = ['image_preview_large', 'created_at', 'updated_at']
+    
+    fieldsets = (
+        (_('Основная информация'), {
+            'fields': ('title', 'description', 'image', 'image_preview_large', 'link', 'button_text')
+        }),
+        (_('Настройки отображения'), {
+            'fields': ('is_active', 'show_on_homepage', 'priority')
+        }),
+        (_('Период действия'), {
+            'fields': ('start_date', 'end_date'),
+            'description': _('Укажите период действия акции')
+        }),
+        (_('Техническая информация'), {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def status_badge(self, obj):
+        if obj.is_valid():
+            return format_html(
+                '<span style="padding: 3px 10px; background: #28a745; color: white; '
+                'border-radius: 3px;">{}</span>',
+                _('Активна')
+            )
+        return format_html(
+            '<span style="padding: 3px 10px; background: #dc3545; color: white; '
+            'border-radius: 3px;">{}</span>',
+            _('Неактивна')
+        )
+    status_badge.short_description = _('Статус')
+    
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="width: 50px; height: 50px; object-fit: cover; '
+                'border-radius: 4px;" />',
+                obj.image.url
+            )
+        return "—"
+    image_preview.short_description = _('Превью')
+    
+    def image_preview_large(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-width: 400px; max-height: 300px; object-fit: contain; '
+                'border-radius: 8px; border: 1px solid #ddd;" />',
+                obj.image.url
+            )
+        return "—"
+    image_preview_large.short_description = _('Изображение')
+    
+    def action_buttons(self, obj):
+        return format_html('''
+            <div style="display: flex; gap: 8px;">
+                <a href="{}" title="Редактировать">
+                    <img src="/static/media/icon-adminpanel/pencil.png" width="24" height="24">
+                </a>
+                <a href="/" title="Просмотр" target="_blank">
+                    <img src="/static/media/icon-adminpanel/eyes.png" width="24" height="24">
+                </a>
+                <a href="{}" title="Удалить" onclick="return confirm('Удалить акцию?')">
+                    <img src="/static/media/icon-adminpanel/recycle-bin.png" width="24" height="24">
+                </a>
+            </div>
+        ''', f'/admin/main/promotion/{obj.id}/change/', f'/admin/main/promotion/{obj.id}/delete/')
+    action_buttons.short_description = "Действия"
+    
+    def changelist_view(self, request, extra_context=None):
+        from reversion.models import Version
+        extra_context = extra_context or {}
+        deleted_count = Version.objects.get_deleted(self.model).count()
+        if deleted_count > 0:
+            extra_context['show_recover_button'] = True
+            extra_context['deleted_count'] = deleted_count
+        return super().changelist_view(request, extra_context)
+    
+    class Media:
+        js = (
+            'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',
+            'http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js',
+            'modeltranslation/js/tabbed_translation_fields.js',
+        )
+        css = {
+            'screen': ('modeltranslation/css/tabbed_translation_fields.css',),
+        }

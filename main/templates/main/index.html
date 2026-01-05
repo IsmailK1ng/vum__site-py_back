@@ -211,6 +211,10 @@
       pointer-events: none;
       transform: translate(-50%, -50%) scale(1.08);
     }
+
+    .grecaptcha-badge {
+      visibility: hidden;
+    }
   </style>
 </head>
 
@@ -861,6 +865,7 @@
     <!-- Секция — CTA (конец) -->
 
   </main>
+  {% include 'main/promotions/modal.html' %}
   <!-- Контент страницы (конец) -->
   {% include 'main/includes/footer.html' %}
   <!-- Кнопка «вверх» (начало) -->
