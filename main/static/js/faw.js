@@ -767,9 +767,10 @@ document.addEventListener('DOMContentLoaded', function () {
       btn.innerHTML = '<span class="btn-caption">Yuborilmoqda...</span>';
 
       try {
-        // ============ ПОЛУЧАЕМ ТОКЕН reCAPTCHA ============
-        const recaptchaToken = await grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', {
-          action: 'become_dealer'
+        let recaptchaToken;
+        await grecaptcha.ready(() => {
+          return grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', { action: 'become_dealer' })
+            .then(token => { recaptchaToken = token; });
         });
 
         const formData = {

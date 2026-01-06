@@ -271,9 +271,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let promotions = [];
     let viewedPromotions = [];
     
-    // Получаем текущий язык
-    const currentLang = document.documentElement.lang || 'uz';
-    // console.log('🌍 Current language:', currentLang);
+    // Получаем короткий код языка (uz, ru, en) — единообразно с другими скриптами
+    const currentLang = (document.documentElement.lang ||
+        (typeof window !== 'undefined' && window.LANGUAGE_CODE) ||
+        getCookie('django_language') ||
+        'uz').split('-')[0].toLowerCase();
     
     // Загружаем просмотренные акции из cookie
     loadViewedPromotions();

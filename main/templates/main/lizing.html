@@ -1298,9 +1298,9 @@
                 }
 
                 try {
-                    // ============ ПОЛУЧАЕМ ТОКЕН reCAPTCHA ============
-                    const recaptchaToken = await grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', {
-                        action: 'contact_form'
+                    let recaptchaToken;
+                    await grecaptcha.ready(async () => {
+                    recaptchaToken = await grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', { action: 'contact_form' });
                     });
 
                     const formData = {

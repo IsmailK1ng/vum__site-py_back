@@ -620,8 +620,9 @@
 
             try {
                 // ============ ПОЛУЧАЕМ ТОКЕН reCAPTCHA ============
-                const recaptchaToken = await grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', {
-                    action: 'job_application'
+                let recaptchaToken;
+                await grecaptcha.ready(async () => {
+                recaptchaToken = await grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', { action: 'job_application' });
                 });
 
                 const formData = new FormData(jobForm);
