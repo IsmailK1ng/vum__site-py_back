@@ -5,11 +5,10 @@
 
 class ProductsManager {
   constructor() {
-    // Определяем текущий язык
-    this.currentLanguage = document.documentElement.lang ||
-      window.LANGUAGE_CODE ||
-      this.getCookie('django_language') ||
-      'uz';
+  this.currentLanguage = (document.documentElement.lang ||
+        window.LANGUAGE_CODE ||
+        this.getCookie('django_language') ||
+        'uz').split('-')[0]; 
 
     // Определяем API URL в зависимости от языка
     this.apiUrl = `/api/${this.currentLanguage}/products/`;

@@ -6,11 +6,11 @@ class ProductDetail {
     constructor() {
         this.productId = null;
 
-        // Определяем текущий язык
-        this.currentLanguage = document.documentElement.lang ||
-            window.LANGUAGE_CODE ||
-            this.getCookie('django_language') ||
-            'uz';
+    // Берём HTML lang для SEO, но используем короткий формат для API
+    this.currentLanguage = (document.documentElement.lang ||
+        window.LANGUAGE_CODE ||
+        this.getCookie('django_language') ||
+        'uz').split('-')[0];
 
         this.apiUrl = this.getApiUrl();
         this.product = null;
