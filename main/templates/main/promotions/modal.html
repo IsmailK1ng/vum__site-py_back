@@ -6,421 +6,529 @@
 <div id="promotionModal" class="promo-modal">
     <div class="promo-modal-content">
         <span class="promo-close">&times;</span>
-
+        
         <div class="promo-slider">
             <!-- Слайды будут загружены через JavaScript -->
         </div>
+        
 
-        <div class="promo-navigation" style="display: none;">
-            <button class="promo-prev" aria-label="{% trans 'Предыдущая' %}">‹</button>
-            <div class="promo-dots"></div>
-            <button class="promo-next" aria-label="{% trans 'Следующая' %}">›</button>
-        </div>
-
-        <label class="promo-checkbox">
-            <input type="checkbox" id="dontShowAgain">
-            <span>{% trans "Не показывать сегодня" %}</span>
-        </label>
     </div>
 </div>
 
 <style>
-    .promo-modal {
-        display: none;
-        position: fixed;
-        z-index: 999999;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        animation: fadeIn 0.3s ease;
+.promo-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.promo-modal-content {
+    position: relative;
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
     }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-
-        to {
-            opacity: 1;
-        }
+    to {
+        transform: translateY(0);
+        opacity: 1;
     }
+}
 
+.promo-close {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    color: #fff;
+    z-index: 100;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.5);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.promo-close:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: rotate(90deg);
+}
+
+.promo-slider {
+    position: relative;
+    overflow: hidden;
+    min-height: 200px;
+}
+
+.promo-slide {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+.promo-slide.active {
+    display: block;
+}
+
+.promo-image {
+    width: 100%;
+    max-height: 400px;
+    overflow: hidden;
+    position: relative;
+}
+
+.promo-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Стрелки навигации */
+.promo-prev,
+.promo-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.4);
+    color: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.promo-prev {
+    left: 15px;
+}
+
+.promo-next {
+    right: 15px;
+}
+
+.promo-prev:hover,
+.promo-next:hover {
+    background: rgba(0, 0, 0, 0.7);
+    transform: translateY(-50%) scale(1.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Точки навигации */
+.promo-dots {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 50;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 8px 16px;
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+}
+
+.promo-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.promo-dot:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: scale(1.2);
+}
+
+.promo-dot.active {
+    background: #ffffff;
+    transform: scale(1.4);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+}
+
+.promo-content {
+    padding: 30px;
+}
+
+.promo-content h2 {
+    margin: 0 0 15px 0;
+    font-size: 28px;
+    color: #333;
+}
+
+.promo-description {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-size: 16px;
+    white-space: pre-line;
+}
+
+.promo-button {
+    display: inline-block;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #000000 0%, #696969 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.promo-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+@media (max-width: 768px) {
     .promo-modal-content {
-        position: relative;
-        background-color: #fff;
-        margin: 5% auto;
-        padding: 0;
-        border-radius: 12px;
-        width: 90%;
-        max-width: 700px;
-        max-height: 80vh;
-        overflow: hidden;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        animation: slideDown 0.3s ease;
+        width: 95%;
+        margin: 10% auto;
     }
-
-    @keyframes slideDown {
-        from {
-            transform: translateY(-50px);
-            opacity: 0;
-        }
-
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
-
-    .promo-close {
-        position: absolute;
-        right: 15px;
-        top: 15px;
-        font-size: 32px;
-        font-weight: bold;
-        color: #fff;
-        z-index: 10;
-        cursor: pointer;
-        background: rgba(0, 0, 0, 0.5);
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-    }
-
-    .promo-close:hover {
-        background: rgba(0, 0, 0, 0.8);
-        transform: rotate(90deg);
-    }
-
-    .promo-slider {
-        position: relative;
-        overflow: hidden;
-        min-height: 200px;
-    }
-
-    .promo-slide {
-        display: none;
-        animation: fadeIn 0.5s ease;
-    }
-
-    .promo-slide.active {
-        display: block;
-    }
-
-    .promo-image {
-        width: 100%;
-        max-height: 300px;
-        overflow: hidden;
-    }
-
-    .promo-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
+    
     .promo-content {
-        padding: 30px;
+        padding: 20px;
     }
-
+    
     .promo-content h2 {
-        margin: 0 0 15px 0;
-        font-size: 28px;
-        color: #333;
+        font-size: 22px;
     }
-
-    .promo-description {
-        color: #666;
-        line-height: 1.6;
-        margin-bottom: 20px;
-        font-size: 16px;
-        white-space: pre-line;
-    }
-
-    .promo-button {
-        display: inline-block;
-        padding: 12px 30px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        text-decoration: none;
-        border-radius: 25px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    }
-
-    .promo-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-    }
-
-    .promo-navigation {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 15px 30px;
-        background: #f8f9fa;
-    }
-
+    
     .promo-prev,
     .promo-next {
-        background: #667eea;
-        color: white;
-        border: none;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        font-size: 24px;
-        cursor: pointer;
-        transition: all 0.3s ease;
+        width: 35px;
+        height: 35px;
+        font-size: 22px;
     }
-
-    .promo-prev:hover,
-    .promo-next:hover {
-        background: #764ba2;
-        transform: scale(1.1);
+    
+    .promo-prev {
+        left: 10px;
     }
-
+    
+    .promo-next {
+        right: 10px;
+    }
+    
     .promo-dots {
-        display: flex;
-        gap: 8px;
+        bottom: 15px;
+        padding: 6px 12px;
     }
-
+    
     .promo-dot {
         width: 10px;
         height: 10px;
-        border-radius: 50%;
-        background: #ccc;
-        cursor: pointer;
-        transition: all 0.3s ease;
     }
-
-    .promo-dot.active {
-        background: #667eea;
-        transform: scale(1.3);
-    }
-
-    .promo-checkbox {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 15px 30px;
-        cursor: pointer;
-        user-select: none;
-    }
-
-    .promo-checkbox input {
-        cursor: pointer;
-    }
-
-    @media (max-width: 768px) {
-        .promo-modal-content {
-            width: 95%;
-            margin: 10% auto;
-        }
-
-        .promo-content {
-            padding: 20px;
-        }
-
-        .promo-content h2 {
-            font-size: 22px;
-        }
-    }
+}
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        console.log('🎯 Promotion modal script loaded');
-
-        const modal = document.getElementById('promotionModal');
-        const closeBtn = document.querySelector('.promo-close');
-        const dontShowCheckbox = document.getElementById('dontShowAgain');
-        const sliderContainer = document.querySelector('.promo-slider');
-        const navigationContainer = document.querySelector('.promo-navigation');
-
-        let currentSlide = 0;
-        let promotions = [];
-
-        // Получаем текущий язык
-        const currentLang = document.documentElement.lang || 'uz';
-        console.log('🌍 Current language:', currentLang);
-
-        // Проверяем cookie
-        const hidePromo = getCookie('hidePromoToday');
-        console.log('🍪 Cookie hidePromoToday:', hidePromo);
-
-        // Загружаем акции через API
-        const apiUrl = `/api/${currentLang}/promotions/`;
-        console.log('📡 Fetching promotions from:', apiUrl);
-
-        fetch(apiUrl)
-            .then(response => {
-                console.log('📥 Response status:', response.status);
-                return response.json();
-            })
-            .then(data => {
-                console.log('📦 Promotions data:', data);
-
-                promotions = data.results || [];
-
-                if (promotions.length > 0) {
-                    console.log('✅ Found', promotions.length, 'promotions');
-                    renderSlides();
-                    setTimeout(() => {
-                        showModal();
-                    }, 1000);
-                } else {
-                    console.warn('⚠️ No promotions found');
-                }
-            })
-            .catch(error => {
-                console.error('❌ Error loading promotions:', error);
-            });
-
-        function renderSlides() {
-            console.log('🎨 Rendering slides...');
-            sliderContainer.innerHTML = '';
-            const dotsContainer = document.querySelector('.promo-dots');
-            dotsContainer.innerHTML = '';
-
-            promotions.forEach((promo, index) => {
-                console.log(`  - Slide ${index + 1}:`, promo.title);
-
-                // Создаём слайд
-                const slide = document.createElement('div');
-                slide.className = 'promo-slide';
-                slide.dataset.promoId = promo.id;
-
-                let html = '';
-
-                if (promo.image_url) {
+document.addEventListener('DOMContentLoaded', function() {
+    // console.log('🎯 Promotion modal script loaded');
+    
+    const modal = document.getElementById('promotionModal');
+    const closeBtn = document.querySelector('.promo-close');
+    const sliderContainer = document.querySelector('.promo-slider');
+    
+    let currentSlide = 0;
+    let promotions = [];
+    let viewedPromotions = [];
+    
+    // Получаем текущий язык
+    const currentLang = document.documentElement.lang || 'uz';
+    // console.log('🌍 Current language:', currentLang);
+    
+    // Загружаем просмотренные акции из cookie
+    loadViewedPromotions();
+    // console.log('👁️ Viewed promotions:', viewedPromotions);
+    
+    // Загружаем акции через API
+    const apiUrl = `/api/${currentLang}/promotions/`;
+    // console.log('📡 Fetching promotions from:', apiUrl);
+    
+    fetch(apiUrl)
+        .then(response => {
+            // console.log('📥 Response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            // console.log('📦 Promotions data:', data);
+            
+            // Проверяем формат ответа (может быть массив или объект с results)
+            const allPromotions = Array.isArray(data) ? data : (data.results || []);
+            
+            // Фильтруем непросмотренные акции
+            promotions = allPromotions.filter(promo => !isPromotionViewed(promo.id));
+            
+            // console.log(`✅ Total: ${allPromotions.length} promotions, Unviewed: ${promotions.length}`);
+            
+            if (promotions.length > 0) {
+                renderSlides();
+                setTimeout(() => {
+                    // console.log('⏰ Showing modal after 1 second');
+                    showModal();
+                }, 1000);
+            } else {
+                // console.log('✨ All promotions have been viewed today');
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error loading promotions:', error);
+        });
+    
+    function renderSlides() {
+        // console.log('🎨 Rendering slides...');
+        sliderContainer.innerHTML = '';
+        
+        promotions.forEach((promo, index) => {
+            // console.log(`  - Slide ${index + 1}:`, promo.title);
+            
+            // Создаём слайд
+            const slide = document.createElement('div');
+            slide.className = 'promo-slide';
+            slide.dataset.promoId = promo.id;
+            
+            let html = '';
+            
+            if (promo.image_url) {
+                html += `<div class="promo-image">`;
+                html += `<img src="${promo.image_url}" alt="${promo.title}">`;
+                
+                // Добавляем навигацию только если больше 1 акции
+                if (promotions.length > 1) {
                     html += `
-                    <div class="promo-image">
-                        <img src="${promo.image_url}" alt="${promo.title}">
-                    </div>
-                `;
+                        <button class="promo-prev" data-action="prev" aria-label="Предыдущая">‹</button>
+                        <button class="promo-next" data-action="next" aria-label="Следующая">›</button>
+                        <div class="promo-dots"></div>
+                    `;
                 }
-
-                html += `
+                
+                html += `</div>`;
+            }
+            
+            html += `
                 <div class="promo-content">
                     <h2>${promo.title}</h2>
                     <div class="promo-description">${promo.description}</div>
             `;
-
-                if (promo.link) {
-                    html += `
+            
+            if (promo.link) {
+                html += `
                     <a href="${promo.link}" class="promo-button" target="_blank">
                         ${promo.button_text}
                     </a>
                 `;
-                }
-
-                html += '</div>';
-                slide.innerHTML = html;
-                sliderContainer.appendChild(slide);
-
-                // Создаём точку навигации
-                if (promotions.length > 1) {
+            }
+            
+            html += '</div>';
+            slide.innerHTML = html;
+            sliderContainer.appendChild(slide);
+        });
+        
+        // Создаём точки навигации для каждого слайда
+        if (promotions.length > 1) {
+            const dotsContainers = document.querySelectorAll('.promo-dots');
+            
+            dotsContainers.forEach(dotsContainer => {
+                dotsContainer.innerHTML = '';
+                
+                for (let i = 0; i < promotions.length; i++) {
                     const dot = document.createElement('span');
                     dot.className = 'promo-dot';
-                    if (index === 0) dot.classList.add('active');
-                    dot.dataset.slide = index;
-                    dot.addEventListener('click', () => showSlide(index));
+                    if (i === 0) dot.classList.add('active');
+                    dot.dataset.slide = i;
+                    dot.addEventListener('click', () => showSlide(i));
                     dotsContainer.appendChild(dot);
                 }
             });
-
-            // Показываем навигацию если больше 1 акции
-            if (promotions.length > 1) {
-                navigationContainer.style.display = 'flex';
-
-                const prevBtn = document.querySelector('.promo-prev');
-                const nextBtn = document.querySelector('.promo-next');
-
-                prevBtn.addEventListener('click', () => showSlide(currentSlide - 1));
-                nextBtn.addEventListener('click', () => showSlide(currentSlide + 1));
-            }
-
-            console.log('✅ Slides rendered');
+            
+            // Обработчики для кнопок prev/next
+            document.querySelectorAll('.promo-prev').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showSlide(currentSlide - 1);
+                });
+            });
+            
+            document.querySelectorAll('.promo-next').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showSlide(currentSlide + 1);
+                });
+            });
         }
-
-        // Проверка cookie
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        }
-
-        function setCookie(name, value, days) {
-            const d = new Date();
-            d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
-            document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
-        }
-
-        // Показать модальное окно
-        function showModal() {
-            if (promotions.length > 0 && !getCookie('hidePromoToday')) {
-                console.log('👁️ Showing modal');
-                modal.style.display = 'block';
-                document.body.style.overflow = 'hidden';
-                showSlide(0);
-            } else {
-                console.log('🚫 Modal blocked by cookie or no promotions');
-            }
-        }
-
-        // Закрыть модальное окно
-        function closeModal() {
-            console.log('❌ Closing modal');
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-
-            if (dontShowCheckbox.checked) {
-                console.log('🍪 Setting cookie to hide for 1 day');
-                setCookie('hidePromoToday', 'true', 1);
+        
+        // console.log('✅ Slides rendered');
+    }
+    
+    // Управление просмотренными акциями
+    function loadViewedPromotions() {
+        const cookie = getCookie('viewedPromotions');
+        if (cookie) {
+            try {
+                const data = JSON.parse(decodeURIComponent(cookie));
+                const today = new Date().toDateString();
+                
+                // Если дата в cookie сегодняшняя - загружаем ID
+                if (data.date === today) {
+                    viewedPromotions = data.ids || [];
+                } else {
+                    // Если новый день - сбрасываем
+                    viewedPromotions = [];
+                    clearViewedPromotions();
+                }
+            } catch (e) {
+                console.error('Error parsing viewed promotions:', e);
+                viewedPromotions = [];
             }
         }
-
-        // Переключение слайдов
-        function showSlide(n) {
-            const slides = document.querySelectorAll('.promo-slide');
-            const dots = document.querySelectorAll('.promo-dot');
-
-            if (slides.length === 0) return;
-
-            slides.forEach(slide => slide.classList.remove('active'));
-            dots.forEach(dot => dot.classList.remove('active'));
-
-            currentSlide = (n + slides.length) % slides.length;
-
-            slides[currentSlide].classList.add('active');
-            if (dots[currentSlide]) {
-                dots[currentSlide].classList.add('active');
-            }
-
-            console.log('📍 Showing slide:', currentSlide + 1);
+    }
+    
+    function saveViewedPromotions() {
+        const today = new Date().toDateString();
+        const data = {
+            date: today,
+            ids: viewedPromotions
+        };
+        
+        const expires = new Date();
+        expires.setHours(23, 59, 59, 999); // До конца дня
+        
+        document.cookie = `viewedPromotions=${encodeURIComponent(JSON.stringify(data))};expires=${expires.toUTCString()};path=/`;
+        // console.log('💾 Saved viewed promotions:', viewedPromotions);
+    }
+    
+    function clearViewedPromotions() {
+        document.cookie = 'viewedPromotions=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/';
+    }
+    
+    function isPromotionViewed(promoId) {
+        return viewedPromotions.includes(promoId);
+    }
+    
+    function markPromotionAsViewed(promoId) {
+        if (!viewedPromotions.includes(promoId)) {
+            viewedPromotions.push(promoId);
+            saveViewedPromotions();
+            // console.log(`✓ Promotion ${promoId} marked as viewed`);
         }
-
-        // События
-        closeBtn.addEventListener('click', closeModal);
-
-        window.addEventListener('click', function (event) {
-            if (event.target === modal) {
-                closeModal();
+    }
+    
+    // Проверка cookie
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+    
+    function setCookie(name, value, days) {
+        const d = new Date();
+        d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+        document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
+    }
+    
+    // Показать модальное окно
+    function showModal() {
+        if (promotions.length > 0) {
+            // console.log('👁️ Showing modal');
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            showSlide(0);
+            
+            // Помечаем текущую акцию как просмотренную
+            markPromotionAsViewed(promotions[0].id);
+        }
+    }
+    
+    // Закрыть модальное окно
+    function closeModal() {
+        // console.log('❌ Closing modal');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Переключение слайдов
+    function showSlide(n) {
+        const slides = document.querySelectorAll('.promo-slide');
+        const allDots = document.querySelectorAll('.promo-dot');
+        
+        if (slides.length === 0) return;
+        
+        slides.forEach(slide => slide.classList.remove('active'));
+        allDots.forEach(dot => dot.classList.remove('active'));
+        
+        currentSlide = (n + slides.length) % slides.length;
+        
+        slides[currentSlide].classList.add('active');
+        
+        // Активируем точки во всех контейнерах
+        allDots.forEach(dot => {
+            if (parseInt(dot.dataset.slide) === currentSlide) {
+                dot.classList.add('active');
             }
         });
-
-        // Закрытие по ESC
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape' && modal.style.display === 'block') {
-                closeModal();
-            }
-        });
+        
+        // Помечаем текущую акцию как просмотренную
+        if (promotions[currentSlide]) {
+            markPromotionAsViewed(promotions[currentSlide].id);
+        }
+        
+        // console.log('📍 Showing slide:', currentSlide + 1);
+    }
+    
+    // События
+    closeBtn.addEventListener('click', closeModal);
+    
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            closeModal();
+        }
     });
+    
+    // Закрытие по ESC
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modal.style.display === 'block') {
+            closeModal();
+        }
+    });
+});
 </script>
