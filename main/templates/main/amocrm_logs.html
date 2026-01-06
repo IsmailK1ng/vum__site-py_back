@@ -162,7 +162,7 @@
     </div>
 
     <div class="log-section">
-        <div class="log-section__header">logs/amocrm.log (последние 100 ошибок)</div>
+        <div class="log-section__header">logs/amocrm.log (последние 50 ошибок)</div>
         <div class="log-section__content">
             {% if amocrm_logs %}
             {% for line in amocrm_logs %}
@@ -175,7 +175,7 @@
     </div>
 
     <div class="log-section">
-        <div class="log-section__header">logs/errors.log (последние 50 строк)</div>
+        <div class="log-section__header">logs/errors.log (последние 100 строк)</div>
         <div class="log-section__content">
             {% if errors_logs %}
             {% for line in errors_logs %}

@@ -102,5 +102,4 @@ def get_sitemaps_for_language(language):
         'static': StaticPagesSitemap(language),
         'products': ProductsSitemap(language),
         'news': NewsSitemap(language),
-        'vacancies': VacancySitemap(language),
     }

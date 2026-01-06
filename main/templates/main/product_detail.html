@@ -1,7 +1,8 @@
 {% load static %}
 {% load static seo_tags %}
 <!DOCTYPE html>
-<html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
+<html dir="ltr" lang="{{ HTML_LANG }}">
+
     
     <head>
     <meta charset="UTF-8">
@@ -528,7 +529,7 @@
     <!-- Подключение Product Detail JS -->
     <script src="{% static 'js/product_detail.js' %}"></script>
 
-<script>
+    <script>
         // ============ ОБРАБОТКА ФОРМЫ ============
         let isSubmitting = false;
 

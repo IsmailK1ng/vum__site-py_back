@@ -1342,7 +1342,7 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
             try:
                 with open(amocrm_log_path, 'r', encoding='utf-8') as f:
                     lines = f.readlines()
-                    amocrm_logs = [line.strip() for line in lines if line.strip()][-100:]
+                    amocrm_logs = [line.strip() for line in lines if line.strip()][-50:]
             except Exception as e:
                 amocrm_logs = [f"Ошибка чтения amocrm.log: {str(e)}"]
         
@@ -1350,7 +1350,7 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
             try:
                 with open(errors_log_path, 'r', encoding='utf-8') as f:
                     lines = f.readlines()
-                    errors_logs = [line.strip() for line in lines if line.strip()][-50:]
+                    errors_logs = [line.strip() for line in lines if line.strip()][-100:]
             except Exception as e:
                 errors_logs = [f"Ошибка чтения errors.log: {str(e)}"]
         
