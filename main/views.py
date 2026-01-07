@@ -258,6 +258,7 @@ class NewsViewSet(viewsets.ModelViewSet):
 
 class ContactFormViewSet(viewsets.ModelViewSet):
     """API для контактных форм FAW.UZ"""
+    queryset = ContactForm.objects.all().order_by('-created_at')
     serializer_class = ContactFormSerializer
     
     # ✅ ИСПРАВЛЕНО: Разные права для разных методов
@@ -268,6 +269,10 @@ class ContactFormViewSet(viewsets.ModelViewSet):
         else:
             # GET/PUT/DELETE только для админов
             return [IsAdminUser()]
+    
+    def get_queryset(self):
+        """Оптимизация: загружаем с select_related"""
+        return ContactForm.objects.all().order_by('-created_at')
     
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['status', 'priority', 'region', 'amocrm_status'] 
