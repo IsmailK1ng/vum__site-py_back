@@ -1283,8 +1283,11 @@
 
         // Обработка формы лизинга
         if (lizingContactForm) {
-            lizingContactForm.addEventListener("submit", async (e) => {
-                e.preventDefault();
+            lizingContactForm.addEventListener("submit", (e) => {
+                showConsentBeforeSubmit(e, lizingContactForm);
+            });
+            
+            window.submitLizingForm = async function(formElement) {
                 console.log('📤 Form submitted');
                 if (lizingIsSubmitting) return;
                 lizingIsSubmitting = true;
@@ -1359,7 +1362,7 @@
                 } finally {
                     lizingIsSubmitting = false;
                 }
-            });
+            };
             console.log('✅ Form submit handler attached');
         }
 
@@ -1768,5 +1771,8 @@ async function generateAndDownloadLizingPDF() {
         initLizingModal();
     }
 </script>
+
+<!-- Data Consent Modal -->
+{% include 'main/includes/data_consent_modal.html' %}
 </body>
 </html>

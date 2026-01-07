@@ -212,10 +212,6 @@
       pointer-events: none;
       transform: translate(-50%, -50%) scale(1.08);
     }
-
-    .grecaptcha-badge {
-      visibility: hidden;
-    }
   </style>
 </head>
 
@@ -1018,8 +1014,12 @@
       });
 
       // Отправка формы
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+      form.addEventListener("submit", (e) => {
+        showConsentBeforeSubmit(e, form);
+      });
+
+      // Обработчик когда согласие дано - отправляем данные
+      window.submitContactForm = async function(formElement) {
         if (isSubmitting) return;
         isSubmitting = true;
 
@@ -1076,7 +1076,7 @@
         } finally {
           isSubmitting = false;
         }
-      });
+      };
 
       // Показ статуса
       function showStatus(message, type = "success") {
@@ -1107,6 +1107,9 @@
     });
   </script>
   <!-- Load Scripts End -->
+
+  <!-- Data Consent Modal -->
+  {% include 'main/includes/data_consent_modal.html' %}
 
 </body>
 

@@ -608,8 +608,11 @@
                 });
             }
 
-            contactForm.addEventListener("submit", async (e) => {
-                e.preventDefault();
+            contactForm.addEventListener("submit", (e) => {
+                showConsentBeforeSubmit(e, contactForm);
+            });
+
+            window.submitProductContactForm = async function(formElement) {
                 if (isSubmitting) return;
                 isSubmitting = true;
 
@@ -673,7 +676,7 @@
                 } finally {
                     isSubmitting = false;
                 }
-            });
+            };
 
             function showStatus(message, type = "success") {
                 statusText.textContent = message;
@@ -718,6 +721,9 @@
             });
         });
     </script>
+
+    <!-- Data Consent Modal -->
+    {% include 'main/includes/data_consent_modal.html' %}
 </body>
 
 </html>
