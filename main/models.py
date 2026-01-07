@@ -814,3 +814,169 @@ class Promotion(models.Model):
         if self.start_date > now:
             return False
         return True
+    
+# ========== SEO META DATA ==========
+
+class PageMeta(models.Model):
+    """
+    SEO мета-данные для страниц сайта.
+    Мультиязычная модель для управления SEO через админку.
+    """
+    
+    MODEL_CHOICES = [
+        ('Page', 'Статическая страница'),
+        ('Post', 'Новость'),
+        ('Product', 'Продукт'),
+        ('Vacancy', 'Вакансия'),
+        ('Dealer', 'Дилер'),
+    ]
+    
+    OG_TYPE_CHOICES = [
+        ('website', 'Website - Обычный сайт'),
+        ('article', 'Article - Статья, новость'),
+        ('product', 'Product - Товар, продукт'),
+        ('profile', 'Profile - Профиль'),
+        ('video.movie', 'Video - Видео'),
+        ('music.song', 'Music - Музыка'),
+        ('book', 'Book - Книга'),
+    ]
+    
+    # ========== ИДЕНТИФИКАЦИЯ ==========
+    model = models.CharField(
+        "Тип страницы",
+        max_length=50,
+        choices=MODEL_CHOICES,
+        help_text="Выберите категорию страницы"
+    )
+    
+    key = models.CharField(
+        "Ключ страницы",
+        max_length=100,
+        help_text="Уникальный идентификатор страницы"
+    )
+    
+    # ========== БАЗОВЫЕ META ТЕГИ ==========
+    title = models.CharField(
+        "Title",
+        max_length=255,
+        help_text="Заголовок для поисковиков (оптимально: 50-70 символов)"
+    )
+    
+    description = models.TextField(
+        "Description",
+        max_length=1000,
+        help_text="Описание для поисковиков (оптимально: 150-250 символов)"
+    )
+    
+    keywords = models.CharField(
+        "Keywords",
+        max_length=500,
+        blank=True,
+        null=True,
+        help_text="Ключевые слова через запятую (необязательно)"
+    )
+    
+    # ========== OPEN GRAPH (соцсети) ==========
+    og_title = models.CharField(
+        "OG Title",
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Заголовок для соцсетей (если пусто - используется Title)"
+    )
+    
+    og_description = models.TextField(
+        "OG Description",
+        max_length=1000,
+        blank=True,
+        null=True,
+        help_text="Описание для соцсетей (если пусто - используется Description)"
+    )
+    
+    og_url = models.URLField(
+        "OG URL",
+        blank=True,
+        null=True,
+        help_text="Полная ссылка на страницу (генерируется автоматически)"
+    )
+    
+    og_type = models.CharField(
+        "OG Type",
+        max_length=50,
+        choices=OG_TYPE_CHOICES,
+        default='website',
+        help_text="Тип контента для соцсетей"
+    )
+    
+    og_site_name = models.CharField(
+        "OG Site Name",
+        max_length=100,
+        default='FAW Uzbekistan',
+        help_text="Название сайта/компании"
+    )
+    
+    og_image = models.ImageField(
+        "OG Image",
+        upload_to="seo/og_images/",
+        blank=True,
+        null=True,
+        help_text="Картинка для соцсетей (рекомендуется: 1200x630px)"
+    )
+    
+    # ========== СЛУЖЕБНЫЕ ПОЛЯ ==========
+    is_active = models.BooleanField(
+        "Активно",
+        default=True,
+        help_text="Использовать эти мета-данные на сайте"
+    )
+    
+    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
+    updated_at = models.DateTimeField("Дата обновления", auto_now=True)
+    
+    class Meta:
+        verbose_name = "SEO - Мета-данные страницы"
+        verbose_name_plural = "SEO - Мета-данные страниц"
+        ordering = ['model', 'key']
+        unique_together = ('model', 'key')
+    
+    def __str__(self):
+        return f"{self.get_model_display()} — {self.key}"
+    
+    def get_og_title(self):
+        """Возвращает OG title или обычный title"""
+        return self.og_title or self.title
+    
+    def get_og_description(self):
+        """Возвращает OG description или обычный description"""
+        return self.og_description or self.description
+    
+    def get_full_url(self):
+        """Генерирует полный URL на основе model и key"""
+        if self.og_url:
+            return self.og_url
+        
+        base_url = 'https://faw.uz'
+        
+        url_map = {
+            'Page': {
+                'home': '/',
+                'about': '/about/',
+                'contact': '/contact/',
+                'products': '/products/',
+                'dealers': '/dealers/',
+                'jobs': '/jobs/',
+                'lizing': '/lizing/',
+                'become-a-dealer': '/become-a-dealer/',
+            },
+            'Post': f'/news/{self.key}/',
+            'Product': f'/products/{self.key}/',
+            'Vacancy': f'/jobs/',
+            'Dealer': f'/dealers/',
+        }
+        
+        if self.model == 'Page':
+            path = url_map['Page'].get(self.key, '/')
+        else:
+            path = url_map.get(self.model, '/').replace('{self.key}', self.key)
+        
+        return f"{base_url}{path}"

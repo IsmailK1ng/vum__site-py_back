@@ -53,6 +53,7 @@ from .models import (
     AmoCRMToken,
     Dashboard,
     Promotion,
+    PageMeta,
     REGION_CHOICES
 )
 from main.services.amocrm.token_manager import TokenManager
@@ -1784,3 +1785,169 @@ class PromotionAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabb
         css = {
             'screen': ('modeltranslation/css/tabbed_translation_fields.css',),
         }
+# ============ SEO META DATA ============
+
+from .forms import PageMetaAdminForm  
+
+@admin.register(PageMeta)
+class PageMetaAdmin(ContentAdminMixin, TabbedTranslationAdmin):
+    """Админка для управления SEO мета-данными"""
+    
+    form = PageMetaAdminForm  #
+    
+    list_display = ['model_badge', 'key_display', 'title_preview', 'is_active', 'og_image_preview', 'updated_at', 'action_buttons']
+    list_filter = ['model', 'is_active', 'created_at']
+    search_fields = ['key', 'title', 'title_uz', 'title_ru', 'title_en']
+    list_editable = ['is_active']
+    readonly_fields = ['created_at', 'updated_at', 'og_image_preview_large']
+    
+    fieldsets = (
+        ('Идентификация страницы', {
+            'fields': ('model', 'key', 'is_active'),
+        }),
+        ('Базовые META теги (для поисковиков)', {
+            'fields': ('title', 'description', 'keywords'),
+        }),
+        ('Open Graph теги (для соцсетей)', {
+            'fields': ('og_title', 'og_description', 'og_url', 'og_type', 'og_site_name', 'og_image', 'og_image_preview_large'),
+            'classes': ('collapse',)
+        }),
+        ('Служебная информация', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    # ========== ДОБАВЛЯЕМ CSS И JS ==========
+    class Media:
+        css = {
+            'all': ('css/admin_seo_help.css',)
+        }
+        js = ('js/admin_seo_help.js',) 
+    
+    # ... остальные методы (model_badge, key_display и т.д.) ОСТАВЛЯЕМ БЕЗ ИЗМЕНЕНИЙ
+    """Админка для управления SEO мета-данными"""
+    
+    list_display = ['model_badge', 'key_display', 'title_preview', 'is_active', 'og_image_preview', 'updated_at', 'action_buttons']
+    list_filter = ['model', 'is_active', 'created_at']
+    search_fields = ['key', 'title', 'title_uz', 'title_ru', 'title_en']
+    list_editable = ['is_active']
+    readonly_fields = ['created_at', 'updated_at', 'og_image_preview_large']
+    
+    fieldsets = (
+        (' Идентификация страницы', {
+            'fields': ('model', 'key', 'is_active'),
+            'description': 'Выберите тип страницы и укажите уникальный ключ'
+        }),
+        (' Базовые META теги (для поисковиков)', {
+            'fields': ('title', 'description', 'keywords'),
+            'description': 'Title и Description влияют на позиции в Google/Yandex'
+        }),
+        ('Open Graph теги (для соцсетей)', {
+            'fields': ('og_title', 'og_description', 'og_url', 'og_type', 'og_site_name', 'og_image', 'og_image_preview_large'),
+            'description': 'Эти теги используются при шаринге в Telegram, WhatsApp, Facebook',
+            'classes': ('collapse',)
+        }),
+        (' Служебная информация', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    # ==================== ОТОБРАЖЕНИЕ ====================
+    
+    def model_badge(self, obj):
+        """Бейдж типа страницы"""
+        colors = {
+            'Page': '#3b82f6',
+            'Post': '#10b981',
+            'Product': '#f59e0b',
+            'Vacancy': '#8b5cf6',
+            'Dealer': '#ec4899',
+        }
+        color = colors.get(obj.model, '#6b7280')
+        return format_html(
+            '<span style="background:{};color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;">{}</span>',
+            color, obj.get_model_display()
+        )
+    model_badge.short_description = "Тип"
+    model_badge.admin_order_field = 'model'
+    
+    def key_display(self, obj):
+        """Отображение ключа"""
+        return format_html(
+            '<code style="background:#f3f4f6;padding:4px 8px;border-radius:4px;font-family:monospace;">{}</code>',
+            obj.key
+        )
+    key_display.short_description = "Ключ"
+    key_display.admin_order_field = 'key'
+    
+    def title_preview(self, obj):
+        """Превью заголовка"""
+        title = obj.title[:60]
+        if len(obj.title) > 60:
+            title += "..."
+        return format_html(
+            '<span style="font-weight:500;">{}</span>',
+            title
+        )
+    title_preview.short_description = "Title"
+    
+    def og_image_preview(self, obj):
+        """Маленькое превью OG картинки"""
+        if obj.og_image:
+            return format_html(
+                '<img src="{}" width="60" height="30" style="object-fit:cover;border-radius:4px;"/>',
+                obj.og_image.url
+            )
+        return format_html('<span style="color:#999;">—</span>')
+    og_image_preview.short_description = "OG Фото"
+    
+    def og_image_preview_large(self, obj):
+        """Большое превью OG картинки"""
+        if obj.og_image:
+            return format_html(
+                '<img src="{}" style="max-width:400px;max-height:200px;object-fit:contain;border-radius:8px;border:1px solid #ddd;"/>',
+                obj.og_image.url
+            )
+        return "—"
+    og_image_preview_large.short_description = "Превью изображения"
+    
+    def action_buttons(self, obj):
+        """Кнопки действий"""
+        return format_html('''
+            <div style="display:flex;gap:8px;">
+                <a href="{}" title="Редактировать">
+                    <img src="/static/media/icon-adminpanel/pencil.png" width="24" height="24">
+                </a>
+                <a href="{}" title="Просмотр на сайте" target="_blank">
+                    <img src="/static/media/icon-adminpanel/eyes.png" width="24" height="24">
+                </a>
+                <a href="{}" title="Удалить" onclick="return confirm('Удалить мета-данные?')">
+                    <img src="/static/media/icon-adminpanel/recycle-bin.png" width="24" height="24">
+                </a>
+            </div>
+        ''', 
+            f'/admin/main/pagemeta/{obj.id}/change/',
+            obj.get_full_url(),
+            f'/admin/main/pagemeta/{obj.id}/delete/'
+        )
+    action_buttons.short_description = "Действия"
+    
+    # ==================== ДОПОЛНИТЕЛЬНЫЕ МЕТОДЫ ====================
+    
+    def save_model(self, request, obj, form, change):
+        """Автозаполнение полей при сохранении"""
+        # Если og_title пустой, копируем из title
+        if not obj.og_title:
+            obj.og_title = obj.title
+        
+        # Если og_description пустой, копируем из description
+        if not obj.og_description:
+            obj.og_description = obj.description
+        
+        # Автогенерация URL если пустой
+        if not obj.og_url:
+            obj.og_url = obj.get_full_url()
+        
+        super().save_model(request, obj, form, change)

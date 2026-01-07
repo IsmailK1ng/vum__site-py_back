@@ -742,7 +742,9 @@ document.addEventListener('DOMContentLoaded', function () {
       e.preventDefault();
 
       const phoneInput = document.getElementById('dealer_phone');
+      const messageInput = document.getElementById('dealer_message');
       const phoneValue = phoneInput ? phoneInput.value.replace(/\D/g, '') : '';
+      const messageValue = messageInput ? messageInput.value.trim() : ''; 
 
       if (phoneValue.length !== 12 || !phoneValue.startsWith('998')) {
         alert('Iltimos, to\'g\'ri telefon raqam kiriting');
@@ -750,9 +752,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
-      // Проверка сообщения
-      const messageInput = document.getElementById('dealer_message');
-      const messageValue = messageInput ? messageInput.value.trim() : '';
       if (!messageValue) {
         alert('Iltimos, xabar yozing');
         messageInput?.focus();
@@ -774,16 +773,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         const formData = {
-          name: document.getElementById('dealer_name')?.value || '',
-          company_name: document.getElementById('dealer_company')?.value || '',
+          name: document.getElementById('dealer_name')?.value.trim() || '',
+          company_name: document.getElementById('dealer_company')?.value.trim() || '',
           experience_years: parseInt(document.getElementById('dealer_experience')?.value) || null,
           region: document.getElementById('dealer_region')?.value || '',
           phone: '+' + phoneValue,
           message: messageValue,
-          recaptcha_token: recaptchaToken  // ← ТОКЕН КАПЧИ
+          recaptcha_token: recaptchaToken
         };
-
-        console.log('📤 Отправляем данные:', formData);
 
         const response = await fetch('/api/uz/dealer-applications/', {
           method: 'POST',
@@ -795,7 +792,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         const data = await response.json();
-        console.log('📨 Ответ сервера:', data);
 
         if (response.ok) {
           const replyDiv = document.querySelector('.form__reply');

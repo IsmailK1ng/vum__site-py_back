@@ -3,7 +3,7 @@ from .models import (
     News, NewsBlock, Vacancy, 
     VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
     Product, ProductFeature, ProductCardSpec, ProductParameter,
-    DealerService, Dealer, BecomeADealerPage, DealerRequirement, Promotion
+    DealerService, Dealer, BecomeADealerPage, DealerRequirement, Promotion,PageMeta     
 )
 
 
@@ -95,3 +95,16 @@ class DealerRequirementTranslationOptions(TranslationOptions):
 class PromotionTranslationOptions(TranslationOptions):
     fields = ('title', 'description', 'button_text')
     required_languages = ()
+
+# ========== SEO META DATA ==========
+@register(PageMeta)
+class PageMetaTranslationOptions(TranslationOptions):
+    fields = (
+        'title',
+        'description',
+        'keywords',
+        'og_title',
+        'og_description',
+        'og_site_name',
+    )
+    required_languages = ()  # Все языки необязательны

@@ -1,0 +1,131 @@
+/* ============================================
+   SEO ПАНЕЛЬ - Стили для иконок подсказок
+   ============================================ */
+
+/* Иконка помощи */
+.seo-help-icon {
+    display: inline-block;
+    margin-left: 8px;
+    cursor: help;
+    position: relative;
+    vertical-align: middle;
+}
+
+.seo-help-icon svg {
+    color: #666;
+    transition: color 0.2s ease;
+}
+
+.seo-help-icon:hover svg {
+    color: #0073aa;
+}
+
+/* Tooltip контейнер */
+.seo-help-tooltip {
+    position: fixed;
+    z-index: 99999;
+    
+    background: #ffffff;
+    color: #333333;
+    padding: 16px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.8;
+    
+    max-width: 500px;
+    min-width: 350px;
+    
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e0e0e0;
+    
+    /* Скрыт по умолчанию */
+    display: none;
+    pointer-events: none;
+}
+
+/* Показываем tooltip */
+.seo-help-tooltip.visible {
+    display: block;
+}
+
+/* Стрелка tooltip */
+.seo-help-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 20px;
+    
+    border: 8px solid transparent;
+    border-bottom-color: #ffffff;
+    
+    filter: drop-shadow(0 -2px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* Стили для содержимого tooltip */
+.seo-help-tooltip strong {
+    color: #0073aa;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+.seo-help-tooltip code {
+    background: #f5f5f5;
+    color: #d63384;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.seo-help-tooltip br {
+    display: block;
+    margin: 6px 0;
+    content: "";
+}
+
+/* Списки в tooltip */
+.seo-help-tooltip ul {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.seo-help-tooltip li {
+    margin: 4px 0;
+}
+
+/* Примеры (зеленый/красный) */
+.seo-help-tooltip .example-good {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.seo-help-tooltip .example-bad {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+/* Разделители */
+.seo-help-tooltip hr {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 12px 0;
+}
+
+/* Адаптивность для маленьких экранов */
+@media (max-width: 768px) {
+    .seo-help-tooltip {
+        max-width: 90vw;
+        min-width: 280px;
+        font-size: 13px;
+        padding: 12px 16px;
+    }
+}
+
+/* Для полей с вкладками языков */
+.django-modeltranslation .seo-help-icon {
+    margin-left: 4px;
+}
+

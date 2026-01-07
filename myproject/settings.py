@@ -194,6 +194,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
                 'myproject.context_processors.html_lang',
+                'main.context_processors.seo_meta',
             ],
         },
     },
