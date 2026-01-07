@@ -38,7 +38,7 @@ def verify_recaptcha(token, action='submit', remote_ip=None):
     
     # Проверка наличия токена
     if not token:
-        logger.warning("reCAPTCHA token is missing")
+        logger.critical(f"🚨 reCAPTCHA TOKEN MISSING! action={action}, token={repr(token)}")
         return {
             'success': False,
             'score': None,
@@ -66,12 +66,12 @@ def verify_recaptcha(token, action='submit', remote_ip=None):
         result = response.json()
         
         # Логируем ответ
-        logger.info(f"reCAPTCHA response: success={result.get('success')}, score={result.get('score')}")
+        logger.info(f"✅ reCAPTCHA API Response: success={result.get('success')}, score={result.get('score')}, action={result.get('action')}")
         
         # Проверяем успешность
         if not result.get('success'):
             error_codes = result.get('error-codes', [])
-            logger.error(f"reCAPTCHA verification failed: {error_codes}")
+            logger.error(f"❌ reCAPTCHA API Error: {error_codes}, token_exists={bool(token)}, action={action}")
             return {
                 'success': False,
                 'score': None,

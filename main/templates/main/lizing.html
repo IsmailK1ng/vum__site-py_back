@@ -1370,6 +1370,7 @@
                     let recaptchaToken;
                     await grecaptcha.ready(async () => {
                     recaptchaToken = await grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', { action: 'contact_form' });
+                    console.log('🔐 reCAPTCHA token obtained:', !!recaptchaToken, 'length:', recaptchaToken?.length);
                     });
 
                     const formData = {
@@ -1384,7 +1385,7 @@
                         recaptcha_token: recaptchaToken  // ← ТОКЕН
                     };
 
-                    console.log('📊 Form data:', formData);
+                    console.log('📊 Form data:', { ...formData, recaptcha_token: '***' });
 
                     console.log('📤 Sending POST request to /api/uz/contact/');
                     const response = await fetch("/api/uz/contact/", {
