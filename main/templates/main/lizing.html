@@ -285,6 +285,53 @@
         [data-theme="dark"] #downloadPdfBtn:hover {
             background: #888;
         }
+
+        .consent-agree-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .consent-agree-input {
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
+            margin-top: 2px;
+            cursor: pointer;
+            accent-color: #1976d2;
+        }
+
+        .consent-agree-text {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            align-items: center;
+            color: #666;
+        }
+
+        .consent-agree-link {
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .consent-agree-link:hover {
+            color: #1565c0;
+            text-decoration: underline;
+        }
+
+        [data-theme="dark"] .consent-agree-text {
+            color: #bbb;
+        }
+
+        [data-theme="dark"] .consent-agree-link {
+            color: #64b5f6;
+        }
     </style>
 </head>
 
@@ -799,6 +846,18 @@
                         rows="4"></textarea>
                 </div>
 
+                <label class="consent-agree-label">
+                    <input type="checkbox" name="consent_agree" id="consent-agree-checkbox-lizing" class="consent-agree-input" required>
+                    <span class="consent-agree-text">
+                        {% if LANGUAGE_CODE == 'ru' %}Я согласен с обработкой данных
+                        {% elif LANGUAGE_CODE == 'en' %}I agree with data processing
+                        {% else %}Men ma'lumotlarni qayta ishlashga roziman{% endif %}.
+                        <a href="#" class="consent-agree-link">
+                            {% if LANGUAGE_CODE == 'ru' %}Политика{% elif LANGUAGE_CODE == 'en' %}Policy{% else %}Siyosat{% endif %}
+                        </a>
+                    </span>
+                </label>
+
                 <div class="faw-form__group">
                     <button type="submit" class="faw-form__submit">
                         <span>
@@ -1284,7 +1343,14 @@
         // Обработка формы лизинга
         if (lizingContactForm) {
             lizingContactForm.addEventListener("submit", (e) => {
-                showConsentBeforeSubmit(e, lizingContactForm);
+                const consentCheckbox = document.getElementById("consent-agree-checkbox-lizing");
+                if (!consentCheckbox.checked) {
+                    e.preventDefault();
+                    alert("Пожалуйста, согласитесь с обработкой ваших персональных данных");
+                    return false;
+                }
+                e.preventDefault();
+                window.submitLizingForm(lizingContactForm);
             });
             
             window.submitLizingForm = async function(formElement) {
@@ -1771,8 +1837,5 @@ async function generateAndDownloadLizingPDF() {
         initLizingModal();
     }
 </script>
-
-<!-- Data Consent Modal -->
-{% include 'main/includes/data_consent_modal.html' %}
 </body>
 </html>

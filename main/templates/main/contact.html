@@ -143,6 +143,48 @@
     }
     </script>
 
+    <style>
+        /* Стили для чекбокса согласия */
+        .consent-agree-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .consent-agree-input {
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
+            margin-top: 2px;
+            cursor: pointer;
+            accent-color: #1976d2;
+        }
+
+        .consent-agree-text {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            align-items: center;
+            color: #666;
+        }
+
+        .consent-agree-link {
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .consent-agree-link:hover {
+            color: #1565c0;
+            text-decoration: underline;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -322,6 +364,21 @@
                                                         <div class="col-12 mxd-grid-item contact-grid-item">
                                                             <textarea name="message" placeholder="{% if LANGUAGE_CODE == 'uz' %}Qanday yuk mashinasiga qiziqasiz? Qoʻshimcha savollar*{% elif LANGUAGE_CODE == 'ru' %}Какой грузовик вас интересует? Дополнительные вопросы*{% else %}What truck are you interested in? Additional questions*{% endif %}"></textarea>
                                                         </div>
+
+                                                        <div class="col-12 mxd-grid-item contact-grid-item">
+                                                            <label class="consent-agree-label">
+                                                                <input type="checkbox" name="consent_agree" id="consent-agree-checkbox-contact" class="consent-agree-input" required>
+                                                                <span class="consent-agree-text">
+                                                                    {% if LANGUAGE_CODE == 'uz' %}
+                                                                    Men o'z ma'lumotlarning qayta ishlashiga rozilik beraman. <a href="#" class="consent-agree-link">Siyosat</a>
+                                                                    {% elif LANGUAGE_CODE == 'ru' %}
+                                                                    Я согласен с обработкой данных. <a href="#" class="consent-agree-link">Политика</a>
+                                                                    {% else %}
+                                                                    I agree with data processing. <a href="#" class="consent-agree-link">Policy</a>
+                                                                    {% endif %}
+                                                                </span>
+                                                            </label>
+                                                        </div>
                                                         
                                                         <div class="col-12 mxd-grid-item">
                                                             <button class="btn btn-anim btn-default btn-large btn-opposite slide-right-up shimmer-btn" type="submit">
@@ -440,6 +497,12 @@
             });
 
             form.addEventListener("submit", async (e) => {
+                const consentCheckbox = document.getElementById("consent-agree-checkbox-contact");
+                if (!consentCheckbox.checked) {
+                    e.preventDefault();
+                    alert("Пожалуйста, согласитесь с обработкой ваших персональных данных");
+                    return false;
+                }
                 e.preventDefault();
                 if (isSubmitting) return;
                 isSubmitting = true;

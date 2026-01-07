@@ -3390,7 +3390,7 @@ body[data-theme="dark"] .contact-detail__icon i {
     width: 100%;
 }
 
-.contact-form input,
+.contact-form input:not(.consent-agree-input),
 .contact-form textarea,
 .contact-form select {
     position: relative;
