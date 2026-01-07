@@ -289,8 +289,9 @@ class ContactFormViewSet(viewsets.ModelViewSet):
                 )
                 
                 if not recaptcha_result['success']:
+                    score = recaptcha_result.get('score', 'N/A')
                     logger.warning(
-                        f"reCAPTCHA failed for contact form: {recaptcha_result['error']}"
+                        f"🚫 reCAPTCHA failed for contact form: score={score}, error={recaptcha_result['error']}"
                     )
                     return Response({
                         'success': False,
@@ -379,8 +380,9 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
                 )
                 
                 if not recaptcha_result['success']:
+                    score = recaptcha_result.get('score', 'N/A')
                     logger.warning(
-                        f"reCAPTCHA failed for job application: {recaptcha_result['error']}"
+                        f"🚫 reCAPTCHA failed for job application: score={score}, error={recaptcha_result['error']}"
                     )
                     return Response({
                         'success': False,
@@ -583,8 +585,9 @@ class BecomeADealerApplicationViewSet(viewsets.ModelViewSet):
                 )
                 
                 if not recaptcha_result['success']:
+                    score = recaptcha_result.get('score', 'N/A')
                     logger.warning(
-                        f"reCAPTCHA failed for dealer application: {recaptcha_result['error']}"
+                        f"🚫 reCAPTCHA failed for dealer application: score={score}, error={recaptcha_result['error']}"
                     )
                     return Response({
                         'success': False,
