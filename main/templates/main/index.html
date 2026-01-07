@@ -1092,7 +1092,6 @@
             grecaptcha.ready(() => {
               grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', { action: 'contact_form' })
                 .then(token => {
-                  console.log('🔐 reCAPTCHA token obtained:', !!token, 'length:', token?.length);
                   resolve(token);
                 })
                 .catch(err => {
@@ -1116,10 +1115,6 @@
             recaptcha_token: recaptchaToken
           };
 
-          console.log('📊 Form data:', { ...formData, recaptcha_token: '***' });
-          console.log('🌐 Using language:', currentLang);
-          console.log('🔑 Token in formData:', !!formData.recaptcha_token);
-
           const response = await fetch("/api/" + currentLang + "/contact/", {
             method: "POST",
             headers: {
@@ -1130,8 +1125,6 @@
           });
 
           const data = await response.json();
-
-          console.log('📨 Response status:', response.status, 'data:', data);
 
           if (response.ok) {
             (window.dataLayer = window.dataLayer || []).push({

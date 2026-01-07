@@ -1259,32 +1259,16 @@
         const lizingPhoneInput = document.getElementById('lizingPhoneInput');
         let lizingIsSubmitting = false;
 
-        console.log('=== Initializing lizing modal ===');
-        console.log('downloadPdfBtn exists:', !!downloadPdfBtn);
-        console.log('lizingModal exists:', !!lizingModal);
-        console.log('lizingModalClose exists:', !!lizingModalClose);
-        console.log('lizingModalOverlay exists:', !!lizingModalOverlay);
-        console.log('lizingContactForm exists:', !!lizingContactForm);
-        console.log('lizingPhoneInput exists:', !!lizingPhoneInput);
-
         if (!downloadPdfBtn || !lizingModal) {
-            console.error('❌ PDF button or modal not found - initialization aborted');
             return;
         }
 
-        console.log('✅ All elements found - initializing handlers');
-
         function openLizingModal() {
-            console.log('📖 Opening lizing modal');
-            console.log('Before: modal classes:', lizingModal.className);
             lizingModal.classList.add('active');
             document.body.style.overflow = 'hidden';
-            console.log('After: modal classes:', lizingModal.className);
-            console.log('Modal display:', window.getComputedStyle(lizingModal).display);
         }
 
         function closeLizingModal() {
-            console.log('📖 Closing lizing modal');
             lizingModal.classList.remove('active');
             document.body.style.overflow = '';
         }
@@ -1292,35 +1276,26 @@
         // Кнопка скачивания PDF
         downloadPdfBtn.addEventListener('click', function (e) {
             e.preventDefault();
-            console.log('🔘 PDF button clicked!');
             openLizingModal();
         });
-
-        console.log('✅ PDF button click handler attached');
 
         // Закрытие модального окна
         if (lizingModalClose) {
             lizingModalClose.addEventListener('click', function (e) {
-                console.log('✖️ Close button clicked');
                 closeLizingModal();
             });
-            console.log('✅ Close button handler attached');
         }
         if (lizingModalOverlay) {
             lizingModalOverlay.addEventListener('click', function (e) {
-                console.log('✖️ Overlay clicked');
                 closeLizingModal();
             });
-            console.log('✅ Overlay click handler attached');
         }
 
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && lizingModal?.classList.contains('active')) {
-                console.log('✖️ Escape key pressed');
                 closeLizingModal();
             }
         });
-        console.log('✅ Escape key handler attached');
 
         // Форматирование телефона
         if (lizingPhoneInput) {
@@ -1337,7 +1312,6 @@
 
                 e.target.value = formatted;
             });
-            console.log('✅ Phone formatting handler attached');
         }
 
         // Обработка формы лизинга
@@ -1354,13 +1328,11 @@
             });
             
             window.submitLizingForm = async function(formElement) {
-                console.log('📤 Form submitted');
                 if (lizingIsSubmitting) return;
                 lizingIsSubmitting = true;
 
                 const phone = lizingPhoneInput.value.replace(/\D/g, "");
                 if (phone.length !== 12) {
-                    console.warn('⚠️ Invalid phone number:', lizingPhoneInput.value);
                     showLizingStatus("❌ Iltimos, telefon raqamingizni to'liq kiriting.", "error");
                     lizingIsSubmitting = false;
                     return;
@@ -1372,11 +1344,9 @@
                         grecaptcha.ready(() => {
                             grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', { action: 'contact_form' })
                                 .then(token => {
-                                    console.log('🔐 reCAPTCHA token obtained:', !!token, 'length:', token?.length);
                                     resolve(token);
                                 })
                                 .catch(err => {
-                                    console.error('❌ reCAPTCHA error:', err);
                                     reject(err);
                                 });
                         });
@@ -1396,10 +1366,6 @@
                         recaptcha_token: recaptchaToken  // ← ТОКЕН
                     };
 
-                    console.log('📊 Form data:', { ...formData, recaptcha_token: '***' });
-                    console.log('🌐 Using language:', currentLang);
-
-                    console.log('📤 Sending POST request to /api/' + currentLang + '/contact/');
                     const response = await fetch("/api/" + currentLang + "/contact/", {
                         method: "POST",
                         headers: {
@@ -1409,12 +1375,9 @@
                         body: JSON.stringify(formData),
                     });
 
-                    console.log('📨 Response status:', response.status);
                     const data = await response.json();
-                    console.log('📨 Response data:', data);
 
                     if (response.ok) {
-                        console.log('✅ Form sent successfully');
                         (window.dataLayer = window.dataLayer || []).push({
                             event: "leasing_form_submitted"
                         });
@@ -1430,7 +1393,6 @@
                             closeLizingModal();
                         }, 2000);
                     } else if (response.status === 400) {
-                        console.error('❌ Validation errors from API:', data.errors || data);
                         throw new Error(`Validation error: ${JSON.stringify(data.errors || data.message)}`);
                     } else {
                         throw new Error(`API Error ${response.status}: ${data.message || 'Unknown error'}`);
@@ -1442,7 +1404,6 @@
                     lizingIsSubmitting = false;
                 }
             };
-            console.log('✅ Form submit handler attached');
         }
 
         function showLizingStatus(message, type = "success") {
@@ -1466,8 +1427,6 @@
                 setTimeout(() => statusBlock.classList.add("hidden"), 400);
             }, 4000);
         }
-
-        console.log('=== Lizing modal initialization complete! ===');
     }
 
 // ============ ЗАГРУЗКА ШРИФТА И ГЕНЕРАЦИЯ PDF ============
@@ -1833,20 +1792,17 @@ async function generateAndDownloadLizingPDF() {
 
         /* ================= SAVE ================= */
         doc.save(`FAW-Lizing-${term}m-${Date.now()}.pdf`);
-        console.log('✅ PDF generated successfully');
 
     } catch (err) {
-        console.error('❌ PDF generation error:', err);
+        console.error('PDF generation error:', err);
         alert('Ошибка при создании PDF. Попробуйте ещё раз.');
     }
 }
 
     // Инициализация при загрузке DOM или сразу если он уже загружен
     if (document.readyState === 'loading') {
-        console.log('DOM loading, attaching DOMContentLoaded listener');
         document.addEventListener('DOMContentLoaded', initLizingModal);
     } else {
-        console.log('DOM already loaded, initializing immediately');
         initLizingModal();
     }
 </script>
