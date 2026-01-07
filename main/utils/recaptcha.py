@@ -85,7 +85,7 @@ def verify_recaptcha(token, action='submit', remote_ip=None):
         
         # Проверяем score
         score = result.get('score', 0)
-        threshold = getattr(settings, 'RECAPTCHA_SCORE_THRESHOLD', 0.3)  # Снижено с 0.5 на 0.3
+        threshold = getattr(settings, 'RECAPTCHA_SCORE_THRESHOLD', 0.65)
         
         logger.info(f"🔍 reCAPTCHA Score Check: {score} >= {threshold}? Action: {result.get('action')}")
         

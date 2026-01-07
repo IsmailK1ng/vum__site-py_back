@@ -96,10 +96,6 @@ body[data-theme="dark"] {
     }
 }
 
-.grecaptcha-badge {
-    visibility: hidden;
-}
-
 /* Hero секции в темной теме */
 body[data-theme="dark"] .mxd-hero-06 {
     background-color: #161616 !important;

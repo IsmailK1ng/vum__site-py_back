@@ -1367,11 +1367,22 @@
                 }
 
                 try {
-                    let recaptchaToken;
-                    await grecaptcha.ready(async () => {
-                    recaptchaToken = await grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', { action: 'contact_form' });
-                    console.log('🔐 reCAPTCHA token obtained:', !!recaptchaToken, 'length:', recaptchaToken?.length);
+                    // Получаем reCAPTCHA токен
+                    let recaptchaToken = await new Promise((resolve, reject) => {
+                        grecaptcha.ready(() => {
+                            grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', { action: 'contact_form' })
+                                .then(token => {
+                                    console.log('🔐 reCAPTCHA token obtained:', !!token, 'length:', token?.length);
+                                    resolve(token);
+                                })
+                                .catch(err => {
+                                    console.error('❌ reCAPTCHA error:', err);
+                                    reject(err);
+                                });
+                        });
                     });
+
+                    const currentLang = (document.documentElement.lang || 'uz').split('-')[0];
 
                     const formData = {
                         name: lizingContactForm.Name.value,
@@ -1386,9 +1397,10 @@
                     };
 
                     console.log('📊 Form data:', { ...formData, recaptcha_token: '***' });
+                    console.log('🌐 Using language:', currentLang);
 
-                    console.log('📤 Sending POST request to /api/uz/contact/');
-                    const response = await fetch("/api/uz/contact/", {
+                    console.log('📤 Sending POST request to /api/' + currentLang + '/contact/');
+                    const response = await fetch("/api/" + currentLang + "/contact/", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",

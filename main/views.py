@@ -295,13 +295,14 @@ class ContactFormViewSet(viewsets.ModelViewSet):
                 
                 if not recaptcha_result['success']:
                     score = recaptcha_result.get('score', 'N/A')
-                    logger.warning(
-                        f"🚫 reCAPTCHA failed for contact form: score={score}, error={recaptcha_result['error']}"
+                    error_msg = recaptcha_result['error']
+                    logger.critical(
+                        f"🚫 reCAPTCHA FAILED: score={score}, threshold=0.1, error={error_msg}, action={recaptcha_result.get('action')}"
                     )
                     return Response({
                         'success': False,
-                        'message': 'Подозрительная активность. Попробуйте позже.',
-                        'errors': {'recaptcha': recaptcha_result['error']}
+                        'message': f'Verification failed: {error_msg}',
+                        'errors': {'recaptcha': error_msg}
                     }, status=status.HTTP_400_BAD_REQUEST)
                 
                 logger.info(f"✅ reCAPTCHA passed: score={recaptcha_result['score']}")
