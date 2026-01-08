@@ -17,7 +17,7 @@ urlpatterns = [
     path('dealers/', views.dealers, name='dealers'),
     path('jobs/', views.jobs, name='jobs'),
     path('api/log-js-error/', views.log_js_error, name='log_js_error'),
-    path('test-utm/', TemplateView.as_view(template_name='test-utm.html'), name='test_utm'),
+
     
     # ========== DASHBOARD ==========
     path('admin/dashboard/', views.dashboard_view, name='admin_dashboard'),
