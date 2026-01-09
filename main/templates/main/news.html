@@ -9,20 +9,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>
-    {% if LANGUAGE_CODE == 'uz' %}
-    VUM Yangiliklar | FAW Trucks Uzbekistan
-    {% elif LANGUAGE_CODE == 'ru' %}
-    Новости VUM | FAW Trucks Uzbekistan
-    {% else %}
-    VUM News | FAW Trucks Uzbekistan
-    {% endif %}
-  </title>
-  {% hreflang_tags %}
-  {% canonical_url %}
-  <!-- Meta Tags -->
-  <meta name="description"
-    content="{% if LANGUAGE_CODE == 'uz' %}VUM kompaniyasining so'nggi yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Последние новости компании VUM{% else %}Latest news from VUM company{% endif %}">
+    {% include 'main/includes/seo_meta.html' %}
+
+    {% hreflang_tags %}
+    {% canonical_url %}
   
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

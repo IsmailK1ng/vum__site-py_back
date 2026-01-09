@@ -5,15 +5,10 @@
 
 <head>
   <meta charset="UTF-8">
+    {% include 'main/includes/seo_meta.html' %}
 
-  <!-- Page Title -->
-  <title>{% if LANGUAGE_CODE == 'uz' %}VUMFAW tarixi{% elif LANGUAGE_CODE == 'ru' %}История VUMFAW{% else %}VUMFAW History{% endif %}</title>
-  {% hreflang_tags %}
-  {% canonical_url %}
-
-  <!-- Meta Tags -->
-  <meta name="description" content="{% if LANGUAGE_CODE == 'uz' %}Faw Trucks O'zbekistonda{% elif LANGUAGE_CODE == 'ru' %}Faw Trucks в Узбекистане{% else %}Faw Trucks in Uzbekistan{% endif %}">
-  <meta name="keywords" content="{% if LANGUAGE_CODE == 'uz' %}Faw Trucks O'zbekistonda{% elif LANGUAGE_CODE == 'ru' %}Faw Trucks в Узбекистане{% else %}Faw Trucks in Uzbekistan{% endif %}">
+    {% hreflang_tags %}
+    {% canonical_url %}
   <meta name="author" content="mix_design">
 
   <!-- Viewport Meta-->

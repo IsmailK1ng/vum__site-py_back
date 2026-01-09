@@ -16,96 +16,153 @@ def seo_meta(request):
     Автоматически определяет тип страницы по URL и загружает соответствующие мета-данные.
     """
     
-    # Получаем текущий путь без языкового префикса
-    path = request.path
+    path = request.path.strip('/')
+    current_lang = get_language()
     
-    # Убираем языковые префиксы /uz/, /ru/, /en/
-    for lang_prefix in ['/uz/', '/ru/', '/en/']:
-        if path.startswith(lang_prefix):
-            path = path[3:]  # Убираем /uz/, /ru/, /en/
-            break
-    
-    path = path.strip('/')
+    # Убираем префикс языка
+    if path.startswith(f'{current_lang}/'):
+        path = path[len(current_lang)+1:]
     
     meta = None
     
     try:
         # ========== СТАТИЧЕСКИЕ СТРАНИЦЫ ==========
-        static_pages = {
-            '': 'home',                          # Главная
-            'about': 'about',                    # О нас
-            'contact': 'contact',                # Контакты
-            'products': 'products',              # Каталог продуктов
-            'dealers': 'dealers',                # Дилеры
-            'jobs': 'jobs',                      # Вакансии
-            'lizing': 'lizing',                  # Лизинг
-            'become-a-dealer': 'become-a-dealer',# Стать дилером
-            'news': 'news',                      # Список новостей
-        }
-        
-        if path in static_pages:
-            # Ищем мета для статической страницы
+        if path == '':
+            # Главная
             meta = PageMeta.objects.filter(
-                model='Page',
-                key=static_pages[path],
-                is_active=True
+                model='Page', key='home', is_active=True
             ).first()
+        
+        elif path == 'about':
+            meta = PageMeta.objects.filter(
+                model='Page', key='about', is_active=True
+            ).first()
+        
+        elif path == 'contact':
+            meta = PageMeta.objects.filter(
+                model='Page', key='contact', is_active=True
+            ).first()
+        
+        elif path == 'services':
+            meta = PageMeta.objects.filter(
+                model='Page', key='services', is_active=True
+            ).first()
+        
+        elif path == 'lizing':
+            meta = PageMeta.objects.filter(
+                model='Page', key='lizing', is_active=True
+            ).first()
+        
+        elif path == 'become-a-dealer':
+            meta = PageMeta.objects.filter(
+                model='Page', key='become-a-dealer', is_active=True
+            ).first()
+        
+        elif path == 'jobs':
+            meta = PageMeta.objects.filter(
+                model='Page', key='jobs', is_active=True
+            ).first()
+        
+        elif path == 'news':
+            # Список новостей
+            meta = PageMeta.objects.filter(
+                model='Page', key='news', is_active=True
+            ).first()
+        
+        elif path == 'dealers':
+            # Список дилеров
+            meta = PageMeta.objects.filter(
+                model='Page', key='dealers', is_active=True
+            ).first()
+        
+        # ========== КАТАЛОГ С КАТЕГОРИЯМИ ==========
+        elif path.startswith('products') and '?' in request.get_full_path():
+            # Каталог с категорией: /products/?category=samosval
+            full_path = request.get_full_path()
             
-            if meta:
-                logger.debug(f"✅ SEO: Найдена мета для статической страницы '{path}' (key={static_pages[path]})")
+            if 'category=samosval' in full_path:
+                meta = PageMeta.objects.filter(
+                    model='Page', key='products_samosval', is_active=True
+                ).first()
+            
+            elif 'category=maxsus' in full_path:
+                meta = PageMeta.objects.filter(
+                    model='Page', key='products_maxsus', is_active=True
+                ).first()
+            
+            elif 'category=furgon' in full_path:
+                meta = PageMeta.objects.filter(
+                    model='Page', key='products_furgon', is_active=True
+                ).first()
+            
+            elif 'category=shassi' in full_path:
+                meta = PageMeta.objects.filter(
+                    model='Page', key='products_shassi', is_active=True
+                ).first()
+            
+            elif 'category=tiger_v' in full_path:
+                meta = PageMeta.objects.filter(
+                    model='Page', key='products_tiger_v', is_active=True
+                ).first()
+            
+            elif 'category=tiger_vh' in full_path:
+                meta = PageMeta.objects.filter(
+                    model='Page', key='products_tiger_vh', is_active=True
+                ).first()
+            
+            elif 'category=tiger_vr' in full_path:
+                meta = PageMeta.objects.filter(
+                    model='Page', key='products_tiger_vr', is_active=True
+                ).first()
         
         # ========== ДИНАМИЧЕСКИЕ СТРАНИЦЫ - НОВОСТИ ==========
         elif path.startswith('news/') and path != 'news':
-            # Извлекаем slug новости: news/kakaya-to-novost/
+            # Детальная новость: /news/muxlisa-ai-statistika/
             slug = path.replace('news/', '').strip('/')
             
             if slug:
-                # Пытаемся найти новость по slug
                 from .models import News
                 try:
                     news = News.objects.get(slug=slug, is_active=True)
                     
-                    # Ищем мета по ID новости
+                    # Ищем SEO по ID новости
                     meta = PageMeta.objects.filter(
                         model='Post',
-                        key=str(news.id),
+                        key=str(news.id),  # ← ID новости!
                         is_active=True
                     ).first()
                     
                     if meta:
-                        logger.debug(f"✅ SEO: Найдена мета для новости '{news.title}' (ID={news.id})")
-                    else:
-                        logger.debug(f"⚠️ SEO: Мета не найдена для новости ID={news.id}, используется fallback")
+                        logger.debug(f"SEO найдено для новости: {news.title} (ID={news.id})")
                 
                 except News.DoesNotExist:
-                    logger.warning(f"❌ SEO: Новость с slug='{slug}' не найдена")
+                    logger.warning(f"Новость не найдена: {slug}")
         
         # ========== ДИНАМИЧЕСКИЕ СТРАНИЦЫ - ПРОДУКТЫ ==========
-        elif path.startswith('products/') and path != 'products':
-            # Извлекаем slug продукта: products/tiger-vh/
+        elif path.startswith('products/') and '?' not in request.get_full_path():
+            # Детальный продукт: /products/avtosamosval-faw-tiger-v/
             slug = path.replace('products/', '').strip('/')
             
             if slug:
-                # Ищем мета по slug продукта
-                meta = PageMeta.objects.filter(
-                    model='Product',
-                    key=slug,
-                    is_active=True
-                ).first()
+                from .models import Product
+                try:
+                    product = Product.objects.get(slug=slug, is_active=True)
+                    
+                    # Ищем SEO по ID продукта
+                    meta = PageMeta.objects.filter(
+                        model='Product',
+                        key=str(product.id),  # ← ID продукта!
+                        is_active=True
+                    ).first()
+                    
+                    if meta:
+                        logger.debug(f"SEO найдено для продукта: {product.title} (ID={product.id})")
                 
-                if meta:
-                    logger.debug(f"✅ SEO: Найдена мета для продукта '{slug}'")
-                else:
-                    logger.debug(f"⚠️ SEO: Мета не найдена для продукта '{slug}', используется fallback")
-        
-        # ========== ЛОГИРОВАНИЕ ДЛЯ ОТЛАДКИ (только в DEBUG режиме) ==========
-        if meta:
-            logger.info(f"✅ SEO Meta загружена: {meta.model} - {meta.key} - {meta.title[:50]}")
-        else:
-            logger.debug(f"⚠️ SEO Meta не найдена для пути: {request.path}")
+                except Product.DoesNotExist:
+                    logger.warning(f"Продукт не найден: {slug}")
     
     except Exception as e:
-        logger.error(f"❌ Ошибка в seo_meta context processor: {str(e)}", exc_info=True)
+        logger.error(f"Ошибка в seo_meta: {str(e)}", exc_info=True)
         meta = None
     
     return {

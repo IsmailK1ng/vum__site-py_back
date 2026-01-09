@@ -3,16 +3,15 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="{{ HTML_LANG }}">
 
-    
     <head>
     <meta charset="UTF-8">
-    <script src="{% static 'js/utm-tracker.js' %}"></script>
-    <title>FAW Trucks - Mahsulot</title>
+   
+    {% include 'main/includes/seo_meta.html' %}
+
     {% hreflang_tags %}
     {% canonical_url %}
-    <meta name="description" content="FAW Trucks в Узбекистане">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
+   
     <!-- Универсальный favicon -->
     <link rel="icon" href="{% static 'images/logo/logo-vum.png' %}" />
     <!-- Для Apple устройств -->
@@ -26,6 +25,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/more_info.css' %}">
 
+    <script src="{% static 'js/utm-tracker.js' %}"></script>
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],

@@ -9,13 +9,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-    <!-- Page Title -->
-    <title>{% if LANGUAGE_CODE == 'uz' %}Lizing{% elif LANGUAGE_CODE == 'ru' %}Лизинг{% else %}Leasing{% endif %} | FAW Trucks</title>
+    {% include 'main/includes/seo_meta.html' %}
+
     {% hreflang_tags %}
     {% canonical_url %}
-    <!-- Meta Tags -->
-    <meta name="description" content="{% if LANGUAGE_CODE == 'uz' %}FAW Trucks lizing xizmatlari O'zbekistonda - qulay shartlar, tez rasmiylashtirish{% elif LANGUAGE_CODE == 'ru' %}Лизинговые услуги FAW Trucks в Узбекистане - удобные условия, быстрое оформление{% else %}FAW Trucks leasing services in Uzbekistan - convenient terms, fast processing{% endif %}">
-    <meta name="keywords" content="FAW Trucks, {% if LANGUAGE_CODE == 'uz' %}lizing, O'zbekiston{% elif LANGUAGE_CODE == 'ru' %}лизинг, Узбекистан{% else %}leasing, Uzbekistan{% endif %}">
     <meta name="author" content="mix_design">
 
     <!-- Favicon -->

@@ -60,7 +60,6 @@ class News(models.Model):
         ordering = ['-order', '-created_at']
 
     def __str__(self):
-        # ✅ Улучшенный вывод для истории версий
         return f"{self.created_at.strftime('%d.%m.%Y')} — {self.title[:50]}"
     
     def save(self, *args, **kwargs):
@@ -122,7 +121,6 @@ class NewsBlock(models.Model):
         verbose_name_plural = "Блоки новостей"
 
     def __str__(self):
-        # ✅ Улучшенный вывод
         type_display = self.get_block_type_display()
         if self.title:
             return f"{self.news.title[:30]} — {type_display}: {self.title[:30]}"
@@ -827,8 +825,6 @@ class PageMeta(models.Model):
         ('Page', 'Статическая страница'),
         ('Post', 'Новость'),
         ('Product', 'Продукт'),
-        ('Vacancy', 'Вакансия'),
-        ('Dealer', 'Дилер'),
     ]
     
     OG_TYPE_CHOICES = [
@@ -836,7 +832,7 @@ class PageMeta(models.Model):
         ('article', 'Article - Статья, новость'),
         ('product', 'Product - Товар, продукт'),
         ('profile', 'Profile - Профиль'),
-        ('video.movie', 'Video - Видео'),
+        ('video.movie', 'Video - Видео'),   
         ('music.song', 'Music - Музыка'),
         ('book', 'Book - Книга'),
     ]
@@ -853,6 +849,16 @@ class PageMeta(models.Model):
         "Ключ страницы",
         max_length=100,
         help_text="Уникальный идентификатор страницы"
+    )
+    
+    # ========== ДОБАВЛЯЕМ ПОЛЕ ДЛЯ ПРАВИЛЬНОЙ СОРТИРОВКИ ==========
+    key_order = models.IntegerField(
+        "Порядок сортировки",
+        null=True,
+        blank=True,
+        db_index=True,
+        editable=False,
+        help_text="Автоматически заполняется из key для правильной сортировки"
     )
     
     # ========== БАЗОВЫЕ META ТЕГИ ==========
@@ -936,11 +942,22 @@ class PageMeta(models.Model):
     class Meta:
         verbose_name = "SEO - Мета-данные страницы"
         verbose_name_plural = "SEO - Мета-данные страниц"
-        ordering = ['model', 'key']
+        ordering = ['model', 'key_order', 'key']  
         unique_together = ('model', 'key')
     
     def __str__(self):
         return f"{self.get_model_display()} — {self.key}"
+    
+    def save(self, *args, **kwargs):
+        """Автоматически заполняем key_order перед сохранением"""
+        if self.key.isdigit():
+            # Если key - число, сохраняем как число
+            self.key_order = int(self.key)
+        else:
+            # Если key - текст (home, about), ставим большое число (в конец)
+            self.key_order = 999999
+        
+        super().save(*args, **kwargs)
     
     def get_og_title(self):
         """Возвращает OG title или обычный title"""
@@ -957,8 +974,9 @@ class PageMeta(models.Model):
         
         base_url = 'https://faw.uz'
         
-        url_map = {
-            'Page': {
+        # ========== ДЛЯ СТАТИЧЕСКИХ СТРАНИЦ ==========
+        if self.model == 'Page':
+            url_map = {
                 'home': '/',
                 'about': '/about/',
                 'contact': '/contact/',
@@ -967,16 +985,32 @@ class PageMeta(models.Model):
                 'jobs': '/jobs/',
                 'lizing': '/lizing/',
                 'become-a-dealer': '/become-a-dealer/',
-            },
-            'Post': f'/news/{self.key}/',
-            'Product': f'/products/{self.key}/',
-            'Vacancy': f'/jobs/',
-            'Dealer': f'/dealers/',
-        }
+                'news': '/news/',
+                'services': '/services/',
+            }
+            path = url_map.get(self.key, '/')
+            return f"{base_url}{path}"
         
-        if self.model == 'Page':
-            path = url_map['Page'].get(self.key, '/')
-        else:
-            path = url_map.get(self.model, '/').replace('{self.key}', self.key)
+        # ========== ДЛЯ НОВОСТЕЙ ==========
+        elif self.model == 'Post':
+            if self.key.isdigit():
+                try:
+                    from main.models import News
+                    news = News.objects.get(id=int(self.key))
+                    return f"{base_url}/news/{news.slug}/"
+                except (News.DoesNotExist, ValueError):
+                    return f"{base_url}/news/"
+            return f"{base_url}/news/"
         
-        return f"{base_url}{path}"
+        # ========== ДЛЯ ПРОДУКТОВ ==========
+        elif self.model == 'Product':
+            if self.key.isdigit():
+                try:
+                    from main.models import Product
+                    product = Product.objects.get(id=int(self.key))
+                    return f"{base_url}/products/{product.slug}/"
+                except (Product.DoesNotExist, ValueError):
+                    return f"{base_url}/products/"
+            return f"{base_url}/products/"
+        
+        return base_url

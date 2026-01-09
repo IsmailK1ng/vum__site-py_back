@@ -6,17 +6,14 @@
 
 <head>
   <meta charset="UTF-8">
-  <script src="{% static 'js/utm-tracker.js' %}"></script>
-  <!-- Заголовок страницы -->
-  <title>Faw Trucks в Узбекистане</title>
+  
+
+  {% include 'main/includes/seo_meta.html' %}
+  
   {% hreflang_tags %}
   {% canonical_url %}
-  <!-- Мета теги -->
-  <meta name="description" content="Faw Trucks в Узбекистане">
-  <meta name="keywords" content="Faw Trucks в Узбекистане">
-  <meta name="author" content="mix_design">
 
-  <!-- Мета viewport -->
+  <meta name="author" content="mix_design">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -33,7 +30,7 @@
   <meta property="og:url" content="https://mixdesign.dev/themeforest/rayo">
   <meta property="og:image" content="https://mixdesign.dev/themeforest/rayo/img/og-image.jpg">
 
-
+  <script src="{% static 'js/utm-tracker.js' %}"></script>
 
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

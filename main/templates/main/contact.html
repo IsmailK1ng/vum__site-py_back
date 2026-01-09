@@ -6,14 +6,11 @@
 
 <head>
     <meta charset="UTF-8" />
-    <script src="{% static 'js/utm-tracker.js' %}"></script>
-    <!-- Page Title -->
-    <title>{% if LANGUAGE_CODE == 'uz' %}Kontaktlar{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %} | FAW Trucks</title>
+    
+    {% include 'main/includes/seo_meta.html' %}
+
     {% hreflang_tags %}
     {% canonical_url %}
-    <!-- Meta Tags -->
-    <meta name="description" content="{% if LANGUAGE_CODE == 'uz' %}FAW Trucks Oʻzbekiston - aloqa maʼlumotlari{% elif LANGUAGE_CODE == 'ru' %}FAW Trucks Узбекистан - контактная информация{% else %}FAW Trucks Uzbekistan - contact information{% endif %}" />
-    <meta name="keywords" content="FAW Trucks, {% if LANGUAGE_CODE == 'uz' %}Oʻzbekiston, kontaktlar{% elif LANGUAGE_CODE == 'ru' %}Узбекистан, контакты{% else %}Uzbekistan, contacts{% endif %}" />
     <meta name="author" content="mix_design" />
 
     <!-- Viewport Meta-->
@@ -31,6 +28,8 @@
     <meta property="og:description" content="{% if LANGUAGE_CODE == 'uz' %}FAW Trucks bilan bogʻlaning{% elif LANGUAGE_CODE == 'ru' %}Свяжитесь с FAW Trucks{% else %}Contact FAW Trucks{% endif %}" />
     <meta property="og:url" content="https://fawtrucks.uz/contact" />
     <meta property="og:image" content="{% static 'images/og-image.jpg' %}" />
+
+    <script src="{% static 'js/utm-tracker.js' %}"></script>
 
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

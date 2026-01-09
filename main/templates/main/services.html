@@ -3,36 +3,22 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="{{ HTML_LANG }}">
 
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-    <!-- Page Title -->
-    <title>{% if LANGUAGE_CODE == 'uz' %}VUM Servis{% elif LANGUAGE_CODE == 'ru' %}Сервис VUM{% else %}VUM Service{%endif %} | FAW Trucks</title>
+    <!-- ========== SEO МЕТА-ДАННЫЕ ========== -->
+    {% include 'main/includes/seo_meta.html' %}
+
     {% hreflang_tags %}
     {% canonical_url %}
-    <!-- Meta Tags -->
-    <meta name="description"
-        content="{% if LANGUAGE_CODE == 'uz' %}FAW Trucks servis xizmati O'zbekistonda - kafolat, texnik xizmat, ehtiyot qismlar{% elif LANGUAGE_CODE == 'ru' %}Сервисное обслуживание FAW Trucks в Узбекистане - гарантия, техобслуживание, запчасти{% else %}FAW Trucks service in Uzbekistan - warranty, maintenance, spare parts{% endif %}">
-    <meta name="keywords"
-        content="FAW Trucks, {% if LANGUAGE_CODE == 'uz' %}servis, texnik xizmat, O'zbekiston{% elif LANGUAGE_CODE == 'ru' %}сервис, техобслуживание, Узбекистан{% else %}service, maintenance, Uzbekistan{% endif %}">
+
     <meta name="author" content="mix_design">
 
     <!-- Favicon -->
     <link rel="icon" href="{% static 'images/logo/logo-vum.png' %}" />
     <link rel="apple-touch-icon" href="{% static 'images/logo/logo-vum.png' %}">
-
-    <!-- Open Graph -->
-    <meta property="og:title"
-        content="{% if LANGUAGE_CODE == 'uz' %}VUM Servis{% elif LANGUAGE_CODE == 'ru' %}Сервис VUM{% else %}VUM Service{% endif %} | FAW Trucks">
-    <meta property="og:description"
-        content="{% if LANGUAGE_CODE == 'uz' %}Professional servis xizmati{% elif LANGUAGE_CODE == 'ru' %}Профессиональное сервисное обслуживание{% else %}Professional service{% endif %}">
-    <meta property="og:url" content="https://fawtrucks.uz/services">
-    <meta property="og:image" content="{% static 'images/service-img/1.JPG' %}">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
 
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -44,7 +30,6 @@
 
     <meta name="yandex-verification" content="78715d404b789626" />
     <meta name="google-site-verification" content="xmjQ3Gc6gAMaPe0MydDnP_uYW0EOz-Y-T6Kzkc7ylEA" />
-
 
     <noscript><img height="1" width="1" style="display:none"
             src="https://www.facebook.com/tr?id=2271244510044933&ev=PageView&noscript=1" /></noscript>
@@ -66,7 +51,6 @@
 </head>
 
 <body>
-
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5K2BD9C3"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>

@@ -107,4 +107,4 @@ class PageMetaTranslationOptions(TranslationOptions):
         'og_description',
         'og_site_name',
     )
-    required_languages = ()  # Все языки необязательны
+    required_languages = ()  

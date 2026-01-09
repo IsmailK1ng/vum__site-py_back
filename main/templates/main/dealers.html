@@ -6,11 +6,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>{% if LANGUAGE_CODE == 'uz' %}VUM dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры VUM{% else %}VUM Dealers{% endif %}</title>
+    {% include 'main/includes/seo_meta.html' %}
+
     {% hreflang_tags %}
     {% canonical_url %}
-    <meta name="description" content="{% if LANGUAGE_CODE == 'uz' %}O'zbekistondagi FAW Trucks{% elif LANGUAGE_CODE == 'ru' %}FAW Trucks в Узбекистане{% else %}FAW Trucks in Uzbekistan{% endif %}">
-    <meta name="keywords" content="FAW Trucks, {% if LANGUAGE_CODE == 'uz' %}dilerlar, Toshkent{% elif LANGUAGE_CODE == 'ru' %}дилеры, Ташкент{% else %}dealers, Tashkent{% endif %}">
     <meta name="author" content="mix_design">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">

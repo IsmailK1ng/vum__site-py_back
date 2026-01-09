@@ -269,7 +269,7 @@ class NewsBlockInline(TranslationStackedInline):
 
 @admin.register(News)
 class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
-    list_display = ['preview_image_tag', 'title', 'author', 'is_active', 'order', 'created_at', 'action_buttons']
+    list_display = ['preview_image_tag', 'title', 'author', 'is_active', 'order', 'created_at', 'seo_button', 'action_buttons']
     list_editable = ['is_active', 'order']
     list_filter = ['is_active', 'created_at']
     search_fields = ['title', 'desc']
@@ -321,6 +321,22 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
             </div>
         ''', f'/admin/main/news/{obj.id}/change/', obj.slug, f'/admin/main/news/{obj.id}/delete/')
     action_buttons.short_description = "Действия"
+
+    def seo_button(self, obj):
+        """Кнопка SEO"""
+        try:
+            seo = PageMeta.objects.get(model='Post', key=str(obj.id))
+            icon_color = '#10b981' if seo.is_active else '#ef4444'
+            status_text = 'Активно' if seo.is_active else 'Неактивно'
+            return format_html(
+                '<a href="/admin/main/pagemeta/{}/change/" title="{}" style="display:inline-block;background:{};color:white;padding:6px 12px;border-radius:6px;text-decoration:none;font-weight:600;font-size:11px;">SEO</a>',
+                seo.id, status_text, icon_color
+            )
+        except PageMeta.DoesNotExist:
+            return format_html(
+                '<span style="color:#999;font-size:11px;">—</span>'
+            )
+    seo_button.short_description = "SEO"
     
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
@@ -1086,7 +1102,7 @@ class ProductGalleryInline(admin.TabularInline):
 class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
     form = ProductCategoriesForm
     
-    list_display = ['thumbnail', 'title', 'all_categories_display', 'is_active', 'is_featured', 'slider_order', 'order']
+    list_display = ['thumbnail', 'title', 'all_categories_display', 'is_active', 'is_featured', 'slider_order', 'order', 'seo_button']
     list_filter = [ProductCategoryFilter, 'is_active', 'is_featured']
     search_fields = ['title', 'slug']
     list_editable = ['is_active', 'is_featured', 'slider_order', 'order']
@@ -1149,6 +1165,22 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
             return format_html(' '.join(tags))
         return "—"
     all_categories_display.short_description = "Категории"
+
+    def seo_button(self, obj):
+        """Кнопка SEO"""
+        try:
+            seo = PageMeta.objects.get(model='Product', key=str(obj.id))
+            icon_color = '#10b981' if seo.is_active else '#ef4444'
+            status_text = 'Активно' if seo.is_active else 'Неактивно'
+            return format_html(
+                '<a href="/admin/main/pagemeta/{}/change/" title="{}" style="display:inline-block;background:{};color:white;padding:6px 12px;border-radius:6px;text-decoration:none;font-weight:600;font-size:11px;">SEO</a>',
+                seo.id, status_text, icon_color
+            )
+        except PageMeta.DoesNotExist:
+            return format_html(
+                '<span style="color:#999;font-size:11px;">—</span>'
+            )
+    seo_button.short_description = "SEO"
     
     def add_to_slider(self, request, queryset):
         updated = queryset.update(is_featured=True)
@@ -1785,6 +1817,7 @@ class PromotionAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabb
         css = {
             'screen': ('modeltranslation/css/tabbed_translation_fields.css',),
         }
+
 # ============ SEO META DATA ============
 
 from .forms import PageMetaAdminForm  
@@ -1793,53 +1826,21 @@ from .forms import PageMetaAdminForm
 class PageMetaAdmin(ContentAdminMixin, TabbedTranslationAdmin):
     """Админка для управления SEO мета-данными"""
     
-    form = PageMetaAdminForm  #
+    form = PageMetaAdminForm
     
-    list_display = ['model_badge', 'key_display', 'title_preview', 'is_active', 'og_image_preview', 'updated_at', 'action_buttons']
-    list_filter = ['model', 'is_active', 'created_at']
+    # ОБНОВЛЕНО: добавлена колонка content_display
+    list_display = ['status_compact', 'model_badge', 'content_with_link', 'title_preview', 'content_created_at', 'updated_at', 'action_buttons']
+    list_filter = ['model', 'is_active']
     search_fields = ['key', 'title', 'title_uz', 'title_ru', 'title_en']
-    list_editable = ['is_active']
+    list_editable = []
     readonly_fields = ['created_at', 'updated_at', 'og_image_preview_large']
     
     fieldsets = (
         ('Идентификация страницы', {
             'fields': ('model', 'key', 'is_active'),
-        }),
-        ('Базовые META теги (для поисковиков)', {
-            'fields': ('title', 'description', 'keywords'),
-        }),
-        ('Open Graph теги (для соцсетей)', {
-            'fields': ('og_title', 'og_description', 'og_url', 'og_type', 'og_site_name', 'og_image', 'og_image_preview_large'),
-            'classes': ('collapse',)
-        }),
-        ('Служебная информация', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',)
-        }),
-    )
-    
-    # ========== ДОБАВЛЯЕМ CSS И JS ==========
-    class Media:
-        css = {
-            'all': ('css/admin_seo_help.css',)
-        }
-        js = ('js/admin_seo_help.js',) 
-    
-    # ... остальные методы (model_badge, key_display и т.д.) ОСТАВЛЯЕМ БЕЗ ИЗМЕНЕНИЙ
-    """Админка для управления SEO мета-данными"""
-    
-    list_display = ['model_badge', 'key_display', 'title_preview', 'is_active', 'og_image_preview', 'updated_at', 'action_buttons']
-    list_filter = ['model', 'is_active', 'created_at']
-    search_fields = ['key', 'title', 'title_uz', 'title_ru', 'title_en']
-    list_editable = ['is_active']
-    readonly_fields = ['created_at', 'updated_at', 'og_image_preview_large']
-    
-    fieldsets = (
-        (' Идентификация страницы', {
-            'fields': ('model', 'key', 'is_active'),
             'description': 'Выберите тип страницы и укажите уникальный ключ'
         }),
-        (' Базовые META теги (для поисковиков)', {
+        ('Базовые META теги (для поисковиков)', {
             'fields': ('title', 'description', 'keywords'),
             'description': 'Title и Description влияют на позиции в Google/Yandex'
         }),
@@ -1848,13 +1849,109 @@ class PageMetaAdmin(ContentAdminMixin, TabbedTranslationAdmin):
             'description': 'Эти теги используются при шаринге в Telegram, WhatsApp, Facebook',
             'classes': ('collapse',)
         }),
-        (' Служебная информация', {
+        ('Служебная информация', {
             'fields': ('created_at', 'updated_at'),
             'classes': ('collapse',)
         }),
     )
     
+    class Media:
+        css = {'all': ('css/admin_seo_help.css',)}
+        js = ('js/admin_seo_help.js',)
+    
+    # ==================== НОВАЯ СОРТИРОВКА ====================
+    
+    def get_queryset(self, request):
+        """
+        Умная сортировка:
+        1. ВСЕ активные (любого типа) - СВЕРХУ
+        2. Неактивные - по типам (Page → Post → Product)
+        """
+        from django.db.models import Case, When, IntegerField
+        
+        qs = super().get_queryset(request).order_by()
+        
+        # Фильтр по типу
+        model_filter = request.GET.get('model')
+        if model_filter:
+            qs = qs.filter(model=model_filter)
+        
+        qs = qs.annotate(
+            priority=Case(
+                When(is_active=True, then=0),
+                When(is_active=False, then=1),
+                output_field=IntegerField(),
+            )
+        )
+        
+        return qs.order_by('priority', 'model', '-updated_at')
+    
+    # ==================== ВКЛАДКИ ПО ТИПАМ ====================
+    
+    def changelist_view(self, request, extra_context=None):
+        """Добавляем вкладки по типам"""
+        extra_context = extra_context or {}
+        
+        # Считаем количество записей по типам
+        from django.db.models import Count
+        stats = PageMeta.objects.values('model').annotate(count=Count('id'))
+        
+        counts = {stat['model']: stat['count'] for stat in stats}
+        total = sum(counts.values())
+        
+        # Текущий фильтр
+        current_model = request.GET.get('model', 'all')
+        
+        extra_context['tabs'] = [
+            {
+                'label': f'Все ({total})',
+                'url': '?',
+                'active': current_model == 'all'
+            },
+            {
+                'label': f'📄 Статические ({counts.get("Page", 0)})',
+                'url': '?model=Page',
+                'active': current_model == 'Page'
+            },
+            {
+                'label': f'📰 Новости ({counts.get("Post", 0)})',
+                'url': '?model=Post',
+                'active': current_model == 'Post'
+            },
+            {
+                'label': f'🚛 Продукты ({counts.get("Product", 0)})',
+                'url': '?model=Product',
+                'active': current_model == 'Product'
+            },
+        ]
+        
+        return super().changelist_view(request, extra_context)
+    
     # ==================== ОТОБРАЖЕНИЕ ====================
+    def status_compact(self, obj):
+        """Компактный статус с ID"""
+        # Получаем ID из key (для Post и Product)
+        obj_id = ''
+        if obj.model in ['Post', 'Product']:
+            obj_id = f'#{obj.key} '
+        
+        if obj.is_active:
+            return format_html(
+                '<span style="color:#10b981;font-weight:600;font-size:16px;"> {}Готово</span>',
+                obj_id
+            )
+        elif not obj.title:
+            return format_html(
+                '<span style="color:#ef4444;font-weight:600;font-size:16px;"> {}Требует заполнения</span>',
+                obj_id
+            )
+        else:
+            return format_html(
+                '<span style="color:#f59e0b;font-weight:600;font-size:16px;"> {}В работе</span>',
+                obj_id
+            )
+    status_compact.short_description = "Статус"
+    status_compact.admin_order_field = 'is_active'
     
     def model_badge(self, obj):
         """Бейдж типа страницы"""
@@ -1862,56 +1959,106 @@ class PageMetaAdmin(ContentAdminMixin, TabbedTranslationAdmin):
             'Page': '#3b82f6',
             'Post': '#10b981',
             'Product': '#f59e0b',
-            'Vacancy': '#8b5cf6',
-            'Dealer': '#ec4899',
         }
         color = colors.get(obj.model, '#6b7280')
         return format_html(
-            '<span style="background:{};color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;">{}</span>',
+            '<span style="background:{};color:white;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;">{}</span>',
             color, obj.get_model_display()
         )
     model_badge.short_description = "Тип"
-    model_badge.admin_order_field = 'model'
     
     def key_display(self, obj):
         """Отображение ключа"""
         return format_html(
-            '<code style="background:#f3f4f6;padding:4px 8px;border-radius:4px;font-family:monospace;">{}</code>',
+            '<code style="background:#f3f4f6;padding:4px 8px;border-radius:4px;font-family:monospace;font-size:11px;">{}</code>',
             obj.key
         )
     key_display.short_description = "Ключ"
-    key_display.admin_order_field = 'key'
+    
+    def content_with_link(self, obj):
+        """Контент с ссылкой на оригинал"""
+        if obj.model == 'Post':
+            try:
+                news = News.objects.get(id=int(obj.key))
+                title = news.title[:60] + ('...' if len(news.title) > 60 else '')
+                return format_html(
+                    '<div style="max-width:350px;">'
+                    '<strong style="display:block;margin-bottom:4px;">{}</strong>'
+                    '<a href="/admin/main/news/{}/change/" style="font-size:14px;color:#3b82f6;text-decoration:none;">→ Открыть новость</a>'
+                    '</div>',
+                    title, news.id
+                )
+            except (News.DoesNotExist, ValueError):
+                return format_html('<span style="color:#999;">Новость не найдена</span>')
+        
+        elif obj.model == 'Product':
+            try:
+                product = Product.objects.get(id=int(obj.key))
+                title = product.title[:60] + ('...' if len(product.title) > 60 else '')
+                return format_html(
+                    '<div style="max-width:350px;">'
+                    '<strong style="display:block;margin-bottom:4px;">{}</strong>'
+                    '<a href="/admin/main/product/{}/change/" style="font-size:14px;color:#3b82f6;text-decoration:none;">→ Открыть продукт</a>'
+                    '</div>',
+                    title, product.id
+                )
+            except (Product.DoesNotExist, ValueError):
+                return format_html('<span style="color:#999;">Продукт не найден</span>')
+        
+        elif obj.model == 'Page':
+            page_names = {
+                'home': 'Главная страница',
+                'about': 'О нас',
+                'contact': 'Контакты',
+                'services': 'Сервис',
+                'lizing': 'Лизинг',
+                'become-a-dealer': 'Стать дилером',
+                'jobs': 'Вакансии',
+                'news': 'Новости (список)',
+                'dealers': 'Дилеры (список)',
+                'products_samosval': 'Каталог: Самосвалы',
+                'products_maxsus': 'Каталог: Спецтехника',
+                'products_furgon': 'Каталог: Фургоны',
+                'products_shassi': 'Каталог: Шасси',
+                'products_tiger_v': 'Каталог: Tiger V',
+                'products_tiger_vh': 'Каталог: Tiger VH',
+                'products_tiger_vr': 'Каталог: Tiger VR',
+            }
+            name = page_names.get(obj.key, obj.key)
+            return format_html(
+                '<div style="max-width:350px;color:#666;"><em>{}</em></div>',
+                name
+            )
+        
+        return '—'
+    content_with_link.short_description = "Контент"
+
+    def content_created_at(self, obj):
+        """Дата создания контента"""
+        if obj.model == 'Post':
+            try:
+                news = News.objects.get(id=int(obj.key))
+                return news.created_at.strftime('%d.%m.%Y')
+            except (News.DoesNotExist, ValueError):
+                return '—'
+        elif obj.model == 'Product':
+            try:
+                product = Product.objects.get(id=int(obj.key))
+                return product.created_at.strftime('%d.%m.%Y')
+            except (Product.DoesNotExist, ValueError):
+                return '—'
+        return '—'
+    content_created_at.short_description = "Создан"
     
     def title_preview(self, obj):
-        """Превью заголовка"""
-        title = obj.title[:60]
-        if len(obj.title) > 60:
+        """Превью SEO заголовка"""
+        if not obj.title:
+            return format_html('<span style="color:#ef4444;font-style:italic;font-weight:500;">(не заполнено)</span>')
+        title = obj.title[:50]
+        if len(obj.title) > 50:
             title += "..."
-        return format_html(
-            '<span style="font-weight:500;">{}</span>',
-            title
-        )
-    title_preview.short_description = "Title"
-    
-    def og_image_preview(self, obj):
-        """Маленькое превью OG картинки"""
-        if obj.og_image:
-            return format_html(
-                '<img src="{}" width="60" height="30" style="object-fit:cover;border-radius:4px;"/>',
-                obj.og_image.url
-            )
-        return format_html('<span style="color:#999;">—</span>')
-    og_image_preview.short_description = "OG Фото"
-    
-    def og_image_preview_large(self, obj):
-        """Большое превью OG картинки"""
-        if obj.og_image:
-            return format_html(
-                '<img src="{}" style="max-width:400px;max-height:200px;object-fit:contain;border-radius:8px;border:1px solid #ddd;"/>',
-                obj.og_image.url
-            )
-        return "—"
-    og_image_preview_large.short_description = "Превью изображения"
+        return format_html('<span style="font-weight:400;color:#374151;">{}</span>', title)
+    title_preview.short_description = "SEO Title"
     
     def action_buttons(self, obj):
         """Кнопки действий"""
@@ -1934,20 +2081,26 @@ class PageMetaAdmin(ContentAdminMixin, TabbedTranslationAdmin):
         )
     action_buttons.short_description = "Действия"
     
+    def og_image_preview_large(self, obj):
+        """Большое превью OG картинки"""
+        if obj.og_image:
+            return format_html(
+                '<img src="{}" style="max-width:400px;max-height:200px;object-fit:contain;border-radius:8px;border:1px solid #ddd;"/>',
+                obj.og_image.url
+            )
+        return "—"
+    og_image_preview_large.short_description = "Превью изображения"
+    
     # ==================== ДОПОЛНИТЕЛЬНЫЕ МЕТОДЫ ====================
     
     def save_model(self, request, obj, form, change):
         """Автозаполнение полей при сохранении"""
-        # Если og_title пустой, копируем из title
         if not obj.og_title:
             obj.og_title = obj.title
-        
-        # Если og_description пустой, копируем из description
         if not obj.og_description:
             obj.og_description = obj.description
-        
-        # Автогенерация URL если пустой
         if not obj.og_url:
             obj.og_url = obj.get_full_url()
-        
         super().save_model(request, obj, form, change)
+
+    
