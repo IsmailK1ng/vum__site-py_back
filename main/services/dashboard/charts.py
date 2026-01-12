@@ -25,37 +25,55 @@ def _get_source_from_utm(lead):
                 return 'instagram'
             elif source in ['fb', 'facebook']:
                 return 'facebook'
-            elif 'yandex' in source or source == 'yd':
+            elif 'yandex' in source or source == 'yd' or 'market' in source or 'zen' in source:
                 return 'yandex'
-            elif 'telegram' in source or source == 'tg':
+            elif 'telegram' in source or source == 'tg' or source == 't.me':
                 return 'telegram'
             elif 'tiktok' in source or source == 'tt':
                 return 'tiktok'
-            elif 'youtube' in source or source == 'yt':
+            elif 'youtube' in source or source == 'yt' or source == 'youtu.be':
                 return 'youtube'
             else:
                 return 'other'
         except:
             pass  # Если ошибка парсинга — проверяем referer
     
-    # 2. ПРОВЕРЯЕМ REFERER (ЕСЛИ НЕТ UTM)
+
     if lead.referer and lead.referer != '':
         referer_lower = lead.referer.lower()
         
-        if 'facebook.com' in referer_lower or 'm.facebook.com' in referer_lower:
+
+        if 'faw.uz' in referer_lower:
+            return 'direct'
+        
+
+        elif 'facebook.com' in referer_lower or 'm.facebook.com' in referer_lower or 'fb.com' in referer_lower or 'fbclid=' in referer_lower:
             return 'facebook'
-        elif 'instagram.com' in referer_lower:
+        
+
+        elif 'instagram.com' in referer_lower or 'ig.me' in referer_lower:
             return 'instagram'
-        elif 'google.com' in referer_lower or 'google.' in referer_lower:
+        
+
+        elif 'google.com' in referer_lower or 'google.' in referer_lower or 'gclid=' in referer_lower:
             return 'google'
-        elif 'yandex' in referer_lower:
+        
+
+        elif 'yandex' in referer_lower or 'market.yandex' in referer_lower or 'zen.yandex' in referer_lower or 'direct.yandex' in referer_lower or 'yclid=' in referer_lower:
             return 'yandex'
-        elif 'telegram' in referer_lower or 't.me' in referer_lower:
+        
+
+        elif 'telegram' in referer_lower or 't.me' in referer_lower or 'telegram.me' in referer_lower or 'telegram.org' in referer_lower:
             return 'telegram'
-        elif 'tiktok.com' in referer_lower:
+        
+
+        elif 'tiktok.com' in referer_lower or 'vm.tiktok' in referer_lower or 'vt.tiktok' in referer_lower or 'ttclid=' in referer_lower:
             return 'tiktok'
-        elif 'youtube.com' in referer_lower or 'youtu.be' in referer_lower:
+        
+
+        elif 'youtube.com' in referer_lower or 'youtu.be' in referer_lower or 'm.youtube' in referer_lower:
             return 'youtube'
+        
         else:
             return 'other'
     
