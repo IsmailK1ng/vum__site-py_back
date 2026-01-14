@@ -317,20 +317,29 @@ function goTo(direction) {
 
 function renderInfo(idx) {
   const slide = slides[getIndex(idx)];
+
+  // Получаем переводы из data-атрибутов элемента slider-data
+  const sliderDataElement = document.getElementById('slider-data');
+  const labels = {
+    price: sliderDataElement?.dataset.labelPrice || 'ЦЕНА',
+    power: sliderDataElement?.dataset.labelPower || 'Мощность двигателя',
+    mpg: sliderDataElement?.dataset.labelMpg || 'Расход топлива'
+  };
+
   document.getElementById('slider-info').innerHTML = `
     <div class="faw-year">${slide.year}</div>
     <div class="faw-title">${slide.title}</div>
     <div class="faw-info-row">
       <div class="faw-info-col">
-        <span class="faw-price-label">NARXI</span>
+        <span class="faw-price-label">${labels.price}</span>
         <div class="faw-price-value">${slide.price}</div>
       </div>
       <div class="faw-info-col">
-        <span class="faw-power-label">KUCH</span>
+        <span class="faw-power-label">${labels.power}</span>
         <div class="faw-power-value">${slide.power}</div>
       </div>
       <div class="faw-info-col">
-        <span class="faw-mpg-label">RASHOD</span>
+        <span class="faw-mpg-label">${labels.mpg}</span>
         <div class="faw-mpg-value">${slide.mpg}</div>
       </div>
     </div>

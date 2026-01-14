@@ -18,9 +18,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   <!-- Универсальный favicon -->
-  <link rel="icon" href="{% static 'images/vum-icon.png' %}" />
+  <link rel="icon" href="{% static 'images/LOGO-VUM.png' %}" />
   <!-- Для Apple устройств -->
-  <link rel="apple-touch-icon" href="{% static 'images/vum-icon.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'images/LOGO-VUM.png' %}">
 
   <!-- Мета для Facebook (начало) -->
   <meta property="og:image:height" content="1200">
@@ -489,7 +489,7 @@
 
     <!-- Секция — слайдер FAW (начало) -->
     <!-- Скрытый элемент с данными слайдера из Django -->
-    <div id="slider-data" style="display: none;">{{ slider_products|safe }}</div>
+    <div id="slider-data" style="display: none;"  data-label-price="{% if LANGUAGE_CODE == 'uz' %}NARXI{% elif LANGUAGE_CODE == 'ru' %}ЦЕНА{% else %}PRICE{% endif %}" data-label-power="{% if LANGUAGE_CODE == 'uz' %}Dvigatel quvvati{% elif LANGUAGE_CODE == 'ru' %}Мощность двигателя{% else %}Engine Power{% endif %}" data-label-mpg="{% if LANGUAGE_CODE == 'uz' %}Yoqilg'i sarfi{% elif LANGUAGE_CODE == 'ru' %}Расход топлива{% else %}Fuel Consumption{% endif %}">{{ slider_products|safe }}</div>
     <!-- Секция — слайдер FAW (начало) -->
     <div class="mxd-section overflow-hidden" style="margin-top: 6.3rem;">
       <div class="mxd-container">
