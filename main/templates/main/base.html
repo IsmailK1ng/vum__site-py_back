@@ -17,8 +17,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-    <link rel="icon" href="{% static 'images/vum-icon.png' %}">
-    <link rel="apple-touch-icon" href="{% static 'images/vum-icon.png' %}">
+    <!-- Favicon (динамически меняется в зависимости от темы) -->
+    <link rel="icon" href="{% static 'images/vum-icon-dark.svg' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/vum-icon-dark.svg' %}">
 
     <!-- Подключение CSS -->
     <link rel="stylesheet" href="{% static 'css/loaders/loader.css' %}">
@@ -43,6 +44,7 @@
 
     <!-- Скрипты -->
     <script src="{% static 'js/utm-tracker.js' %}"></script>
+    <script src="{% static 'js/favicon-theme.js' %}"></script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

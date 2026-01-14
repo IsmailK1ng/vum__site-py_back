@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for file in about.html become_a_dealer.html contact.html dealers.html jobs.html lizing.html news.html news_detail.html product_detail.html services.html)",
+      "Bash(do sed -i \"/js\\\\/app.js/a\\\\  <script src=\"\"{% static ''js/favicon-theme.js'' %}\"\"></script>\" \"$file\")",
+      "Bash(done)",
+      "Bash(for file in *.html)",
+      "Bash(do sed -i \"s|images/LOGO-VUM\\\\.png|images/vum-icon-dark.svg|g\" \"$file\")"
+    ]
+  }
+}
