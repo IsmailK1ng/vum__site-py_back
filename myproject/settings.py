@@ -251,8 +251,6 @@ CSRF_TRUSTED_ORIGINS = [
     'https://www.faw.uz',
     'https://faw.kg',
     'https://www.faw.kg',
-    'https://new.faw.uz',
-    'https://www.new.faw.uz',
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -264,8 +262,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
     'http://localhost:8080',
-    'https://new.faw.uz',
-    'https://www.new.faw.uz',
+
 ]
 
 CORS_ALLOW_ALL_ORIGINS = DEBUG

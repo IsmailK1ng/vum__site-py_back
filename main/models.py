@@ -942,7 +942,7 @@ class PageMeta(models.Model):
     class Meta:
         verbose_name = "SEO - Мета-данные страницы"
         verbose_name_plural = "SEO - Мета-данные страниц"
-        ordering = ['model', 'key_order', 'key']  
+        ordering = ['-is_active', '-updated_at', 'model', 'key_order', 'key']
         unique_together = ('model', 'key')
     
     def __str__(self):
