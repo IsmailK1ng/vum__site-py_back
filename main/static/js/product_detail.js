@@ -356,7 +356,6 @@ class ProductDetail {
             window.gallerySwiper = swiper;
         }, 400);
     }
-
     updateBreadcrumbs() {
         const breadcrumbLinks = document.querySelectorAll('.breadcrumb-ol li a');
         if (breadcrumbLinks.length < 3) return;
@@ -369,16 +368,11 @@ class ProductDetail {
 
         const categoryLink = breadcrumbLinks[1];
         if (categoryLink) {
-            // Берём перевод только из локального словаря, игнорируя category_display
             const categoryName = this.t(`categories.${this.product.category}`) || 'Models';
-
             categoryLink.textContent = categoryName;
             categoryLink.href = `/#models`;
         }
-
-        document.title = `${this.product.title} - FAW Trucks`;
     }
-
     generateSchemaMarkup() {
         const baseUrl = `${window.location.protocol}//${window.location.host}`;
         const currentUrl = window.location.href;
