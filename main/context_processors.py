@@ -21,7 +21,7 @@ def seo_meta(request):
     # Убираем начальный и конечный слеш
     path = path.strip('/')
     
- z
+ 
     if path.startswith(current_lang):
         # Убираем язык
         path = path[len(current_lang):]
