@@ -1,5 +1,3 @@
-# myproject/urls.py
-
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -38,16 +36,13 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 ]
 
-urlpatterns += [
-    path('', include('main.urls')), 
-]
-
+# ========== ОСНОВНЫЕ URL ТОЛЬКО ЧЕРЕЗ i18n_patterns ==========
 urlpatterns += i18n_patterns(
-    path('', include('main.urls')),
+    path('', include('main.urls')),  
     prefix_default_language=False  
 )
 
 # ========== МЕДИА И СТАТИКА (только DEBUG) ==========
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root='')
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  

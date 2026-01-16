@@ -260,8 +260,6 @@ class ProductsManager {
       breadcrumbActive.textContent = categoryInfo.breadcrumb;
     }
 
-    // 5. Обновляем title страницы
-    document.title = `${categoryInfo.title} - FAW Trucks`;
 
     // Сохраняем текст кнопки для использования в карточках
     this.buttonText = categoryInfo.buttonText;
@@ -434,6 +432,9 @@ class ProductsManager {
     const productTitle = product.title || product.name || 'Продукт';
     const buttonText = this.buttonText || 'Подробнее';
 
+    const languagePrefix = this.currentLanguage === 'uz' ? '' : `/${this.currentLanguage}`;
+    const productUrl = `${languagePrefix}/products/${productSlug}/`;
+
     return `
       <div class="faw-truck-card">
         <div class="truck-image-container">
@@ -443,7 +444,7 @@ class ProductsManager {
           <h3 class="truck-title">${productTitle}</h3>
           ${specsHTML ? `<div class="truck-specs">${specsHTML}</div>` : ''}
           <div class="truck-cta">
-            <a href="/products/${productSlug}/" class="btn-details">${buttonText}</a>
+            <a href="${productUrl}" class="btn-details">${buttonText}</a>
           </div>
         </div>
       </div>

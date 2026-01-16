@@ -1,4 +1,4 @@
-<!-- ========== SEO МЕТА-ДАННЫЕ ========== -->
+
 {% if page_meta %}
   <title>{{ page_meta.title }}</title>
   <meta name="description" content="{{ page_meta.description }}">
@@ -10,9 +10,7 @@
   <meta property="og:description" content="{{ page_meta.get_og_description }}">
   <meta property="og:type" content="{{ page_meta.og_type }}">
   <meta property="og:site_name" content="{{ page_meta.og_site_name }}">
-  {% if page_meta.og_url %}
-    <meta property="og:url" content="{{ page_meta.og_url }}">
-  {% endif %}
+  <meta property="og:url" content="{{ current_page_url }}">
   {% if page_meta.og_image %}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ page_meta.og_image.url }}">
     <meta property="og:image:width" content="1200">

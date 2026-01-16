@@ -1,9 +1,11 @@
+# main/translation.py
+
 from modeltranslation.translator import register, TranslationOptions
 from .models import (
     News, NewsBlock, Vacancy, 
     VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
     Product, ProductFeature, ProductCardSpec, ProductParameter,
-    DealerService, Dealer, BecomeADealerPage, DealerRequirement, Promotion,PageMeta     
+    DealerService, Dealer, BecomeADealerPage, DealerRequirement, Promotion, PageMeta     
 )
 
 
@@ -49,11 +51,11 @@ class VacancyIdealCandidateTranslationOptions(TranslationOptions):
 class ProductTranslationOptions(TranslationOptions):
     fields = (
         'title',
-        # Поля для слайдера
         'slider_price',
         'slider_power',
         'slider_fuel_consumption',
     )
+
 
 @register(ProductFeature)
 class ProductFeatureTranslationOptions(TranslationOptions):
@@ -96,7 +98,7 @@ class PromotionTranslationOptions(TranslationOptions):
     fields = ('title', 'description', 'button_text')
     required_languages = ()
 
-# ========== SEO META DATA ==========
+
 @register(PageMeta)
 class PageMetaTranslationOptions(TranslationOptions):
     fields = (
@@ -106,5 +108,6 @@ class PageMetaTranslationOptions(TranslationOptions):
         'og_title',
         'og_description',
         'og_site_name',
+        'og_url',  
     )
-    required_languages = ()  
+    required_languages = ()

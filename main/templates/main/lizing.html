@@ -13,19 +13,10 @@
 
     {% hreflang_tags %}
     {% canonical_url %}
-    <meta name="author" content="mix_design">
 
     <!-- Favicon -->
     <link rel="icon" href="{% static 'images/vum-icon-dark.svg' %}" />
     <link rel="apple-touch-icon" href="{% static 'images/vum-icon-dark.svg' %}">
-
-    <!-- Open Graph -->
-    <meta property="og:title" content="{% if LANGUAGE_CODE == 'uz' %}Lizing{% elif LANGUAGE_CODE == 'ru' %}Лизинг{% else %}Leasing{% endif %} | FAW Trucks">
-    <meta property="og:description" content="{% if LANGUAGE_CODE == 'uz' %}Qulay lizing shartlari{% elif LANGUAGE_CODE == 'ru' %}Удобные условия лизинга{% else %}Convenient leasing terms{% endif %}">
-    <meta property="og:url" content="https://fawtrucks.uz/lizing">
-    <meta property="og:image" content="{% static 'images/lizing.png' %}">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
 
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

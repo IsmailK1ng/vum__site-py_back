@@ -35,9 +35,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'reversion',
     
-    # Приложения проектов
-    'main',  # FAW Uzbekistan
-    'kg',    # FAW Kyrgyzstan
+    'main',  
+    'kg',    
 ]
 
 # ============ REST FRAMEWORK ============
@@ -159,11 +158,13 @@ JAZZMIN_UI_TWEAKS = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'myproject.middleware.WWWRedirectMiddleware',  
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.locale.LocaleMiddleware',  
     'myproject.middleware.ForceRussianMiddleware', 
+    'myproject.middleware.LanguageCookieMiddleware', 
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'myproject.middleware.RefreshUserPermissionsMiddleware', 
@@ -171,7 +172,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'reversion.middleware.RevisionMiddleware',
 ]
-
 ROOT_URLCONF = 'myproject.urls'
 
 # ============ TEMPLATES ============
@@ -278,14 +278,10 @@ if not DEBUG:
         'https://www.faw.uz',
         'https://faw.kg', 
         'https://www.faw.kg',
-        'https://new.faw.uz',
-        'https://www.new.faw.uz',
     ]
     ALLOWED_HOSTS = [
         'faw.uz',
         'www.faw.uz',
-        'new.faw.uz',
-        'www.new.faw.uz',
         'faw.uz', 'www.faw.uz',
         'faw.kg', 'www.faw.kg',
         'api.faw.uz', 'api.faw.kg'
@@ -302,11 +298,14 @@ if not DEBUG:
 LANGUAGE_COOKIE_NAME = 'django_language'
 LANGUAGE_COOKIE_AGE = 365 * 24 * 60 * 60
 LANGUAGE_COOKIE_PATH = '/'
-LANGUAGE_COOKIE_DOMAIN = None
+LANGUAGE_COOKIE_DOMAIN = '.faw.uz' 
 LANGUAGE_COOKIE_SECURE = not DEBUG
 LANGUAGE_COOKIE_HTTPONLY = False
 LANGUAGE_COOKIE_SAMESITE = 'Lax'
 
+
+SESSION_COOKIE_DOMAIN = '.faw.uz'
+CSRF_COOKIE_DOMAIN = '.faw.uz'
 # ============ CKEDITOR ============
 
 CKEDITOR_CONFIGS = {

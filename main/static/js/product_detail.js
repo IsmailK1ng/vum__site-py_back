@@ -99,9 +99,18 @@ class ProductDetail {
     }
 
     async init() {
+        // 🔍 DEBUG
+        console.log('Full URL:', window.location.href);
+        console.log('Pathname:', window.location.pathname);
+        console.log('Search params:', window.location.search);
+        
         const pathParts = window.location.pathname.split('/').filter(p => p);
         const slug = pathParts[pathParts.length - 1];
+        
+        console.log('Path parts:', pathParts);
+        console.log('Extracted slug:', slug);
 
+        
         if (!slug) {
             this.showError(this.t('notFound'));
             return;
@@ -476,6 +485,17 @@ class ProductDetail {
 // Инициализация
 let productDetailInstance = null;
 
-document.addEventListener('DOMContentLoaded', () => {
-    productDetailInstance = new ProductDetail();
-});
+// Ждем полной загрузки страницы
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initProductDetail);
+} else {
+    // DOM уже загружен
+    initProductDetail();
+}
+
+function initProductDetail() {
+    // Дополнительная задержка для гарантии
+    setTimeout(() => {
+        productDetailInstance = new ProductDetail();
+    }, 100);
+}

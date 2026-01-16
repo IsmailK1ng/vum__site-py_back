@@ -1,8 +1,7 @@
-"""
-Context Processors для добавления данных во все шаблоны
-"""
+# main/context_processors.py
 
 from django.utils.translation import get_language
+from django.conf import settings
 from .models import PageMeta
 import logging
 
@@ -18,15 +17,14 @@ def seo_meta(request):
     path = request.path
     current_lang = get_language()
     
-    # Убираем начальный и конечный слеш
     path = path.strip('/')
     
- 
-    if path.startswith(current_lang):
-        # Убираем язык
+    if path.startswith(current_lang + '/'):
+        path = path[len(current_lang) + 1:]
+    elif path.startswith(current_lang):
         path = path[len(current_lang):]
-        # Убираем слеш после языка
-        path = path.lstrip('/')
+    
+    path = path.lstrip('/')
     
     meta = None
     
@@ -118,6 +116,17 @@ def seo_meta(request):
         logger.error(f"[SEO] Ошибка: {str(e)}", exc_info=True)
         meta = None
     
+    
+    scheme = 'https' if not settings.DEBUG else request.scheme
+
+    host = request.get_host()
+
+    current_path = request.path
+    
+   
+    current_page_url = f"{scheme}://{host}{current_path}"
+    
     return {
-        'page_meta': meta
+        'page_meta': meta,
+        'current_page_url': current_page_url  
     }

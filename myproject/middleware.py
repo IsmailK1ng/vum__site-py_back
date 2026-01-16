@@ -1,9 +1,57 @@
 from django.utils import translation
 from django.conf import settings
+from django.http import HttpResponsePermanentRedirect
 import logging
 
 logger = logging.getLogger('django')
 
+
+class WWWRedirectMiddleware:
+    """
+    Редирект с www.faw.uz на faw.uz (301)
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        host = request.get_host().lower()
+        
+        # Редирект только в продакшене
+        if not settings.DEBUG and host.startswith('www.'):
+            new_host = host[4:]
+            new_url = f"{request.scheme}://{new_host}{request.get_full_path()}"
+            return HttpResponsePermanentRedirect(new_url)
+        
+        return self.get_response(request)
+
+
+class LanguageCookieMiddleware:
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        
+
+        current_language = translation.get_language()
+        
+        cookie_language = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
+        
+
+        if cookie_language != current_language:
+            response.set_cookie(
+                key=settings.LANGUAGE_COOKIE_NAME,
+                value=current_language,
+                max_age=settings.LANGUAGE_COOKIE_AGE,
+                path=settings.LANGUAGE_COOKIE_PATH,
+                domain=settings.LANGUAGE_COOKIE_DOMAIN,
+                secure=settings.LANGUAGE_COOKIE_SECURE,
+                httponly=settings.LANGUAGE_COOKIE_HTTPONLY,
+                samesite=settings.LANGUAGE_COOKIE_SAMESITE,
+            )
+        
+        return response
 
 class ForceRussianMiddleware:
     """Принудительно устанавливает русский язык для админки, узбекский для сайта"""
