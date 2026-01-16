@@ -116,17 +116,18 @@ def seo_meta(request):
         logger.error(f"[SEO] Ошибка: {str(e)}", exc_info=True)
         meta = None
     
-    
-    scheme = 'https' if not settings.DEBUG else request.scheme
-
+    if settings.DEBUG:
+        scheme = request.scheme
+    else:
+        scheme = 'https'
     host = request.get_host()
-
-    current_path = request.path
     
-   
-    current_page_url = f"{scheme}://{host}{current_path}"
+
+    full_path_with_params = request.get_full_path()
+
+    current_page_url = f"{scheme}://{host}{full_path_with_params}"
     
     return {
         'page_meta': meta,
-        'current_page_url': current_page_url  
+        'current_page_url': current_page_url
     }

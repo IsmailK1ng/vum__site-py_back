@@ -158,6 +158,7 @@ JAZZMIN_UI_TWEAKS = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'myproject.middleware.ClearOldCookiesMiddleware',
     'myproject.middleware.WWWRedirectMiddleware',  
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -282,7 +283,6 @@ if not DEBUG:
     ALLOWED_HOSTS = [
         'faw.uz',
         'www.faw.uz',
-        'faw.uz', 'www.faw.uz',
         'faw.kg', 'www.faw.kg',
         'api.faw.uz', 'api.faw.kg'
     ]
@@ -298,14 +298,14 @@ if not DEBUG:
 LANGUAGE_COOKIE_NAME = 'django_language'
 LANGUAGE_COOKIE_AGE = 365 * 24 * 60 * 60
 LANGUAGE_COOKIE_PATH = '/'
-LANGUAGE_COOKIE_DOMAIN = '.faw.uz' 
 LANGUAGE_COOKIE_SECURE = not DEBUG
 LANGUAGE_COOKIE_HTTPONLY = False
 LANGUAGE_COOKIE_SAMESITE = 'Lax'
 
 
-SESSION_COOKIE_DOMAIN = '.faw.uz'
-CSRF_COOKIE_DOMAIN = '.faw.uz'
+LANGUAGE_COOKIE_DOMAIN = None
+SESSION_COOKIE_DOMAIN = None  
+CSRF_COOKIE_DOMAIN = None
 # ============ CKEDITOR ============
 
 CKEDITOR_CONFIGS = {

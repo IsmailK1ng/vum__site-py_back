@@ -28,7 +28,9 @@ def hreflang_tags(context):
     domain = request.build_absolute_uri('/').rstrip('/')
     url_kwargs = request.resolver_match.kwargs if request.resolver_match else {}
     
-  
+    query_string = request.META.get('QUERY_STRING', '')
+    query_params = f'?{query_string}' if query_string else ''
+    
     current_language = translation.get_language()
     
     tags = []
@@ -36,21 +38,23 @@ def hreflang_tags(context):
     try:
         translation.activate('uz')
         uz_url = reverse(url_name, kwargs=url_kwargs)
-        tags.append(f'<link rel="alternate" hreflang="uz" href="{domain}{uz_url}" />')
-        tags.append(f'<link rel="alternate" hreflang="x-default" href="{domain}{uz_url}" />')
+        uz_full_url = f"{uz_url}{query_params}"
+        tags.append(f'<link rel="alternate" hreflang="uz" href="{domain}{uz_full_url}" />')
+        tags.append(f'<link rel="alternate" hreflang="x-default" href="{domain}{uz_full_url}" />')
         
         translation.activate('ru')
         ru_url = reverse(url_name, kwargs=url_kwargs)
-        tags.append(f'<link rel="alternate" hreflang="ru" href="{domain}{ru_url}" />')
-
+        ru_full_url = f"{ru_url}{query_params}" 
+        tags.append(f'<link rel="alternate" hreflang="ru" href="{domain}{ru_full_url}" />')
+        
         translation.activate('en')
         en_url = reverse(url_name, kwargs=url_kwargs)
-        tags.append(f'<link rel="alternate" hreflang="en" href="{domain}{en_url}" />')
+        en_full_url = f"{en_url}{query_params}"  
+        tags.append(f'<link rel="alternate" hreflang="en" href="{domain}{en_full_url}" />')
         
     except NoReverseMatch:
         return ''
     finally:
-
         translation.activate(current_language)
     
     return mark_safe('\n    '.join(tags))
@@ -64,8 +68,7 @@ def canonical_url(context):
     request = context.get('request')
     if not request:
         return ''
-    
-    # Получаем чистый URL без параметров
+
     scheme = request.scheme  
     host = request.get_host()  
     path = request.path  
