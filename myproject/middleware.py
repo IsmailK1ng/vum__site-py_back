@@ -14,11 +14,14 @@ class WWWRedirectMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        host = request.get_host().lower()
+        try:
+            host = request.get_host().lower()
+        except Exception as e:
+            logger.warning(f"Invalid host in WWWRedirectMiddleware: {e}")
+            return self.get_response(request)
         
-        # Редирект только в продакшене
         if not settings.DEBUG and host.startswith('www.'):
-            new_host = host[4:]
+            new_host = host[4:]  # Убирает 'www.'
             new_url = f"{request.scheme}://{new_host}{request.get_full_path()}"
             return HttpResponsePermanentRedirect(new_url)
         
@@ -32,13 +35,9 @@ class LanguageCookieMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
-        
-
         current_language = translation.get_language()
-        
         cookie_language = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
         
-
         if cookie_language != current_language:
             response.set_cookie(
                 key=settings.LANGUAGE_COOKIE_NAME,
@@ -53,6 +52,7 @@ class LanguageCookieMiddleware:
         
         return response
 
+
 class ForceRussianMiddleware:
     """Принудительно устанавливает русский язык для админки, узбекский для сайта"""
     
@@ -61,16 +61,11 @@ class ForceRussianMiddleware:
     
     def __call__(self, request):
         try:
-            # Admin всегда на русском
             if request.path.startswith('/admin/'):
                 translation.activate('ru')
                 request.LANGUAGE_CODE = 'ru'
-            
-            # ✅ API: определяем язык из URL
             elif request.path.startswith('/api/'):
-                language = 'uz'  # default
-                
-                # Проверяем префикс языка в URL
+                language = 'uz'
                 if '/api/uz/' in request.path:
                     language = 'uz'
                 elif '/api/ru/' in request.path:
@@ -140,4 +135,3 @@ class RefreshUserPermissionsMiddleware:
         except Exception as e:
             logger.error(f"Ошибка в RefreshUserPermissionsMiddleware: {str(e)}", exc_info=True)
             return self.get_response(request)
-        
