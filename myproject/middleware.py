@@ -85,19 +85,14 @@ class ForceRussianMiddleware:
                 translation.activate(language)
                 request.LANGUAGE_CODE = language
             
-            # ✅ Frontend: определяем язык из URL префикса
             else:
-                language = 'uz'  # default
-                
-                # Проверяем языковой префикс
-                if request.path.startswith('/uz/'):
-                    language = 'uz'
-                elif request.path.startswith('/ru/'):
+                language = 'uz'  
+                if request.path.startswith('/ru/'):
                     language = 'ru'
                 elif request.path.startswith('/en/'):
                     language = 'en'
                 else:
-                    # Fallback на session/cookie для старых URL
+                    # Fallback на session/cookie
                     saved_language = request.session.get('_language')
                     cookie_language = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
                     language = saved_language or cookie_language or 'uz'
@@ -146,31 +141,3 @@ class RefreshUserPermissionsMiddleware:
             logger.error(f"Ошибка в RefreshUserPermissionsMiddleware: {str(e)}", exc_info=True)
             return self.get_response(request)
         
-class ClearOldCookiesMiddleware:
-    """
-    ВРЕМЕННЫЙ - удалить через месяц после деплоя
-    Очищает старые cookies с domain=.faw.uz
-    """
-    
-    def __init__(self, get_response):
-        self.get_response = get_response
-    
-    def __call__(self, request):
-        response = self.get_response(request)
-        
-        # Проверяем маркер миграции
-        if not request.COOKIES.get('_cookie_migrated'):
-            # Удаляем старые cookies
-            for cookie in ['csrftoken', 'sessionid', 'django_language']:
-                response.delete_cookie(cookie, domain='.faw.uz')
-            
-            # Ставим маркер
-            response.set_cookie(
-                '_cookie_migrated',
-                '1',
-                max_age=365*24*60*60,
-                httponly=True,
-                secure=not settings.DEBUG
-            )
-        
-        return response
