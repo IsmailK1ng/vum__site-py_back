@@ -21,7 +21,7 @@ class WWWRedirectMiddleware:
             return self.get_response(request)
         
         if not settings.DEBUG and host.startswith('www.'):
-            new_host = host[4:]  # Убирает 'www.'
+            new_host = host[4:]
             new_url = f"{request.scheme}://{new_host}{request.get_full_path()}"
             return HttpResponsePermanentRedirect(new_url)
         
@@ -29,7 +29,6 @@ class WWWRedirectMiddleware:
 
 
 class LanguageCookieMiddleware:
-
     def __init__(self, get_response):
         self.get_response = get_response
 
@@ -64,6 +63,7 @@ class ForceRussianMiddleware:
             if request.path.startswith('/admin/'):
                 translation.activate('ru')
                 request.LANGUAGE_CODE = 'ru'
+            
             elif request.path.startswith('/api/'):
                 language = 'uz'
                 if '/api/uz/' in request.path:
@@ -81,23 +81,15 @@ class ForceRussianMiddleware:
                 request.LANGUAGE_CODE = language
             
             else:
-                language = 'uz'  
                 if request.path.startswith('/ru/'):
                     language = 'ru'
                 elif request.path.startswith('/en/'):
                     language = 'en'
                 else:
-                    # Fallback на session/cookie
-                    saved_language = request.session.get('_language')
-                    cookie_language = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
-                    language = saved_language or cookie_language or 'uz'
+                    language = 'uz'
                 
-                if language in [lang[0] for lang in settings.LANGUAGES]:
-                    translation.activate(language)
-                    request.LANGUAGE_CODE = language
-                else:
-                    translation.activate('uz')
-                    request.LANGUAGE_CODE = 'uz'
+                translation.activate(language)
+                request.LANGUAGE_CODE = language
             
             response = self.get_response(request)
             

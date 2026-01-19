@@ -15,7 +15,7 @@ admin.site.site_header = "FAW Admin"
 admin.site.site_title = "FAW"
 admin.site.index_title = "Админ панель VUM Site"
 
-# ========== СНАЧАЛА ПАТТЕРНЫ БЕЗ ЯЗЫКА ==========
+# ========== БАЗОВЫЕ РОУТЫ (без языка) ==========
 urlpatterns = [
     path('robots.txt', serve, {'document_root': settings.BASE_DIR / 'main' / 'static', 'path': 'robots.txt'}),
     
@@ -38,12 +38,15 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-# ========== i18n_patterns В КОНЦЕ ==========
+urlpatterns += [
+    path('', include('main.urls')),
+]
+
 urlpatterns += i18n_patterns(
     path('', include('main.urls')),
     prefix_default_language=False
 )
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
