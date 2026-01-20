@@ -28,7 +28,6 @@ urlpatterns = [
     path('admin/kg/stats/', kg_stats_dashboard, name='kg-stats'),
     path('admin/', admin.site.urls),
     path('set-language/', set_language_get, name='set_language'),
-    path('i18n/', include('django.conf.urls.i18n')),
     path('nested_admin/', include('nested_admin.urls')),
     
     # ========== API БЕЗ ЯЗЫКА ==========
@@ -38,7 +37,6 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 ]
 
-
 urlpatterns += [
     path('', include('main.urls')),
 ]
@@ -47,6 +45,7 @@ urlpatterns += i18n_patterns(
     path('', include('main.urls')),
     prefix_default_language=False
 )
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
