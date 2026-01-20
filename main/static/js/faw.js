@@ -91,6 +91,9 @@ function initializeSlidesFromDjango() {
       return false;
     }
 
+    // Получаем перевод для кнопки из data-атрибута
+    const detailsLabel = sliderDataElement.dataset.labelDetails || "Batafsil";
+
     slides = djangoSlides.map(slide => ({
       year: slide.year || "2025",
       title: slide.title || "FAW Truck",
@@ -98,7 +101,7 @@ function initializeSlidesFromDjango() {
       power: slide.power || "—",
       mpg: slide.mpg || "—",
       image: slide.image || null,
-      cta: [{ type: "main", label: "Batafsil", link: slide.link || "#" }]
+      cta: [{ type: "main", label: detailsLabel, link: slide.link || "#" }]
     }));
 
     return true;
