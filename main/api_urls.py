@@ -1,4 +1,3 @@
-
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
@@ -25,6 +24,7 @@ router.register(r'dealer-applications', BecomeADealerApplicationViewSet, basenam
 router.register(r'promotions', PromotionViewSet, basename='promotions') 
 
 urlpatterns = [
+    path('', include(router.urls)),    
     path('uz/', include(router.urls)),
     path('ru/', include(router.urls)),
     path('en/', include(router.urls)),

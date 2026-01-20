@@ -225,12 +225,16 @@ def news_detail(request, slug):
 
 
 def set_language_get(request):
-    """Переключение языка ТОЛЬКО для сайта"""
+    """Переключение языка с правильным редиректом"""
     language = request.GET.get('language') or request.POST.get('language')
     
     if language and language in ['uz', 'ru', 'en']:
         request.session['_language'] = language
-        next_url = request.META.get('HTTP_REFERER', '/')
+        
+        if language == 'uz':
+            next_url = '/' 
+        else:
+            next_url = f'/{language}/' 
         
         response = redirect(next_url)
         response.set_cookie(

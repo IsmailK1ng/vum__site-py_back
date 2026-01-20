@@ -158,7 +158,6 @@ JAZZMIN_UI_TWEAKS = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'myproject.middleware.ClearOldCookiesMiddleware',
     'myproject.middleware.WWWRedirectMiddleware',  
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',

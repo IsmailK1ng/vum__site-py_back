@@ -14,9 +14,12 @@ class WWWRedirectMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        host = request.get_host().lower()
+        try:
+            host = request.get_host().lower()
+        except Exception as e:
+            logger.warning(f"Invalid host in WWWRedirectMiddleware: {e}")
+            return self.get_response(request)
         
-        # Редирект только в продакшене
         if not settings.DEBUG and host.startswith('www.'):
             new_host = host[4:]
             new_url = f"{request.scheme}://{new_host}{request.get_full_path()}"
@@ -26,19 +29,14 @@ class WWWRedirectMiddleware:
 
 
 class LanguageCookieMiddleware:
-
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
         response = self.get_response(request)
-        
-
         current_language = translation.get_language()
-        
         cookie_language = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
         
-
         if cookie_language != current_language:
             response.set_cookie(
                 key=settings.LANGUAGE_COOKIE_NAME,
@@ -53,6 +51,7 @@ class LanguageCookieMiddleware:
         
         return response
 
+
 class ForceRussianMiddleware:
     """Принудительно устанавливает русский язык для админки, узбекский для сайта"""
     
@@ -61,16 +60,12 @@ class ForceRussianMiddleware:
     
     def __call__(self, request):
         try:
-            # Admin всегда на русском
             if request.path.startswith('/admin/'):
                 translation.activate('ru')
                 request.LANGUAGE_CODE = 'ru'
             
-            # ✅ API: определяем язык из URL
             elif request.path.startswith('/api/'):
-                language = 'uz'  # default
-                
-                # Проверяем префикс языка в URL
+                language = 'uz'
                 if '/api/uz/' in request.path:
                     language = 'uz'
                 elif '/api/ru/' in request.path:
@@ -85,29 +80,16 @@ class ForceRussianMiddleware:
                 translation.activate(language)
                 request.LANGUAGE_CODE = language
             
-            # ✅ Frontend: определяем язык из URL префикса
             else:
-                language = 'uz'  # default
-                
-                # Проверяем языковой префикс
-                if request.path.startswith('/uz/'):
-                    language = 'uz'
-                elif request.path.startswith('/ru/'):
+                if request.path.startswith('/ru/'):
                     language = 'ru'
                 elif request.path.startswith('/en/'):
                     language = 'en'
                 else:
-                    # Fallback на session/cookie для старых URL
-                    saved_language = request.session.get('_language')
-                    cookie_language = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
-                    language = saved_language or cookie_language or 'uz'
+                    language = 'uz'
                 
-                if language in [lang[0] for lang in settings.LANGUAGES]:
-                    translation.activate(language)
-                    request.LANGUAGE_CODE = language
-                else:
-                    translation.activate('uz')
-                    request.LANGUAGE_CODE = 'uz'
+                translation.activate(language)
+                request.LANGUAGE_CODE = language
             
             response = self.get_response(request)
             
@@ -145,32 +127,3 @@ class RefreshUserPermissionsMiddleware:
         except Exception as e:
             logger.error(f"Ошибка в RefreshUserPermissionsMiddleware: {str(e)}", exc_info=True)
             return self.get_response(request)
-        
-class ClearOldCookiesMiddleware:
-    """
-    ВРЕМЕННЫЙ - удалить через месяц после деплоя
-    Очищает старые cookies с domain=.faw.uz
-    """
-    
-    def __init__(self, get_response):
-        self.get_response = get_response
-    
-    def __call__(self, request):
-        response = self.get_response(request)
-        
-        # Проверяем маркер миграции
-        if not request.COOKIES.get('_cookie_migrated'):
-            # Удаляем старые cookies
-            for cookie in ['csrftoken', 'sessionid', 'django_language']:
-                response.delete_cookie(cookie, domain='.faw.uz')
-            
-            # Ставим маркер
-            response.set_cookie(
-                '_cookie_migrated',
-                '1',
-                max_age=365*24*60*60,
-                httponly=True,
-                secure=not settings.DEBUG
-            )
-        
-        return response

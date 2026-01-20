@@ -180,14 +180,14 @@ class ProductCardSpecSerializer(serializers.ModelSerializer):
         fields = ['id', 'icon', 'value', 'order']
 
 
-class ProductCardSerializer(serializers.ModelSerializer):
+class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer):  # ← ДОБАВЬ!
     """Карточки продуктов для списка"""
     card_specs = ProductCardSpecSerializer(many=True, read_only=True)
     image_url = serializers.SerializerMethodField()
     category_display = serializers.CharField(source='get_category_display', read_only=True)
-    
-
     all_categories = serializers.SerializerMethodField()
+    
+    title = serializers.SerializerMethodField()
     
     class Meta:
         model = Product
@@ -196,6 +196,9 @@ class ProductCardSerializer(serializers.ModelSerializer):
             'all_categories',  
             'image_url', 'card_specs', 'is_featured', 'order'
         ]
+    def get_title(self, obj):
+        lang = self.get_current_language()
+        return getattr(obj, f'title_{lang}', None) or obj.title
     
     def get_all_categories(self, obj):
         """Возвращает все категории продукта (основную + дополнительные)"""
