@@ -158,13 +158,13 @@ JAZZMIN_UI_TWEAKS = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'myproject.middleware.WWWRedirectMiddleware',  
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.locale.LocaleMiddleware',  
-    'myproject.middleware.ForceRussianMiddleware', 
-    'myproject.middleware.LanguageCookieMiddleware', 
+    'myproject.middleware.WWWRedirectMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'myproject.middleware.ForceRussianMiddleware',
+    'myproject.middleware.LanguageCookieMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'myproject.middleware.RefreshUserPermissionsMiddleware', 

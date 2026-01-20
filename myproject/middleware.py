@@ -7,25 +7,22 @@ logger = logging.getLogger('django')
 
 
 class WWWRedirectMiddleware:
-    """
-    Редирект с www.faw.uz на faw.uz (301)
-    """
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        try:
-            host = request.get_host().lower()
-        except Exception as e:
-            logger.warning(f"Invalid host in WWWRedirectMiddleware: {e}")
+        if settings.DEBUG:
             return self.get_response(request)
-        
-        if not settings.DEBUG and host.startswith('www.'):
-            new_host = host[4:]
-            new_url = f"{request.scheme}://{new_host}{request.get_full_path()}"
-            return HttpResponsePermanentRedirect(new_url)
-        
+
+        host = request.META.get('HTTP_HOST', '').lower()
+
+        if host == 'www.faw.uz':
+            return HttpResponsePermanentRedirect(
+                'https://faw.uz' + request.get_full_path()
+            )
+
         return self.get_response(request)
+
 
 
 class LanguageCookieMiddleware:
