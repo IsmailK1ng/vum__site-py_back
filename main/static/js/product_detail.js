@@ -388,51 +388,51 @@ class ProductDetail {
 
         // Product Schema
         const productSchema = {
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": this.product.title,
-            "image": this.product.main_image_url ? `${baseUrl}${this.product.main_image_url}` : [],
-            "description": this.product.category_display || this.product.title,
-            "brand": {
-                "@type": "Brand",
-                "name": "FAW"
-            },
-            "manufacturer": {
-                "@type": "Organization",
-                "name": "Van Universal Motors"
-            },
-            "category": this.product.category_display || "Commercial Vehicle"
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": this.product.title,
+        "image": this.product.main_image_url || null, // 
+        "description": this.product.title, // 
+        "brand": {
+            "@type": "Brand",
+            "name": "FAW"
+        },
+        "manufacturer": {
+            "@type": "Organization",
+            "name": "Van Universal Motors"
+        },
+        "category": this.product.category_display || "Commercial Vehicle"
         };
 
         // Добавляем галерею если есть
         if (this.product.gallery && this.product.gallery.length > 0) {
-            productSchema.image = this.product.gallery.map(img => `${baseUrl}${img.image_url}`);
+        productSchema.image = this.product.gallery.map(img => img.image_url); 
         }
 
-        // BreadcrumbList Schema
+        // BreadcrumbList Schema (без изменений)
         const breadcrumbSchema = {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {
-                    "@type": "ListItem",
-                    "position": 1,
-                    "name": this.currentLanguage === 'uz' ? 'Bosh sahifa' : (this.currentLanguage === 'ru' ? 'Главная' : 'Home'),
-                    "item": `${baseUrl}/`
-                },
-                {
-                    "@type": "ListItem",
-                    "position": 2,
-                    "name": this.currentLanguage === 'uz' ? 'Modellar' : (this.currentLanguage === 'ru' ? 'Модели' : 'Models'),
-                    "item": `${baseUrl}/#models`
-                },
-                {
-                    "@type": "ListItem",
-                    "position": 3,
-                    "name": this.product.title,
-                    "item": currentUrl
-                }
-            ]
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+            "@type": "ListItem",
+            "position": 1,
+            "name": this.currentLanguage === 'uz' ? 'Bosh sahifa' : (this.currentLanguage === 'ru' ? 'Главная' : 'Home'),
+            "item": `${baseUrl}/`
+            },
+            {
+            "@type": "ListItem",
+            "position": 2,
+            "name": this.currentLanguage === 'uz' ? 'Modellar' : (this.currentLanguage === 'ru' ? 'Модели' : 'Models'),
+            "item": `${baseUrl}/#models`
+            },
+            {
+            "@type": "ListItem",
+            "position": 3,
+            "name": this.product.title,
+            "item": currentUrl
+            }
+        ]
         };
 
         // Вставляем разметку в DOM
@@ -440,11 +440,11 @@ class ProductDetail {
         const breadcrumbSchemaEl = document.getElementById('breadcrumb-schema');
 
         if (productSchemaEl) {
-            productSchemaEl.textContent = JSON.stringify(productSchema, null, 2);
+        productSchemaEl.textContent = JSON.stringify(productSchema, null, 2);
         }
 
         if (breadcrumbSchemaEl) {
-            breadcrumbSchemaEl.textContent = JSON.stringify(breadcrumbSchema, null, 2);
+        breadcrumbSchemaEl.textContent = JSON.stringify(breadcrumbSchema, null, 2);
         }
     }
 

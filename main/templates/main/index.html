@@ -14,6 +14,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es2019%2Ces2020%2Ces2021"></script>
+
   <!-- Универсальный favicon (динамически меняется в зависимости от темы) -->
   <link rel="icon" href="{% static 'images/vum-icon-dark.svg' %}" />
   <link rel="apple-touch-icon" href="{% static 'images/vum-icon-dark.svg' %}">
@@ -63,98 +65,14 @@
   <!-- Google reCAPTCHA v3 -->
   <script src="https://www.google.com/recaptcha/api.js?render=6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow"></script>
 
-  <!-- Schema.org Organization Markup -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Van Universal Motors",
-    "alternateName": "VUM",
-    "url": "{{ request.scheme }}://{{ request.get_host }}",
-    "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/logo-vum.png' %}",
-    "description": "{% if LANGUAGE_CODE == 'uz' %}Van Universal Motors (VUM) — O'zbekistonda FAW tijorat texnikasining rasmiy ishlab chiqaruvchisi{% elif LANGUAGE_CODE == 'ru' %}Van Universal Motors (VUM) является официальным производителем коммерческих автомобилей FAW в Узбекистане{% else %}Van Universal Motors (VUM) is the official manufacturer of FAW commercial vehicles in Uzbekistan{% endif %}",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "{% if LANGUAGE_CODE == 'uz' %}Abdulla Qahhor ko'chasi, 2B{% elif LANGUAGE_CODE == 'ru' %}улица Абдулла Каххар, 2B{% else %}Abdulla Kahhar Street, 2B{% endif %}",
-      "addressLocality": "{% if LANGUAGE_CODE == 'uz' %}Toshkent{% elif LANGUAGE_CODE == 'ru' %}Ташкент{% else %}Tashkent{% endif %}",
-      "addressRegion": "{% if LANGUAGE_CODE == 'uz' %}Yakkasaroy tumani{% elif LANGUAGE_CODE == 'ru' %}район Яккасарай{% else %}Yakkasaray District{% endif %}",
-      "addressCountry": "UZ"
-    },
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "telephone": "+998-55-508-60-60",
-      "contactType": "customer service",
-      "email": "info@faw.uz"
-    },
-    "sameAs": []
-  }
-  </script>
+<!-- Schema.org Organization Markup -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Van Universal Motors","alternateName":"VUM","url":"{{ request.scheme }}://{{ request.get_host }}","logo":"{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/logo-vum.png' %}","description":"{% if LANGUAGE_CODE == 'uz' %}Van Universal Motors (VUM) — O'zbekistonda FAW tijorat texnikasining rasmiy ishlab chiqaruvchisi{% elif LANGUAGE_CODE == 'ru' %}Van Universal Motors (VUM) является официальным производителем коммерческих автомобилей FAW в Узбекистане{% else %}Van Universal Motors (VUM) is the official manufacturer of FAW commercial vehicles in Uzbekistan{% endif %}","address":{"@type":"PostalAddress","streetAddress":"{% if LANGUAGE_CODE == 'uz' %}Abdulla Qahhor ko'chasi, 2B{% elif LANGUAGE_CODE == 'ru' %}улица Абдулла Каххар, 2B{% else %}Abdulla Kahhar Street, 2B{% endif %}","addressLocality":"{% if LANGUAGE_CODE == 'uz' %}Toshkent{% elif LANGUAGE_CODE == 'ru' %}Ташкент{% else %}Tashkent{% endif %}","addressRegion":"{% if LANGUAGE_CODE == 'uz' %}Yakkasaroy tumani{% elif LANGUAGE_CODE == 'ru' %}район Яккасарай{% else %}Yakkasaray District{% endif %}","addressCountry":"UZ"},"contactPoint":{"@type":"ContactPoint","telephone":"+998-55-508-60-60","contactType":"customer service","email":"info@faw.uz"},"sameAs":[]}</script>
 
   <!-- Schema.org WebSite Markup with Navigation -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "FAW Trucks Uzbekistan",
-    "url": "{{ request.scheme }}://{{ request.get_host }}",
-    "publisher": {
-      "@type": "Organization",
-      "name": "Van Universal Motors"
-    },
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": {
-        "@type": "EntryPoint",
-        "urlTemplate": "{{ request.scheme }}://{{ request.get_host }}/products/?search={search_term_string}"
-      },
-      "query-input": "required name=search_term_string"
-    }
-  }
-  </script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"FAW Trucks Uzbekistan","url":"{{ request.scheme }}://{{ request.get_host }}","publisher":{"@type":"Organization","name":"Van Universal Motors"},"potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"{{ request.scheme }}://{{ request.get_host }}/products/?search={search_term_string}"},"query-input":"required name=search_term_string"}}</script>
 
   <!-- Schema.org SiteNavigationElement -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "SiteNavigationElement",
-        "name": "{% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}",
-        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'dealers' %}"
-      },
-      {
-        "@type": "SiteNavigationElement",
-        "name": "{% if LANGUAGE_CODE == 'uz' %}Yangiliklar{% elif LANGUAGE_CODE == 'ru' %}Новости{% else %}News{% endif %}",
-        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'news' %}"
-      },
-      {
-        "@type": "SiteNavigationElement",
-        "name": "{% if LANGUAGE_CODE == 'uz' %}Modellar{% elif LANGUAGE_CODE == 'ru' %}Модели{% else %}Models{% endif %}",
-        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'products' %}"
-      },
-      {
-        "@type": "SiteNavigationElement",
-        "name": "{% if LANGUAGE_CODE == 'uz' %}Kompaniya haqida{% elif LANGUAGE_CODE == 'ru' %}О компании{% else %}About{% endif %}",
-        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'about' %}"
-      },
-      {
-        "@type": "SiteNavigationElement",
-        "name": "{% if LANGUAGE_CODE == 'uz' %}Lizing{% elif LANGUAGE_CODE == 'ru' %}Лизинг{% else %}Leasing{% endif %}",
-        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'lizing' %}"
-      },
-      {
-        "@type": "SiteNavigationElement",
-        "name": "{% if LANGUAGE_CODE == 'uz' %}Servis{% elif LANGUAGE_CODE == 'ru' %}Сервис{% else %}Service{% endif %}",
-        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'services' %}"
-      },
-      {
-        "@type": "SiteNavigationElement",
-        "name": "{% if LANGUAGE_CODE == 'uz' %}Bog'lanish{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %}",
-        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'contact' %}"
-      }
-    ]
-  }
-  </script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'dealers' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Yangiliklar{% elif LANGUAGE_CODE == 'ru' %}Новости{% else %}News{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'news' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Modellar{% elif LANGUAGE_CODE == 'ru' %}Модели{% else %}Models{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'products' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Kompaniya haqida{% elif LANGUAGE_CODE == 'ru' %}О компании{% else %}About{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'about' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Lizing{% elif LANGUAGE_CODE == 'ru' %}Лизинг{% else %}Leasing{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'lizing' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Servis{% elif LANGUAGE_CODE == 'ru' %}Сервис{% else %}Service{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'services' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Bog'lanish{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'contact' %}"}]}</script>
 
   <!-- Цвет браузера (конец) -->
   <style>

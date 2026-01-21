@@ -17,6 +17,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es2019%2Ces2020%2Ces2021"></script>
+    
+
     <!-- Универсальный favicon -->
     <link rel="icon" href="{% static 'images/vum-icon-dark.svg' %}" />
     <link rel="apple-touch-icon" href="{% static 'images/vum-icon-dark.svg' %}">
@@ -67,56 +70,11 @@
     <!-- reCAPTCHA v3 -->
      <script src="https://www.google.com/recaptcha/api.js?render=6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow"></script>
 
-    <!-- Schema.org ContactPage -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "ContactPage",
-      "name": "{% if LANGUAGE_CODE == 'uz' %}Kontaktlar{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %}",
-      "mainEntity": {
-        "@type": "Organization",
-        "name": "Van Universal Motors",
-        "url": "{{ request.scheme }}://{{ request.get_host }}",
-        "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/logo-vum.png' %}",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "{% if LANGUAGE_CODE == 'uz' %}Abdulla Qahhor ko'chasi, 2B{% elif LANGUAGE_CODE == 'ru' %}улица Абдулла Каххар, 2B{% else %}Abdulla Kahhar Street, 2B{% endif %}",
-          "addressLocality": "{% if LANGUAGE_CODE == 'uz' %}Toshkent{% elif LANGUAGE_CODE == 'ru' %}Ташкент{% else %}Tashkent{% endif %}",
-          "addressRegion": "{% if LANGUAGE_CODE == 'uz' %}Yakkasaroy tumani{% elif LANGUAGE_CODE == 'ru' %}район Яккасарай{% else %}Yakkasaray District{% endif %}",
-          "addressCountry": "UZ"
-        },
-        "contactPoint": {
-          "@type": "ContactPoint",
-          "telephone": "+998-55-508-60-60",
-          "contactType": "customer service",
-          "email": "info@faw.uz",
-          "availableLanguage": ["uz", "ru", "en"]
-        }
-      }
-    }
-    </script>
+<!-- Schema.org ContactPage -->
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"ContactPage","name":"{% if LANGUAGE_CODE == 'uz' %}Kontaktlar{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %}","mainEntity":{"@type":"Organization","name":"Van Universal Motors","url":"{{ request.scheme }}://{{ request.get_host }}","logo":"{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/logo-vum.png' %}","address":{"@type":"PostalAddress","streetAddress":"{% if LANGUAGE_CODE == 'uz' %}Abdulla Qahhor ko'chasi, 2B{% elif LANGUAGE_CODE == 'ru' %}улица Абдулла Каххар, 2B{% else %}Abdulla Kahhar Street, 2B{% endif %}","addressLocality":"{% if LANGUAGE_CODE == 'uz' %}Toshkent{% elif LANGUAGE_CODE == 'ru' %}Ташкент{% else %}Tashkent{% endif %}","addressRegion":"{% if LANGUAGE_CODE == 'uz' %}Yakkasaroy tumani{% elif LANGUAGE_CODE == 'ru' %}район Яккасарай{% else %}Yakkasaray District{% endif %}","addressCountry":"UZ"},"contactPoint":{"@type":"ContactPoint","telephone":"+998-55-508-60-60","contactType":"customer service","email":"info@faw.uz","availableLanguage":["uz","ru","en"]}}}</script>
 
     <!-- Schema.org BreadcrumbList -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}",
-          "item": "{{ request.scheme }}://{{ request.get_host }}/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "{% if LANGUAGE_CODE == 'uz' %}Kontaktlar{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %}",
-          "item": "{{ request.build_absolute_uri }}"
-        }
-      ]
-    }
-    </script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}","item":"{{ request.scheme }}://{{ request.get_host }}/"},{"@type":"ListItem","position":2,"name":"{% if LANGUAGE_CODE == 'uz' %}Kontaktlar{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %}","item":"{{ request.build_absolute_uri }}"}]}</script>
 
     <style>
         /* Стили для чекбокса согласия */

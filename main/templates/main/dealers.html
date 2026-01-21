@@ -14,6 +14,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es2019%2Ces2020%2Ces2021"></script>
+    
+
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -57,63 +60,12 @@
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
 
-    <!-- Schema.org ItemList for Dealers -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      "name": "{% if LANGUAGE_CODE == 'uz' %}VUM Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры VUM{% else %}VUM Dealers{% endif %}",
-      "itemListElement": [
-        {% for dealer in dealers %}
-        {
-          "@type": "ListItem",
-          "position": {{ forloop.counter }},
-          "item": {
-            "@type": "LocalBusiness",
-            "name": "{{ dealer.name }}",
-            "address": {
-              "@type": "PostalAddress",
-              "streetAddress": "{{ dealer.address }}",
-              "addressLocality": "{{ dealer.city }}",
-              "addressCountry": "UZ"
-            },
-            "geo": {
-              "@type": "GeoCoordinates",
-              "latitude": "{{ dealer.latitude }}",
-              "longitude": "{{ dealer.longitude }}"
-            },
-            "telephone": "{{ dealer.phone }}",
-            "email": "{{ dealer.email }}"{% if dealer.website %},
-            "url": "{{ dealer.website }}"{% endif %}{% if dealer.logo %},
-            "image": "{{ request.scheme }}://{{ request.get_host }}{{ dealer.logo.url }}"{% endif %}
-          }
-        }{% if not forloop.last %},{% endif %}
-        {% endfor %}
-      ]
-    }
-    </script>
+<!-- Schema.org ItemList for Dealers -->
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","name":"{% if LANGUAGE_CODE == 'uz' %}VUM Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры VUM{% else %}VUM Dealers{% endif %}","itemListElement":[{% for dealer in dealers %}{"@type":"ListItem","position":{{ forloop.counter }},"item":{"@type":"LocalBusiness","name":"{{ dealer.name }}","address":{"@type":"PostalAddress","streetAddress":"{{ dealer.address }}","addressLocality":"{{ dealer.city }}","addressCountry":"UZ"},"geo":{"@type":"GeoCoordinates","latitude":"{{ dealer.latitude }}","longitude":"{{ dealer.longitude }}"},"telephone":"{{ dealer.phone }}","email":"{{ dealer.email }}"{% if dealer.website %},"url":"{{ dealer.website }}"{% endif %}{% if dealer.logo %},"image":"{{ request.scheme }}://{{ request.get_host }}{{ dealer.logo.url }}"{% endif %}}}{% if not forloop.last %},{% endif %}{% endfor %}]}</script>
 
     <!-- Schema.org BreadcrumbList -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}",
-          "item": "{{ request.scheme }}://{{ request.get_host }}/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "{% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}",
-          "item": "{{ request.build_absolute_uri }}"
-        }
-      ]
-    }
-    </script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}","item":"{{ request.scheme }}://{{ request.get_host }}/"},{"@type":"ListItem","position":2,"name":"{% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}","item":"{{ request.build_absolute_uri }}"}]}</script>
+
 </head>
 
 <body>  
