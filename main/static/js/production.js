@@ -5,10 +5,10 @@
 
 class ProductsManager {
   constructor() {
-  this.currentLanguage = (document.documentElement.lang ||
-        window.LANGUAGE_CODE ||
-        this.getCookie('django_language') ||
-        'uz').split('-')[0]; 
+    this.currentLanguage = (document.documentElement.lang ||
+      window.LANGUAGE_CODE ||
+      this.getCookie('django_language') ||
+      'uz').split('-')[0];
 
     // Определяем API URL в зависимости от языка
     this.apiUrl = `/api/${this.currentLanguage}/products/`;
@@ -265,6 +265,19 @@ class ProductsManager {
     this.buttonText = categoryInfo.buttonText;
   }
 
+  async fetchWithRetry(url, retries = 2, delay = 1000) {
+    for (let i = 0; i <= retries; i++) {
+      try {
+        const response = await fetch(url);
+        if (response.ok) return response;  // ← Успех - сразу выход
+        if (response.status >= 400) throw new Error(`HTTP ${response.status}`);
+      } catch (error) {
+        if (i === retries) throw error;  // ← Последняя попытка - ошибка
+        await new Promise(r => setTimeout(r, delay));  // ← Ждём 1 сек
+      }
+    }
+  }
+
   async loadProducts() {
     try {
       this.showLoader();
@@ -274,11 +287,7 @@ class ProductsManager {
       let nextUrl = this.apiUrl;
 
       while (nextUrl) {
-        const response = await fetch(nextUrl);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        const response = await this.fetchWithRetry(nextUrl);
 
         const data = await response.json();
 
@@ -286,10 +295,8 @@ class ProductsManager {
         const products = data.results || data.products || data || [];
         allProducts = allProducts.concat(products);
 
-        // ✅ ИСПРАВЛЕНИЕ: Приводим URL к HTTPS
-           // Приводим URL к текущему протоколу (http/https)
+        
         if (data.next) {
-          // Используем относительный URL вместо абсолютного
           try {
             const url = new URL(data.next);
             nextUrl = url.pathname + url.search;
