@@ -410,9 +410,25 @@ class DealerServiceSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug']
 
 
-class DealerSerializer(serializers.ModelSerializer):
+# main/serializers.py
+
+class DealerServiceSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = DealerService
+        fields = ['id', 'name', 'slug']
+    
+    def get_name(self, obj):
+        lang = self.get_current_language()
+        return getattr(obj, f'name_{lang}', None) or obj.name
+
+
+class DealerSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
     services = serializers.SerializerMethodField()
     coordinates = serializers.SerializerMethodField()
+    address = serializers.SerializerMethodField()
+    working_hours = serializers.SerializerMethodField()
     
     class Meta:
         model = Dealer
@@ -423,7 +439,19 @@ class DealerSerializer(serializers.ModelSerializer):
         ]
     
     def get_services(self, obj):
-        return [service.name for service in obj.services.all()]
+        lang = self.get_current_language()
+        return [
+            getattr(service, f'name_{lang}', None) or service.name 
+            for service in obj.services.all()
+        ]
+    
+    def get_address(self, obj):
+        lang = self.get_current_language()
+        return getattr(obj, f'address_{lang}', None) or obj.address
+    
+    def get_working_hours(self, obj):
+        lang = self.get_current_language()
+        return getattr(obj, f'working_hours_{lang}', None) or obj.working_hours
     
     def get_coordinates(self, obj):
         return [float(obj.latitude), float(obj.longitude)]

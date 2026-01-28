@@ -3,94 +3,72 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="{{ HTML_LANG }}">
 
-
 <head>
     <meta charset="UTF-8">
     {% include 'main/includes/seo_meta.html' %}
-
     {% hreflang_tags %}
     {% canonical_url %}
-
+    
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
+    
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es2019%2Ces2020%2Ces2021"></script>
     
-
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-5K2BD9C3');</script>
-    <!-- End Google Tag Manager -->
-
+    
     <meta name="yandex-verification" content="78715d404b789626" />
     <meta name="google-site-verification" content="xmjQ3Gc6gAMaPe0MydDnP_uYW0EOz-Y-T6Kzkc7ylEA" />
     <meta name="facebook-domain-verification" content="8d4u99q1mimerz10hkbzvpjywt0rag" />
-
-
-    <!-- amoCRM Pixel для автораспределения -->
-    <script type="text/javascript" id="amo_pixel_identifier_js" async="async"
+    
+    <!-- amoCRM Pixel -->
+    <script type="text/javascript" id="amo_pixel_identifier_js" async
         src="https://piper.amocrm.ru/pixel/js/identifier/pixel_identifier.js"></script>
     <script>
         window.AMOPIXEL_IDENTIFIER_PARAMS = window.AMOPIXEL_IDENTIFIER_PARAMS || {};
         window.AMOPIXEL_IDENTIFIER_PARAMS.onload = function (pixel_identifier) {
             var visitor_uid = pixel_identifier.getVisitorUid();
-            if (visitor_uid) {
-                sessionStorage.setItem('amo_visitor_uid', visitor_uid);
-            }
+            if (visitor_uid) sessionStorage.setItem('amo_visitor_uid', visitor_uid);
         };
     </script>
-
-    <!-- Универсальный favicon -->
+    
     <link rel="icon" href="{% static 'images/vum-icon-dark.svg' %}" />
-    <!-- Для Apple устройств -->
     <link rel="apple-touch-icon" href="{% static 'images/vum-icon-dark.svg' %}">
-
+    
     <!-- Styles -->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/breadcrumbs.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/site_dealers.css' %}">
-
-    <!-- Browser Color -->
+    <link rel="stylesheet" href="{% static 'css/loaders/loader.css' %}">
+    <link rel="stylesheet" href="{% static 'css/plugins.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main_site.css' %}">
+    <link rel="stylesheet" href="{% static 'css/site_main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+    <link rel="stylesheet" href="{% static 'css/site_dealers.css' %}">
+    
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
-
-<!-- Schema.org ItemList for Dealers -->
+    
+    <!-- Schema.org -->
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","name":"{% if LANGUAGE_CODE == 'uz' %}VUM Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры VUM{% else %}VUM Dealers{% endif %}","itemListElement":[{% for dealer in dealers %}{"@type":"ListItem","position":{{ forloop.counter }},"item":{"@type":"LocalBusiness","name":"{{ dealer.name }}","address":{"@type":"PostalAddress","streetAddress":"{{ dealer.address }}","addressLocality":"{{ dealer.city }}","addressCountry":"UZ"},"geo":{"@type":"GeoCoordinates","latitude":"{{ dealer.latitude }}","longitude":"{{ dealer.longitude }}"},"telephone":"{{ dealer.phone }}","email":"{{ dealer.email }}"{% if dealer.website %},"url":"{{ dealer.website }}"{% endif %}{% if dealer.logo %},"image":"{{ request.scheme }}://{{ request.get_host }}{{ dealer.logo.url }}"{% endif %}}}{% if not forloop.last %},{% endif %}{% endfor %}]}</script>
-
-    <!-- Schema.org BreadcrumbList -->
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}","item":"{{ request.scheme }}://{{ request.get_host }}/"},{"@type":"ListItem","position":2,"name":"{% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}","item":"{{ request.build_absolute_uri }}"}]}</script>
-
 </head>
 
 <body>  
-
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5K2BD9C3"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-
-    <!-- Loader -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5K2BD9C3" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    
     <div id="loader" style="display: none;" class="loader">
         <div class="loader__wrapper">
             <div class="loader__content">
-                <div class="loader__count">
-                    <span class="count__text">0</span>
-                </div>
+                <div class="loader__count"><span class="count__text">0</span></div>
             </div>
         </div>
     </div>
-
-    <!-- Header -->
+    
     {% include 'main/includes/header.html' %}
-
     <div class="mxd-block loading-wrap"></div>
-
+    
     <!-- Breadcrumbs -->
     <div class="mxd-block">
         <div class="mxd-section-filter pre-grid">
@@ -108,12 +86,12 @@
             </div>
         </div>
     </div>
-
+    
     <!-- Title -->
     <div class="faw-history-title fade-in">
         <h2 class="reveal-type">{% if LANGUAGE_CODE == 'uz' %}VUM rasmiy dilerlar{% elif LANGUAGE_CODE == 'ru' %}Официальные дилеры VUM{% else %}VUM Official Dealers{% endif %}</h2>
     </div>
-
+    
     <!-- Map Container -->
     <div class="container">
         <div class="map-header">
@@ -135,21 +113,30 @@
                 </div>
             </div>
         </div>
-
-        <!-- Map -->
+        
         <div id="map">
             <div class="loading" id="mapLoading">
                 <div class="spinner"></div>
                 <span>{% if LANGUAGE_CODE == 'uz' %}Kartani yuklash...{% elif LANGUAGE_CODE == 'ru' %}Загрузка карты...{% else %}Loading map...{% endif %}</span>
             </div>
             <button class="find-nearest-btn" onclick="findNearestDealer()" title="{% if LANGUAGE_CODE == 'uz' %}Eng yaqin dilerni topish{% elif LANGUAGE_CODE == 'ru' %}Найти ближайшего дилера{% else %}Find nearest dealer{% endif %}">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor" />
                 </svg>
             </button>
         </div>
     </div>
-
+    
+    <!-- Fallback List -->
+    <div id="dealersList" style="display: none; margin-top: 40px;">
+        <div class="container">
+            <h3 style="font-size: 28px; margin-bottom: 32px; text-align: center; font-weight: 700; color: #000;">
+                {% if LANGUAGE_CODE == 'uz' %}Dilerlar ro'yxati{% elif LANGUAGE_CODE == 'ru' %}Список дилеров{% else %}Dealers list{% endif %}
+            </h3>
+            <div id="dealersListContent" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;"></div>
+        </div>
+    </div>
+    
     <!-- Stats -->
     <div class="stats">
         <div class="stat-item">
@@ -169,7 +156,7 @@
             <div class="stat-label">{% if LANGUAGE_CODE == 'uz' %}Xizmat turlari{% elif LANGUAGE_CODE == 'ru' %}Виды услуг{% else %}Service types{% endif %}</div>
         </div>
     </div>
-
+    
     <!-- Modal -->
     <div id="dealerModal" class="modal">
         <div class="modal-content">
@@ -183,26 +170,21 @@
             </div>
         </div>
     </div>
-
-    <!-- Footer -->
+    
     {% include 'main/includes/footer.html' %}
-
-    <!-- To Top Button -->
+    
     <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
         <i class="ph ph-arrow-up"></i>
     </a>
-
-    <!-- Scripts -->
+    
     <script src="{% static 'js/libs.min.js' %}"></script>
     <script src="{% static 'js/app.js' %}"></script>
-  <script src="{% static 'js/favicon-theme.js' %}"></script>
+    <script src="{% static 'js/favicon-theme.js' %}"></script>
     <script src="{% static 'js/error-logger.js' %}"></script>
     <script src="{% static 'js/faw.js' %}"></script>
-
     <script src="https://api-maps.yandex.ru/2.1/?apikey=145cca7b-9118-4b72-b7b6-261dbc414620&lang={% if LANGUAGE_CODE == 'ru' %}ru_RU{% elif LANGUAGE_CODE == 'en' %}en_US{% else %}uz_UZ{% endif %}"></script>
-
+    
     <script>
-        // Переводы для JavaScript
         const translations = {
             address: "{% if LANGUAGE_CODE == 'uz' %}Manzil{% elif LANGUAGE_CODE == 'ru' %}Адрес{% else %}Address{% endif %}",
             phone: "{% if LANGUAGE_CODE == 'uz' %}Telefon{% elif LANGUAGE_CODE == 'ru' %}Телефон{% else %}Phone{% endif %}",
@@ -223,18 +205,44 @@
             noGeolocation: "{% if LANGUAGE_CODE == 'uz' %}Brauzeringiz geolokatsiyani qo'llab-quvvatlamaydi{% elif LANGUAGE_CODE == 'ru' %}Ваш браузер не поддерживает геолокацию{% else %}Your browser doesn't support geolocation{% endif %}"
         };
 
-        const UZBEKISTAN_CENTER = [41.377491, 64.585262];
         const UZBEKISTAN_BOUNDS = [[37.172, 55.998], [45.590, 73.132]];
         const uzbekistanBorder = [[37.250789, 67.340123], [37.368912, 66.524178], [38.410876, 65.221345], [38.899123, 64.175892], [39.948765, 62.905123], [40.505432, 62.005678], [41.090123, 61.888456], [41.430567, 60.088912], [42.228456, 59.981789], [42.756789, 58.634567], [42.175890, 57.791234], [41.831234, 56.937890], [41.313890, 55.973456], [44.995858, 55.928917], [45.592123, 58.508456], [44.789456, 60.245123], [43.504477, 62.013300], [43.655432, 63.191234], [43.002890, 66.103456], [41.992890, 66.515432], [41.173789, 66.719234], [40.667456, 68.265123], [41.389456, 69.075123], [42.086543, 70.394123], [41.525123, 70.425234], [41.398123, 71.875234], [40.871234, 73.060123], [40.151123, 71.780234], [40.249567, 71.019198], [40.501678, 70.463234], [40.2204216, 69.2579536], [39.800000, 68.900000], [39.538789, 68.541234], [38.906789, 68.181234], [38.162345, 68.397123], [37.725123, 68.305432], [37.200789, 67.850456], [37.250789, 67.340123]];
 
         let dealers = [];
         let map, clusterer, currentFilter = 'all', filteredDealers = [];
 
+        // ✅ Функция нормализации названий городов
+        function normalizeCityName(city) {
+            const transliteration = {
+                'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
+                'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+                'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+                'ф': 'f', 'х': 'x', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch', 'ъ': '',
+                'ы': 'i', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+                'ў': 'o', 'қ': 'q', 'ғ': 'g', 'ҳ': 'h'
+            };
+            
+            let normalized = '';
+            for (let char of city.toLowerCase()) {
+                normalized += transliteration[char] || char;
+            }
+            return normalized;
+        }
+
+        // ✅ Загрузка дилеров с сортировкой
         async function loadDealers() {
             try {
                 const response = await fetch('/api/uz/dealers/');
                 const data = await response.json();
-                dealers = data.results || data;
+                
+                // Сортировка по региону
+                const rawDealers = data.results || data;
+                dealers = rawDealers.sort((a, b) => {
+                    const cityA = normalizeCityName(a.city);
+                    const cityB = normalizeCityName(b.city);
+                    return cityA.localeCompare(cityB);
+                });
+                
                 filteredDealers = [...dealers];
 
                 if (map && clusterer) {
@@ -246,10 +254,37 @@
             }
         }
 
-        ymaps.ready(() => {
-            initializeMap();
-            loadDealers();
-        });
+        // ✅ Инициализация карты или fallback
+        if (typeof ymaps !== 'undefined') {
+            ymaps.ready(() => {
+                initializeMap();
+                loadDealers();
+            });
+        } else {
+            console.warn('⚠️ Yandex Maps API не загружена');
+            
+            const loader = document.getElementById('mapLoading');
+            if (loader) loader.style.display = 'none';
+            
+            const mapContainer = document.getElementById('map');
+            if (mapContainer) {
+                mapContainer.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; padding: 40px; text-align: center; background: #f8f9fa; border-radius: 12px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                        <h3 style="margin: 20px 0 10px; font-size: 20px; color: #333;">
+                            {% if LANGUAGE_CODE == 'uz' %}Xarita yuklanmadi{% elif LANGUAGE_CODE == 'ru' %}Карта не загрузилась{% else %}Map failed to load{% endif %}
+                        </h3>
+                        <p style="margin: 0; font-size: 16px; color: #666; max-width: 400px;">
+                            {% if LANGUAGE_CODE == 'uz' %}Dilerlar ro'yxati pastda{% elif LANGUAGE_CODE == 'ru' %}Список дилеров ниже{% else %}Dealers list below{% endif %}
+                        </p>
+                    </div>
+                `;
+            }
+            
+            loadDealers().then(() => showDealersListFallback());
+        }
 
         function initializeMap() {
             const loader = document.getElementById('mapLoading');
@@ -269,14 +304,6 @@
             const mapElement = document.getElementById('map');
             if (mapElement) mapElement.addEventListener('wheel', (e) => e.stopPropagation(), { passive: true });
 
-            loadAndDisplayRegions();
-            initializeClusterer();
-            initializeDealers();
-            updateStats();
-            setupEventListeners();
-        }
-
-        function loadAndDisplayRegions() {
             map.geoObjects.add(new ymaps.Polygon([uzbekistanBorder], {
                 hintContent: 'O\'zbekiston Respublikasi'
             }, {
@@ -286,417 +313,421 @@
                 fillColor: 'rgba(231, 76, 60, 0.05)',
                 fillOpacity: 0
             }));
-        }
 
-        function initializeClusterer() {
             clusterer = new ymaps.Clusterer({
                 groupByCoordinates: false,
                 clusterDisableClickZoom: false,
                 clusterHideIconOnBalloonOpen: false,
                 geoObjectHideIconOnBalloonOpen: false,
                 clusterIconLayout: ymaps.templateLayoutFactory.createClass(
-                    '<div style="position:absolute;left:-30px;top:-30px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#0a2883 0%,#1e40af 100%);border:4px solid white;box-shadow:0 4px 16px rgba(10,40,131,0.4);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:white;font-family:Arial,sans-serif;">' +
-                    '$[properties.geoObjects.length]' +
-                    '</div>'
+                    '<div style="position:absolute;left:-30px;top:-30px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#0a2883 0%,#1e40af 100%);border:4px solid white;box-shadow:0 4px 16px rgba(10,40,131,0.4);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:white;font-family:Arial,sans-serif;">$[properties.geoObjects.length]</div>'
                 ),
-                clusterIconShape: {
-                    type: 'Circle',
-                    coordinates: [0, 0],
-                    radius: 30
-                }
+                clusterIconShape: { type: 'Circle', coordinates: [0, 0], radius: 30 }
             });
+
+            initializeDealers();
+            updateStats();
+            setupEventListeners();
         }
 
         function createPlacemark(dealer) {
             const truckIconUrl = "{% static 'images/dealers-icon/icon-info/truck.png' %}";
-
             const balloonContent = `
-        <div style="padding:16px;max-width:320px;font-family:var(--_font-accent)">
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #e2e8f0">
-                <img src="{% static 'images/dealers-icon/icon-info/location.png' %}" style="width:20px;height:20px;object-fit:contain" alt="location">
-                <div style="flex:1">
-                    <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:2px">${translations.address}</div>
-                    <div style="font-size:13px;color:#000000;line-height:1.4">${dealer.address}</div>
+                <div style="padding:16px;max-width:320px;font-family:var(--_font-accent)">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #e2e8f0">
+                        <img src="{% static 'images/dealers-icon/icon-info/location.png' %}" style="width:20px;height:20px;object-fit:contain">
+                        <div style="flex:1">
+                            <div style="font-size:11px;color:#000;font-weight:500;margin-bottom:2px">${translations.address}</div>
+                            <div style="font-size:13px;color:#000;line-height:1.4">${dealer.address}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                        <img src="{% static 'images/dealers-icon/icon-info/call.png' %}" style="width:20px;height:20px;object-fit:contain">
+                        <div style="flex:1">
+                            <div style="font-size:11px;color:#000;font-weight:500;margin-bottom:2px">${translations.phone}</div>
+                            <a href="tel:${dealer.phone}" style="font-size:14px;color:#000;text-decoration:none;font-weight:600">${dealer.phone}</a>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                        <img src="{% static 'images/dealers-icon/icon-info/clock.png' %}" style="width:20px;height:20px;object-fit:contain">
+                        <div style="flex:1">
+                            <div style="font-size:11px;color:#000;font-weight:500;margin-bottom:2px">${translations.workingHours}</div>
+                            <div style="font-size:15px;color:#000;line-height:1.4">${dealer.working_hours}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+                        <img src="{% static 'images/dealers-icon/icon-info/service.png' %}" style="width:20px;height:20px;object-fit:contain">
+                        <div style="flex:1">
+                            <div style="font-size:11px;color:#000;font-weight:500;margin-bottom:4px">${translations.services}</div>
+                            <div style="display:flex;flex-wrap:wrap;gap:6px">${(dealer.services || []).map(s =>`<span style="background:#fff;color:#000;padding:0;border-radius:6px;font-size:15px;font-weight:500">${s}</span>`
+                        ).join('')}</div>
+                    </div>
                 </div>
+                <button onclick="showDealerDetails(${dealer.id})" style="background:#000;color:#fff;border:none;padding:12px 20px;border-radius:10px;cursor:pointer;width:100%;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(10,40,131,0.3);transition:all 0.3s">${translations.detailsBtn}</button>
             </div>
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-                <img src="{% static 'images/dealers-icon/icon-info/call.png' %}" style="width:20px;height:20px;object-fit:contain" alt="phone">
-                <div style="flex:1">
-                    <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:2px">${translations.phone}</div>
-                    <a href="tel:${dealer.phone}" style="font-size:14px;color:#000000;text-decoration:none;font-weight:600">${dealer.phone}</a>
-                </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-                <img src="{% static 'images/dealers-icon/icon-info/clock.png' %}" style="width:20px;height:20px;object-fit:contain" alt="clock">
-                <div style="flex:1">
-                    <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:2px">${translations.workingHours}</div>
-                    <div style="font-size:15px;color:#000000;line-height:1.4">${dealer.working_hours}</div>
-                </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-                <img src="{% static 'images/dealers-icon/icon-info/service.png' %}" style="width:20px;height:20px;object-fit:contain" alt="service">
-                <div style="flex:1">
-                    <div style="font-size:11px;color:#000000;font-weight:500;margin-bottom:4px">${translations.services}</div>
-                    <div style="display:flex;flex-wrap:wrap;gap:6px">${(dealer.services || []).map(s =>
-                `<span style="background:#ffffff;color:#000000;padding:0px;border-radius:6px;font-size:15px;font-weight:500">${s}</span>`
-            ).join('')}</div>
-                </div>
-            </div>
-            <button onclick="showDealerDetails(${dealer.id})" style="background:#000000;color:white;border:none;padding:12px 20px;border-radius:10px;cursor:pointer;width:100%;font-weight:600;font-size:14px;box-shadow:0 4px 12px rgba(10,40,131,0.3);transition:all 0.3s">${translations.detailsBtn}</button>
-        </div>
-    `;
+        `;
 
-            return new ymaps.Placemark(dealer.coordinates, {
-                id: dealer.id,
-                balloonContentHeader: `<div style="padding:12px 16px;background:#ffffff;border-bottom:1px solid #000000;font-family:var(--_font-accent)">
-            <div style="font-size:16px;font-weight:700;color:#000000;margin-bottom:4px">${dealer.name}</div>
-            <div style="font-size:12px;color:#000000;font-weight:500">${dealer.city}</div>
-        </div>`,
-                balloonContentBody: balloonContent,
-                hintContent: `${dealer.name} - ${dealer.city}`
-            }, {
-                iconLayout: ymaps.templateLayoutFactory.createClass(
-                    '<div style="width:44px;height:44px;border-radius:50%;background:white;border:3px solid #000000;box-shadow:0 4px 12px rgba(10,40,131,0.3);display:flex;align-items:center;justify-content:center;position:absolute;left:-22px;top:-22px;pointer-events:all;">' +
-                    '<img src="' + truckIconUrl + '" style="width:26px;height:26px;object-fit:contain;pointer-events:none;"/>' +
-                    '</div>'
-                ),
-                iconShape: {
-                    type: 'Circle',
-                    coordinates: [0, 0],
-                    radius: 22
-                }
-            });
+        return new ymaps.Placemark(dealer.coordinates, {
+            id: dealer.id,
+            balloonContentHeader: `<div style="padding:12px 16px;background:#fff;border-bottom:1px solid #000;font-family:var(--_font-accent)">
+                <div style="font-size:16px;font-weight:700;color:#000;margin-bottom:4px">${dealer.name}</div>
+                <div style="font-size:12px;color:#000;font-weight:500">${dealer.city}</div>
+            </div>`,
+            balloonContentBody: balloonContent,
+            hintContent: `${dealer.name} - ${dealer.city}`
+        }, {
+            iconLayout: ymaps.templateLayoutFactory.createClass(
+                '<div style="width:44px;height:44px;border-radius:50%;background:#fff;border:3px solid #000;box-shadow:0 4px 12px rgba(10,40,131,0.3);display:flex;align-items:center;justify-content:center;position:absolute;left:-22px;top:-22px;pointer-events:all;">' +
+                '<img src="' + truckIconUrl + '" style="width:26px;height:26px;object-fit:contain;pointer-events:none;"/></div>'
+            ),
+            iconShape: { type: 'Circle', coordinates: [0, 0], radius: 22 }
+        });
+    }
+
+    function initializeDealers() {
+        if (!dealers.length) return;
+        const placemarks = dealers.map(createPlacemark);
+        clusterer.add(placemarks);
+        map.geoObjects.add(clusterer);
+    }
+
+    function showDealerDetails(id) {
+        const d = dealers.find(x => x.id === id);
+        if (!d) return;
+
+        document.getElementById('modalTitle').textContent = d.name;
+        document.getElementById('modalSubtitle').textContent = d.city;
+        document.getElementById('dealerInfo').innerHTML = `
+            <div class="info-item">
+                <div class="info-icon-wrapper"><img src="{% static 'images/dealers-icon/icon-info-details/location.png' %}" class="info-icon-img"></div>
+                <div class="info-text">
+                    <div class="info-label">${translations.address}</div>
+                    <div class="info-value">${d.address}</div>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon-wrapper"><img src="{% static 'images/dealers-icon/icon-info-details/call.png' %}" class="info-icon-img"></div>
+                <div class="info-text">
+                    <div class="info-label">${translations.phone}</div>
+                    <a href="tel:${d.phone}" class="info-value info-link">${d.phone}</a>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon-wrapper"><img src="{% static 'images/dealers-icon/icon-info-details/mail.png' %}" class="info-icon-img"></div>
+                <div class="info-text">
+                    <div class="info-label">${translations.email}</div>
+                    <a href="mailto:${d.email}" class="info-value info-link">${d.email}</a>
+                </div>
+            </div>
+            ${d.website ? `<div class="info-item">
+                <div class="info-icon-wrapper"><img src="{% static 'images/dealers-icon/icon-info-details/web.png' %}" class="info-icon-img"></div>
+                <div class="info-text">
+                    <div class="info-label">${translations.website}</div>
+                    <a href="${d.website}" target="_blank" rel="noopener" class="info-value info-link">${d.website}</a>
+                </div>
+            </div>` : ''}
+            <div class="info-item">
+                <div class="info-icon-wrapper"><img src="{% static 'images/dealers-icon/icon-info-details/clock.png' %}" class="info-icon-img"></div>
+                <div class="info-text">
+                    <div class="info-label">${translations.workingHours}</div>
+                    <div class="info-value">${d.working_hours}</div>
+                </div>
+            </div>
+            ${d.manager ? `<div class="info-item">
+                <div class="info-icon-wrapper">
+                    <svg class="info-icon-img" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="currentColor" stroke-width="2"/>
+                        <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="info-text">
+                    <div class="info-label">${translations.manager}</div>
+                    <div class="info-value">${d.manager}</div>
+                </div>
+            </div>` : ''}
+            <div class="info-item">
+                <div class="info-icon-wrapper"><img src="{% static 'images/dealers-icon/icon-info/service.png' %}" class="info-icon-img"></div>
+                <div class="info-text">
+                    <div class="info-label">${translations.services}</div>
+                    <div class="services">${(d.services || []).map(s => '<span class="service-tag">' + s + '</span>').join('')}</div>
+                </div>
+            </div>
+            <div class="contact-buttons">
+                <a href="tel:${d.phone}" class="contact-btn btn-primary">
+                    <img src="{% static 'images/dealers-icon/icon-info-details/call.png' %}" style="width:18px;height:18px;filter:brightness(0) invert(1)">
+                    ${translations.callBtn}
+                </a>
+                <button onclick="buildRoute([${d.coordinates}])" class="contact-btn btn-secondary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2L12 22M12 2L5 9M12 2L19 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 13L17 18L12 22L7 18L12 13Z" fill="currentColor"/>
+                    </svg>
+                    ${translations.routeBtn}
+                </button>
+            </div>
+        `;
+
+        document.getElementById('dealerModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function buildRoute(dealerCoordinates) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                pos => createRoute([pos.coords.latitude, pos.coords.longitude], dealerCoordinates),
+                () => createRoute(map.getCenter(), dealerCoordinates)
+            );
+        } else {
+            createRoute(map.getCenter(), dealerCoordinates);
         }
+    }
 
-        function initializeDealers() {
-            const placemarks = dealers.map(createPlacemark);
-            clusterer.add(placemarks);
-            map.geoObjects.add(clusterer);
-        }
-
-        function showDealerDetails(id) {
-            const d = dealers.find(x => x.id === id);
-            if (!d) return;
-
-            document.getElementById('modalTitle').textContent = d.name;
-            document.getElementById('modalSubtitle').textContent = d.city;
-            document.getElementById('dealerInfo').innerHTML = `
-        <div class="info-item">
-            <div class="info-icon-wrapper">
-                <img src="{% static 'images/dealers-icon/icon-info-details/location.png' %}" class="info-icon-img" alt="location">
-            </div>
-            <div class="info-text">
-                <div class="info-label">${translations.address}</div>
-                <div class="info-value">${d.address}</div>
-            </div>
-        </div>
-        <div class="info-item">
-            <div class="info-icon-wrapper">
-                <img src="{% static 'images/dealers-icon/icon-info-details/call.png' %}" class="info-icon-img" alt="phone">
-            </div>
-            <div class="info-text">
-                <div class="info-label">${translations.phone}</div>
-                <a href="tel:${d.phone}" class="info-value info-link">${d.phone}</a>
-            </div>
-        </div>
-        <div class="info-item">
-            <div class="info-icon-wrapper">
-                <img src="{% static 'images/dealers-icon/icon-info-details/mail.png' %}" class="info-icon-img" alt="email">
-            </div>
-            <div class="info-text">
-                <div class="info-label">${translations.email}</div>
-                <a href="mailto:${d.email}" class="info-value info-link">${d.email}</a>
-            </div>
-        </div>
-        ${d.website ? `
-        <div class="info-item">
-            <div class="info-icon-wrapper">
-                <img src="{% static 'images/dealers-icon/icon-info-details/web.png' %}" class="info-icon-img" alt="website">
-            </div>
-            <div class="info-text">
-                <div class="info-label">${translations.website}</div>
-                <a href="${d.website}" target="_blank" rel="noopener" class="info-value info-link">${d.website}</a>
-            </div>
-        </div>` : ''}
-        <div class="info-item">
-            <div class="info-icon-wrapper">
-                <img src="{% static 'images/dealers-icon/icon-info-details/clock.png' %}" class="info-icon-img" alt="clock">
-            </div>
-            <div class="info-text">
-                <div class="info-label">${translations.workingHours}</div>
-                <div class="info-value">${d.working_hours}</div>
-            </div>
-        </div>
-        ${d.manager ? `
-        <div class="info-item">
-            <div class="info-icon-wrapper">
-                <svg class="info-icon-img" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="currentColor" stroke-width="2"/>
-                    <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div class="info-text">
-                <div class="info-label">${translations.manager}</div>
-                <div class="info-value">${d.manager}</div>
-            </div>
-        </div>` : ''}
-        <div class="info-item">
-            <div class="info-icon-wrapper">
-                <img src="{% static 'images/dealers-icon/icon-info/service.png' %}" class="info-icon-img" alt="services">
-            </div>
-            <div class="info-text">
-                <div class="info-label">${translations.services}</div>
-                <div class="services">${(d.services || []).map(s => '<span class="service-tag">' + s + '</span>').join('')}</div>
-            </div>
-        </div>
-        <div class="contact-buttons">
-            <a href="tel:${d.phone}" class="contact-btn btn-primary">
-                <img src="{% static 'images/dealers-icon/icon-info-details/call.png' %}" style="width:18px;height:18px;filter:brightness(0) invert(1)" alt="call">
-                ${translations.callBtn}
-            </a>
-            <button onclick="buildRoute([${d.coordinates}])" class="contact-btn btn-secondary">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L12 22M12 2L5 9M12 2L19 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M12 13L17 18L12 22L7 18L12 13Z" fill="currentColor"/>
-                </svg>
-                ${translations.routeBtn}
-            </button>
-        </div>
-    `;
-
-            document.getElementById('dealerModal').style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-
-        function buildRoute(dealerCoordinates) {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    pos => createRoute([pos.coords.latitude, pos.coords.longitude], dealerCoordinates),
-                    () => createRoute(map.getCenter(), dealerCoordinates)
-                );
-            } else {
-                createRoute(map.getCenter(), dealerCoordinates);
+    function createRoute(from, to) {
+        map.geoObjects.each(obj => {
+            if (obj.geometry && obj.geometry.getType() === 'LineString') {
+                map.geoObjects.remove(obj);
             }
-        }
+        });
 
-        function createRoute(from, to) {
-            map.geoObjects.each(obj => {
-                if (obj.geometry && obj.geometry.getType() === 'LineString') {
-                    map.geoObjects.remove(obj);
-                }
-            });
-
-            ymaps.route([from, to], {
-                mapStateAutoApply: true,
-                routingMode: 'auto'
-            }).then(route => {
-                route.getWayPoints().options.set({
-                    preset: 'islands#redStretchyIcon',
-                    iconColor: '#0a2883'
-                });
-                route.getRoutes().options.set({
-                    strokeColor: '#0a2883',
-                    strokeWidth: 5,
-                    strokeOpacity: 0.9
-                });
-                map.geoObjects.add(route);
-
-                const modal = document.getElementById('dealerModal');
-                if (modal) modal.style.display = 'none';
-
-                setTimeout(() => {
-                    const distance = (route.getLength() / 1000).toFixed(1);
-                    const time = Math.round(route.getTime() / 60);
-                    alert(`${translations.routeBuilt}\n${translations.distance}: ${distance} km\n${translations.time}: ${time} ${translations.minutes}`);
-                }, 500);
-            }).catch(() => {
-                alert(translations.routeError);
-            });
-        }
-
-        function setupEventListeners() {
-            let searchTimeout;
-            const searchBox = document.getElementById('searchBox');
-
-            if (searchBox) {
-                searchBox.addEventListener('input', (e) => {
-                    clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(() => filterDealers(e.target.value), 300);
-                });
-            }
-
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    if (this.dataset.service) {
-                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                        this.classList.add('active');
-                        currentFilter = this.dataset.service;
-                        filterDealers(searchBox ? searchBox.value : '');
-                    }
-                });
-            });
+        ymaps.route([from, to], {
+            mapStateAutoApply: true,
+            routingMode: 'auto'
+        }).then(route => {
+            route.getWayPoints().options.set({ preset: 'islands#redStretchyIcon', iconColor: '#0a2883' });
+            route.getRoutes().options.set({ strokeColor: '#0a2883', strokeWidth: 5, strokeOpacity: 0.9 });
+            map.geoObjects.add(route);
 
             const modal = document.getElementById('dealerModal');
-            const closeBtn = document.querySelector('.close');
+            if (modal) modal.style.display = 'none';
 
-            const closeModal = () => {
-                modal.style.display = 'none';
-                document.body.style.overflow = '';
-                document.body.style.position = '';
-                document.body.style.width = '';
-            };
+            setTimeout(() => {
+                const distance = (route.getLength() / 1000).toFixed(1);
+                const time = Math.round(route.getTime() / 60);
+                alert(`${translations.routeBuilt}\n${translations.distance}: ${distance} km\n${translations.time}: ${time} ${translations.minutes}`);
+            }, 500);
+        }).catch(() => alert(translations.routeError));
+    }
 
-            if (closeBtn) {
-                closeBtn.onclick = closeModal;
-            }
+    function setupEventListeners() {
+        let searchTimeout;
+        const searchBox = document.getElementById('searchBox');
 
-            window.onclick = (e) => {
-                if (e.target === modal) closeModal();
-            };
+        if (searchBox) {
+            searchBox.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => filterDealers(e.target.value), 300);
+            });
+        }
 
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modal.style.display === 'block') {
-                    closeModal();
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                if (this.dataset.service) {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.service;
+                    filterDealers(searchBox ? searchBox.value : '');
                 }
             });
+        });
 
-            modal.addEventListener('wheel', (e) => {
-                e.stopPropagation();
-            }, { passive: true });
+        const modal = document.getElementById('dealerModal');
+        const closeBtn = document.querySelector('.close');
 
-            modal.addEventListener('touchmove', (e) => {
-                e.stopPropagation();
-            }, { passive: true });
-        }
+        const closeModal = () => {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+        };
 
-        function filterDealers(query = '') {
-            query = query.toLowerCase().trim();
-            let filtered = dealers;
+        if (closeBtn) closeBtn.onclick = closeModal;
+        window.onclick = (e) => { if (e.target === modal) closeModal(); };
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.style.display === 'block') closeModal();
+        });
 
-            if (query.length >= 2) {
-                filtered = filtered.filter(d =>
-                    d.name.toLowerCase().includes(query) ||
-                    d.address.toLowerCase().includes(query) ||
-                    d.city.toLowerCase().includes(query) ||
-                    (d.manager && d.manager.toLowerCase().includes(query)) ||
-                    d.services.some(s => s.toLowerCase().includes(query))
-                );
-            }
+        modal.addEventListener('wheel', (e) => e.stopPropagation(), { passive: true });
+        modal.addEventListener('touchmove', (e) => e.stopPropagation(), { passive: true });
+    }
 
-            if (currentFilter !== 'all') {
-                filtered = filtered.filter(d => d.services.includes(currentFilter));
-            }
+    function filterDealers(query = '') {
+        query = query.toLowerCase().trim();
+        let filtered = dealers;
 
-            filteredDealers = filtered;
-            updateMapWithDealers(filtered);
-            updateStats();
-        }
-
-        function updateMapWithDealers(dealersToShow) {
-            clusterer.removeAll();
-
-            if (!dealersToShow.length) {
-                updateStats();
-                return;
-            }
-
-            const placemarks = dealersToShow.map(createPlacemark);
-            clusterer.add(placemarks);
-
-            if (dealersToShow.length === 1) {
-                map.setCenter(dealersToShow[0].coordinates, 12, { duration: 300 });
-            } else {
-                try {
-                    const bounds = clusterer.getBounds();
-                    if (bounds) {
-                        map.setBounds(bounds, {
-                            checkZoomRange: true,
-                            zoomMargin: [60, 60, 60, 60],
-                            duration: 300
-                        });
-                    }
-                } catch (e) {
-                    console.error('Bounds error:', e);
-                }
-            }
-        }
-
-        function updateStats() {
-            const totalEl = document.getElementById('totalDealers');
-            const visibleEl = document.getElementById('visibleDealers');
-            const citiesEl = document.getElementById('citiesCount');
-            const servicesEl = document.getElementById('servicesCount');
-
-            if (totalEl) animateNumber(totalEl, dealers.length);
-            if (visibleEl) animateNumber(visibleEl, filteredDealers.length);
-            if (citiesEl) animateNumber(citiesEl, new Set(dealers.map(d => d.city)).size);
-            if (servicesEl) animateNumber(servicesEl, new Set(dealers.flatMap(d => d.services)).size);
-        }
-
-        function animateNumber(el, target) {
-            const current = parseInt(el.textContent) || 0;
-            if (current === target) return;
-
-            const increment = target > current ? 1 : -1;
-            const steps = Math.abs(target - current);
-            const duration = Math.max(30, Math.min(500 / steps, 100));
-            let step = 0;
-
-            const timer = setInterval(() => {
-                const val = current + (increment * ++step);
-                if ((increment > 0 && val >= target) || (increment < 0 && val <= target)) {
-                    el.textContent = target;
-                    clearInterval(timer);
-                } else {
-                    el.textContent = val;
-                }
-            }, duration);
-        }
-
-        function findNearestDealer() {
-            if (!navigator.geolocation) {
-                alert(translations.noGeolocation);
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                pos => {
-                    const userCoords = [pos.coords.latitude, pos.coords.longitude];
-                    let nearest = null;
-                    let minDist = Infinity;
-
-                    dealers.forEach(d => {
-                        const dist = calculateDistance(userCoords, d.coordinates);
-                        if (dist < minDist) {
-                            minDist = dist;
-                            nearest = d;
-                        }
-                    });
-
-                    if (nearest) {
-                        map.setCenter(nearest.coordinates, 14, { duration: 400 });
-                        setTimeout(() => showDealerDetails(nearest.id), 800);
-                    }
-                },
-                () => alert(translations.locationError)
+        if (query.length >= 2) {
+            filtered = filtered.filter(d =>
+                d.name.toLowerCase().includes(query) ||
+                d.address.toLowerCase().includes(query) ||
+                d.city.toLowerCase().includes(query) ||
+                (d.manager && d.manager.toLowerCase().includes(query)) ||
+                d.services.some(s => s.toLowerCase().includes(query))
             );
         }
 
-        function calculateDistance(c1, c2) {
-            const R = 6371;
-            const dLat = (c2[0] - c1[0]) * Math.PI / 180;
-            const dLon = (c2[1] - c1[1]) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) ** 2 +
-                Math.cos(c1[0] * Math.PI / 180) *
-                Math.cos(c2[0] * Math.PI / 180) *
-                Math.sin(dLon / 2) ** 2;
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        if (currentFilter !== 'all') {
+            filtered = filtered.filter(d => d.services.includes(currentFilter));
         }
 
-        window.showDealerDetails = showDealerDetails;
-        window.buildRoute = buildRoute;
-        window.findNearestDealer = findNearestDealer;
-    </script>
-</body>
+        filteredDealers = filtered;
+        updateMapWithDealers(filtered);
+        updateStats();
+    }
 
+    function updateMapWithDealers(dealersToShow) {
+        if (!map || !clusterer) return;
+        
+        clusterer.removeAll();
+
+        if (!dealersToShow.length) {
+            updateStats();
+            return;
+        }
+
+        const placemarks = dealersToShow.map(createPlacemark);
+        clusterer.add(placemarks);
+
+        if (dealersToShow.length === 1) {
+            map.setCenter(dealersToShow[0].coordinates, 12, { duration: 300 });
+        } else {
+            try {
+                const bounds = clusterer.getBounds();
+                if (bounds) {
+                    map.setBounds(bounds, {
+                        checkZoomRange: true,
+                        zoomMargin: [60, 60, 60, 60],
+                        duration: 300
+                    });
+                }
+            } catch (e) {
+                console.error('Bounds error:', e);
+            }
+        }
+    }
+
+    function updateStats() {
+        const totalEl = document.getElementById('totalDealers');
+        const visibleEl = document.getElementById('visibleDealers');
+        const citiesEl = document.getElementById('citiesCount');
+        const servicesEl = document.getElementById('servicesCount');
+
+        if (totalEl) animateNumber(totalEl, dealers.length);
+        if (visibleEl) animateNumber(visibleEl, filteredDealers.length);
+        if (citiesEl) animateNumber(citiesEl, new Set(dealers.map(d => d.city)).size);
+        if (servicesEl) animateNumber(servicesEl, new Set(dealers.flatMap(d => d.services)).size);
+    }
+
+    function animateNumber(el, target) {
+        const current = parseInt(el.textContent) || 0;
+        if (current === target) return;
+
+        const increment = target > current ? 1 : -1;
+        const steps = Math.abs(target - current);
+        const duration = Math.max(30, Math.min(500 / steps, 100));
+        let step = 0;
+
+        const timer = setInterval(() => {
+            const val = current + (increment * ++step);
+            if ((increment > 0 && val >= target) || (increment < 0 && val <= target)) {
+                el.textContent = target;
+                clearInterval(timer);
+            } else {
+                el.textContent = val;
+            }
+        }, duration);
+    }
+
+    function findNearestDealer() {
+        if (!navigator.geolocation) {
+            alert(translations.noGeolocation);
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            pos => {
+                const userCoords = [pos.coords.latitude, pos.coords.longitude];
+                let nearest = null;
+                let minDist = Infinity;
+
+                dealers.forEach(d => {
+                    const dist = calculateDistance(userCoords, d.coordinates);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        nearest = d;
+                    }
+                });
+
+                if (nearest && map) {
+                    map.setCenter(nearest.coordinates, 14, { duration: 400 });
+                    setTimeout(() => showDealerDetails(nearest.id), 800);
+                }
+            },
+            () => alert(translations.locationError)
+        );
+    }
+
+    function calculateDistance(c1, c2) {
+        const R = 6371;
+        const dLat = (c2[0] - c1[0]) * Math.PI / 180;
+        const dLon = (c2[1] - c1[1]) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(c1[0] * Math.PI / 180) *
+            Math.cos(c2[0] * Math.PI / 180) *
+            Math.sin(dLon / 2) ** 2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    // ✅ Fallback список дилеров
+    function showDealersListFallback() {
+        const dealersList = document.getElementById('dealersList');
+        const dealersListContent = document.getElementById('dealersListContent');
+        
+        if (!dealersList || !dealersListContent || !dealers.length) return;
+        
+        dealersList.style.display = 'block';
+        
+        dealersListContent.innerHTML = dealers.map(d => `
+            <div class="dealer-card" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 4px 20px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 2px 12px rgba(0,0,0,0.08)'">
+                <h4 style="font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #000;">${d.name}</h4>
+                <p style="font-size: 14px; color: #666; margin-bottom: 16px;">${d.city}</p>
+                
+                <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: flex-start;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a2883" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                    <span style="font-size: 14px; color: #333; line-height: 1.5;">${d.address}</span>
+                </div>
+                
+                <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a2883" stroke-width="2">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                    <a href="tel:${d.phone}" style="font-size: 14px; color: #0a2883; font-weight: 600; text-decoration: none;">${d.phone}</a>
+                </div>
+                
+                <div style="display: flex; gap: 8px; margin-bottom: 16px; align-items: center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a2883" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span style="font-size: 14px; color: #333;">${d.working_hours}</span>
+                </div>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px;">
+                    ${(d.services || []).map(s => `<span style="background: #f0f4ff; color: #0a2883; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;">${s}</span>`).join('')}
+                </div>
+                
+                <a href="tel:${d.phone}" style="display: block; background: #000; color: white; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: background 0.2s;" onmouseover="this.style.background='#0a2883'" onmouseout="this.style.background='#000'">
+                    ${translations.callBtn}
+                </a>
+            </div>
+        `).join('');
+        
+        updateStats();
+    }
+
+    window.showDealerDetails = showDealerDetails;
+    window.buildRoute = buildRoute;
+    window.findNearestDealer = findNearestDealer;
+</script>
+</body>
 </html>
