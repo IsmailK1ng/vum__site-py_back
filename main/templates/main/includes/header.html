@@ -113,6 +113,7 @@
                 style="display: inline;">
                 {% csrf_token %}
                 <input type="hidden" name="language" value="" id="language-input">
+                <input type="hidden" name="next" value="" id="next-input">
                 <div class="language-switcher">
                     <span class="language-current">
                         {% if LANGUAGE_CODE == 'ru' %}RU{% elif LANGUAGE_CODE == 'en' %}EN{% else %}UZ{% endif %}
@@ -247,9 +248,30 @@
                                         </a>
                                     </li>
                                     <li class="main-menu__item">
+                                        <a class="main-menu__link btn" href="{% url 'lizing' %}">
+                                            <span class="btn-caption">
+                                                {% if LANGUAGE_CODE == 'ru' %}Лизинг{% elif LANGUAGE_CODE == 'en' %}Leasing{% else %}Lizing{% endif %}
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="main-menu__item">
+                                        <a class="main-menu__link btn" href="{% url 'services' %}">
+                                            <span class="btn-caption">
+                                                {% if LANGUAGE_CODE == 'ru' %}Сервис{% elif LANGUAGE_CODE == 'en' %}Service{% else %}Servis{% endif %}
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="main-menu__item">
                                         <a class="main-menu__link btn" href="{% url 'contact' %}">
                                             <span class="btn-caption">
                                                 {% if LANGUAGE_CODE == 'ru' %}Контакты{% elif LANGUAGE_CODE == 'en' %}Contacts{% else %}Bog'lanish{% endif %}
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="main-menu__item">
+                                        <a class="main-menu__link btn" href="{% url 'jobs' %}">
+                                            <span class="btn-caption">
+                                                {% if LANGUAGE_CODE == 'ru' %}Вакансии{% elif LANGUAGE_CODE == 'en' %}Jobs{% else %}Vakansiya{% endif %}
                                             </span>
                                         </a>
                                     </li>
@@ -276,10 +298,13 @@
     function switchLanguage(lang) {
         console.log('Switching to language:', lang);
         document.getElementById('language-input').value = lang;
-        
+
+        // Устанавливаем текущий URL, чтобы остаться на той же странице
+        document.getElementById('next-input').value = window.location.pathname + window.location.search;
+
         // Сохраняем, что нужно перезагрузить контент после смены языка
         sessionStorage.setItem('languageChanged', 'true');
-        
+
         document.querySelector('.language-switcher-form').submit();
     }
 
