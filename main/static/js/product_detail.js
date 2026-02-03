@@ -7,10 +7,10 @@ class ProductDetail {
         this.productId = null;
 
 
-    this.currentLanguage = (document.documentElement.lang ||
-        window.LANGUAGE_CODE ||
-        this.getCookie('django_language') ||
-        'uz').split('-')[0];
+        this.currentLanguage = (document.documentElement.lang ||
+            window.LANGUAGE_CODE ||
+            this.getCookie('django_language') ||
+            'uz').split('-')[0];
 
         this.apiUrl = this.getApiUrl();
         this.product = null;
@@ -84,7 +84,7 @@ class ProductDetail {
         let value = this.translations[this.currentLanguage];
 
         for (const k of keys) {
-            value = value?.[k];
+            value = (value && value[k] !== undefined) ? value[k] : undefined;
         }
 
         return value || key;
@@ -103,14 +103,14 @@ class ProductDetail {
         console.log('Full URL:', window.location.href);
         console.log('Pathname:', window.location.pathname);
         console.log('Search params:', window.location.search);
-        
+
         const pathParts = window.location.pathname.split('/').filter(p => p);
         const slug = pathParts[pathParts.length - 1];
-        
+
         console.log('Path parts:', pathParts);
         console.log('Extracted slug:', slug);
 
-        
+
         if (!slug) {
             this.showError(this.t('notFound'));
             return;
@@ -290,11 +290,11 @@ class ProductDetail {
     initSwiper() {
         if (typeof Swiper === 'undefined') return;
 
-        const existingSwiper = document.querySelector('.mxd-demo-swiper')?.swiper;
+        var swiperContainer = document.querySelector('.mxd-demo-swiper');
+        var existingSwiper = (swiperContainer && swiperContainer.swiper) ? swiperContainer.swiper : null;
         if (existingSwiper) {
             existingSwiper.destroy(true, true);
         }
-
         const realSlides = document.querySelectorAll('.swiper-wrapper .swiper-slide').length;
         const minSlidesForLoop = 6;
 
@@ -388,51 +388,51 @@ class ProductDetail {
 
         // Product Schema
         const productSchema = {
-        "@context": "https://schema.org",
-        "@type": "Product",
-        "name": this.product.title,
-        "image": this.product.main_image_url || null, // 
-        "description": this.product.title, // 
-        "brand": {
-            "@type": "Brand",
-            "name": "FAW"
-        },
-        "manufacturer": {
-            "@type": "Organization",
-            "name": "Van Universal Motors"
-        },
-        "category": this.product.category_display || "Commercial Vehicle"
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": this.product.title,
+            "image": this.product.main_image_url || null, // 
+            "description": this.product.title, // 
+            "brand": {
+                "@type": "Brand",
+                "name": "FAW"
+            },
+            "manufacturer": {
+                "@type": "Organization",
+                "name": "Van Universal Motors"
+            },
+            "category": this.product.category_display || "Commercial Vehicle"
         };
 
         // Добавляем галерею если есть
         if (this.product.gallery && this.product.gallery.length > 0) {
-        productSchema.image = this.product.gallery.map(img => img.image_url); 
+            productSchema.image = this.product.gallery.map(img => img.image_url);
         }
 
         // BreadcrumbList Schema (без изменений)
         const breadcrumbSchema = {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-            {
-            "@type": "ListItem",
-            "position": 1,
-            "name": this.currentLanguage === 'uz' ? 'Bosh sahifa' : (this.currentLanguage === 'ru' ? 'Главная' : 'Home'),
-            "item": `${baseUrl}/`
-            },
-            {
-            "@type": "ListItem",
-            "position": 2,
-            "name": this.currentLanguage === 'uz' ? 'Modellar' : (this.currentLanguage === 'ru' ? 'Модели' : 'Models'),
-            "item": `${baseUrl}/#models`
-            },
-            {
-            "@type": "ListItem",
-            "position": 3,
-            "name": this.product.title,
-            "item": currentUrl
-            }
-        ]
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": this.currentLanguage === 'uz' ? 'Bosh sahifa' : (this.currentLanguage === 'ru' ? 'Главная' : 'Home'),
+                    "item": `${baseUrl}/`
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": this.currentLanguage === 'uz' ? 'Modellar' : (this.currentLanguage === 'ru' ? 'Модели' : 'Models'),
+                    "item": `${baseUrl}/#models`
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 3,
+                    "name": this.product.title,
+                    "item": currentUrl
+                }
+            ]
         };
 
         // Вставляем разметку в DOM
@@ -440,11 +440,11 @@ class ProductDetail {
         const breadcrumbSchemaEl = document.getElementById('breadcrumb-schema');
 
         if (productSchemaEl) {
-        productSchemaEl.textContent = JSON.stringify(productSchema, null, 2);
+            productSchemaEl.textContent = JSON.stringify(productSchema, null, 2);
         }
 
         if (breadcrumbSchemaEl) {
-        breadcrumbSchemaEl.textContent = JSON.stringify(breadcrumbSchema, null, 2);
+            breadcrumbSchemaEl.textContent = JSON.stringify(breadcrumbSchema, null, 2);
         }
     }
 

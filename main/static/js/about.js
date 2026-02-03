@@ -8,7 +8,7 @@ gsap.registerPlugin(Flip);
 const content = document.querySelector('body');
 const imgLoad = imagesLoaded(content);
 const loadingWrap = document.querySelector('.loading-wrap');
-const loadingItems = loadingWrap.querySelectorAll('.loading__item');
+const loadingItems = loadingWrap ? loadingWrap.querySelectorAll('.loading__item') : [];
 const fadeInItems = document.querySelectorAll('.loading__fade');
 
 function startLoader() {
@@ -28,6 +28,7 @@ function startLoader() {
 startLoader();
 
 function pageAppearance() {
+  if (!loadingItems || !loadingItems.length) return;
   gsap.set(loadingItems, { opacity: 0 })
   gsap.to(loadingItems, {
     duration: 1.1,
@@ -1550,16 +1551,19 @@ $(".btn-to-top").each(function () {
 // ------------------------------------------------------------------------------ //
 // Parallax Universal (apply parallax effect to any element with a data-speed attribute) Start
 // ------------------------------------------------------------------------------ //
-gsap.to("[data-speed]", {
-  y: (i, el) => (1 - parseFloat(el.getAttribute("data-speed"))) * ScrollTrigger.maxScroll(window),
-  ease: "none",
-  scrollTrigger: {
-    start: 0,
-    end: "max",
-    invalidateOnRefresh: true,
-    scrub: 0
-  }
-});
+const speedElements = document.querySelectorAll("[data-speed]");
+if (speedElements.length) {
+  gsap.to(speedElements, {
+    y: (i, el) => (1 - parseFloat(el.getAttribute("data-speed"))) * ScrollTrigger.maxScroll(window),
+    ease: "none",
+    scrollTrigger: {
+      start: 0,
+      end: "max",
+      invalidateOnRefresh: true,
+      scrub: 0
+    }
+  });
+}
 
 // --------------------------------------------- //
 // Parallax Universal End

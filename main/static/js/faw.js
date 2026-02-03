@@ -323,10 +323,20 @@ function renderInfo(idx) {
 
   // Получаем переводы из data-атрибутов элемента slider-data
   const sliderDataElement = document.getElementById('slider-data');
+  var labelPrice = 'ЦЕНА';
+  var labelPower = 'Мощность двигателя';
+  var labelMpg = 'Расход топлива';
+
+  if (sliderDataElement && sliderDataElement.dataset) {
+    if (sliderDataElement.dataset.labelPrice) labelPrice = sliderDataElement.dataset.labelPrice;
+    if (sliderDataElement.dataset.labelPower) labelPower = sliderDataElement.dataset.labelPower;
+    if (sliderDataElement.dataset.labelMpg) labelMpg = sliderDataElement.dataset.labelMpg;
+  }
+
   const labels = {
-    price: sliderDataElement?.dataset.labelPrice || 'ЦЕНА',
-    power: sliderDataElement?.dataset.labelPower || 'Мощность двигателя',
-    mpg: sliderDataElement?.dataset.labelMpg || 'Расход топлива'
+    price: labelPrice,
+    power: labelPower,
+    mpg: labelMpg
   };
 
   document.getElementById('slider-info').innerHTML = `
@@ -455,8 +465,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.addEventListener('keydown', function (e) {
       const active = document.activeElement;
-      const tag = active?.tagName?.toLowerCase();
-      if (tag === 'input' || tag === 'textarea' || active?.isContentEditable) return;
+      var tag = (active && active.tagName) ? active.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea' || (active && active.isContentEditable)) return;
       if (e.key === 'ArrowLeft' && !animating) goTo('left');
       else if (e.key === 'ArrowRight' && !animating) goTo('right');
     });
@@ -484,7 +494,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       sliderTrackEl.addEventListener('touchend', function (ev) {
         if (!touchMoved) return;
-        const lastTouch = ev.changedTouches?.[0];
+        var lastTouch = (ev.changedTouches && ev.changedTouches.length > 0) ? ev.changedTouches[0] : null;
         if (!lastTouch) return;
         const dx = lastTouch.clientX - touchStartX;
         if (Math.abs(dx) < threshold) return;
@@ -756,17 +766,17 @@ document.addEventListener('DOMContentLoaded', function () {
       const phoneInput = document.getElementById('dealer_phone');
       const messageInput = document.getElementById('dealer_message');
       const phoneValue = phoneInput ? phoneInput.value.replace(/\D/g, '') : '';
-      const messageValue = messageInput ? messageInput.value.trim() : ''; 
+      const messageValue = messageInput ? messageInput.value.trim() : '';
 
       if (phoneValue.length !== 12 || !phoneValue.startsWith('998')) {
         alert('Iltimos, to\'g\'ri telefon raqam kiriting');
-        phoneInput?.focus();
+        if (phoneInput) phoneInput.focus();
         return;
       }
 
       if (!messageValue) {
         alert('Iltimos, xabar yozing');
-        messageInput?.focus();
+        if (messageInput) messageInput.focus();
         return;
       }
 
@@ -784,21 +794,28 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(token => { recaptchaToken = token; });
         });
 
+        var dealerNameEl = document.getElementById('dealer_name');
+        var dealerCompanyEl = document.getElementById('dealer_company');
+        var dealerExpEl = document.getElementById('dealer_experience');
+        var dealerRegionEl = document.getElementById('dealer_region');
+
         const formData = {
-          name: document.getElementById('dealer_name')?.value.trim() || '',
-          company_name: document.getElementById('dealer_company')?.value.trim() || '',
-          experience_years: parseInt(document.getElementById('dealer_experience')?.value) || null,
-          region: document.getElementById('dealer_region')?.value || '',
+          name: (dealerNameEl && dealerNameEl.value) ? dealerNameEl.value.trim() : '',
+          company_name: (dealerCompanyEl && dealerCompanyEl.value) ? dealerCompanyEl.value.trim() : '',
+          experience_years: (dealerExpEl && dealerExpEl.value) ? parseInt(dealerExpEl.value) : null,
+          region: (dealerRegionEl && dealerRegionEl.value) ? dealerRegionEl.value : '',
           phone: '+' + phoneValue,
           message: messageValue,
           recaptcha_token: recaptchaToken
         };
 
+        var csrfEl = document.querySelector('[name=csrfmiddlewaretoken]');
+
         const response = await fetch('/api/uz/dealer-applications/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+            'X-CSRFToken': (csrfEl && csrfEl.value) ? csrfEl.value : ''
           },
           body: JSON.stringify(formData)
         });
@@ -824,9 +841,9 @@ document.addEventListener('DOMContentLoaded', function () {
         window.logJSError('Dealer form submission error: ' + error.message, {
           file: 'faw-scripts.js',
           formData: {
-            name: document.getElementById('dealer_name')?.value,
+            name: (document.getElementById('dealer_name') && document.getElementById('dealer_name').value) ? document.getElementById('dealer_name').value : '',
             phone: '+' + phoneValue,
-            region: document.getElementById('dealer_region')?.value
+            region: (document.getElementById('dealer_region') && document.getElementById('dealer_region').value) ? document.getElementById('dealer_region').value : ''
           }
         });
         alert('Xatolik yuz berdi. Iltimos qaytadan urinib ko\'ring.');
