@@ -298,6 +298,26 @@
     color: #fff;
 }
 
+.truck-price {
+    text-align: center;
+    margin: 5px 0;
+    padding: 8px 15px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.truck-price .price-value {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.product-price-range {
+    display: none !important;
+}
+
 .truck-specs {
     display: flex;
     justify-content: space-between;
@@ -677,6 +697,10 @@ body[data-theme="dark"] .hero-05-title__item {
 
     .truck-title {
         font-size: 20px;
+    }
+
+    .truck-price .price-value {
+        font-size: 18px;
     }
 
     .spec-value {

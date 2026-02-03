@@ -1118,6 +1118,7 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
             'fields': (
                 ('title', 'slug'),
                 'selected_categories',
+                'price',
                 ('order', 'is_active', 'is_featured'),
                 ('main_image', 'card_image')
             )

@@ -541,10 +541,22 @@ def products(request):
         }
         
         category_info = CATEGORY_DATA.get(category, CATEGORY_DATA['tiger_vh'])
-        
+
+        # Вычисляем диапазон цен для текущей категории
+        from django.db.models import Min, Max
+        price_range = Product.objects.filter(
+            category=category,
+            is_active=True,
+            price__isnull=False
+        ).aggregate(
+            min_price=Min('price'),
+            max_price=Max('price')
+        )
+
         return render(request, 'main/products.html', {
             'category': category,
-            'category_info': category_info
+            'category_info': category_info,
+            'price_range': price_range
         })
     except Exception as e:
         logger.error(f"Ошибка на странице продуктов: {str(e)}", exc_info=True)

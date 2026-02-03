@@ -52,6 +52,28 @@
   <!-- Schema.org BreadcrumbList Markup -->
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}","item":"{{ request.scheme }}://{{ request.get_host }}/"},{"@type":"ListItem","position":2,"name":"{% if LANGUAGE_CODE == 'uz' %}Modellar{% elif LANGUAGE_CODE == 'ru' %}Модели{% else %}Models{% endif %}","item":"{{ request.build_absolute_uri }}"}]}</script>
 
+  <!-- Schema.org CollectionPage с информацией о ценах -->
+  {% if price_range.min_price and price_range.max_price %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "{% if LANGUAGE_CODE == 'uz' %}{{ category_info.title }}{% elif LANGUAGE_CODE == 'ru' %}{{ category_info.title_ru }}{% else %}{{ category_info.title_en }}{% endif %}",
+    "url": "{{ request.build_absolute_uri }}",
+    "mainEntity": {
+      "@type": "ItemList",
+      "name": "{% if LANGUAGE_CODE == 'uz' %}{{ category_info.title }}{% elif LANGUAGE_CODE == 'ru' %}{{ category_info.title_ru }}{% else %}{{ category_info.title_en }}{% endif %}",
+      "offers": {
+        "@type": "AggregateOffer",
+        "lowPrice": "{{ price_range.min_price }}",
+        "highPrice": "{{ price_range.max_price }}",
+        "priceCurrency": "UZS"
+      }
+    }
+  }
+  </script>
+  {% endif %}
+
   <style>
     .loader-container {
       display: flex;

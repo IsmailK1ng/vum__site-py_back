@@ -193,8 +193,8 @@ class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer
         model = Product
         fields = [
             'id', 'title', 'slug', 'category', 'category_display',
-            'all_categories',  
-            'image_url', 'card_specs', 'is_featured', 'order'
+            'all_categories',
+            'image_url', 'card_specs', 'is_featured', 'order', 'price'
         ]
     def get_title(self, obj):
         lang = self.get_current_language()

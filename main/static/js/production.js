@@ -337,6 +337,7 @@ class ProductsManager {
       this.renderCards();
       this.createPagination();
       this.generateSchemaMarkup();
+      this.updatePriceRange();
       this.hideLoader();
 
     } catch (error) {
@@ -355,30 +356,63 @@ class ProductsManager {
   generateSchemaMarkup() {
     const baseUrl = `${window.location.protocol}//${window.location.host}`;
 
+    // Вычисляем диапазон цен для AggregateOffer
+    const prices = this.filteredProducts
+      .map(p => p.price)
+      .filter(price => price != null && price > 0);
+
+    const minPrice = prices.length > 0 ? Math.min(...prices) : null;
+    const maxPrice = prices.length > 0 ? Math.max(...prices) : null;
+
     // ItemList Schema для каталога продуктов
     const itemListSchema = {
       "@context": "https://schema.org",
       "@type": "ItemList",
       "name": this.currentCategory ? this.getCategoryData(this.currentCategory)?.title || "FAW Products" : "FAW Products",
-      "itemListElement": this.filteredProducts.slice(0, 20).map((product, index) => ({
-        "@type": "ListItem",
-        "position": index + 1,
-        "item": {
-          "@type": "Product",
-          "name": product.title,
-          "image": product.main_image_url ? `${baseUrl}${product.main_image_url}` : "",
-          "url": `${baseUrl}/products/${product.slug}/`,
-          "brand": {
-            "@type": "Brand",
-            "name": "FAW"
-          },
-          "manufacturer": {
-            "@type": "Organization",
-            "name": "Van Universal Motors"
+      "itemListElement": this.filteredProducts.slice(0, 20).map((product, index) => {
+        const productSchema = {
+          "@type": "ListItem",
+          "position": index + 1,
+          "item": {
+            "@type": "Product",
+            "name": product.title,
+            "image": product.main_image_url ? `${baseUrl}${product.main_image_url}` : "",
+            "url": `${baseUrl}/products/${product.slug}/`,
+            "brand": {
+              "@type": "Brand",
+              "name": "FAW"
+            },
+            "manufacturer": {
+              "@type": "Organization",
+              "name": "Van Universal Motors"
+            }
           }
+        };
+
+        // Добавляем информацию о цене, если она есть
+        if (product.price && product.price > 0) {
+          productSchema.item.offers = {
+            "@type": "Offer",
+            "price": product.price,
+            "priceCurrency": "UZS",
+            "availability": "https://schema.org/InStock"
+          };
         }
-      }))
+
+        return productSchema;
+      })
     };
+
+    // Добавляем AggregateOffer на уровне категории, если есть цены
+    if (minPrice && maxPrice) {
+      itemListSchema.offers = {
+        "@type": "AggregateOffer",
+        "lowPrice": minPrice,
+        "highPrice": maxPrice,
+        "priceCurrency": "UZS",
+        "offerCount": prices.length
+      };
+    }
 
     // Вставляем разметку в DOM
     const schemaEl = document.getElementById('products-schema');
@@ -442,6 +476,21 @@ class ProductsManager {
     const languagePrefix = this.currentLanguage === 'uz' ? '' : `/${this.currentLanguage}`;
     const productUrl = `${languagePrefix}/products/${productSlug}/`;
 
+    // Форматируем цену, если она есть
+    let priceHTML = '';
+    if (product.price && product.price > 0) {
+      const formattedPrice = new Intl.NumberFormat('uz-UZ', {
+        style: 'decimal',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(product.price);
+      priceHTML = `
+        <div class="truck-price">
+          <span class="price-value">${formattedPrice} UZS</span>
+        </div>
+      `;
+    }
+
     return `
       <div class="faw-truck-card">
         <div class="truck-image-container">
@@ -449,6 +498,7 @@ class ProductsManager {
         </div>
         <div class="truck-info">
           <h3 class="truck-title">${productTitle}</h3>
+          ${priceHTML}
           ${specsHTML ? `<div class="truck-specs">${specsHTML}</div>` : ''}
           <div class="truck-cta">
             <a href="${productUrl}" class="btn-details">${buttonText}</a>
@@ -626,6 +676,53 @@ class ProductsManager {
     }
     const pagination = document.getElementById('pagination');
     if (pagination) pagination.innerHTML = '';
+  }
+
+  updatePriceRange() {
+    // Вычисляем минимальную и максимальную цену для текущей категории
+    const prices = this.filteredProducts
+      .map(p => p.price)
+      .filter(price => price != null && price > 0);
+
+    if (prices.length === 0) return; // Нет цен - не показываем
+
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+
+    // Форматируем цены
+    const formatPrice = (price) => {
+      return new Intl.NumberFormat('uz-UZ', {
+        style: 'decimal',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(price);
+    };
+
+    // Текст в зависимости от языка
+    const priceText = {
+      'uz': `${formatPrice(minPrice)} UZS dan ${formatPrice(maxPrice)} UZS gacha`,
+      'ru': `От ${formatPrice(minPrice)} UZS до ${formatPrice(maxPrice)} UZS`,
+      'en': `From ${formatPrice(minPrice)} UZS to ${formatPrice(maxPrice)} UZS`
+    };
+
+    const priceRangeText = priceText[this.currentLanguage] || priceText['uz'];
+
+    // Находим элемент для вставки диапазона цен
+    const sloganElement = document.querySelector('.hero-05-title__item:not(.title-item-image)');
+    if (sloganElement) {
+      // Создаем или обновляем элемент с диапазоном цен
+      let priceElement = document.querySelector('.product-price-range');
+      if (!priceElement) {
+        priceElement = document.createElement('em');
+        priceElement.className = 'hero-05-title__item product-price-range';
+        priceElement.style.fontSize = '20px';
+        priceElement.style.marginTop = '10px';
+        priceElement.style.display = 'block';
+        priceElement.style.opacity = '0.8';
+        sloganElement.parentNode.appendChild(priceElement);
+      }
+      priceElement.textContent = priceRangeText;
+    }
   }
 
   showError(message) {

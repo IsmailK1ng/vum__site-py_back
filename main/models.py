@@ -165,11 +165,19 @@ class Product(models.Model):
         null=True,
         help_text="Выберите категории через запятую. Например: samosval,maxsus"
     )
+    price = models.DecimalField(
+        "Цена (UZS)",
+        max_digits=15,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        help_text="Цена в узбекских сумах для отображения диапазона цен в категориях"
+    )
     main_image = models.ImageField("Главное изображение", upload_to="products/main/")
     card_image = models.ImageField(
-        "Изображение для карточки", 
-        upload_to="products/cards/", 
-        blank=True, 
+        "Изображение для карточки",
+        upload_to="products/cards/",
+        blank=True,
         null=True
     )
     
