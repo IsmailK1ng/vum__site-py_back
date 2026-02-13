@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (promo.image_url) {
                 html += `<div class="promo-image">`;
-                html += `<img src="${promo.image_url}" alt="${promo.title}">`;
+                html += `<img src="${promo.image_url}" alt="${promo.title}" loading="lazy">`;
                 
                 // Добавляем навигацию только если больше 1 акции
                 if (promotions.length > 1) {

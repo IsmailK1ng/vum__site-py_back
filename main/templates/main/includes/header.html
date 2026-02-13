@@ -4,7 +4,7 @@
         <!-- Логотип -->
         <div class="mxd-header__logo loading__fade">
             <a href="{% url 'home' %}" class="mxd-logo">
-                <img src="{% static 'images/LOGO-VUM.png' %}" class="mxd-logo__image" alt="FAW Logo">
+                <img data-src="{% static 'images/LOGO-VUM.png' %}" class="mxd-logo__image" alt="FAW Logo" loading="lazy">
             </a>
         </div>
 
@@ -309,3 +309,4 @@
     }
 
     </script>
+    <script crossorigin="anonymous" src="{% static 'js/lazy-load.js' %}"></script>

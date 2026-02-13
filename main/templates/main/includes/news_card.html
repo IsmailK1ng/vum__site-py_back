@@ -6,9 +6,9 @@
     <div class="slide-header-row">
       <div class="slide-avatar">
         {% if news.author_photo %}
-          <img src="{{ news.author_photo.url }}" alt="{{ news.author.username }}" class="avatar-image">
+          <img data-src="{{ news.author_photo.url }}" alt="{{ news.author.username }}" class="avatar-image" loading="lazy">
         {% else %}
-          <img src="{% static 'images/avatars/default.jpg' %}" alt="Автор" class="avatar-image">
+          <img data-src="{% static 'images/avatars/default.jpg' %}" alt="Автор" class="avatar-image" loading="lazy">
         {% endif %}
       </div>
       <div class="slide-header">
@@ -25,9 +25,9 @@
     <!-- Фото -->
     <div class="slide-image">
       {% if news.preview_image %}
-        <img src="{{ news.preview_image.url }}" alt="{{ news.title }}">
+        <img data-src="{{ news.preview_image.url }}" alt="{{ news.title }}" loading="lazy">
       {% else %}
-        <img src="{% static 'images/news/placeholder.jpg' %}" alt="{{ news.title }}">
+        <img data-src="{% static 'images/news/placeholder.jpg' %}" alt="{{ news.title }}" loading="lazy">
       {% endif %}
     </div>
   </a>

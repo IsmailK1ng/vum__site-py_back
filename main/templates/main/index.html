@@ -209,8 +209,8 @@
                           </g>
                         </svg>
                         <!-- image -->
-                        <img class="btn-rotating__image" src="{% static 'images/logo/FAW-logo-big.png' %}"
-                          style="filter: brightness(0) invert(1);" alt="Object">
+                        <img class="btn-rotating__image" data-src="{% static 'images/logo/FAW-logo-big.png' %}"
+                          style="filter: brightness(0) invert(1);" alt="Object" loading="lazy">
                       </a>
                     </div>
                   </div>
@@ -242,7 +242,7 @@
                 </g>
               </svg>
               <!-- image -->
-              <img class="btn-rotating__image" src="{% static 'images/logo/faw-logo.png' %}" alt="Object">
+              <img class="btn-rotating__image" data-src="{% static 'images/logo/faw-logo.png' %}" alt="Object" loading="lazy">
             </a>
           </div>
         </div>
@@ -320,7 +320,7 @@
                 <div class="col-12 col-xl-4 mxd-blog-preview__item mxd-grid-item">
                   <a class="mxd-blog-preview__media" href="{% url 'products' %}?category=samosval">
                     <div class="mxd-blog-preview__image blog-preview-image-1 parallax-img-small">
-                      <img class="parallax-img-small" src="{% static 'images/Models/samosval.webp' %}" alt="Blog Preview Image">
+                      <img class="parallax-img-small" data-src="{% static 'images/Models/samosval.webp' %}" alt="Blog Preview Image" loading="lazy">
                     </div>
                     <div class="mxd-blog-preview__tags">
                       <span class="tag tag-default tag-permanent">FAW</span>
@@ -345,8 +345,8 @@
                 <div class="col-12 col-xl-4 mxd-blog-preview__item mxd-grid-item">
                   <a class="mxd-blog-preview__media" href="{% url 'products' %}?category=maxsus">
                     <div class="mxd-blog-preview__image blog-preview-image-2 parallax-img-small">
-                      <img class="parallax-img-small" src="{% static 'images/Models/maxsustrans.webp' %}"
-                        alt="Blog Preview Image">
+                      <img class="parallax-img-small" data-src="{% static 'images/Models/maxsustrans.webp' %}"
+                        alt="Blog Preview Image" loading="lazy">
                     </div>
                     <div class="mxd-blog-preview__tags">
                       <span class="tag tag-default tag-permanent">FAW</span>
@@ -371,8 +371,8 @@
                 <div class="col-12 col-xl-4 mxd-blog-preview__item mxd-grid-item">
                   <a class="mxd-blog-preview__media" href="{% url 'products' %}?category=furgon">
                     <div class="mxd-blog-preview__image blog-preview-image-3 parallax-img-small">
-                      <img class="parallax-img-small" src="{% static 'images/Models/avtofurgon.webp' %}"
-                        alt="Blog Preview Image">
+                      <img class="parallax-img-small" data-src="{% static 'images/Models/avtofurgon.webp' %}"
+                        alt="Blog Preview Image" loading="lazy">
                     </div>
                     <div class="mxd-blog-preview__tags">
                       <span class="tag tag-default tag-permanent">FAW</span>
@@ -411,8 +411,8 @@
       <div class="mxd-container">
         <div class="mxd-block">
           <div class="faw-bg">
-            <img src="{% static 'images/slider-foto_img/bg-slider.webp' %}" alt="FAW Slider Background"
-              class="faw-bg-image">
+            <img data-src="{% static 'images/slider-foto_img/bg-slider.webp' %}" alt="FAW Slider Background"
+              class="faw-bg-image" loading="lazy">
           </div>
           <div class="faw-slider-container">
             <div class="faw-slider-main">
@@ -711,9 +711,9 @@
                   <!-- Картинка -->
                   <div class="slide-image">
                     {% if news.preview_image %}
-                    <img src="{{ news.preview_image.url }}" alt="{{ news.title }}">
+                    <img data-src="{{ news.preview_image.url }}" alt="{{ news.title }}" loading="lazy">
                     {% else %}
-                    <img src="{% static 'images/news/placeholder.jpg' %}" alt="{{ news.title }}">
+                    <img data-src="{% static 'images/news/placeholder.jpg' %}" alt="{{ news.title }}" loading="lazy">
                     {% endif %}
                   </div>
                 </a>
@@ -768,8 +768,8 @@
                 <div class="mxd-promo__layout">
                   <div class="mxd-promo__icon-section">
                     <span class="mxd-promo__icon">
-                      <img src="{% static 'images/logo/faw-logo.png' %}" style="filter: brightness(0) invert(1);"
-                        alt="VUM Icon">
+                      <img data-src="{% static 'images/logo/faw-logo.png' %}" style="filter: brightness(0) invert(1);"
+                        alt="VUM Icon" loading="lazy">
                       <span class="mxd-promo__icon-tx reveal-type">FAW TRUCKS</span>
                     </span>
                   </div>
@@ -1048,20 +1048,6 @@
       }
     });
 
-    // Lazy loading изображений
-    document.addEventListener('DOMContentLoaded', () => {
-      const images = document.querySelectorAll('img[data-src]');
-      const imageObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const img = entry.target;
-            img.src = img.dataset.src;
-            imageObserver.unobserve(img);
-          }
-        });
-      });
-      images.forEach(img => imageObserver.observe(img));
-    });
   </script>
   <!-- Load Scripts End -->
 

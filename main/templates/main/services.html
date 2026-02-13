@@ -108,7 +108,7 @@
         <div class="mxd-container">
             <div class="mxd-divider">
                 <div class="mxd-divider__image parallax-img">
-                    <img src="{% static 'images/service-img/1.JPG' %}"
+                    <img data-src="{% static 'images/service-img/1.JPG' %}"
                         alt="{% if LANGUAGE_CODE == 'uz' %}VUM Servis{% elif LANGUAGE_CODE == 'ru' %}Сервис VUM{% else %}VUM Service{% endif %}"
                         loading="lazy">
                 </div>
@@ -161,7 +161,7 @@
                             <div class="col-12 col-xl-4 mxd-blog-preview__item mxd-grid-item animate-card-3">
                                 <div
                                     class="mxd-blog-preview__image blog-preview-image-{{ forloop.counter }} parallax-img-small">
-                                    <img src="{% static 'images/service-img/card/'|add:img|add:'.webp' %}"
+                                    <img data-src="{% static 'images/service-img/card/'|add:img|add:'.webp' %}"
                                         alt="Service Image" loading="lazy">
                                 </div>
                             </div>
@@ -449,7 +449,7 @@
         <div class="mxd-container">
             <div class="mxd-divider">
                 <div class="mxd-divider__image parallax-img">
-                    <img src="{% static 'images/service-img/2.JPG' %}"
+                    <img data-src="{% static 'images/service-img/2.JPG' %}"
                         alt="{% if LANGUAGE_CODE == 'uz' %}Texnik xizmat{% elif LANGUAGE_CODE == 'ru' %}Техобслуживание{% else %}Maintenance{% endif %}"
                         loading="lazy">
                 </div>
@@ -513,7 +513,7 @@
                             {% for img in '451' %}
                             <div class="col-12 col-xl-4 mxd-blog-preview__item mxd-grid-item animate-card-3">
                                 <div class="mxd-blog-preview__image blog-preview-image-{{ forloop.counter }} parallax-img-small">
-                                    <img src="{% static 'images/service-img/card/'|add:img|add:'.webp' %}"
+                                    <img data-src="{% static 'images/service-img/card/'|add:img|add:'.webp' %}"
                                         alt="Service Image" loading="lazy">
                                 </div>
                             </div>
@@ -534,7 +534,7 @@
         <div class="mxd-container">
             <div class="mxd-divider">
                 <div class="mxd-divider__image parallax-img">
-                    <img src="{% static 'images/service-img/3.jpg' %}"
+                    <img data-src="{% static 'images/service-img/3.jpg' %}"
                         alt="{% if LANGUAGE_CODE == 'uz' %}FAW ehtiyot qismlar{% elif LANGUAGE_CODE == 'ru' %}Запчасти FAW{% else %}FAW spare parts{% endif %}"
                         loading="lazy">
                 </div>

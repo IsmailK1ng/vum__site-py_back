@@ -349,14 +349,14 @@
             const balloonContent = `
                 <div style="padding:16px;max-width:320px;font-family:var(--_font-accent)">
                     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #e2e8f0">
-                        <img src="{% static 'images/dealers-icon/icon-info/location.png' %}" style="width:20px;height:20px;object-fit:contain">
+                        <img data-src="{% static 'images/dealers-icon/icon-info/location.png' %}" style="width:20px;height:20px;object-fit:contain" loading="lazy">
                         <div style="flex:1">
                             <div style="font-size:11px;color:#000;font-weight:500;margin-bottom:2px">${translations.address}</div>
                             <div style="font-size:13px;color:#000;line-height:1.4">${dealer.address}</div>
                         </div>
                     </div>
                     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-                        <img src="{% static 'images/dealers-icon/icon-info/call.png' %}" style="width:20px;height:20px;object-fit:contain">
+                        <img data-src="{% static 'images/dealers-icon/icon-info/call.png' %}" style="width:20px;height:20px;object-fit:contain" loading="lazy">
                         <div style="flex:1">
                             <div style="font-size:11px;color:#000;font-weight:500;margin-bottom:2px">${translations.phone}</div>
                             <a href="tel:${dealer.phone}" style="font-size:14px;color:#000;text-decoration:none;font-weight:600">${dealer.phone}</a>
