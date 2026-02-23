@@ -69,6 +69,13 @@ def canonical_url(context):
     if not request:
         return ''
 
+    if request.path.rstrip('/') == '/products' and request.GET.get('category'):
+        return '' 
+    
+    if request.path.startswith('/ru/products') or request.path.startswith('/en/products'):
+        if request.GET.get('category'):
+            return '' 
+    
     scheme = request.scheme  
     host = request.get_host()  
     path = request.path  
