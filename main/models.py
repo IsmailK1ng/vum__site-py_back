@@ -173,6 +173,11 @@ class Product(models.Model):
         null=True,
         help_text="Цена в узбекских сумах для отображения диапазона цен в категориях"
     )
+    price_is_from = models.BooleanField(
+        "Цена 'от'",
+        default=False,
+        help_text="Если включено, перед ценой будет отображаться слово 'от'"
+    )
     main_image = models.ImageField("Главное изображение", upload_to="products/main/")
     card_image = models.ImageField(
         "Изображение для карточки",

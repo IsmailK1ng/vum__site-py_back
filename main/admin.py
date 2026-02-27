@@ -1018,13 +1018,49 @@ class ProductCategoryFilter(admin.SimpleListFilter):
         return queryset
 
 
+class PriceWidget(forms.MultiWidget):
+    """Чекбокс 'от' + поле ввода цены в одну строку"""
+    def __init__(self, attrs=None):
+        widgets = [
+            forms.CheckboxInput(attrs={'title': 'от / dan / from', 'style': 'width:auto;margin-right:6px;vertical-align:middle;'}),
+            forms.NumberInput(attrs={'step': '1', 'style': 'width:220px;'}),
+        ]
+        super().__init__(widgets, attrs)
+
+    def decompress(self, value):
+        return [False, value]
+
+
+class PriceField(forms.MultiValueField):
+    widget = PriceWidget
+
+    def __init__(self, *args, **kwargs):
+        fields = [
+            forms.BooleanField(required=False),
+            forms.DecimalField(required=False, max_digits=15, decimal_places=2),
+        ]
+        kwargs.setdefault('require_all_fields', False)
+        super().__init__(fields=fields, *args, **kwargs)
+
+    def compress(self, data_list):
+        return {
+            'price_is_from': data_list[0] if data_list else False,
+            'price': data_list[1] if len(data_list) > 1 else None,
+        }
+
+
 class ProductCategoriesForm(forms.ModelForm):
     selected_categories = forms.MultipleChoiceField(
         choices=Product.CATEGORY_CHOICES,
         widget=forms.CheckboxSelectMultiple,
-        required=True, 
+        required=True,
         label="Категории",
         help_text="Выберите категории продукта"
+    )
+    price_combined = PriceField(
+        label='Цена (UZS)',
+        required=False,
+        help_text='☑ — перед ценой будет отображаться "от"'
     )
     
     class Meta:
@@ -1041,6 +1077,7 @@ class ProductCategoriesForm(forms.ModelForm):
                 additional = [cat.strip() for cat in self.instance.categories.split(',') if cat.strip()]
                 selected.extend(additional)
             self.fields['selected_categories'].initial = list(dict.fromkeys(selected))
+            self.fields['price_combined'].initial = [self.instance.price_is_from, self.instance.price]
     
     def clean_selected_categories(self):
         categories = self.cleaned_data.get('selected_categories', [])
@@ -1054,6 +1091,10 @@ class ProductCategoriesForm(forms.ModelForm):
         if selected:
             instance.category = selected[0]
             instance.categories = ','.join(selected[1:]) if len(selected) > 1 else ''
+        combined = self.cleaned_data.get('price_combined')
+        if combined:
+            instance.price_is_from = combined.get('price_is_from', False)
+            instance.price = combined.get('price')
         if commit:
             instance.save()
         return instance
@@ -1118,7 +1159,7 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
             'fields': (
                 ('title', 'slug'),
                 'selected_categories',
-                'price',
+                'price_combined',
                 ('order', 'is_active', 'is_featured'),
                 ('main_image', 'card_image')
             )
@@ -1127,7 +1168,7 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
             'classes': ('collapse',),
             'fields': (
                 'slider_image',
-                ('slider_year', 'slider_order'),
+                'slider_order',
                 'slider_price',
                 ('slider_power', 'slider_fuel_consumption'),
             ),

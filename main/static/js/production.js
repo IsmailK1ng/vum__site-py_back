@@ -214,13 +214,11 @@ class ProductsManager {
 
   updatePageContent() {
     if (!this.currentCategory) {
-      console.log('No category specified');
       return;
     }
 
     const categoryInfo = this.getCategoryData(this.currentCategory);
     if (!categoryInfo) {
-      console.error('Unknown category:', this.currentCategory);
       return;
     }
 
@@ -248,8 +246,7 @@ class ProductsManager {
         heroImage.alt = categoryInfo.title;
       };
       testImg.onerror = () => {
-        // Если нет - оставляем текущее или ставим заглушку
-        console.warn(`Hero image not found: ${staticPath}`);
+        // Если нет - оставляем текущее
       };
       testImg.src = staticPath;
     }
@@ -310,8 +307,6 @@ class ProductsManager {
 
       this.allProducts = allProducts;
 
-      console.log(`✅ Загружено ${this.allProducts.length} продуктов`);
-
       // ФИЛЬТРУЕМ продукты по категории на фронтенде
       if (this.currentCategory) {
         this.filteredProducts = this.allProducts.filter(product => {
@@ -324,7 +319,6 @@ class ProductsManager {
           return false;
         });
 
-        console.log(`✅ Найдено ${this.filteredProducts.length} продуктов в категории "${this.currentCategory}"`);
       } else {
         this.filteredProducts = [...this.allProducts];
       }
@@ -341,7 +335,6 @@ class ProductsManager {
       this.hideLoader();
 
     } catch (error) {
-      console.error('Products loading error:', error);
       if (window.logJSError) {
         window.logJSError('Products loading error: ' + error.message, {
           file: 'products.js',
@@ -481,12 +474,18 @@ class ProductsManager {
     if (product.price && product.price > 0) {
       const formattedPrice = new Intl.NumberFormat('uz-UZ', {
         style: 'decimal',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
       }).format(product.price);
+
+      const fromLabel = { 'uz': 'dan', 'ru': 'от', 'en': 'from' };
+      const fromPrefix = product.price_is_from
+        ? `<span class="price-label">${fromLabel[this.currentLanguage] || fromLabel['uz']}</span> `
+        : '';
+
       priceHTML = `
         <div class="truck-price">
-          <span class="price-value">${formattedPrice} UZS</span>
+          ${fromPrefix}<span class="price-value">${formattedPrice} UZS</span>
         </div>
       `;
     }
@@ -693,8 +692,8 @@ class ProductsManager {
     const formatPrice = (price) => {
       return new Intl.NumberFormat('uz-UZ', {
         style: 'decimal',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
       }).format(price);
     };
 
