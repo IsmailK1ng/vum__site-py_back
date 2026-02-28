@@ -536,6 +536,13 @@ document.addEventListener('DOMContentLoaded', function () {
       document.body.classList.add('light-mode');
       document.body.classList.remove('dark-mode');
     }
+
+    const switcher = document.getElementById('color-switcher');
+    if (switcher) {
+      switcher.innerHTML = theme === 'dark'
+        ? '<i class="ph-bold ph-sun-horizon"></i>'
+        : '<i class="ph-bold ph-moon-stars"></i>';
+    }
   }
 
   const isMobile = () => window.innerWidth < 1200;

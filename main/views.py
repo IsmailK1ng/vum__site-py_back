@@ -119,6 +119,10 @@ def services(request):
     return render(request, 'main/services.html')
 
 
+def faq(request):
+    return render(request, 'main/faq.html')
+
+
 def product_detail(request, product_id):
     return render(request, 'main/product_detail.html', {'product_id': product_id})
 

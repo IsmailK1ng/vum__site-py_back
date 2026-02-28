@@ -1,0 +1,385 @@
+{% load static %}
+{% load seo_tags %}
+<!DOCTYPE html>
+<html dir="ltr" lang="{{ HTML_LANG }}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    {% include 'main/includes/seo_meta.html' %}
+    {% hreflang_tags %}
+    {% canonical_url %}
+
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'images/vum-icon-dark.svg' %}" />
+    <link rel="apple-touch-icon" href="{% static 'images/vum-icon-dark.svg' %}">
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-5K2BD9C3');</script>
+    <!-- End Google Tag Manager -->
+
+    <meta name="yandex-verification" content="78715d404b789626" />
+    <meta name="google-site-verification" content="xmjQ3Gc6gAMaPe0MydDnP_uYW0EOz-Y-T6Kzkc7ylEA" />
+    <meta name="facebook-domain-verification" content="8d4u99q1mimerz10hkbzvpjywt0rag" />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="{% static 'css/loaders/loader.css' %}">
+    <link rel="stylesheet" href="{% static 'css/plugins.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main_site.css' %}">
+    <link rel="stylesheet" href="{% static 'css/site_main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+    <link rel="stylesheet" href="{% static 'css/site_service.css' %}">
+    <link rel="stylesheet" href="{% static 'css/faq.css' %}">
+
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#FAF7F6" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#161616" media="(prefers-color-scheme: dark)">
+    <meta name="msapplication-navbutton-color" content="#161616">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Schema.org FAQPage — для Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "{% if LANGUAGE_CODE == 'uz' %}Oldindan buyurtma berish imkoniyati bormi?{% elif LANGUAGE_CODE == 'ru' %}Можно ли оформить предварительный заказ?{% else %}Is it possible to place a pre-order?{% endif %}",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "{% if LANGUAGE_CODE == 'uz' %}Ha, mijozlar avtomobillarni oldindan buyurtma asosida rasmiylashtirishlari mumkin.{% elif LANGUAGE_CODE == 'ru' %}Да, клиенты могут оформить автомобили на основе предварительного заказа.{% else %}Yes, customers can register vehicles on a pre-order basis.{% endif %}"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "{% if LANGUAGE_CODE == 'uz' %}To'lovni bo'lib-bo'lib amalga oshirish imkoniyati bormi?{% elif LANGUAGE_CODE == 'ru' %}Возможна ли рассрочка платежа?{% else %}Is installment payment available?{% endif %}",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "{% if LANGUAGE_CODE == 'uz' %}Ha, to'lovni bo'lib-bo'lib amalga oshirish imkoniyati lizing orqali taqdim etiladi.{% elif LANGUAGE_CODE == 'ru' %}Да, возможность рассрочки платежа предоставляется через лизинг.{% else %}Yes, installment payment is available through leasing.{% endif %}"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "{% if LANGUAGE_CODE == 'uz' %}Bo'sh ish o'rinlari bo'yicha qanday murojaat qilish mumkin?{% elif LANGUAGE_CODE == 'ru' %}Как можно откликнуться на вакансии?{% else %}How can I apply for vacancies?{% endif %}",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "{% if LANGUAGE_CODE == 'uz' %}Rasmiy web sahifamiz orqali bo'sh ish o'rinlariga murojaat qoldirish mumkin.{% elif LANGUAGE_CODE == 'ru' %}Заявки на вакансии можно подать через наш официальный сайт.{% else %}You can apply for vacancies through our official website.{% endif %}"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "{% if LANGUAGE_CODE == 'uz' %}Sotib olingan avtomobilni ro'yxatdan o'tkazishda yordam beriladimi?{% elif LANGUAGE_CODE == 'ru' %}Помогают ли с регистрацией купленного автомобиля?{% else %}Is assistance provided with vehicle registration?{% endif %}",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "{% if LANGUAGE_CODE == 'uz' %}Ha, mijozlarga hujjatlarni rasmiylashtirish va ro'yxatdan o'tkazish jarayonlari bo'yicha maslahat beriladi.{% elif LANGUAGE_CODE == 'ru' %}Да, клиентам предоставляется консультация по оформлению документов и процессу регистрации.{% else %}Yes, customers are provided with advice on documentation and registration processes.{% endif %}"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "{% if LANGUAGE_CODE == 'uz' %}Avtomobil mavjudligini qanday bilsam bo'ladi?{% elif LANGUAGE_CODE == 'ru' %}Как узнать о наличии автомобиля?{% else %}How can I check vehicle availability?{% endif %}",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "{% if LANGUAGE_CODE == 'uz' %}Mavjud modellarning holati haqida sayt orqali so'rov qoldirib yoki sotuv bo'limiga murojaat qilib tezkor ma'lumot olish mumkin.{% elif LANGUAGE_CODE == 'ru' %}Информацию о наличии можно получить, оставив запрос на сайте или обратившись в отдел продаж.{% else %}You can get quick information by submitting a request on the site or contacting the sales department.{% endif %}"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "{% if LANGUAGE_CODE == 'uz' %}Buyurtma asosida avtomobil olib kelish imkoniyati bormi?{% elif LANGUAGE_CODE == 'ru' %}Можно ли привезти автомобиль под заказ?{% else %}Is it possible to bring a vehicle to order?{% endif %}",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "{% if LANGUAGE_CODE == 'uz' %}Ha, kerakli konfiguratsiyadagi avtomobilni oldindan buyurtma asosida olib kelish imkoniyati mavjud.{% elif LANGUAGE_CODE == 'ru' %}Да, существует возможность привезти автомобиль нужной конфигурации под предварительный заказ.{% else %}Yes, it is possible to bring a vehicle in the required configuration on a pre-order basis.{% endif %}"
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- Schema.org BreadcrumbList -->
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}","item":"{{ request.scheme }}://{{ request.get_host }}/"},{"@type":"ListItem","position":2,"name":"{% if LANGUAGE_CODE == 'uz' %}Ko'p so'raladigan savollar{% elif LANGUAGE_CODE == 'ru' %}Часто задаваемые вопросы{% else %}FAQ{% endif %}","item":"{{ request.build_absolute_uri }}"}]}</script>
+
+</head>
+
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5K2BD9C3"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <!-- Loader -->
+    <div id="loader" class="loader" style="display: none;">
+        <div class="loader__wrapper">
+            <div class="loader__content">
+                <div class="loader__count">
+                    <span class="count__text">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'main/includes/header.html' %}
+
+    <div class="mxd-block loading-wrap"></div>
+
+    <!-- Breadcrumbs -->
+    <nav class="mxd-section-filter pre-grid" aria-label="breadcrumb">
+        <div class="mxd-section-filter__inner animate-card-3">
+            <div class="mxd-grid-item-1">
+                <div class="section-filter">
+                    <ol class="breadcrumb-ol">
+                        <li><a href="{% url 'home' %}">{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}</a></li>
+                        <li class="active" aria-current="page"><a href="{% url 'faq' %}">{% if LANGUAGE_CODE == 'uz' %}Ko'p so'raladigan savollar{% elif LANGUAGE_CODE == 'ru' %}Часто задаваемые вопросы{% else %}FAQ{% endif %}</a></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Title -->
+    <header class="faw-history-title fade-in">
+        <h1 class="reveal-type">{% if LANGUAGE_CODE == 'uz' %}Ko'p so'raladigan savollar{% elif LANGUAGE_CODE == 'ru' %}Часто задаваемые вопросы{% else %}Frequently Asked Questions{% endif %}</h1>
+    </header>
+
+    <main id="mxd-page-content" class="mxd-page-content">
+
+        <!-- FAQ Accordion -->
+        <section class="mxd-section bp-5">
+            <div class="mxd-container grid-container">
+                <div class="mxd-block">
+
+                    <div class="faq-accordion">
+
+                        <!-- Q1 -->
+                        <div class="faq-item is-open">
+                            <button class="faq-question" type="button" aria-expanded="true">
+                                <span>{% if LANGUAGE_CODE == 'uz' %}Oldindan buyurtma berish imkoniyati bormi?{% elif LANGUAGE_CODE == 'ru' %}Можно ли оформить предварительный заказ?{% else %}Is it possible to place a pre-order?{% endif %}</span>
+                                <span class="faq-question__icon"><i class="ph ph-plus"></i></span>
+                            </button>
+                            <div class="faq-answer">
+                                <div class="faq-answer__inner">
+                                    {% if LANGUAGE_CODE == 'uz' %}Ha, mijozlar avtomobillarni oldindan buyurtma asosida rasmiylashtirishlari mumkin.{% elif LANGUAGE_CODE == 'ru' %}Да, клиенты могут оформить автомобили на основе предварительного заказа.{% else %}Yes, customers can register vehicles on a pre-order basis.{% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Q2 -->
+                        <div class="faq-item is-open">
+                            <button class="faq-question" type="button" aria-expanded="true">
+                                <span>{% if LANGUAGE_CODE == 'uz' %}To'lovni bo'lib-bo'lib amalga oshirish imkoniyati bormi?{% elif LANGUAGE_CODE == 'ru' %}Возможна ли рассрочка платежа?{% else %}Is installment payment available?{% endif %}</span>
+                                <span class="faq-question__icon"><i class="ph ph-plus"></i></span>
+                            </button>
+                            <div class="faq-answer">
+                                <div class="faq-answer__inner">
+                                    {% if LANGUAGE_CODE == 'uz' %}Ha, to'lovni bo'lib-bo'lib amalga oshirish imkoniyati lizing orqali taqdim etiladi.{% elif LANGUAGE_CODE == 'ru' %}Да, возможность рассрочки платежа предоставляется через лизинг.{% else %}Yes, installment payment is available through leasing.{% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Q3 -->
+                        <div class="faq-item is-open">
+                            <button class="faq-question" type="button" aria-expanded="true">
+                                <span>{% if LANGUAGE_CODE == 'uz' %}Bo'sh ish o'rinlari bo'yicha qanday murojaat qilish mumkin?{% elif LANGUAGE_CODE == 'ru' %}Как можно откликнуться на вакансии?{% else %}How can I apply for vacancies?{% endif %}</span>
+                                <span class="faq-question__icon"><i class="ph ph-plus"></i></span>
+                            </button>
+                            <div class="faq-answer">
+                                <div class="faq-answer__inner">
+                                    {% if LANGUAGE_CODE == 'uz' %}Rasmiy web sahifamiz orqali bo'sh ish o'rinlariga murojaat qoldirish mumkin.{% elif LANGUAGE_CODE == 'ru' %}Заявки на вакансии можно подать через наш официальный сайт.{% else %}You can apply for vacancies through our official website.{% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Q4 -->
+                        <div class="faq-item is-open">
+                            <button class="faq-question" type="button" aria-expanded="true">
+                                <span>{% if LANGUAGE_CODE == 'uz' %}Sotib olingan avtomobilni ro'yxatdan o'tkazishda yordam beriladimi?{% elif LANGUAGE_CODE == 'ru' %}Помогают ли с регистрацией купленного автомобиля?{% else %}Is assistance provided with vehicle registration?{% endif %}</span>
+                                <span class="faq-question__icon"><i class="ph ph-plus"></i></span>
+                            </button>
+                            <div class="faq-answer">
+                                <div class="faq-answer__inner">
+                                    {% if LANGUAGE_CODE == 'uz' %}Ha, mijozlarga hujjatlarni rasmiylashtirish va ro'yxatdan o'tkazish jarayonlari bo'yicha maslahat beriladi.{% elif LANGUAGE_CODE == 'ru' %}Да, клиентам предоставляется консультация по оформлению документов и процессу регистрации.{% else %}Yes, customers are provided with advice on documentation and registration processes.{% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Q5 -->
+                        <div class="faq-item is-open">
+                            <button class="faq-question" type="button" aria-expanded="true">
+                                <span>{% if LANGUAGE_CODE == 'uz' %}Avtomobil mavjudligini qanday bilsam bo'ladi?{% elif LANGUAGE_CODE == 'ru' %}Как узнать о наличии автомобиля?{% else %}How can I check vehicle availability?{% endif %}</span>
+                                <span class="faq-question__icon"><i class="ph ph-plus"></i></span>
+                            </button>
+                            <div class="faq-answer">
+                                <div class="faq-answer__inner">
+                                    {% if LANGUAGE_CODE == 'uz' %}Mavjud modellarning holati haqida sayt orqali so'rov qoldirib yoki sotuv bo'limiga murojaat qilib tezkor ma'lumot olish mumkin.{% elif LANGUAGE_CODE == 'ru' %}Информацию о наличии можно получить, оставив запрос на сайте или обратившись в отдел продаж.{% else %}You can get quick information by submitting a request on the site or contacting the sales department.{% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Q6 -->
+                        <div class="faq-item is-open">
+                            <button class="faq-question" type="button" aria-expanded="true">
+                                <span>{% if LANGUAGE_CODE == 'uz' %}Buyurtma asosida avtomobil olib kelish imkoniyati bormi?{% elif LANGUAGE_CODE == 'ru' %}Можно ли привезти автомобиль под заказ?{% else %}Is it possible to bring a vehicle to order?{% endif %}</span>
+                                <span class="faq-question__icon"><i class="ph ph-plus"></i></span>
+                            </button>
+                            <div class="faq-answer">
+                                <div class="faq-answer__inner">
+                                    {% if LANGUAGE_CODE == 'uz' %}Ha, kerakli konfiguratsiyadagi avtomobilni oldindan buyurtma asosida olib kelish imkoniyati mavjud.{% elif LANGUAGE_CODE == 'ru' %}Да, существует возможность привезти автомобиль нужной конфигурации под предварительный заказ.{% else %}Yes, it is possible to bring a vehicle in the required configuration on a pre-order basis.{% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Форма дополнительных вопросов -->
+        <section class="mxd-section pb-5 faq-form-section">
+            <div class="mxd-container grid-container">
+                <div class="mxd-block">
+
+                    <div class="faw-history-title fade-in">
+                        <h2>{% if LANGUAGE_CODE == 'uz' %}Savolingiz qoldimi?{% elif LANGUAGE_CODE == 'ru' %}Остались вопросы?{% else %}Still have questions?{% endif %}</h2>
+                    </div>
+                    <p class="faq-form-subtitle">
+                        {% if LANGUAGE_CODE == 'uz' %}Savol qoldiring — biz tez orada javob beramiz{% elif LANGUAGE_CODE == 'ru' %}Задайте вопрос — мы ответим в ближайшее время{% else %}Ask a question — we will reply shortly{% endif %}
+                    </p>
+
+                    <div class="faq-form-wrap">
+                        <div class="faq-form-status" id="faqFormStatus"></div>
+
+                        <form class="form" id="faqForm">
+                            {% csrf_token %}
+                            <input type="text" name="name" placeholder="{% if LANGUAGE_CODE == 'uz' %}F.I.SH*{% elif LANGUAGE_CODE == 'ru' %}Ф.И.О*{% else %}Full name*{% endif %}" required />
+                            <input type="tel" name="phone" placeholder="+998 (__) ___-__-__" id="faqPhoneInput" pattern="[+]*[0-9\s\-\(\)]*" required />
+                            <textarea name="question" placeholder="{% if LANGUAGE_CODE == 'uz' %}Savolingizni yozing*{% elif LANGUAGE_CODE == 'ru' %}Напишите ваш вопрос*{% else %}Write your question*{% endif %}" required></textarea>
+
+                            <div class="form-submit-row">
+                                <button class="btn btn-anim btn-default btn-large btn-opposite slide-right-up shimmer-btn" type="submit">
+                                    <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Yuborish{% elif LANGUAGE_CODE == 'ru' %}Отправить{% else %}Send{% endif %}</span>
+                                    <span class="shimmer"></span>
+                                    <i class="ph-bold ph-arrow-up-right"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    {% include 'main/includes/footer.html' %}
+
+    <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
+        <i class="ph ph-arrow-up"></i>
+    </a>
+
+    <script crossorigin="anonymous" src="{% static 'js/libs.min.js' %}"></script>
+    <script crossorigin="anonymous" src="{% static 'js/favicon-theme.js' %}"></script>
+    <script crossorigin="anonymous" src="{% static 'js/error-logger.js' %}"></script>
+    <script crossorigin="anonymous" src="{% static 'js/faw.js' %}"></script>
+
+    <script>
+    // FAQ Аккордеон
+    document.querySelectorAll('.faq-question').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var item = this.closest('.faq-item');
+            var isOpen = item.classList.contains('is-open');
+
+            // Закрываем все
+            document.querySelectorAll('.faq-item').forEach(function(el) {
+                el.classList.remove('is-open');
+                el.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+            });
+
+            // Открываем текущий (если не был открыт)
+            if (!isOpen) {
+                item.classList.add('is-open');
+                this.setAttribute('aria-expanded', 'true');
+            }
+        });
+    });
+
+    // Phone mask для FAQ формы
+    (function() {
+        var phoneInput = document.getElementById('faqPhoneInput');
+        if (!phoneInput) return;
+        phoneInput.addEventListener('input', function(e) {
+            var value = e.target.value.replace(/\D/g, '');
+            if (!value.startsWith('998')) value = '998' + value;
+            if (value.length > 12) value = value.slice(0, 12);
+            var formatted = '+998 ';
+            if (value.length > 3) formatted += '(' + value.slice(3, 5);
+            if (value.length >= 5) formatted += ') ' + value.slice(5, 8);
+            if (value.length >= 8) formatted += '-' + value.slice(8, 10);
+            if (value.length >= 10) formatted += '-' + value.slice(10, 12);
+            e.target.value = formatted;
+        });
+    })();
+
+    // Форма дополнительных вопросов
+    (function() {
+        var form = document.getElementById('faqForm');
+        var status = document.getElementById('faqFormStatus');
+        var currentLang = (document.documentElement.lang || 'uz').split('-')[0];
+        var isSubmitting = false;
+
+        var t = {
+            'uz': { success: '✅ Savolingiz yuborildi! Tez orada javob beramiz.', error: '❌ Xatolik yuz berdi. Qaytadan urinib ko\'ring.' },
+            'ru': { success: '✅ Вопрос отправлен! Мы ответим в ближайшее время.',  error: '❌ Произошла ошибка. Попробуйте снова.' },
+            'en': { success: '✅ Question sent! We will reply shortly.', error: '❌ An error occurred. Please try again.' }
+        }[currentLang] || { success: '✅ Yuborildi!', error: '❌ Xatolik.' };
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (isSubmitting) return;
+            isSubmitting = true;
+
+            var btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            status.className = 'faq-form-status';
+
+            var data = {
+                name: form.querySelector('[name=name]').value,
+                phone: form.querySelector('[name=phone]').value.replace(/\D/g, ''),
+                message: form.querySelector('[name=question]').value,
+            };
+
+            try {
+                var response = await fetch('/api/' + currentLang + '/contact/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify(data)
+                });
+                var result = await response.json();
+                if (response.ok && (result.success !== false)) {
+                    status.className = 'faq-form-status success';
+                    status.textContent = t.success;
+                    form.reset();
+                } else {
+                    status.className = 'faq-form-status error';
+                    status.textContent = t.error;
+                }
+            } catch (err) {
+                status.className = 'faq-form-status error';
+                status.textContent = t.error;
+            } finally {
+                btn.disabled = false;
+                isSubmitting = false;
+            }
+        });
+    })();
+    </script>
+
+</body>
+</html>
