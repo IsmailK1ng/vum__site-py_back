@@ -36,7 +36,7 @@
                 </li>
                 <li class="desktop-menu__item">
                     <a href="{% url 'news' %}" class="desktop-menu__link">
-                        {% if LANGUAGE_CODE == 'ru' %}Новости компании{% elif LANGUAGE_CODE == 'en' %}Company news{% else %}Kompaniya yangiliklari{% endif %}
+                        {% if LANGUAGE_CODE == 'ru' %}Новости{% elif LANGUAGE_CODE == 'en' %}News{% else %}Yangiliklar{% endif %}
                     </a>
                 </li>
                 <li class="desktop-menu__item">
@@ -101,6 +101,11 @@
                 <li class="desktop-menu__item">
                     <a href="{% url 'jobs' %}" class="desktop-menu__link">
                         {% if LANGUAGE_CODE == 'ru' %}Вакансии{% elif LANGUAGE_CODE == 'en' %}Jobs{% else %}Vakansiya{% endif %}
+                    </a>
+                </li>
+                <li class="desktop-menu__item">
+                    <a href="{% url 'faq' %}" class="desktop-menu__link">
+                        FAQ
                     </a>
                 </li>
             </ul>

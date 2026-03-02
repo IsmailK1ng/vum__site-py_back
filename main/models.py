@@ -1025,5 +1025,22 @@ class PageMeta(models.Model):
                 except (Product.DoesNotExist, ValueError):
                     return f"{base_url}/products/"
             return f"{base_url}/products/"
+
+
+# ========== FAQ ==========
+
+class FAQItem(models.Model):
+    question = models.CharField("Вопрос", max_length=500)
+    answer = models.TextField("Ответ")
+    order = models.PositiveIntegerField("Порядок", default=0)
+    is_active = models.BooleanField("Активен", default=True)
+
+    class Meta:
+        verbose_name = "FAQ — вопрос"
+        verbose_name_plural = "FAQ — вопросы"
+        ordering = ['order']
+
+    def __str__(self):
+        return self.question or f"FAQ #{self.pk}"
         
         return base_url

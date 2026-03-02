@@ -44,62 +44,26 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <!-- Schema.org FAQPage — для Google -->
+    {% if faq_items %}
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "FAQPage",
       "mainEntity": [
+        {% for item in faq_items %}
         {
           "@type": "Question",
-          "name": "{% if LANGUAGE_CODE == 'uz' %}Oldindan buyurtma berish imkoniyati bormi?{% elif LANGUAGE_CODE == 'ru' %}Можно ли оформить предварительный заказ?{% else %}Is it possible to place a pre-order?{% endif %}",
+          "name": "{{ item.question|escapejs }}",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "{% if LANGUAGE_CODE == 'uz' %}Ha, mijozlar avtomobillarni oldindan buyurtma asosida rasmiylashtirishlari mumkin.{% elif LANGUAGE_CODE == 'ru' %}Да, клиенты могут оформить автомобили на основе предварительного заказа.{% else %}Yes, customers can register vehicles on a pre-order basis.{% endif %}"
+            "text": "{{ item.answer|escapejs }}"
           }
-        },
-        {
-          "@type": "Question",
-          "name": "{% if LANGUAGE_CODE == 'uz' %}To'lovni bo'lib-bo'lib amalga oshirish imkoniyati bormi?{% elif LANGUAGE_CODE == 'ru' %}Возможна ли рассрочка платежа?{% else %}Is installment payment available?{% endif %}",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "{% if LANGUAGE_CODE == 'uz' %}Ha, to'lovni bo'lib-bo'lib amalga oshirish imkoniyati lizing orqali taqdim etiladi.{% elif LANGUAGE_CODE == 'ru' %}Да, возможность рассрочки платежа предоставляется через лизинг.{% else %}Yes, installment payment is available through leasing.{% endif %}"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "{% if LANGUAGE_CODE == 'uz' %}Bo'sh ish o'rinlari bo'yicha qanday murojaat qilish mumkin?{% elif LANGUAGE_CODE == 'ru' %}Как можно откликнуться на вакансии?{% else %}How can I apply for vacancies?{% endif %}",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "{% if LANGUAGE_CODE == 'uz' %}Rasmiy web sahifamiz orqali bo'sh ish o'rinlariga murojaat qoldirish mumkin.{% elif LANGUAGE_CODE == 'ru' %}Заявки на вакансии можно подать через наш официальный сайт.{% else %}You can apply for vacancies through our official website.{% endif %}"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "{% if LANGUAGE_CODE == 'uz' %}Sotib olingan avtomobilni ro'yxatdan o'tkazishda yordam beriladimi?{% elif LANGUAGE_CODE == 'ru' %}Помогают ли с регистрацией купленного автомобиля?{% else %}Is assistance provided with vehicle registration?{% endif %}",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "{% if LANGUAGE_CODE == 'uz' %}Ha, mijozlarga hujjatlarni rasmiylashtirish va ro'yxatdan o'tkazish jarayonlari bo'yicha maslahat beriladi.{% elif LANGUAGE_CODE == 'ru' %}Да, клиентам предоставляется консультация по оформлению документов и процессу регистрации.{% else %}Yes, customers are provided with advice on documentation and registration processes.{% endif %}"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "{% if LANGUAGE_CODE == 'uz' %}Avtomobil mavjudligini qanday bilsam bo'ladi?{% elif LANGUAGE_CODE == 'ru' %}Как узнать о наличии автомобиля?{% else %}How can I check vehicle availability?{% endif %}",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "{% if LANGUAGE_CODE == 'uz' %}Mavjud modellarning holati haqida sayt orqali so'rov qoldirib yoki sotuv bo'limiga murojaat qilib tezkor ma'lumot olish mumkin.{% elif LANGUAGE_CODE == 'ru' %}Информацию о наличии можно получить, оставив запрос на сайте или обратившись в отдел продаж.{% else %}You can get quick information by submitting a request on the site or contacting the sales department.{% endif %}"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "{% if LANGUAGE_CODE == 'uz' %}Buyurtma asosida avtomobil olib kelish imkoniyati bormi?{% elif LANGUAGE_CODE == 'ru' %}Можно ли привезти автомобиль под заказ?{% else %}Is it possible to bring a vehicle to order?{% endif %}",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "{% if LANGUAGE_CODE == 'uz' %}Ha, kerakli konfiguratsiyadagi avtomobilni oldindan buyurtma asosida olib kelish imkoniyati mavjud.{% elif LANGUAGE_CODE == 'ru' %}Да, существует возможность привезти автомобиль нужной конфигурации под предварительный заказ.{% else %}Yes, it is possible to bring a vehicle in the required configuration on a pre-order basis.{% endif %}"
-          }
-        }
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
       ]
     }
     </script>
+    {% endif %}
 
     <!-- Schema.org BreadcrumbList -->
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}","item":"{{ request.scheme }}://{{ request.get_host }}/"},{"@type":"ListItem","position":2,"name":"{% if LANGUAGE_CODE == 'uz' %}Ko'p so'raladigan savollar{% elif LANGUAGE_CODE == 'ru' %}Часто задаваемые вопросы{% else %}FAQ{% endif %}","item":"{{ request.build_absolute_uri }}"}]}</script>
@@ -155,83 +119,19 @@
 
                     <div class="faq-accordion">
 
-                        <!-- Q1 -->
-                        <div class="faq-item is-open">
-                            <button class="faq-question" type="button" aria-expanded="true">
-                                <span>{% if LANGUAGE_CODE == 'uz' %}Oldindan buyurtma berish imkoniyati bormi?{% elif LANGUAGE_CODE == 'ru' %}Можно ли оформить предварительный заказ?{% else %}Is it possible to place a pre-order?{% endif %}</span>
+                        {% for item in faq_items %}
+                        <div class="faq-item">
+                            <button class="faq-question" type="button" aria-expanded="false">
+                                <span>{{ item.question }}</span>
                                 <span class="faq-question__icon"><i class="ph ph-plus"></i></span>
                             </button>
                             <div class="faq-answer">
-                                <div class="faq-answer__inner">
-                                    {% if LANGUAGE_CODE == 'uz' %}Ha, mijozlar avtomobillarni oldindan buyurtma asosida rasmiylashtirishlari mumkin.{% elif LANGUAGE_CODE == 'ru' %}Да, клиенты могут оформить автомобили на основе предварительного заказа.{% else %}Yes, customers can register vehicles on a pre-order basis.{% endif %}
-                                </div>
+                                <div class="faq-answer__inner">{{ item.answer }}</div>
                             </div>
                         </div>
-
-                        <!-- Q2 -->
-                        <div class="faq-item is-open">
-                            <button class="faq-question" type="button" aria-expanded="true">
-                                <span>{% if LANGUAGE_CODE == 'uz' %}To'lovni bo'lib-bo'lib amalga oshirish imkoniyati bormi?{% elif LANGUAGE_CODE == 'ru' %}Возможна ли рассрочка платежа?{% else %}Is installment payment available?{% endif %}</span>
-                                <span class="faq-question__icon"><i class="ph ph-plus"></i></span>
-                            </button>
-                            <div class="faq-answer">
-                                <div class="faq-answer__inner">
-                                    {% if LANGUAGE_CODE == 'uz' %}Ha, to'lovni bo'lib-bo'lib amalga oshirish imkoniyati lizing orqali taqdim etiladi.{% elif LANGUAGE_CODE == 'ru' %}Да, возможность рассрочки платежа предоставляется через лизинг.{% else %}Yes, installment payment is available through leasing.{% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Q3 -->
-                        <div class="faq-item is-open">
-                            <button class="faq-question" type="button" aria-expanded="true">
-                                <span>{% if LANGUAGE_CODE == 'uz' %}Bo'sh ish o'rinlari bo'yicha qanday murojaat qilish mumkin?{% elif LANGUAGE_CODE == 'ru' %}Как можно откликнуться на вакансии?{% else %}How can I apply for vacancies?{% endif %}</span>
-                                <span class="faq-question__icon"><i class="ph ph-plus"></i></span>
-                            </button>
-                            <div class="faq-answer">
-                                <div class="faq-answer__inner">
-                                    {% if LANGUAGE_CODE == 'uz' %}Rasmiy web sahifamiz orqali bo'sh ish o'rinlariga murojaat qoldirish mumkin.{% elif LANGUAGE_CODE == 'ru' %}Заявки на вакансии можно подать через наш официальный сайт.{% else %}You can apply for vacancies through our official website.{% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Q4 -->
-                        <div class="faq-item is-open">
-                            <button class="faq-question" type="button" aria-expanded="true">
-                                <span>{% if LANGUAGE_CODE == 'uz' %}Sotib olingan avtomobilni ro'yxatdan o'tkazishda yordam beriladimi?{% elif LANGUAGE_CODE == 'ru' %}Помогают ли с регистрацией купленного автомобиля?{% else %}Is assistance provided with vehicle registration?{% endif %}</span>
-                                <span class="faq-question__icon"><i class="ph ph-plus"></i></span>
-                            </button>
-                            <div class="faq-answer">
-                                <div class="faq-answer__inner">
-                                    {% if LANGUAGE_CODE == 'uz' %}Ha, mijozlarga hujjatlarni rasmiylashtirish va ro'yxatdan o'tkazish jarayonlari bo'yicha maslahat beriladi.{% elif LANGUAGE_CODE == 'ru' %}Да, клиентам предоставляется консультация по оформлению документов и процессу регистрации.{% else %}Yes, customers are provided with advice on documentation and registration processes.{% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Q5 -->
-                        <div class="faq-item is-open">
-                            <button class="faq-question" type="button" aria-expanded="true">
-                                <span>{% if LANGUAGE_CODE == 'uz' %}Avtomobil mavjudligini qanday bilsam bo'ladi?{% elif LANGUAGE_CODE == 'ru' %}Как узнать о наличии автомобиля?{% else %}How can I check vehicle availability?{% endif %}</span>
-                                <span class="faq-question__icon"><i class="ph ph-plus"></i></span>
-                            </button>
-                            <div class="faq-answer">
-                                <div class="faq-answer__inner">
-                                    {% if LANGUAGE_CODE == 'uz' %}Mavjud modellarning holati haqida sayt orqali so'rov qoldirib yoki sotuv bo'limiga murojaat qilib tezkor ma'lumot olish mumkin.{% elif LANGUAGE_CODE == 'ru' %}Информацию о наличии можно получить, оставив запрос на сайте или обратившись в отдел продаж.{% else %}You can get quick information by submitting a request on the site or contacting the sales department.{% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Q6 -->
-                        <div class="faq-item is-open">
-                            <button class="faq-question" type="button" aria-expanded="true">
-                                <span>{% if LANGUAGE_CODE == 'uz' %}Buyurtma asosida avtomobil olib kelish imkoniyati bormi?{% elif LANGUAGE_CODE == 'ru' %}Можно ли привезти автомобиль под заказ?{% else %}Is it possible to bring a vehicle to order?{% endif %}</span>
-                                <span class="faq-question__icon"><i class="ph ph-plus"></i></span>
-                            </button>
-                            <div class="faq-answer">
-                                <div class="faq-answer__inner">
-                                    {% if LANGUAGE_CODE == 'uz' %}Ha, kerakli konfiguratsiyadagi avtomobilni oldindan buyurtma asosida olib kelish imkoniyati mavjud.{% elif LANGUAGE_CODE == 'ru' %}Да, существует возможность привезти автомобиль нужной конфигурации под предварительный заказ.{% else %}Yes, it is possible to bring a vehicle in the required configuration on a pre-order basis.{% endif %}
-                                </div>
-                            </div>
-                        </div>
+                        {% empty %}
+                        <p style="opacity:.5">{% if LANGUAGE_CODE == 'uz' %}Hozircha savollar yo'q.{% elif LANGUAGE_CODE == 'ru' %}Вопросов пока нет.{% else %}No questions yet.{% endif %}</p>
+                        {% endfor %}
 
                     </div>
                 </div>

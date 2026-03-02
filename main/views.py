@@ -34,6 +34,7 @@ from .models import (
     BecomeADealerPage, 
     BecomeADealerApplication,
     Promotion,
+    FAQItem,
     REGION_CHOICES
 )
 from .serializers import (
@@ -120,7 +121,8 @@ def services(request):
 
 
 def faq(request):
-    return render(request, 'main/faq.html')
+    faq_items = FAQItem.objects.filter(is_active=True).order_by('order')
+    return render(request, 'main/faq.html', {'faq_items': faq_items})
 
 
 def product_detail(request, product_id):

@@ -54,6 +54,7 @@ from .models import (
     Dashboard,
     Promotion,
     PageMeta,
+    FAQItem,
     REGION_CHOICES
 )
 from main.services.amocrm.token_manager import TokenManager
@@ -2144,5 +2145,15 @@ class PageMetaAdmin(ContentAdminMixin, TabbedTranslationAdmin):
         if not obj.og_url:
             obj.og_url = obj.get_full_url()
         super().save_model(request, obj, form, change)
+
+
+# ========== FAQ ==========
+
+@admin.register(FAQItem)
+class FAQItemAdmin(TabbedTranslationAdmin):
+    list_display = ('question', 'order', 'is_active')
+    list_editable = ('order', 'is_active')
+    list_display_links = ('question',)
+    ordering = ('order',)
 
     

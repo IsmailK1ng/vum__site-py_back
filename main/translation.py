@@ -2,10 +2,11 @@
 
 from modeltranslation.translator import register, TranslationOptions
 from .models import (
-    News, NewsBlock, Vacancy, 
+    News, NewsBlock, Vacancy,
     VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
     Product, ProductFeature, ProductCardSpec, ProductParameter,
-    DealerService, Dealer, BecomeADealerPage, DealerRequirement, Promotion, PageMeta     
+    DealerService, Dealer, BecomeADealerPage, DealerRequirement, Promotion, PageMeta,
+    FAQItem,
 )
 
 
@@ -108,6 +109,12 @@ class PageMetaTranslationOptions(TranslationOptions):
         'og_title',
         'og_description',
         'og_site_name',
-        'og_url',  
+        'og_url',
     )
     required_languages = ()
+
+
+# ========== FAQ ==========
+@register(FAQItem)
+class FAQItemTranslationOptions(TranslationOptions):
+    fields = ('question', 'answer')
