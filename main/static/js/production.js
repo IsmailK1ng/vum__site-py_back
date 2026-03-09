@@ -363,23 +363,33 @@ class ProductsManager {
       "@type": "ItemList",
       "name": this.currentCategory ? this.getCategoryData(this.currentCategory)?.title || "FAW Products" : "FAW Products",
       "itemListElement": this.filteredProducts.slice(0, 20).map((product, index) => {
+        const imageUrl = product.image_url || product.image || product.main_image || '';
+        const productItem = {
+          "@type": "Product",
+          "name": product.title,
+          "url": `${baseUrl}/products/${product.slug}/`,
+          "brand": {
+            "@type": "Brand",
+            "name": "FAW"
+          },
+          "manufacturer": {
+            "@type": "Organization",
+            "name": "Van Universal Motors"
+          }
+        };
+
+        if (imageUrl) {
+          productItem.image = imageUrl.startsWith('http') ? imageUrl : `${baseUrl}${imageUrl}`;
+        }
+
+        if (product.description) {
+          productItem.description = product.description;
+        }
+
         const productSchema = {
           "@type": "ListItem",
           "position": index + 1,
-          "item": {
-            "@type": "Product",
-            "name": product.title,
-            "image": product.main_image_url ? `${baseUrl}${product.main_image_url}` : "",
-            "url": `${baseUrl}/products/${product.slug}/`,
-            "brand": {
-              "@type": "Brand",
-              "name": "FAW"
-            },
-            "manufacturer": {
-              "@type": "Organization",
-              "name": "Van Universal Motors"
-            }
-          }
+          "item": productItem
         };
 
         // Добавляем информацию о цене, если она есть
