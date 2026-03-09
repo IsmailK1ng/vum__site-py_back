@@ -8,7 +8,7 @@ const DashboardApp = {
      * Инициализация Dashboard
      */
     init: function (initialFilters) {
-        console.log('Dashboard: Инициализация...');
+
 
         this.currentFilters = initialFilters;
 
@@ -26,14 +26,13 @@ const DashboardApp = {
         // Инициализируем вкладки таблиц
         this.initTabs();
 
-        console.log('Dashboard: Готов!');
     },
 
     /**
      * Загрузка данных
      */
     loadData: function () {
-        console.log('Dashboard: Загрузка данных...', this.currentFilters);
+
 
         // Показываем индикаторы загрузки
         this.showLoading();
@@ -41,7 +40,6 @@ const DashboardApp = {
         // Запрашиваем данные через API
         DashboardAPI.getData(this.currentFilters)
             .then(data => {
-                console.log('Dashboard: Данные получены', data);
                 this.renderData(data);
                 this.hideLoading();
             })
@@ -136,7 +134,6 @@ const DashboardApp = {
      */
 
     renderTables: function (charts) {
-        console.log('Dashboard: Отрисовка таблиц', charts);
 
         // 1. Таблица источников (уже работает)
         this.renderSourcesTable(charts.sources);
@@ -179,7 +176,6 @@ const DashboardApp = {
     renderSourcesTable: function (sources) {
         const tbody = document.getElementById('table-sources-body');
         if (!tbody || !sources) {
-            console.log('Таблица источников: элемент не найден');
             return;
         }
 
@@ -206,7 +202,6 @@ const DashboardApp = {
         });
 
         tbody.innerHTML = html;
-        console.log('Таблица источников: отрисована');
     },
 
     /**
@@ -215,7 +210,6 @@ const DashboardApp = {
     renderModelsTable: function (models) {
         const tbody = document.getElementById('table-models-body');
         if (!tbody || !models) {
-            console.log('Таблица моделей: элемент не найден');
             return;
         }
 
@@ -245,7 +239,6 @@ const DashboardApp = {
         });
 
         tbody.innerHTML = html;
-        console.log('Таблица моделей: отрисована');
     },
 
     /**
@@ -254,7 +247,6 @@ const DashboardApp = {
     renderRegionsTable: function (regions) {
         const tbody = document.getElementById('table-regions-body');
         if (!tbody || !regions) {
-            console.log('Таблица регионов: элемент не найден');
             return;
         }
 
@@ -283,7 +275,6 @@ const DashboardApp = {
         });
 
         tbody.innerHTML = html;
-        console.log('Таблица регионов: отрисована');
     },
 
 
@@ -408,7 +399,6 @@ const DashboardApp = {
             weekdaysBody.innerHTML = html;
         }
 
-        console.log('Временной анализ: отрисован');
     },
 
     /**
@@ -438,7 +428,6 @@ const DashboardApp = {
         });
 
         tbody.innerHTML = html;
-        console.log('UTM кампании: отрисованы');
     },
 
     /**
@@ -466,7 +455,6 @@ const DashboardApp = {
         });
 
         tbody.innerHTML = html;
-        console.log('Referer: отрисован');
     },
 
     /**
@@ -519,7 +507,6 @@ const DashboardApp = {
             sourceContainer.innerHTML = html;
         }
 
-        console.log('Матрицы: отрисованы');
     },
 
     /**
@@ -586,7 +573,6 @@ const DashboardApp = {
             }
         }
 
-        console.log('Поведение клиентов: отрисовано');
     },
 
     /**

@@ -6,12 +6,8 @@ const DashboardAPI = {
      * Инициализация
      */
     init: function () {
-        console.log('API: Инициализация...');
-
         // Получаем CSRF токен
         this.csrfToken = this.getCSRFToken();
-
-        console.log('API: Готов!');
     },
     /**
      * Загрузить список продуктов

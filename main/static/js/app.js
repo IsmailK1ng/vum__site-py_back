@@ -73,7 +73,6 @@ function startLoader() {
   let counterElement = document.querySelector(".loader__count .count__text");
   if (!counterElement) {
     // loader counter not present on this page — skip safe start
-    console.warn('startLoader: loader counter element not found, skipping counter update');
     return;
   }
   let currentValue = 0;
@@ -1435,7 +1434,6 @@ var injectorOptions = {
   }
 };
 SVGInjector(mySVGsToInject, injectorOptions, function (totalSVGsInjected) {
-  console.log('We injected ' + totalSVGsInjected + ' SVG(s)!');
 });
 // --------------------------------------------- //
 // SVG DOM Injection End

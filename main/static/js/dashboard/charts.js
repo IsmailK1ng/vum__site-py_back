@@ -7,22 +7,16 @@ const DashboardCharts = {
      * Инициализация
      */
     init: function () {
-        console.log('Charts: Инициализация...');
-
         // Настройки Chart.js по умолчанию
         Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
         Chart.defaults.font.size = 13;
         Chart.defaults.color = '#6b7280';
-
-        console.log('Charts: Готов!');
     },
 
     /**
      * Отрисовать все графики
      */
     renderAll: function (data) {
-        console.log('Charts: Отрисовка всех графиков...', data);
-
         // Уничтожаем старые графики
         this.destroyAll();
 

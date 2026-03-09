@@ -1092,14 +1092,12 @@ if (!testimonialsSlider) {
       // Остановка автоплея при наведении на всю карточку
       card.addEventListener('mouseenter', function () {
         swiper.autoplay.stop();
-        console.log('Autoplay stopped - hovered on card');
       });
 
       // Возобновление при убирании ховера с карточки
       card.addEventListener('mouseleave', function () {
         if (!autoplayPaused) { // Только если не было явного клика
           swiper.autoplay.start();
-          console.log('Autoplay resumed - left card hover');
         }
       });
 
@@ -1107,7 +1105,6 @@ if (!testimonialsSlider) {
       card.addEventListener('click', function (e) {
         swiper.autoplay.stop();
         autoplayPaused = true;
-        console.log('Autoplay stopped permanently - clicked on card');
       });
     });
 
@@ -1118,7 +1115,6 @@ if (!testimonialsSlider) {
       if (!clickedCard && autoplayPaused) {
         swiper.autoplay.start();
         autoplayPaused = false;
-        console.log('Autoplay resumed - clicked outside testimonial cards');
       }
     });
   }
@@ -1195,12 +1191,9 @@ function onYouTubeIframeAPIReady() {
     const player = new YT.Player('youtube-video-1', {
       events: {
         'onStateChange': function (event) {
-          console.log('YouTube State:', event.data); // Отладка
           if (event.data === YT.PlayerState.PLAYING) {
-            console.log('Stopping Swiper autoplay');
             swiper.autoplay.stop();
           } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
-            console.log('Starting Swiper autoplay');
             swiper.autoplay.start();
           }
         }
@@ -1474,7 +1467,6 @@ var injectorOptions = {
   }
 };
 SVGInjector(mySVGsToInject, injectorOptions, function (totalSVGsInjected) {
-  console.log('We injected ' + totalSVGsInjected + ' SVG(s)!');
 });
 // --------------------------------------------- //
 // SVG DOM Injection End
@@ -1595,7 +1587,6 @@ function initFAWCounters() {
     });
 
     if (!counter1.error) {
-      console.log('Counter 1 initialized successfully');
     } else {
       console.error('Counter 1 error:', counter1.error);
     }
@@ -1611,7 +1602,6 @@ function initFAWCounters() {
     });
 
     if (!counter2.error) {
-      console.log('Counter 2 initialized successfully');
     } else {
       console.error('Counter 2 error:', counter2.error);
     }
@@ -1627,7 +1617,6 @@ function initFAWCounters() {
     });
 
     if (!counter3.error) {
-      console.log('Counter 3 initialized successfully');
     } else {
       console.error('Counter 3 error:', counter3.error);
     }
@@ -1636,7 +1625,6 @@ function initFAWCounters() {
   // Counter 4: 24/7 Support (display as text immediately)
   if (document.getElementById('stats-counter-4')) {
     document.getElementById('stats-counter-4').textContent = '200';
-    console.log('Counter 4 set to 24/7');
   }
 }
 

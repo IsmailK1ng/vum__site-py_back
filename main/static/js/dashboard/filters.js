@@ -6,7 +6,6 @@ const DashboardFilters = {
      * Инициализация фильтров
      */
     init: function () {
-        console.log('Filters: Инициализация...');
 
         // Обработчик формы
         const form = document.getElementById('dashboard-filters-form');
@@ -33,7 +32,6 @@ const DashboardFilters = {
             });
         }
 
-        console.log('Filters: Готов!');
     },
 
     /**
@@ -41,8 +39,6 @@ const DashboardFilters = {
      */
 
     applyFilters: function () {
-        console.log('Filters: Применяем фильтры...');
-
         // Собираем данные из формы
         const filters = {
             date_from: document.getElementById('date_from').value,
@@ -83,7 +79,7 @@ const DashboardFilters = {
      */
 
     resetFilters: function () {
-        console.log('Filters: Сброс фильтров...');
+
 
         // ✅ ОЧИЩАЕМ ВСЕ ПОЛЯ
         document.getElementById('date_from').value = '';
@@ -101,7 +97,7 @@ const DashboardFilters = {
      * Экспорт в Excel
      */
     exportExcel: function () {
-        console.log('Filters: Экспорт в Excel...');
+
 
         // ✅ БЕРЁМ ДАННЫЕ ИЗ ФОРМЫ, А НЕ ИЗ DashboardApp
         const filters = {

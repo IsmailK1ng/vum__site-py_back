@@ -309,20 +309,28 @@ CSRF_COOKIE_DOMAIN = None
 
 CKEDITOR_CONFIGS = {
     'default': {
-        'toolbar': 'Custom',
-        'toolbar_Custom': [
-            ['Bold', 'Italic', 'Underline'],
-            ['NumberedList', 'BulletedList'],
-            ['Link', 'Unlink'],
-            ['RemoveFormat', 'Source']
+        'toolbar': 'Full',
+        'toolbar_Full': [
+            ['Source', '-', 'NewPage', 'Preview'],
+            ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'],
+            ['Find', 'Replace', '-', 'SelectAll'],
+            ['Image', 'Table', 'HorizontalRule', 'SpecialChar', 'Iframe'],
+            '/',
+            ['Bold', 'Italic', 'Underline', 'Strike', '-', 'Subscript', 'Superscript'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'],
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['Link', 'Unlink', 'Anchor'],
+            '/',
+            ['Styles', 'Format', 'Font', 'FontSize'],
+            ['TextColor', 'BGColor'],
+            ['Maximize', 'ShowBlocks', 'RemoveFormat'],
         ],
-        'height': 300,
+        'height': 400,
         'width': '100%',
-        'removePlugins': 'elementspath',
-        'resize_enabled': False,
+        'removePlugins': 'elementspath,exportpdf',
+        'resize_enabled': True,
         'forcePasteAsPlainText': False,
         'allowedContent': True,
-        'extraAllowedContent': 'ul li ol strong p',
     },
 }
 
