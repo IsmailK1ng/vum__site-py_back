@@ -431,6 +431,14 @@ AMOCRM_FIELD_REFERER = config('AMOCRM_FIELD_REFERER', default='3022633', cast=in
 AMOCRM_FIELD_UTM = config('AMOCRM_FIELD_UTM', default='3024889', cast=int)
 AMOCRM_FIELD_MESSAGE = config('AMOCRM_FIELD_MESSAGE', default='2944145', cast=int)
 
+# UTM поля amoCRM
+AMOCRM_FIELD_UTM_SOURCE   = config('AMOCRM_FIELD_UTM_SOURCE',   default='90741', cast=int)
+AMOCRM_FIELD_UTM_MEDIUM   = config('AMOCRM_FIELD_UTM_MEDIUM',   default='90737', cast=int)
+AMOCRM_FIELD_UTM_CAMPAIGN = config('AMOCRM_FIELD_UTM_CAMPAIGN', default='90739', cast=int)
+AMOCRM_FIELD_UTM_TERM     = config('AMOCRM_FIELD_UTM_TERM',     default='90743', cast=int)
+AMOCRM_FIELD_UTM_CONTENT  = config('AMOCRM_FIELD_UTM_CONTENT',  default='90735', cast=int)
+AMOCRM_FIELD_UTM_REFERRER = config('AMOCRM_FIELD_UTM_REFERRER', default='90745', cast=int)
+
 # ========== Telegram Bot настройки ==========
 TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
 TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')

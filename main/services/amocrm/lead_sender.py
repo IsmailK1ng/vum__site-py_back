@@ -1,3 +1,4 @@
+import json
 import requests
 import logging
 from django.utils import timezone
@@ -25,11 +26,7 @@ class LeadSender:
 
             pipeline_id = settings.AMOCRM_PIPELINE_ID
             editable_status = cls._get_editable_status_for_pipeline(token_obj.access_token, pipeline_id)
-            
-            if editable_status:
-                status_to_use = editable_status
-            else:
-                status_to_use = settings.AMOCRM_STATUS_ID
+            status_to_use = editable_status if editable_status else settings.AMOCRM_STATUS_ID
 
             lead_data = cls._prepare_lead_data(contact_form, pipeline_id, status_to_use)
 
@@ -38,12 +35,14 @@ class LeadSender:
                 'Content-Type': 'application/json'
             }
 
+            # Шаг 1 — создаём лид
             response = requests.post(
                 f'https://{settings.AMOCRM_SUBDOMAIN}.amocrm.ru/api/v4/leads/complex',
                 json=lead_data,
                 headers=headers,
                 timeout=10
             )
+
             if response.status_code in [200, 201]:
                 result = response.json()
                 lead_id = cls._extract_lead_id(result)
@@ -54,35 +53,85 @@ class LeadSender:
                     contact_form.amocrm_sent_at = timezone.now()
                     contact_form.amocrm_error = None
                     contact_form.save()
+
+                    # Шаг 2 — PATCH для UTM полей виджета статистики
+                    cls._patch_utm_fields(lead_id, contact_form, headers)
+
                 else:
                     raise ValueError("ID лида не найден в ответе amoCRM")
             else:
                 error_text = cls._parse_error_response(response)
-                logger.error(f"❌ Ошибка amoCRM {response.status_code}: {error_text}")  
+                logger.error(f"❌ Ошибка amoCRM {response.status_code}: {error_text}")
                 contact_form.amocrm_status = 'failed'
                 contact_form.amocrm_error = error_text[:500]
                 contact_form.save()
 
         except requests.exceptions.Timeout:
             error_text = "Таймаут соединения с amoCRM"
-            logger.error(f"⏱️ {error_text}") 
+            logger.error(f"⏱️ {error_text}")
             contact_form.amocrm_status = 'failed'
             contact_form.amocrm_error = error_text
             contact_form.save()
 
         except requests.exceptions.RequestException as e:
             error_text = f"Ошибка запроса: {str(e)}"
-            logger.error(f"🌐 {error_text}") 
+            logger.error(f"🌐 {error_text}")
             contact_form.amocrm_status = 'failed'
             contact_form.amocrm_error = error_text[:500]
             contact_form.save()
 
         except Exception as e:
             error_text = f"{type(e).__name__}: {str(e)}"
-            logger.error(f"💥 Критическая ошибка: {error_text}", exc_info=True)  
+            logger.error(f"💥 Критическая ошибка: {error_text}", exc_info=True)
             contact_form.amocrm_status = 'failed'
             contact_form.amocrm_error = error_text[:500]
             contact_form.save()
+
+    @classmethod
+    def _patch_utm_fields(cls, lead_id, contact_form, headers):
+        """PATCH запрос для заполнения UTM полей виджета статистики"""
+        if not contact_form.utm_data:
+            return
+
+        try:
+            utm = json.loads(contact_form.utm_data)
+        except (json.JSONDecodeError, TypeError):
+            return
+
+        utm_field_map = {
+            'utm_source':   settings.AMOCRM_FIELD_UTM_SOURCE,
+            'utm_medium':   settings.AMOCRM_FIELD_UTM_MEDIUM,
+            'utm_campaign': settings.AMOCRM_FIELD_UTM_CAMPAIGN,
+            'utm_term':     settings.AMOCRM_FIELD_UTM_TERM,
+            'utm_content':  settings.AMOCRM_FIELD_UTM_CONTENT,
+            'utm_referrer': settings.AMOCRM_FIELD_UTM_REFERRER,
+        }
+
+        custom_fields = []
+        for key, field_id in utm_field_map.items():
+            value = (utm.get(key) or '').strip()
+            if value:
+                custom_fields.append({
+                    "field_id": field_id,
+                    "values": [{"value": value[:500]}]
+                })
+
+        if not custom_fields:
+            return
+
+        try:
+            response = requests.patch(
+                f'https://{settings.AMOCRM_SUBDOMAIN}.amocrm.ru/api/v4/leads/{lead_id}',
+                headers=headers,
+                json={"custom_fields_values": custom_fields},
+                timeout=10
+            )
+            if response.status_code == 200:
+                logger.info(f"✅ UTM поля обновлены для лида {lead_id}")
+            else:
+                logger.error(f"❌ Ошибка PATCH UTM лид {lead_id}: {response.status_code} {response.text[:200]}")
+        except Exception as e:
+            logger.error(f"❌ Исключение PATCH UTM лид {lead_id}: {str(e)}")
 
     @staticmethod
     def _get_editable_status_for_pipeline(access_token, pipeline_id):
@@ -99,7 +148,7 @@ class LeadSender:
                     return s.get('id')
             return None
         except Exception as e:
-            logger.error(f"Не удалось получить статусы pipeline {pipeline_id}: {e}") 
+            logger.error(f"Не удалось получить статусы pipeline {pipeline_id}: {e}")
             return None
 
     @staticmethod
@@ -116,7 +165,7 @@ class LeadSender:
                         return leads[0]['id']
             return None
         except (KeyError, IndexError, TypeError) as e:
-            logger.error(f"❌ Ошибка парсинга ID лида: {str(e)}") 
+            logger.error(f"❌ Ошибка парсинга ID лида: {str(e)}")
             return None
 
     @staticmethod
@@ -170,12 +219,6 @@ class LeadSender:
             lead_custom_fields.append({
                 "field_id": settings.AMOCRM_FIELD_REFERER,
                 "values": [{"value": contact_form.referer[:500]}]
-            })
-
-        if contact_form.utm_data:
-            lead_custom_fields.append({
-                "field_id": settings.AMOCRM_FIELD_UTM,
-                "values": [{"value": contact_form.utm_data[:1000]}]
             })
 
         lead_custom_fields.append({

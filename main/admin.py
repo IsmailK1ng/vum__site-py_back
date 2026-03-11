@@ -506,12 +506,15 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
             ws.title = "Заявки FAW UZ"
             
             headers = [
-                'Номер', 'ФИО', 'Телефон', 'Модель', 'Регион', 'Сообщение', 
+                'Номер', 'ФИО', 'Телефон', 'Модель', 'Регион', 'Сообщение',
                 'Статус', 'Приоритет', 'Менеджер', 'Дата',
-                'amoCRM Статус', 'amoCRM ID', 'amoCRM Дата', 'amoCRM Ошибка'
+                'amoCRM Статус', 'amoCRM ID', 'amoCRM Дата', 'amoCRM Ошибка',
+                'UTM Source', 'UTM Medium', 'UTM Campaign', 'UTM Term', 'UTM Content',
+                'Referer', 'Visitor UID',
             ]
             ws.append(headers)
             
+            # Стили шапки
             header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
             header_font = Font(bold=True, color='FFFFFF')
             
@@ -520,7 +523,21 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
                 cell.font = header_font
                 cell.alignment = Alignment(horizontal='center', vertical='center')
             
+            # Отдельный цвет для UTM колонок чтобы визуально выделить
+            utm_fill = PatternFill(start_color='1a6b3c', end_color='1a6b3c', fill_type='solid')
+            utm_start_col = 15  # UTM Source начинается с 15й колонки
+            for col_idx in range(utm_start_col, len(headers) + 1):
+                ws.cell(row=1, column=col_idx).fill = utm_fill
+            
             for idx, contact in enumerate(queryset, start=1):
+                # Парсим utm_data из JSON
+                utm = {}
+                if contact.utm_data:
+                    try:
+                        utm = json.loads(contact.utm_data)
+                    except (json.JSONDecodeError, TypeError):
+                        utm = {}
+                
                 ws.append([
                     idx,
                     contact.name,
@@ -535,11 +552,20 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
                     contact.get_amocrm_status_display(),
                     contact.amocrm_lead_id or '-',
                     contact.amocrm_sent_at.strftime('%d.%m.%Y %H:%M') if contact.amocrm_sent_at else '-',
-                    contact.amocrm_error[:100] if contact.amocrm_error else '-'
+                    contact.amocrm_error[:100] if contact.amocrm_error else '-',
+                    # --- UTM ---
+                    utm.get('utm_source', '-'),
+                    utm.get('utm_medium', '-'),
+                    utm.get('utm_campaign', '-'),
+                    utm.get('utm_term', '-'),
+                    utm.get('utm_content', '-'),
+                    contact.referer[:100] if contact.referer else '-',
+                    contact.visitor_uid or '-',
                 ])
             
+            # Авто-ширина колонок
             for column in ws.columns:
-                max_length = max(len(str(cell.value)) for cell in column)
+                max_length = max(len(str(cell.value or '')) for cell in column)
                 ws.column_dimensions[column[0].column_letter].width = min(max_length + 2, 50)
             
             response = HttpResponse(
@@ -554,7 +580,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
             logger.error(f"❌ Error exporting to Excel: {str(e)}", exc_info=True)
             self.message_user(request, f'Ошибка экспорта: {str(e)}', level=messages.ERROR)
             return redirect(request.path)
-    
+
     export_to_excel.short_description = 'Экспорт в Excel'
     
     # ==================== QUERYSET ====================
