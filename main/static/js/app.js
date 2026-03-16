@@ -1126,9 +1126,9 @@ for(let i = 0; i < link.length; i++) {
 // --------------------------------------------- //
 // Swiper Slider - Testimonials #01 Start
 // --------------------------------------------- //
-const testimonialsSlider = document.querySelector("testimonials-slider");
+const testimonialsSlider = document.querySelector(".testimonials-slider");
 
-if (!testimonialsSlider) {
+if (testimonialsSlider) {
   const swiper = new Swiper('.swiper-testimonials', {
     slidesPerView: 'auto',
     grabCursor: true,
@@ -1156,9 +1156,9 @@ if (!testimonialsSlider) {
 // --------------------------------------------- //
 // Swiper Slider - Testimonials #02 Start
 // --------------------------------------------- //
-const testimonialsSlider2 = document.querySelector("testimonials-slider-2");
+const testimonialsSlider2 = document.querySelector(".testimonials-slider-2");
 
-if (!testimonialsSlider2) {
+if (testimonialsSlider2) {
   const swiper = new Swiper('.swiper-testimonials-2', {
     slidesPerView: 1,
     grabCursor: true,
