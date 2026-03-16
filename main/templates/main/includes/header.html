@@ -4,7 +4,7 @@
         <!-- Логотип -->
         <div class="mxd-header__logo loading__fade">
             <a href="{% url 'home' %}" class="mxd-logo">
-                <img data-src="{% static 'images/LOGO-VUM.png' %}" class="mxd-logo__image" alt="FAW Logo" loading="lazy">
+                <img src="{% static 'images/LOGO-VUM.png' %}" class="mxd-logo__image" alt="FAW Logo" width="100" height="34">
             </a>
         </div>
 
@@ -297,7 +297,6 @@
             </div>
         </div>
     </nav>
-    <script crossorigin="anonymous" src="{% static 'js/error-logger.js' %}"></script>
     <!-- <script crossorigin="anonymous" src="{% static 'js/snow.js' %}"></script> -->
     <script>
     function switchLanguage(lang) {
@@ -313,4 +312,3 @@
     }
 
     </script>
-    <script crossorigin="anonymous" src="{% static 'js/lazy-load.js' %}"></script>

@@ -98,6 +98,9 @@ class LeadSender:
         except (json.JSONDecodeError, TypeError):
             return
 
+        if not isinstance(utm, dict):
+            return
+
         utm_field_map = {
             'utm_source':   settings.AMOCRM_FIELD_UTM_SOURCE,
             'utm_medium':   settings.AMOCRM_FIELD_UTM_MEDIUM,

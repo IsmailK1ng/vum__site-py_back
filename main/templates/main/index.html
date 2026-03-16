@@ -1,175 +1,45 @@
+{% extends 'main/base.html' %}
 {% load static %}
-{% load static seo_tags %}
-<!DOCTYPE html>
-<html dir="ltr" lang="{{ HTML_LANG }}">
+{% load seo_tags %}
 
+{% block recaptcha %}
+<script async defer src="https://www.google.com/recaptcha/api.js?render=6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow"></script>
+{% endblock %}
 
-<head>
-  <meta charset="UTF-8">
-  {% include 'main/includes/seo_meta.html' %}
-  
-  {% hreflang_tags %}
-  {% canonical_url %}
+{% block schema_json %}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Van Universal Motors","alternateName":"VUM","url":"{{ request.scheme }}://{{ request.get_host }}","logo":"{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/logo-vum.png' %}","description":"{% if LANGUAGE_CODE == 'uz' %}Van Universal Motors (VUM) — O'zbekistonda FAW tijorat texnikasining rasmiy ishlab chiqaruvchisi{% elif LANGUAGE_CODE == 'ru' %}Van Universal Motors (VUM) является официальным производителем коммерческих автомобилей FAW в Узбекистане{% else %}Van Universal Motors (VUM) is the official manufacturer of FAW commercial vehicles in Uzbekistan{% endif %}","address":{"@type":"PostalAddress","streetAddress":"{% if LANGUAGE_CODE == 'uz' %}Abdulla Qahhor ko'chasi, 2B{% elif LANGUAGE_CODE == 'ru' %}улица Абдулла Каххар, 2B{% else %}Abdulla Kahhar Street, 2B{% endif %}","addressLocality":"{% if LANGUAGE_CODE == 'uz' %}Toshkent{% elif LANGUAGE_CODE == 'ru' %}Ташкент{% else %}Tashkent{% endif %}","addressRegion":"{% if LANGUAGE_CODE == 'uz' %}Yakkasaroy tumani{% elif LANGUAGE_CODE == 'ru' %}район Яккасарай{% else %}Yakkasaray District{% endif %}","addressCountry":"UZ"},"contactPoint":{"@type":"ContactPoint","telephone":"+998-55-508-60-60","contactType":"customer service","email":"info@faw.uz"},"sameAs":[]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"FAW Trucks Uzbekistan","url":"{{ request.scheme }}://{{ request.get_host }}","publisher":{"@type":"Organization","name":"Van Universal Motors"},"potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"{{ request.scheme }}://{{ request.get_host }}/products/?search={search_term_string}"},"query-input":"required name=search_term_string"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'dealers' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Yangiliklar{% elif LANGUAGE_CODE == 'ru' %}Новости{% else %}News{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'news' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Modellar{% elif LANGUAGE_CODE == 'ru' %}Модели{% else %}Models{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'products' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Kompaniya haqida{% elif LANGUAGE_CODE == 'ru' %}О компании{% else %}About{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'about' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Lizing{% elif LANGUAGE_CODE == 'ru' %}Лизинг{% else %}Leasing{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'lizing' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Servis{% elif LANGUAGE_CODE == 'ru' %}Сервис{% else %}Service{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'services' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Bog'lanish{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'contact' %}"}]}</script>
+{% endblock %}
 
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+{% block inline_styles %}
 
+<style>
+  * { user-select: none; }
+  #faw-main-contact-form { padding-top: 120px; }
+  .mxd-hero-06__video iframe {
+    position: absolute; top: 50%; left: 50%;
+    width: 110%; height: 110%;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+  .consent-agree-label { display: flex; align-items: flex-start; cursor: pointer; user-select: none; gap: 10px; margin: 15px 0; }
+  .consent-agree-input { width: 18px; height: 18px; min-width: 18px; margin-top: 2px; cursor: pointer; accent-color: #1976d2; }
+  .consent-agree-text { font-size: 13px; line-height: 1.5; color: #666; }
+  .consent-agree-link { color: #1976d2; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+  .consent-agree-link:hover { text-decoration: underline; color: #1565c0; }
 
-  <!-- Универсальный favicon (динамически меняется в зависимости от темы) -->
-  <link rel="icon" href="{% static 'images/vum-icon-dark.svg' %}" />
-  <link rel="apple-touch-icon" href="{% static 'images/vum-icon-dark.svg' %}">
+  .youtube-facade-thumb {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: opacity 0.5s ease;
+  z-index: 1;
+}
+</style>
+{% endblock %}
 
-  <script crossorigin="anonymous" src="{% static 'js/utm-tracker.js' %}"></script>
-
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-5K2BD9C3');</script>
-
-  <!-- Meta Pixel Code -->
-  <script>
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '1159924786072799');
-  fbq('track', 'PageView');
-  </script>
-  <noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=1159924786072799&ev=PageView&noscript=1"
-  /></noscript>
-  <!-- End Meta Pixel Code -->
-
-  <!-- Yandex.Metrika counter -->
-  <script type="text/javascript">
-      (function(m,e,t,r,i,k,a){
-          m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-          m[i].l=1*new Date();
-          for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-          k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-      })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106067065', 'ym');
-
-      ym(106067065, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-  </script>
-  <noscript><div><img src="https://mc.yandex.ru/watch/106067065" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-<!-- /Yandex.Metrika counter -->
-
-
-  <meta name="google-site-verification" content="xmjQ3Gc6gAMaPe0MydDnP_uYW0EOz-Y-T6Kzkc7ylEA" />
-  <meta name="yandex-verification" content="78715d404b789626" />
-  <meta name="facebook-domain-verification" content="8d4u99q1mimerz10hkbzvpjywt0rag" />
-
-  <!-- amoCRM Pixel для автораспределения -->
-  <script type="text/javascript" id="amo_pixel_identifier_js" async="async"
-    src="https://piper.amocrm.ru/pixel/js/identifier/pixel_identifier.js"></script>
-
-  <script>
-    window.AMOPIXEL_IDENTIFIER_PARAMS = window.AMOPIXEL_IDENTIFIER_PARAMS || {};
-    window.AMOPIXEL_IDENTIFIER_PARAMS.onload = function (pixel_identifier) {
-      var visitor_uid = pixel_identifier.getVisitorUid();
-      if (visitor_uid) {
-        sessionStorage.setItem('amo_visitor_uid', visitor_uid);
-      }
-    };
-  </script>
-
-  <!-- Подключение стилей (начало) -->
-  <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
-  <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/snow.css' %}"> -->
- 
-  <!-- Цвет браузера (начало) -->
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
-  <meta name="msapplication-navbutton-color" content="#161616">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <!-- Google reCAPTCHA v3 -->
-  <script src="https://www.google.com/recaptcha/api.js?render=6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow"></script>
-
-<!-- Schema.org Organization Markup -->
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Van Universal Motors","alternateName":"VUM","url":"{{ request.scheme }}://{{ request.get_host }}","logo":"{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/logo-vum.png' %}","description":"{% if LANGUAGE_CODE == 'uz' %}Van Universal Motors (VUM) — O'zbekistonda FAW tijorat texnikasining rasmiy ishlab chiqaruvchisi{% elif LANGUAGE_CODE == 'ru' %}Van Universal Motors (VUM) является официальным производителем коммерческих автомобилей FAW в Узбекистане{% else %}Van Universal Motors (VUM) is the official manufacturer of FAW commercial vehicles in Uzbekistan{% endif %}","address":{"@type":"PostalAddress","streetAddress":"{% if LANGUAGE_CODE == 'uz' %}Abdulla Qahhor ko'chasi, 2B{% elif LANGUAGE_CODE == 'ru' %}улица Абдулла Каххар, 2B{% else %}Abdulla Kahhar Street, 2B{% endif %}","addressLocality":"{% if LANGUAGE_CODE == 'uz' %}Toshkent{% elif LANGUAGE_CODE == 'ru' %}Ташкент{% else %}Tashkent{% endif %}","addressRegion":"{% if LANGUAGE_CODE == 'uz' %}Yakkasaroy tumani{% elif LANGUAGE_CODE == 'ru' %}район Яккасарай{% else %}Yakkasaray District{% endif %}","addressCountry":"UZ"},"contactPoint":{"@type":"ContactPoint","telephone":"+998-55-508-60-60","contactType":"customer service","email":"info@faw.uz"},"sameAs":[]}</script>
-
-  <!-- Schema.org WebSite Markup with Navigation -->
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"FAW Trucks Uzbekistan","url":"{{ request.scheme }}://{{ request.get_host }}","publisher":{"@type":"Organization","name":"Van Universal Motors"},"potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"{{ request.scheme }}://{{ request.get_host }}/products/?search={search_term_string}"},"query-input":"required name=search_term_string"}}</script>
-
-  <!-- Schema.org SiteNavigationElement -->
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'dealers' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Yangiliklar{% elif LANGUAGE_CODE == 'ru' %}Новости{% else %}News{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'news' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Modellar{% elif LANGUAGE_CODE == 'ru' %}Модели{% else %}Models{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'products' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Kompaniya haqida{% elif LANGUAGE_CODE == 'ru' %}О компании{% else %}About{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'about' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Lizing{% elif LANGUAGE_CODE == 'ru' %}Лизинг{% else %}Leasing{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'lizing' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Servis{% elif LANGUAGE_CODE == 'ru' %}Сервис{% else %}Service{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'services' %}"},{"@type":"SiteNavigationElement","name":"{% if LANGUAGE_CODE == 'uz' %}Bog'lanish{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'contact' %}"}]}</script>
-
-  <!-- Цвет браузера (конец) -->
-  <style>
-    * {
-      user-select: none;
-    }
-
-    #faw-main-contact-form {
-      padding-top: 120px;
-    }
-
-    .mxd-hero-06__video iframe {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 110%;
-      height: 110%;
-      pointer-events: none;
-      transform: translate(-50%, -50%) scale(1.08);
-    }
-
-    /* Стили для чекбокса согласия */
-    .consent-agree-label {
-      display: flex;
-      align-items: flex-start;
-      cursor: pointer;
-      user-select: none;
-      gap: 10px;
-      margin: 15px 0;
-    }
-
-    .consent-agree-input {
-      width: 18px;
-      height: 18px;
-      min-width: 18px;
-      margin-top: 2px;
-      cursor: pointer;
-      accent-color: #1976d2;
-    }
-
-    .consent-agree-text {
-      font-size: 13px;
-      line-height: 1.5;
-      color: #666;
-    }
-
-    .consent-agree-link {
-      color: #1976d2;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s;
-    }
-
-    .consent-agree-link:hover {
-      text-decoration: underline;
-      color: #1565c0;
-    }
-  </style>
-</head>
-
-<body>
-
-  <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5K2BD9C3"
-  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-  <!-- End Google Tag Manager (noscript) -->
+{% block content %}
 
 
   {% include 'main/includes/header.html' %}
@@ -183,11 +53,13 @@
           <div class="mxd-hero-06__top">
             <div class="mxd-hero-06__content">
               <div class="mxd-hero-06__video">
-                <iframe
-                  src="https://www.youtube.com/embed/jfWZggL9j0E?autoplay=1&rel=0&mute=1&controls=0&showinfo=0&modestbranding=1&loop=1&playlist=jfWZggL9j0E"
+                <img src="{% static 'images/back/hero-preview.webp' %}"
+                  alt="VUM FAW видео превью" class="youtube-facade-thumb"
+                  width="1280" height="720" fetchpriority="high">
+                <iframe title="VUM FAW - официальное видео"
+                  data-src="https://www.youtube.com/embed/jfWZggL9j0E?autoplay=1&rel=0&mute=1&controls=0&showinfo=0&modestbranding=1&loop=1&playlist=jfWZggL9j0E"
                   frameborder="0" allow="autoplay; encrypted-media" style="border-radius: 30px;"
-                  allowfullscreen loop="loop" muted="muted" poster="https://dummyimage.com/1920x1080/5d5d5d/838383"
-                  referrerpolicy="strict-origin-when-cross-origin">
+                  allowfullscreen referrerpolicy="strict-origin-when-cross-origin">
                 </iframe>
                 <div class="hero-06-video__cover"></div>
                 <div class="hero-06-video__cover"></div>
@@ -827,16 +699,9 @@
     <i class="ph ph-arrow-up"></i>
   </a>
   <!-- Кнопка «вверх» (конец) -->
+{% endblock %}
 
-  <!-- Подключение скриптов (начало) -->
-  <script crossorigin="anonymous" src="{% static 'js/libs.min.js' %}"></script>
-  <script crossorigin="anonymous" src="{% static 'js/app.js' %}"></script>
-  <script crossorigin="anonymous" src="{% static 'js/error-logger.js' %}"></script>
-  <script crossorigin="anonymous" src="{% static 'js/favicon-theme.js' %}"></script>
-  <script crossorigin="anonymous" src="{% static 'js/faw.js' %}"></script>
-  <!-- <script crossorigin="anonymous" src="{% static 'js/snow.js' %}"></script> -->
-
-  <!-- Мобильный фикс: надёжно отключаем инлайн-стили параллакса для маленьких экранов -->
+{% block extra_js %}
 <script>
     (function () {
       var observer = null;
@@ -851,7 +716,7 @@
           el.style.right = '';
           el.style.bottom = '';
           el.style.position = 'static';
-        } catch (e) {/* игнорируем ошибки */ }
+        } catch (e) {}
       }
 
       function disableParallaxInline() {
@@ -860,7 +725,6 @@
         containers.forEach(function (container) {
           cleanNode(container);
           container.querySelectorAll('*').forEach(function (child) { cleanNode(child); });
-
           var img = container.querySelector('img');
           if (img) {
             img.style.transform = 'none';
@@ -883,46 +747,30 @@
 
       function startObserver() {
         if (window.innerWidth > 550) {
-          if (observer) {
-            observer.disconnect();
-            observer = null;
-          }
+          if (observer) { observer.disconnect(); observer = null; }
           return;
         }
         if (observer) return;
-
         var config = { attributes: true, attributeFilter: ['style'], subtree: true, childList: true };
         observer = new MutationObserver(function (mutations) {
           var shouldRun = false;
           for (var i = 0; i < mutations.length; i++) {
             var m = mutations[i];
             if (m.type === 'attributes' || m.type === 'childList') {
-              if (m.target && m.target.closest && m.target.closest('.mxd-blog-preview__image')) {
-                shouldRun = true;
-                break;
-              }
+              if (m.target && m.target.closest && m.target.closest('.mxd-blog-preview__image')) { shouldRun = true; break; }
               if (m.addedNodes && m.addedNodes.length) {
                 for (var j = 0; j < m.addedNodes.length; j++) {
-                  if (m.addedNodes[j].closest && m.addedNodes[j].closest('.mxd-blog-preview__image')) {
-                    shouldRun = true;
-                    break;
-                  }
+                  if (m.addedNodes[j].closest && m.addedNodes[j].closest('.mxd-blog-preview__image')) { shouldRun = true; break; }
                 }
               }
             }
           }
           if (shouldRun) disableParallaxInline();
         });
-
-        document.querySelectorAll('.mxd-blog-preview__image').forEach(function (node) {
-          observer.observe(node, config);
-        });
+        document.querySelectorAll('.mxd-blog-preview__image').forEach(function (node) { observer.observe(node, config); });
       }
 
-      function init() {
-        disableParallaxInline();
-        startObserver();
-      }
+      function init() { disableParallaxInline(); startObserver(); }
 
       window.addEventListener('DOMContentLoaded', init);
       window.addEventListener('load', init);
@@ -930,24 +778,17 @@
       var resizeTimer;
       window.addEventListener('resize', function () {
         clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function () {
-          disableParallaxInline();
-          startObserver();
-        }, 200);
+        resizeTimer = setTimeout(function () { disableParallaxInline(); startObserver(); }, 200);
       });
 
       var runs = 0;
       var interval = setInterval(function () {
-        disableParallaxInline();
-        startObserver();
+        disableParallaxInline(); startObserver();
         runs++;
-        if (runs > 12) {
-          clearInterval(interval);
-        }
+        if (runs > 12) clearInterval(interval);
       }, 500);
     })();
 
-    // ============ ОБРАБОТКА ФОРМЫ ============
     let isSubmitting = false;
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -956,22 +797,18 @@
       const statusBlock = document.querySelector(".form-status");
       const statusText = statusBlock.querySelector(".form-status__text");
 
-      // Маска телефона
       phoneInput.addEventListener("input", (e) => {
         let value = e.target.value.replace(/\D/g, "");
         if (!value.startsWith("998")) value = "998" + value;
         if (value.length > 12) value = value.slice(0, 12);
-
         let formatted = "+998 ";
         if (value.length > 3) formatted += "(" + value.slice(3, 5);
         if (value.length >= 5) formatted += ") " + value.slice(5, 8);
         if (value.length >= 8) formatted += "-" + value.slice(8, 10);
         if (value.length >= 10) formatted += "-" + value.slice(10, 12);
-
         e.target.value = formatted;
       });
 
-      // Отправка формы
       form.addEventListener("submit", (e) => {
         const consentCheckbox = document.getElementById("consent-agree-checkbox");
         if (!consentCheckbox.checked) {
@@ -983,36 +820,24 @@
         window.submitContactForm(form);
       });
 
-      // Обработчик когда согласие дано - отправляем данные
       window.submitContactForm = async function(formElement) {
         if (isSubmitting) return;
         isSubmitting = true;
-
         const phone = phoneInput.value.replace(/\D/g, "");
         if (phone.length !== 12) {
           showStatus("❌ Iltimos, telefon raqamingizni to'liq kiriting.", "error");
           isSubmitting = false;
           return;
         }
-
         try {
-          // Получаем reCAPTCHA токен
           let recaptchaToken = await new Promise((resolve, reject) => {
             grecaptcha.ready(() => {
               grecaptcha.execute('6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow', { action: 'contact_form' })
-                .then(token => {
-                  resolve(token);
-                })
-                .catch(err => {
-                  console.error('❌ reCAPTCHA error:', err);
-                  reject(err);
-                });
+                .then(resolve).catch(reject);
             });
           });
-
           const utmData = window.getUTMData();
           const currentLang = (document.documentElement.lang || 'uz').split('-')[0];
-
           const formData = {
             name: form.name.value,
             region: form.region.value,
@@ -1023,23 +848,14 @@
             visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null,
             recaptcha_token: recaptchaToken
           };
-
           const response = await fetch("/api/" + currentLang + "/contact/", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value,
-            },
+            headers: { "Content-Type": "application/json", "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value },
             body: JSON.stringify(formData),
           });
-
           const data = await response.json();
-
           if (response.ok) {
-            (window.dataLayer = window.dataLayer || []).push({
-              event: "lead_form_submitted"
-            });
-
+            (window.dataLayer = window.dataLayer || []).push({ event: "lead_form_submitted" });
             showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
             form.reset();
           } else {
@@ -1053,24 +869,30 @@
         }
       };
 
-      // Показ статуса
       function showStatus(message, type = "success") {
         statusText.textContent = message;
         statusBlock.className = `form-status ${type} show`;
         statusBlock.classList.remove("hidden");
-
         setTimeout(() => {
           statusBlock.classList.remove("show");
           setTimeout(() => statusBlock.classList.add("hidden"), 400);
         }, 4000);
       }
     });
-
-  </script>
-  <!-- Load Scripts End -->
-
-  <!-- Data Consent Modal -->
-
-</body>
-
-</html>
+</script>
+<script>
+  window.addEventListener('load', function() {
+    var iframe = document.querySelector('.mxd-hero-06__video iframe[data-src]');
+    if (iframe) {
+      iframe.src = iframe.dataset.src;
+      var thumb = document.querySelector('.youtube-facade-thumb');
+      if (thumb) {
+        iframe.addEventListener('load', function() {
+          thumb.style.opacity = '0';
+          setTimeout(function() { thumb.style.display = 'none'; }, 500);
+        });
+      }
+    }
+  });
+</script>
+{% endblock %}

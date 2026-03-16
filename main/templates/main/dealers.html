@@ -1,94 +1,12 @@
+{% extends 'main/base.html' %}
 {% load static %}
-{% load seo_tags %} 
-<!DOCTYPE html>
-<html dir="ltr" lang="{{ HTML_LANG }}">
 
-<head>
-    <meta charset="UTF-8">
-    {% include 'main/includes/seo_meta.html' %}
-    {% hreflang_tags %}
-    {% canonical_url %}
-    
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    
-    
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-5K2BD9C3');</script>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+<link rel="stylesheet" href="{% static 'css/site_dealers.css' %}">
+{% endblock %}
 
-    <!-- Meta Pixel Code -->
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1159924786072799');
-    fbq('track', 'PageView');
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1159924786072799&ev=PageView&noscript=1"
-    /></noscript>
-    <!-- End Meta Pixel Code -->
-
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function(m,e,t,r,i,k,a){
-            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-            m[i].l=1*new Date();
-            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106067065', 'ym');
-
-        ym(106067065, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/106067065" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-
-    <meta name="yandex-verification" content="78715d404b789626" />
-    <meta name="google-site-verification" content="xmjQ3Gc6gAMaPe0MydDnP_uYW0EOz-Y-T6Kzkc7ylEA" />
-    <meta name="facebook-domain-verification" content="8d4u99q1mimerz10hkbzvpjywt0rag" />
-    
-    <!-- amoCRM Pixel -->
-    <script type="text/javascript" id="amo_pixel_identifier_js" async
-        src="https://piper.amocrm.ru/pixel/js/identifier/pixel_identifier.js"></script>
-    <script>
-        window.AMOPIXEL_IDENTIFIER_PARAMS = window.AMOPIXEL_IDENTIFIER_PARAMS || {};
-        window.AMOPIXEL_IDENTIFIER_PARAMS.onload = function (pixel_identifier) {
-            var visitor_uid = pixel_identifier.getVisitorUid();
-            if (visitor_uid) sessionStorage.setItem('amo_visitor_uid', visitor_uid);
-        };
-    </script>
-    
-    <link rel="icon" href="{% static 'images/vum-icon-dark.svg' %}" />
-    <link rel="apple-touch-icon" href="{% static 'images/vum-icon-dark.svg' %}">
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="{% static 'css/loaders/loader.css' %}">
-    <link rel="stylesheet" href="{% static 'css/plugins.css' %}">
-    <link rel="stylesheet" href="{% static 'css/main_site.css' %}">
-    <link rel="stylesheet" href="{% static 'css/site_main.css' %}">
-    <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
-    <link rel="stylesheet" href="{% static 'css/site_dealers.css' %}">
-    
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
-    
-    <!-- Schema.org -->
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","name":"{% if LANGUAGE_CODE == 'uz' %}VUM Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры VUM{% else %}VUM Dealers{% endif %}","itemListElement":[{% for dealer in dealers %}{"@type":"ListItem","position":{{ forloop.counter }},"item":{"@type":"LocalBusiness","name":"{{ dealer.name }}","address":{"@type":"PostalAddress","streetAddress":"{{ dealer.address }}","addressLocality":"{{ dealer.city }}","addressCountry":"UZ"},"geo":{"@type":"GeoCoordinates","latitude":"{{ dealer.latitude }}","longitude":"{{ dealer.longitude }}"},"telephone":"{{ dealer.phone }}","email":"{{ dealer.email }}"{% if dealer.website %},"url":"{{ dealer.website }}"{% endif %}{% if dealer.logo %},"image":"{{ request.scheme }}://{{ request.get_host }}{{ dealer.logo.url }}"{% endif %}}}{% if not forloop.last %},{% endif %}{% endfor %}]}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}","item":"{{ request.scheme }}://{{ request.get_host }}/"},{"@type":"ListItem","position":2,"name":"{% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}","item":"{{ request.build_absolute_uri }}"}]}</script>
-</head>
-
-<body>  
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5K2BD9C3" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    
+{% block content %} 
     <div id="loader" style="display: none;" class="loader">
         <div class="loader__wrapper">
             <div class="loader__content">
@@ -208,12 +126,11 @@
         <i class="ph ph-arrow-up"></i>
     </a>
     
-    <script crossorigin="anonymous" src="{% static 'js/libs.min.js' %}"></script>
-    <script crossorigin="anonymous" src="{% static 'js/app.js' %}"></script>
-    <script crossorigin="anonymous" src="{% static 'js/favicon-theme.js' %}"></script>
-    <script crossorigin="anonymous" src="{% static 'js/error-logger.js' %}"></script>
-    <script crossorigin="anonymous" src="{% static 'js/faw.js' %}"></script>
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=145cca7b-9118-4b72-b7b6-261dbc414620&lang={% if LANGUAGE_CODE == 'ru' %}ru_RU{% elif LANGUAGE_CODE == 'en' %}en_US{% else %}uz_UZ{% endif %}"></script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://api-maps.yandex.ru/2.1/?apikey=145cca7b-9118-4b72-b7b6-261dbc414620&lang={% if LANGUAGE_CODE == 'ru' %}ru_RU{% elif LANGUAGE_CODE == 'en' %}en_US{% else %}uz_UZ{% endif %}"></script>
+
     
     <script>
         const translations = {
@@ -756,9 +673,8 @@
         updateStats();
     }
 
-    window.showDealerDetails = showDealerDetails;
+window.showDealerDetails = showDealerDetails;
     window.buildRoute = buildRoute;
     window.findNearestDealer = findNearestDealer;
-</script>
-</body>
-</html>
+    </script>
+{% endblock %}

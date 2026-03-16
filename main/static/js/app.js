@@ -1124,67 +1124,6 @@ for(let i = 0; i < link.length; i++) {
 // --------------------------------------------- //
 
 // --------------------------------------------- //
-// Swiper Slider - Testimonials #01 Start
-// --------------------------------------------- //
-const testimonialsSlider = document.querySelector(".testimonials-slider");
-
-if (testimonialsSlider) {
-  const swiper = new Swiper('.swiper-testimonials', {
-    slidesPerView: 'auto',
-    grabCursor: true,
-    spaceBetween: 30,
-    autoplay: true,
-    delay: 3000,
-    speed: 1000,
-    loop: true,
-    parallax: true,
-    loopFillGroupWithBlank: true,
-    pagination: {
-      el: ".swiper-pagination",
-      type: "fraction",
-    },
-    navigation: {
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev',
-    },
-  });
-};
-// --------------------------------------------- //
-// Swiper Slider - Testimonials #01 End
-// --------------------------------------------- //
-
-// --------------------------------------------- //
-// Swiper Slider - Testimonials #02 Start
-// --------------------------------------------- //
-const testimonialsSlider2 = document.querySelector(".testimonials-slider-2");
-
-if (testimonialsSlider2) {
-  const swiper = new Swiper('.swiper-testimonials-2', {
-    slidesPerView: 1,
-    grabCursor: true,
-    effect: 'fade',
-    spaceBetween: 30,
-    autoplay: true,
-    delay: 3000,
-    speed: 1000,
-    loop: true,
-    parallax: true,
-    loopFillGroupWithBlank: true,
-    pagination: {
-      el: ".swiper-pagination",
-      type: "fraction",
-    },
-    navigation: {
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev',
-    },
-  });
-};
-// --------------------------------------------- //
-// Swiper Slider - Testimonials #02 End
-// --------------------------------------------- //
-
-// --------------------------------------------- //
 // Swiper Slider - Inner Pages Demo Start
 // --------------------------------------------- //
 const innerDemoSlider = document.querySelector(".mxd-demo-swiper:not([data-custom-init])");

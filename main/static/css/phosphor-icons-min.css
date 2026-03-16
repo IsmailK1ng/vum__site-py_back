@@ -1,0 +1,81 @@
+/* Phosphor Icons - only used icons */
+
+@font-face {
+  font-family: "Phosphor-Bold";
+  src: url("../fonts/Phosphor/Phosphor-Bold.woff2") format("woff2"),
+       url("../fonts/Phosphor/Phosphor-Bold.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Phosphor-Fill";
+  src: url("../fonts/Phosphor/Phosphor-Fill.woff2") format("woff2"),
+       url("../fonts/Phosphor/Phosphor-Fill.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Phosphor";
+  src: url("../fonts/Phosphor/Phosphor.woff2") format("woff2"),
+       url("../fonts/Phosphor/Phosphor.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.ph-bold {
+  font-family: "Phosphor-Bold" !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ph-fill {
+  font-family: "Phosphor-Fill" !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ph {
+  font-family: "Phosphor" !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ph-bold.ph-arrow-up-right:before { content: "\e092"; }
+.ph-bold.ph-sun-horizon:before    { content: "\e5b6"; }
+
+.ph-fill.ph-arrow-up-right:before { content: "\e092"; }
+.ph-fill.ph-envelope:before       { content: "\e214"; }
+.ph-fill.ph-map-pin:before        { content: "\e316"; }
+.ph-fill.ph-phone:before          { content: "\e3b8"; }
+.ph-fill.ph-smiley-wink:before    { content: "\e666"; }
+
+.ph.ph-arrow-left:before  { content: "\e058"; }
+.ph.ph-arrow-right:before { content: "\e06c"; }
+.ph.ph-arrow-up:before    { content: "\e08e"; }
+.ph.ph-copyright:before   { content: "\e54a"; }
+.ph.ph-download:before    { content: "\e20a"; }
+.ph.ph-plus:before        { content: "\e3d4"; }
+.ph-bold.ph-moon-stars:before { content: "\e58e"; }

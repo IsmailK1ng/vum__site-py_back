@@ -42,3 +42,5 @@ Desktop.ini
 *.tmp
 *.old
 *.dump
+main/static/css/*.orig
+main/static/css/*purged.css

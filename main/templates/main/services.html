@@ -1,91 +1,18 @@
+{% extends 'main/base.html' %}
 {% load static %}
-{% load seo_tags %} 
-<!DOCTYPE html>
-<html dir="ltr" lang="{{ HTML_LANG }}">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+<link rel="stylesheet" href="{% static 'css/site_service.css' %}">
+{% endblock %}
 
+{% block app_js %}{% endblock %}
 
-    <!-- ========== SEO МЕТА-ДАННЫЕ ========== -->
-    {% include 'main/includes/seo_meta.html' %}
+{% block extra_js %}
+<script defer src="{% static 'js/about.js' %}"></script>
+{% endblock %}
 
-    {% hreflang_tags %}
-    {% canonical_url %}
-    <!-- Favicon -->
-    <link rel="icon" href="{% static 'images/vum-icon-dark.svg' %}" />
-    <link rel="apple-touch-icon" href="{% static 'images/vum-icon-dark.svg' %}">
-
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-5K2BD9C3');</script>
-    <!-- End Google Tag Manager -->
-
-    <!-- Meta Pixel Code -->
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1159924786072799');
-    fbq('track', 'PageView');
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1159924786072799&ev=PageView&noscript=1"
-    /></noscript>
-    <!-- End Meta Pixel Code -->
-
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function(m,e,t,r,i,k,a){
-            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-            m[i].l=1*new Date();
-            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106067065', 'ym');
-
-        ym(106067065, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/106067065" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-
-
-    <meta name="yandex-verification" content="78715d404b789626" />
-    <meta name="google-site-verification" content="xmjQ3Gc6gAMaPe0MydDnP_uYW0EOz-Y-T6Kzkc7ylEA" />
-    <meta name="facebook-domain-verification" content="8d4u99q1mimerz10hkbzvpjywt0rag" />
-
-
-    <!-- Preload Critical CSS -->
-    <link rel="preload" href="{% static 'css/main_site.css' %}" as="style">
-    <link rel="stylesheet" href="{% static 'css/loaders/loader.css' %}">
-    <link rel="stylesheet" href="{% static 'css/plugins.css' %}">
-    <link rel="stylesheet" href="{% static 'css/main_site.css' %}">
-    <link rel="stylesheet" href="{% static 'css/site_main.css' %}">
-    <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
-    <link rel="stylesheet" href="{% static 'css/site_service.css' %}">
-
-    <!-- Theme Colors -->
-    <meta name="theme-color" content="#FAF7F6" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#161616" media="(prefers-color-scheme: dark)">
-    <meta name="msapplication-navbutton-color" content="#161616">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-</head>
-
-<body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5K2BD9C3"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-
+{% block content %}
     <!-- Loader -->
     <div id="loader" class="loader" style="display: none;">
         <div class="loader__wrapper">
@@ -607,12 +534,4 @@
         aria-label="{% if LANGUAGE_CODE == 'uz' %}Yuqoriga{% elif LANGUAGE_CODE == 'ru' %}Наверх{% else %}To top{% endif %}">
         <i class="ph ph-arrow-up" aria-hidden="true"></i>
     </a>
-
-        <!-- Scripts -->
-        <script crossorigin="anonymous" src="{% static 'js/libs.min.js' %}"></script>
-        <script crossorigin="anonymous" src="{% static 'js/favicon-theme.js' %}"></script>
-        <script crossorigin="anonymous" src="{% static 'js/error-logger.js' %}"></script>
-        <script crossorigin="anonymous" src="{% static 'js/faw.js' %}"></script>
-        <script crossorigin="anonymous" src="{% static 'js/about.js' %}"></script>
-    </body>
-    </html>
+{% endblock %}

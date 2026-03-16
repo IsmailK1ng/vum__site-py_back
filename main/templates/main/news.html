@@ -1,104 +1,17 @@
+{% extends 'main/base.html' %}
 {% load static %}
-{% load seo_tags %} 
-<!DOCTYPE html>
-<html dir="ltr" lang="{{ HTML_LANG }}">
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+<link rel="stylesheet" href="{% static 'css/site_news.css' %}">
+{% endblock %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+{% block schema_json %}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","name":"{% if LANGUAGE_CODE == 'uz' %}VUM Yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Новости VUM{% else %}VUM News{% endif %}","itemListElement":[{% for news in news_list %}{"@type":"ListItem","position":{{ forloop.counter }},"item":{"@type":"NewsArticle","headline":"{{ news.title }}","description":"{{ news.desc }}","image":{% if news.preview_image %}"{{ request.scheme }}://{{ request.get_host }}{{ news.preview_image.url }}"{% else %}""{% endif %},"datePublished":"{{ news.created_at|date:'c' }}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'news_detail' news.slug %}","publisher":{"@type":"Organization","name":"Van Universal Motors","logo":{"@type":"ImageObject","url":"{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/logo-vum.png' %}"}}}}{% if not forloop.last %},{% endif %}{% endfor %}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}","item":"{{ request.scheme }}://{{ request.get_host }}/"},{"@type":"ListItem","position":2,"name":"{% if LANGUAGE_CODE == 'uz' %}Yangiliklar{% elif LANGUAGE_CODE == 'ru' %}Новости{% else %}News{% endif %}","item":"{{ request.build_absolute_uri }}"}]}</script>
+{% endblock %}
 
-    {% include 'main/includes/seo_meta.html' %}
-
-    {% hreflang_tags %}
-    {% canonical_url %}
-    
-    
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-5K2BD9C3');</script>
-  <!-- End Google Tag Manager -->
-
-  <!-- Meta Pixel Code -->
-  <script>
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '1159924786072799');
-  fbq('track', 'PageView');
-  </script>
-  <noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=1159924786072799&ev=PageView&noscript=1"
-  /></noscript>
-  <!-- End Meta Pixel Code -->
-
-  <!-- Yandex.Metrika counter -->
-  <script type="text/javascript">
-      (function(m,e,t,r,i,k,a){
-          m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-          m[i].l=1*new Date();
-          for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-          k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-      })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106067065', 'ym');
-
-      ym(106067065, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-  </script>
-  <noscript><div><img src="https://mc.yandex.ru/watch/106067065" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-  <!-- /Yandex.Metrika counter -->
-
-
-  <meta name="yandex-verification" content="78715d404b789626" />
-  <meta name="google-site-verification" content="xmjQ3Gc6gAMaPe0MydDnP_uYW0EOz-Y-T6Kzkc7ylEA" />
-  <meta name="facebook-domain-verification" content="8d4u99q1mimerz10hkbzvpjywt0rag" />
-
-
-
-  <!-- Универсальный favicon -->
-  <link rel="icon" href="{% static 'images/vum-icon-dark.svg' %}" />
-  <!-- Для Apple устройств -->
-  <link rel="apple-touch-icon" href="{% static 'images/vum-icon-dark.svg' %}">
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="{% static 'css/loaders/loader.css' %}">
-  <link rel="stylesheet" href="{% static 'css/plugins.css' %}">
-  <link rel="stylesheet" href="{% static 'css/main_site.css' %}">
-  <link rel="stylesheet" href="{% static 'css/site_main.css' %}">
-  <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
-  <link rel="stylesheet" href="{% static 'css/site_news.css' %}">
-
-  <!-- Browser Color -->
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
-  <meta name="msapplication-navbutton-color" content="#161616">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  
-
-<!-- Schema.org ItemList for News -->
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","name":"{% if LANGUAGE_CODE == 'uz' %}VUM Yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Новости VUM{% else %}VUM News{% endif %}","itemListElement":[{% for news in news_list %}{"@type":"ListItem","position":{{ forloop.counter }},"item":{"@type":"NewsArticle","headline":"{{ news.title }}","description":"{{ news.desc }}","image":{% if news.preview_image %}"{{ request.scheme }}://{{ request.get_host }}{{ news.preview_image.url }}"{% else %}""{% endif %},"datePublished":"{{ news.created_at|date:'c' }}","url":"{{ request.scheme }}://{{ request.get_host }}{% url 'news_detail' news.slug %}","publisher":{"@type":"Organization","name":"Van Universal Motors","logo":{"@type":"ImageObject","url":"{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/logo-vum.png' %}"}}}}{% if not forloop.last %},{% endif %}{% endfor %}]}</script>
-
-  <!-- Schema.org BreadcrumbList -->
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}","item":"{{ request.scheme }}://{{ request.get_host }}/"},{"@type":"ListItem","position":2,"name":"{% if LANGUAGE_CODE == 'uz' %}Yangiliklar{% elif LANGUAGE_CODE == 'ru' %}Новости{% else %}News{% endif %}","item":"{{ request.build_absolute_uri }}"}]}</script>
-  
-</head>
-
-<body>
-  <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5K2BD9C3"
-  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-  <!-- End Google Tag Manager (noscript) -->
-
-   
-  <!-- Loader -->
+{% block content %}
   <div id="loader" style="display: none;" class="loader">
     <div class="loader__wrapper">
       <div class="loader__content">
@@ -109,13 +22,10 @@
     </div>
   </div>
 
-  <!-- Header -->
   {% include 'main/includes/header.html' %}
 
-  <!-- Page Content Start -->
   <div class="mxd-block loading-wrap"></div>
 
-  <!-- Breadcrumbs Start -->
   <div class="mxd-block">
     <div class="mxd-section-filter pre-grid">
       <div class="mxd-section-filter__inner animate-card-3">
@@ -123,28 +33,8 @@
           <div class="section-filter">
             <div aria-label="breadcrumb">
               <ol class="breadcrumb-ol">
-                <li>
-                  <a href="{% url 'home' %}">
-                    {% if LANGUAGE_CODE == 'uz' %}
-                    Bosh sahifa
-                    {% elif LANGUAGE_CODE == 'ru' %}
-                    Главная
-                    {% else %}
-                    Home
-                    {% endif %}
-                  </a>
-                </li>
-                <li class="active">
-                  <a href="{% url 'news' %}">
-                    {% if LANGUAGE_CODE == 'uz' %}
-                    VUM yangiliklar
-                    {% elif LANGUAGE_CODE == 'ru' %}
-                    Новости VUM
-                    {% else %}
-                    VUM News
-                    {% endif %}
-                  </a>
-                </li>
+                <li><a href="{% url 'home' %}">{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}</a></li>
+                <li class="active"><a href="{% url 'news' %}">{% if LANGUAGE_CODE == 'uz' %}VUM yangiliklar{% elif LANGUAGE_CODE == 'ru' %}Новости VUM{% else %}VUM News{% endif %}</a></li>
               </ol>
             </div>
           </div>
@@ -152,47 +42,27 @@
       </div>
     </div>
   </div>
-  <!-- Breadcrumbs End -->
 
-  <!-- Hero Section Start -->
   <div class="mxd-hero-07__top">
     <h1 class="mxd-hero-07__title">
-      {% if LANGUAGE_CODE == 'uz' %}
-      VUM. Yangiliklar.
-      {% elif LANGUAGE_CODE == 'ru' %}
-      VUM. Новости.
-      {% else %}
-      VUM. News.
-      {% endif %}
+      {% if LANGUAGE_CODE == 'uz' %}VUM. Yangiliklar.{% elif LANGUAGE_CODE == 'ru' %}VUM. Новости.{% else %}VUM. News.{% endif %}
     </h1>
     <div class="mxd-hero-07__marquee loading__item">
       <div class="marquee marquee-right--gsap bright">
         <div class="marquee__toright">
-          <!-- Marquee Item 1 -->
           <div class="marquee__item one-line item-regular text">
             <p class="marquee__text">VUM</p>
             <div class="marquee__image">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="currentColor">
-                <path fill="currentColor"
-                  d="M78.4,38.4c0,0-11.8,0-15.8,0c-1.6,0-4.8-0.2-7.1-0.8c-2.3-0.6-4.3-0.8-6.3-2.4c-2-1.2-3.5-3.2-4.7-4.8 c-1.2-1.6-1.6-3.6-2-5.5c-0.3-1.5-0.7-4.3-0.8-5.9c-0.2-4.3,0-17.4,0-17.4C41.8,0.8,41,0,40.2,0s-1.6,0.8-1.6,1.6c0,0,0,13.1,0,17.4 c0,1.6-0.6,4.3-0.8,5.9c-0.3,2-0.8,4-2,5.5c-1.2,2-2.8,3.6-4.7,4.8s-4,1.8-6.3,2.4c-1.9,0.5-4.7,0.6-6.7,0.8c-3.9,0.4-16.6,0-16.6,0 C0.8,38.4,0,39.2,0,40c0,0.8,0.8,1.6,1.6,1.6c0,0,12.2,0,16.6,0c1.6,0,4.8,0.3,6.7,0.8c2.3,0.6,4.3,0.8,6.3,2.4 c1.6,1.2,3.2,2.8,4.3,4.4c1.2,2,2.1,3.9,2.4,6.3c0.2,1.7,0.7,4.7,0.8,6.7c0.2,4,0,16.2,0,16.2c0,0.8,0.8,1.6,1.6,1.6 s1.6-0.8,1.6-1.6c0,0,0-12.3,0-16.2c0-1.6,0.5-5.1,0.8-6.7c0.5-2.3,0.8-4.4,2.4-6.3c1.2-1.6,2.8-3.2,4.3-4.4c2-1.2,3.9-2,6.3-2.4 c1.8-0.3,5.1-0.7,7.1-0.8c3.5-0.2,15.8,0,15.8,0c0.8,0,1.6-0.8,1.6-1.6C80,39.2,79.2,38.4,78.4,38.4C78.4,38.4,78.4,38.4,78.4,38.4z" />
+                <path fill="currentColor" d="M78.4,38.4c0,0-11.8,0-15.8,0c-1.6,0-4.8-0.2-7.1-0.8c-2.3-0.6-4.3-0.8-6.3-2.4c-2-1.2-3.5-3.2-4.7-4.8 c-1.2-1.6-1.6-3.6-2-5.5c-0.3-1.5-0.7-4.3-0.8-5.9c-0.2-4.3,0-17.4,0-17.4C41.8,0.8,41,0,40.2,0s-1.6,0.8-1.6,1.6c0,0,0,13.1,0,17.4 c0,1.6-0.6,4.3-0.8,5.9c-0.3,2-0.8,4-2,5.5c-1.2,2-2.8,3.6-4.7,4.8s-4,1.8-6.3,2.4c-1.9,0.5-4.7,0.6-6.7,0.8c-3.9,0.4-16.6,0-16.6,0 C0.8,38.4,0,39.2,0,40c0,0.8,0.8,1.6,1.6,1.6c0,0,12.2,0,16.6,0c1.6,0,4.8,0.3,6.7,0.8c2.3,0.6,4.3,0.8,6.3,2.4 c1.6,1.2,3.2,2.8,4.3,4.4c1.2,2,2.1,3.9,2.4,6.3c0.2,1.7,0.7,4.7,0.8,6.7c0.2,4,0,16.2,0,16.2c0,0.8,0.8,1.6,1.6,1.6 s1.6-0.8,1.6-1.6c0,0,0-12.3,0-16.2c0-1.6,0.5-5.1,0.8-6.7c0.5-2.3,0.8-4.4,2.4-6.3c1.2-1.6,2.8-3.2,4.3-4.4c2-1.2,3.9-2,6.3-2.4 c1.8-0.3,5.1-0.7,7.1-0.8c3.5-0.2,15.8,0,15.8,0c0.8,0,1.6-0.8,1.6-1.6C80,39.2,79.2,38.4,78.4,38.4C78.4,38.4,78.4,38.4,78.4,38.4z"/>
               </svg>
             </div>
           </div>
-          <!-- Marquee Item 2 -->
           <div class="marquee__item one-line item-regular text">
-            <p class="marquee__text">
-              {% if LANGUAGE_CODE == 'uz' %}
-              Yangiliklar
-              {% elif LANGUAGE_CODE == 'ru' %}
-              Новости
-              {% else %}
-              News
-              {% endif %}
-            </p>
+            <p class="marquee__text">{% if LANGUAGE_CODE == 'uz' %}Yangiliklar{% elif LANGUAGE_CODE == 'ru' %}Новости{% else %}News{% endif %}</p>
             <div class="marquee__image">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="currentColor">
-                <path fill="currentColor"
-                  d="M78.4,38.4c0,0-11.8,0-15.8,0c-1.6,0-4.8-0.2-7.1-0.8c-2.3-0.6-4.3-0.8-6.3-2.4c-2-1.2-3.5-3.2-4.7-4.8 c-1.2-1.6-1.6-3.6-2-5.5c-0.3-1.5-0.7-4.3-0.8-5.9c-0.2-4.3,0-17.4,0-17.4C41.8,0.8,41,0,40.2,0s-1.6,0.8-1.6,1.6c0,0,0,13.1,0,17.4 c0,1.6-0.6,4.3-0.8,5.9c-0.3,2-0.8,4-2,5.5c-1.2,2-2.8,3.6-4.7,4.8s-4,1.8-6.3,2.4c-1.9,0.5-4.7,0.6-6.7,0.8c-3.9,0.4-16.6,0-16.6,0 C0.8,38.4,0,39.2,0,40c0,0.8,0.8,1.6,1.6,1.6c0,0,12.2,0,16.6,0c1.6,0,4.8,0.3,6.7,0.8c2.3,0.6,4.3,0.8,6.3,2.4 c1.6,1.2,3.2,2.8,4.3,4.4c1.2,2,2.1,3.9,2.4,6.3c0.2,1.7,0.7,4.7,0.8,6.7c0.2,4,0,16.2,0,16.2c0,0.8,0.8,1.6,1.6,1.6 s1.6-0.8,1.6-1.6c0,0,0-12.3,0-16.2c0-1.6,0.5-5.1,0.8-6.7c0.5-2.3,0.8-4.4,2.4-6.3c1.2-1.6,2.8-3.2,4.3-4.4c2-1.2,3.9-2,6.3-2.4 c1.8-0.3,5.1-0.7,7.1-0.8c3.5-0.2,15.8,0,15.8,0c0.8,0,1.6-0.8,1.6-1.6C80,39.2,79.2,38.4,78.4,38.4C78.4,38.4,78.4,38.4,78.4,38.4z" />
+                <path fill="currentColor" d="M78.4,38.4c0,0-11.8,0-15.8,0c-1.6,0-4.8-0.2-7.1-0.8c-2.3-0.6-4.3-0.8-6.3-2.4c-2-1.2-3.5-3.2-4.7-4.8 c-1.2-1.6-1.6-3.6-2-5.5c-0.3-1.5-0.7-4.3-0.8-5.9c-0.2-4.3,0-17.4,0-17.4C41.8,0.8,41,0,40.2,0s-1.6,0.8-1.6,1.6c0,0,0,13.1,0,17.4 c0,1.6-0.6,4.3-0.8,5.9c-0.3,2-0.8,4-2,5.5c-1.2,2-2.8,3.6-4.7,4.8s-4,1.8-6.3,2.4c-1.9,0.5-4.7,0.6-6.7,0.8c-3.9,0.4-16.6,0-16.6,0 C0.8,38.4,0,39.2,0,40c0,0.8,0.8,1.6,1.6,1.6c0,0,12.2,0,16.6,0c1.6,0,4.8,0.3,6.7,0.8c2.3,0.6,4.3,0.8,6.3,2.4 c1.6,1.2,3.2,2.8,4.3,4.4c1.2,2,2.1,3.9,2.4,6.3c0.2,1.7,0.7,4.7,0.8,6.7c0.2,4,0,16.2,0,16.2c0,0.8,0.8,1.6,1.6,1.6 s1.6-0.8,1.6-1.6c0,0,0-12.3,0-16.2c0-1.6,0.5-5.1,0.8-6.7c0.5-2.3,0.8-4.4,2.4-6.3c1.2-1.6,2.8-3.2,4.3-4.4c2-1.2,3.9-2,6.3-2.4 c1.8-0.3,5.1-0.7,7.1-0.8c3.5-0.2,15.8,0,15.8,0c0.8,0,1.6-0.8,1.6-1.6C80,39.2,79.2,38.4,78.4,38.4C78.4,38.4,78.4,38.4,78.4,38.4z"/>
               </svg>
             </div>
           </div>
@@ -200,17 +70,12 @@
       </div>
     </div>
   </div>
-  <!-- Hero Section End -->
 
-  <!-- News Cards Grid Start -->
   <div class="mxd-block">
     <div class="mxd-card-grid mxd-grid-item" id="card-grid">
-
       {% for news in news_list %}
-      <!-- Card -->
       <div class="mxd-card">
-        <a href="{% url 'news_detail' news.slug %}" class="slide-content"
-          style="text-decoration: none; color: inherit;">
+        <a href="{% url 'news_detail' news.slug %}" class="slide-content" style="text-decoration: none; color: inherit;">
           <div class="slide-header-row">
             <div class="slide-header__wrapper">
               <div class="slide-header">
@@ -219,8 +84,7 @@
             </div>
             <div class="slide-header__meta">
               <svg class="slide-header__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                <path
-                  d="M224 64C206.3 64 192 78.3 192 96L192 128L160 128C124.7 128 96 156.7 96 192L96 240L544 240L544 192C544 156.7 515.3 128 480 128L448 128L448 96C448 78.3 433.7 64 416 64C398.3 64 384 78.3 384 96L384 128L256 128L256 96C256 78.3 241.7 64 224 64zM96 288L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 288L96 288z" />
+                <path d="M224 64C206.3 64 192 78.3 192 96L192 128L160 128C124.7 128 96 156.7 96 192L96 240L544 240L544 192C544 156.7 515.3 128 480 128L448 128L448 96C448 78.3 433.7 64 416 64C398.3 64 384 78.3 384 96L384 128L256 128L256 96C256 78.3 241.7 64 224 64zM96 288L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 288L96 288z"/>
               </svg>
               <span class="slide-header__date">{{ news.created_at|date:"d.m.y" }}</span>
             </div>
@@ -238,316 +102,142 @@
         </a>
       </div>
       {% empty %}
-      <!-- Empty State -->
       <div class="mxd-card" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
-        <p style="font-size: 18px; color: #888;">
-          {% if LANGUAGE_CODE == 'uz' %}
-          Hozircha yangiliklar yo'q
-          {% elif LANGUAGE_CODE == 'ru' %}
-          Пока нет новостей
-          {% else %}
-          No news yet
-          {% endif %}
-        </p>
+        <p style="font-size: 18px; color: #888;">{% if LANGUAGE_CODE == 'uz' %}Hozircha yangiliklar yo'q{% elif LANGUAGE_CODE == 'ru' %}Пока нет новостей{% else %}No news yet{% endif %}</p>
       </div>
       {% endfor %}
-
     </div>
   </div>
-  <!-- News Cards Grid End -->
 
-  <!-- Pagination Block Start -->
   <div class="mxd-block">
     <div class="mxd-blog-pagination">
       <div class="mxd-blog-pagination__inner">
-        <div class="mxd-blog-pagination__items" id="pagination">
-          <!-- Pagination buttons will be generated by JavaScript -->
-        </div>
+        <div class="mxd-blog-pagination__items" id="pagination"></div>
       </div>
     </div>
   </div>
-  <!-- Pagination Block End -->
 
-  <!-- Footer -->
   {% include 'main/includes/footer.html' %}
 
-  <!-- To Top Button -->
   <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
     <i class="ph ph-arrow-up"></i>
   </a>
+{% endblock %}
 
-  <!-- Scripts -->
-  <script crossorigin="anonymous" src="{% static 'js/libs.min.js' %}"></script>
-  <script crossorigin="anonymous" src="{% static 'js/app.js' %}"></script>
-  <script crossorigin="anonymous" src="{% static 'js/favicon-theme.js' %}"></script>
-  <script crossorigin="anonymous" src="{% static 'js/error-logger.js' %}"></script>
-  <script crossorigin="anonymous" src="{% static 'js/faw.js' %}"></script>
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('touchstart', () => {}, { passive: true });
+    document.addEventListener('wheel', () => {}, { passive: true });
 
-  <!-- Pagination & Marquee Script -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // ========== PASSIVE LISTENERS ==========
-      document.addEventListener('touchstart', () => { }, { passive: true });
-      document.addEventListener('wheel', () => { }, { passive: true });
+    const CONFIG = { CARDS_PER_PAGE: 6, ANIMATION_DELAY: 0.1, SCROLL_OFFSET: 100, MARQUEE_DURATION: 60 };
+    const prevText = '{{ LANGUAGE_CODE }}' === 'uz' ? 'Ortga' : ('{{ LANGUAGE_CODE }}' === 'ru' ? 'Назад' : 'Previous');
+    const nextText = '{{ LANGUAGE_CODE }}' === 'uz' ? 'Oldinga' : ('{{ LANGUAGE_CODE }}' === 'ru' ? 'Вперёд' : 'Next');
+    const elements = { cardGrid: document.getElementById('card-grid'), pagination: document.getElementById('pagination') };
+    if (!elements.cardGrid || !elements.pagination) return;
+    const cards = Array.from(elements.cardGrid.getElementsByClassName('mxd-card'));
+    if (cards.length === 0) return;
+    const totalPages = Math.ceil(cards.length / CONFIG.CARDS_PER_PAGE);
+    let currentPage = 1;
 
-      // ========== КОНФИГУРАЦИЯ ==========
-      const CONFIG = {
-        CARDS_PER_PAGE: 6,
-        ANIMATION_DELAY: 0.1,
-        SCROLL_OFFSET: 100,
-        MARQUEE_DURATION: 60
-      };
-
-      // ========== ПЕРЕВОДЫ ДЛЯ ПАГИНАЦИИ ==========
-      const prevText = '{{ LANGUAGE_CODE }}' === 'uz' ? 'Ortga' : ('{{ LANGUAGE_CODE }}' === 'ru' ? 'Назад' : 'Previous');
-      const nextText = '{{ LANGUAGE_CODE }}' === 'uz' ? 'Oldinga' : ('{{ LANGUAGE_CODE }}' === 'ru' ? 'Вперёд' : 'Next');
-
-      // ========== ПОЛУЧЕНИЕ ЭЛЕМЕНТОВ ==========
-      const elements = {
-        cardGrid: document.getElementById('card-grid'),
-        pagination: document.getElementById('pagination')
-      };
-
-      // Проверка наличия элементов
-      if (!elements.cardGrid || !elements.pagination) {
-        return;
-      }
-
-      const cards = Array.from(elements.cardGrid.getElementsByClassName('mxd-card'));
-
-      if (cards.length === 0) {
-        return;
-      }
-
-      const totalPages = Math.ceil(cards.length / CONFIG.CARDS_PER_PAGE);
-      let currentPage = 1;
-
-      // ========== ФУНКЦИЯ: ПОКАЗАТЬ СТРАНИЦУ ==========
-      function showPage(pageNumber) {
-        const start = (pageNumber - 1) * CONFIG.CARDS_PER_PAGE;
-        const end = pageNumber * CONFIG.CARDS_PER_PAGE;
-
-        // Показываем/скрываем карточки с анимацией
-        cards.forEach((card, index) => {
-          if (index >= start && index < end) {
-            card.style.display = 'block';
-            card.style.animation = 'cardAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-            card.style.animationDelay = `${(index - start) * CONFIG.ANIMATION_DELAY}s`;
-          } else {
-            card.style.display = 'none';
-          }
-        });
-
-        // Обновляем активные кнопки
-        updatePaginationButtons(pageNumber);
-
-        // Плавный скролл при смене страницы
-        if (currentPage !== pageNumber) {
-          window.scrollTo({
-            top: elements.cardGrid.offsetTop - CONFIG.SCROLL_OFFSET,
-            behavior: 'smooth'
-          });
-        }
-
-        currentPage = pageNumber;
-      }
-
-      // ========== ФУНКЦИЯ: ОБНОВИТЬ КНОПКИ ПАГИНАЦИИ ==========
-      function updatePaginationButtons(pageNumber) {
-        // Обновляем номера страниц
-        const pageButtons = elements.pagination.querySelectorAll('.blog-pagination-number');
-        pageButtons.forEach(button => {
-          const page = parseInt(button.dataset.page);
-          button.classList.toggle('active', page === pageNumber);
-        });
-
-        // Обновляем кнопки навигации
-        const prevButton = elements.pagination.querySelector('.prev');
-        const nextButton = elements.pagination.querySelector('.next');
-
-        if (prevButton) {
-          prevButton.classList.toggle('disabled', pageNumber === 1);
-        }
-
-        if (nextButton) {
-          nextButton.classList.toggle('disabled', pageNumber === totalPages);
-        }
-      }
-
-      // ========== ФУНКЦИЯ: СОЗДАТЬ КНОПКУ НАВИГАЦИИ ==========
-      function createNavigationButton(type, text, icon, slideClass, iconAfter = false) {
-        const button = document.createElement('a');
-        button.href = 'javascript:void(0);';
-        button.className = `mxd-blog-pagination__item blog-pagination-control ${type} btn btn-anim btn-line-small btn-bright anim-no-delay ${slideClass}`;
-        button.dataset.page = type;
-        button.setAttribute('role', 'button');
-        button.setAttribute('aria-label', text);
-
-        button.innerHTML = iconAfter
-          ? `<span class="btn-caption">${text}</span><i class="ph ${icon}"></i>`
-          : `<i class="ph ${icon}"></i><span class="btn-caption">${text}</span>`;
-
-        // Обработчик клика
-        button.addEventListener('click', (e) => {
-          e.preventDefault();
-          if (button.classList.contains('disabled')) return;
-
-          if (type === 'prev' && currentPage > 1) {
-            showPage(currentPage - 1);
-          } else if (type === 'next' && currentPage < totalPages) {
-            showPage(currentPage + 1);
-          }
-        });
-
-        return button;
-      }
-
-      // ========== ФУНКЦИЯ: СОЗДАТЬ КНОПКУ СТРАНИЦЫ ==========
-      function createPageButton(pageNumber) {
-        const button = document.createElement('a');
-        button.href = 'javascript:void(0);';
-        button.className = `mxd-blog-pagination__item blog-pagination-number btn btn-anim`;
-        button.dataset.page = pageNumber;
-        button.innerHTML = `<span class="btn-caption">${pageNumber}</span>`;
-        button.setAttribute('role', 'button');
-        button.setAttribute('aria-label', `Sahifa ${pageNumber}`);
-
-        if (pageNumber === currentPage) {
-          button.classList.add('active');
-        }
-
-        // Обработчик клика
-        button.addEventListener('click', (e) => {
-          e.preventDefault();
-          showPage(pageNumber);
-        });
-
-        return button;
-      }
-
-      // ========== ФУНКЦИЯ: СОЗДАТЬ ПАГИНАЦИЮ ==========
-      function createPagination() {
-        // Очищаем контейнер
-        elements.pagination.innerHTML = '';
-
-        // Кнопка "Назад"
-        const prevButton = createNavigationButton('prev', prevText, 'ph-arrow-left', 'slide-left');
-        elements.pagination.appendChild(prevButton);
-
-        // Кнопки страниц
-        for (let i = 1; i <= totalPages; i++) {
-          const pageButton = createPageButton(i);
-          elements.pagination.appendChild(pageButton);
-        }
-
-        // Кнопка "Вперёд"
-        const nextButton = createNavigationButton('next', nextText, 'ph-arrow-right', 'slide-right', true);
-        elements.pagination.appendChild(nextButton);
-
-        // Анимация текста кнопок
-        animateButtonText();
-
-        // Показываем первую страницу
-        showPage(currentPage);
-      }
-
-      // ========== ФУНКЦИЯ: АНИМАЦИЯ ТЕКСТА КНОПОК ==========
-      function animateButtonText() {
-        const buttons = elements.pagination.querySelectorAll('.btn-anim .btn-caption');
-
-        buttons.forEach(button => {
-          const text = button.textContent;
-          const letters = text.split('').map(char => {
-            return `<span class="btn-anim__letter">${char === ' ' ? '&nbsp;' : char}</span>`;
-          }).join('');
-
-          button.innerHTML = letters;
-        });
-      }
-
-      // ========== ФУНКЦИЯ: MARQUEE АНИМАЦИЯ ==========
-      function initMarquee() {
-        const marqueeContainers = document.querySelectorAll('.marquee-right--gsap');
-
-        marqueeContainers.forEach(container => {
-          const marqueeContent = container.querySelector('.marquee__toright');
-
-          if (!marqueeContent) return;
-
-          // Дублируем контент 3 раза для бесшовной анимации
-          const originalHTML = marqueeContent.innerHTML;
-          marqueeContent.innerHTML = originalHTML + originalHTML + originalHTML;
-
-          // Проверяем наличие GSAP
-          if (typeof gsap === 'undefined') {
-            return;
-          }
-
-          // Анимация слева направо - БЕЗ РЕАКЦИИ НА СКРОЛЛ
-          gsap.to(marqueeContent, {
-            duration: CONFIG.MARQUEE_DURATION,
-            ease: 'none',
-            repeat: -1,
-            modifiers: {
-              x: gsap.utils.unitize(x => parseFloat(x) % 33.333)
-            }
-          });
-        });
-      }
-
-      // ========== ИНИЦИАЛИЗАЦИЯ ==========
-      try {
-        // Создаём пагинацию
-        createPagination();
-
-        // Инициализируем marquee
-        initMarquee();
-
-      } catch (error) {
-        console.error('❌ Ошибка при инициализации:', error);
-      }
-
-      // ========== КЛАВИАТУРНАЯ НАВИГАЦИЯ ==========
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft' && currentPage > 1) {
-          e.preventDefault();
-          showPage(currentPage - 1);
-        } else if (e.key === 'ArrowRight' && currentPage < totalPages) {
-          e.preventDefault();
-          showPage(currentPage + 1);
-        }
+    function showPage(pageNumber) {
+      const start = (pageNumber - 1) * CONFIG.CARDS_PER_PAGE;
+      const end = pageNumber * CONFIG.CARDS_PER_PAGE;
+      cards.forEach((card, index) => {
+        if (index >= start && index < end) {
+          card.style.display = 'block';
+          card.style.animation = 'cardAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+          card.style.animationDelay = `${(index - start) * CONFIG.ANIMATION_DELAY}s`;
+        } else { card.style.display = 'none'; }
       });
+      updatePaginationButtons(pageNumber);
+      if (currentPage !== pageNumber) { window.scrollTo({ top: elements.cardGrid.offsetTop - CONFIG.SCROLL_OFFSET, behavior: 'smooth' }); }
+      currentPage = pageNumber;
+    }
 
-      // ========== TOUCH SWIPE НАВИГАЦИЯ (для мобильных) ==========
-      let touchStartX = 0;
-      let touchEndX = 0;
+    function updatePaginationButtons(pageNumber) {
+      elements.pagination.querySelectorAll('.blog-pagination-number').forEach(button => {
+        button.classList.toggle('active', parseInt(button.dataset.page) === pageNumber);
+      });
+      const prevButton = elements.pagination.querySelector('.prev');
+      const nextButton = elements.pagination.querySelector('.next');
+      if (prevButton) prevButton.classList.toggle('disabled', pageNumber === 1);
+      if (nextButton) nextButton.classList.toggle('disabled', pageNumber === totalPages);
+    }
 
-      elements.cardGrid.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-      }, { passive: true });
+    function createNavigationButton(type, text, icon, slideClass, iconAfter = false) {
+      const button = document.createElement('a');
+      button.href = 'javascript:void(0);';
+      button.className = `mxd-blog-pagination__item blog-pagination-control ${type} btn btn-anim btn-line-small btn-bright anim-no-delay ${slideClass}`;
+      button.dataset.page = type;
+      button.setAttribute('role', 'button');
+      button.setAttribute('aria-label', text);
+      button.innerHTML = iconAfter ? `<span class="btn-caption">${text}</span><i class="ph ${icon}"></i>` : `<i class="ph ${icon}"></i><span class="btn-caption">${text}</span>`;
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (button.classList.contains('disabled')) return;
+        if (type === 'prev' && currentPage > 1) showPage(currentPage - 1);
+        else if (type === 'next' && currentPage < totalPages) showPage(currentPage + 1);
+      });
+      return button;
+    }
 
-      elements.cardGrid.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-      }, { passive: true });
+    function createPageButton(pageNumber) {
+      const button = document.createElement('a');
+      button.href = 'javascript:void(0);';
+      button.className = `mxd-blog-pagination__item blog-pagination-number btn btn-anim`;
+      button.dataset.page = pageNumber;
+      button.innerHTML = `<span class="btn-caption">${pageNumber}</span>`;
+      button.setAttribute('role', 'button');
+      if (pageNumber === currentPage) button.classList.add('active');
+      button.addEventListener('click', (e) => { e.preventDefault(); showPage(pageNumber); });
+      return button;
+    }
 
-      function handleSwipe() {
-        const swipeThreshold = 50;
-        const diff = touchStartX - touchEndX;
+    function animateButtonText() {
+      elements.pagination.querySelectorAll('.btn-anim .btn-caption').forEach(button => {
+        const text = button.textContent;
+        button.innerHTML = text.split('').map(char => `<span class="btn-anim__letter">${char === ' ' ? '&nbsp;' : char}</span>`).join('');
+      });
+    }
 
-        if (Math.abs(diff) > swipeThreshold) {
-          if (diff > 0 && currentPage < totalPages) {
-            // Swipe left - next page
-            showPage(currentPage + 1);
-          } else if (diff < 0 && currentPage > 1) {
-            // Swipe right - previous page
-            showPage(currentPage - 1);
-          }
-        }
-      }
+    function createPagination() {
+      elements.pagination.innerHTML = '';
+      elements.pagination.appendChild(createNavigationButton('prev', prevText, 'ph-arrow-left', 'slide-left'));
+      for (let i = 1; i <= totalPages; i++) elements.pagination.appendChild(createPageButton(i));
+      elements.pagination.appendChild(createNavigationButton('next', nextText, 'ph-arrow-right', 'slide-right', true));
+      animateButtonText();
+      showPage(currentPage);
+    }
+
+    function initMarquee() {
+      document.querySelectorAll('.marquee-right--gsap').forEach(container => {
+        const marqueeContent = container.querySelector('.marquee__toright');
+        if (!marqueeContent) return;
+        const originalHTML = marqueeContent.innerHTML;
+        marqueeContent.innerHTML = originalHTML + originalHTML + originalHTML;
+        if (typeof gsap === 'undefined') return;
+        gsap.to(marqueeContent, { duration: CONFIG.MARQUEE_DURATION, ease: 'none', repeat: -1, modifiers: { x: gsap.utils.unitize(x => parseFloat(x) % 33.333) } });
+      });
+    }
+
+    try { createPagination(); initMarquee(); } catch (error) { console.error('Error:', error); }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' && currentPage > 1) { e.preventDefault(); showPage(currentPage - 1); }
+      else if (e.key === 'ArrowRight' && currentPage < totalPages) { e.preventDefault(); showPage(currentPage + 1); }
     });
-  </script>
 
-</body>
-
-</html>
+    let touchStartX = 0, touchEndX = 0;
+    elements.cardGrid.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    elements.cardGrid.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0 && currentPage < totalPages) showPage(currentPage + 1);
+        else if (diff < 0 && currentPage > 1) showPage(currentPage - 1);
+      }
+    }, { passive: true });
+  });
+</script>
+{% endblock %}

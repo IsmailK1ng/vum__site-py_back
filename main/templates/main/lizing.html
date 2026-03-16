@@ -1,360 +1,22 @@
+{% extends 'main/base.html' %}
 {% load static %}
-{% load seo_tags %} 
-<!DOCTYPE html>
-<html dir="ltr" lang="{{ HTML_LANG }}">
+{% load seo_tags %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/site_lizing.css' %}">
+<link rel="stylesheet" href="{% static 'css/more_info.css' %}">
+{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+{% block recaptcha %}
+<script async defer src="https://www.google.com/recaptcha/api.js?render=6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow"></script>
+{% endblock %}
 
-    
-    
-    {% include 'main/includes/seo_meta.html' %}
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+{% endblock %}
 
-    {% hreflang_tags %}
-    {% canonical_url %}
-
-    <!-- Favicon -->
-    <link rel="icon" href="{% static 'images/vum-icon-dark.svg' %}" />
-    <link rel="apple-touch-icon" href="{% static 'images/vum-icon-dark.svg' %}">
-
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-5K2BD9C3');</script>
-    <!-- End Google Tag Manager -->
-
-    <!-- Meta Pixel Code -->
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1159924786072799');
-    fbq('track', 'PageView');
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1159924786072799&ev=PageView&noscript=1"
-    /></noscript>
-    <!-- End Meta Pixel Code -->
-
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function(m,e,t,r,i,k,a){
-            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-            m[i].l=1*new Date();
-            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106067065', 'ym');
-
-        ym(106067065, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/106067065" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-
-
-    <meta name="yandex-verification" content="78715d404b789626" />
-    <meta name="google-site-verification" content="xmjQ3Gc6gAMaPe0MydDnP_uYW0EOz-Y-T6Kzkc7ylEA" />
-    <meta name="facebook-domain-verification" content="8d4u99q1mimerz10hkbzvpjywt0rag" />
-
-    <!-- Preload Critical CSS -->
-    <link rel="preload" href="{% static 'css/main_site.css' %}" as="style">
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="{% static 'css/loaders/loader.css' %}">
-    <link rel="stylesheet" href="{% static 'css/plugins.css' %}">
-    <link rel="stylesheet" href="{% static 'css/main_site.css' %}">
-    <link rel="stylesheet" href="{% static 'css/site_main.css' %}">
-    <link rel="stylesheet" href="{% static 'css/site_lizing.css' %}">
-
-    <!-- Theme Colors -->
-    <meta name="theme-color" content="#FAF7F6" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#161616" media="(prefers-color-scheme: dark)">
-    <meta name="msapplication-navbutton-color" content="#161616">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <!-- Google reCAPTCHA v3 -->
-    <script src="https://www.google.com/recaptcha/api.js?render=6LecXTAsAAAAAN5LP2bcc7RHYV-0clG7B9p7KZow"></script>
-    <!-- Стили для модальных окон -->
-    <style>
-        .faw-modal {
-            display: none !important;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 99999;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .faw-modal.active {
-            display: flex !important;
-        }
-
-        .faw-modal__overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 1;
-        }
-
-        .faw-modal__content {
-            position: relative;
-            z-index: 2;
-            background: white;
-            border-radius: 8px;
-            padding: 40px;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .faw-modal__close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #333;
-            transition: color 0.2s;
-            z-index: 3;
-        }
-
-        .faw-modal__close:hover {
-            color: #000;
-        }
-
-        .faw-modal__header {
-            margin-bottom: 25px;
-        }
-
-        .faw-modal__title {
-            font-size: 24px;
-            font-weight: 700;
-            margin: 0 0 10px 0;
-        }
-
-        .faw-modal__subtitle {
-            font-size: 14px;
-            color: #666;
-            margin: 0;
-            line-height: 1.6;
-        }
-
-        .faw-modal__form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .faw-form__group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .faw-form__input,
-        .faw-form__select,
-        .faw-form__textarea {
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            font-family: inherit;
-        }
-
-        .faw-form__input:focus,
-        .faw-form__select:focus,
-        .faw-form__textarea:focus {
-            outline: none;
-            border-color: #333;
-            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
-        }
-
-        .faw-form__submit {
-            padding: 12px 20px;
-            background: #333;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: background 0.3s;
-        }
-
-        .faw-form__submit:hover {
-            background: #555;
-        }
-
-        .faw-form__status {
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            text-align: center;
-            transition: opacity 0.3s;
-        }
-
-        .faw-form__status.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .faw-form__status.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .faw-form__status.hidden {
-            display: none;
-        }
-
-        .faw-form__status.show {
-            display: block;
-            opacity: 1;
-        }
-
-        [data-theme="dark"] .faw-modal__content {
-            background: #222;
-            color: #fff;
-        }
-
-        [data-theme="dark"] .faw-modal__close {
-            color: #ccc;
-        }
-
-        [data-theme="dark"] .faw-form__input,
-        [data-theme="dark"] .faw-form__select,
-        [data-theme="dark"] .faw-form__textarea {
-            background: #333;
-            color: #fff;
-            border-color: #444;
-        }
-
-        [data-theme="dark"] .faw-form__submit {
-            background: #666;
-        }
-
-        [data-theme="dark"] .faw-modal__subtitle {
-            color: #bbb;
-        }
-
-        #downloadPdfBtn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 24px;
-            background: #333;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        #downloadPdfBtn:hover {
-            background: #555;
-        }
-
-        [data-theme="dark"] #downloadPdfBtn {
-            background: #666;
-        }
-
-        [data-theme="dark"] #downloadPdfBtn:hover {
-            background: #888;
-        }
-
-        .consent-agree-label {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 20px;
-            cursor: pointer;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .consent-agree-input {
-            width: 18px;
-            height: 18px;
-            min-width: 18px;
-            margin-top: 2px;
-            cursor: pointer;
-            accent-color: #1976d2;
-        }
-
-        .consent-agree-text {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            align-items: center;
-            color: #666;
-        }
-
-        .consent-agree-link {
-            color: #1976d2;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .consent-agree-link:hover {
-            color: #1565c0;
-            text-decoration: underline;
-        }
-
-        [data-theme="dark"] .consent-agree-text {
-            color: #bbb;
-        }
-
-        [data-theme="dark"] .consent-agree-link {
-            color: #64b5f6;
-        }
-    </style>
-</head>
-
-<body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5K2BD9C3"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
+{% block content %}
 
     <!-- Header -->
     {% include 'main/includes/header.html' %}
@@ -893,17 +555,6 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script crossorigin="anonymous" src="{% static 'js/libs.min.js' %}"></script>
-    <script crossorigin="anonymous" src="{% static 'js/app.js' %}"></script>
-  <script crossorigin="anonymous" src="{% static 'js/favicon-theme.js' %}"></script>
-    <script crossorigin="anonymous" src="{% static 'js/error-logger.js' %}"></script>
-    <script crossorigin="anonymous" src="{% static 'js/faw.js' %}"></script>
-    <!-- jsPDF для генерации PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-
-
     <!-- Scroll Script -->
     <script>
         (function () {
@@ -1379,7 +1030,7 @@
                         product: 'FAW Trucks - Лизинг',
                         message: lizingContactForm.Message.value || '',
                         referer: window.location.href,
-                        utm_data: window.getUTMData ? JSON.stringify(window.getUTMData()) : '{}',
+                        utm_data: window.getUTMData ? window.getUTMData() : {},
                         visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null,
                         recaptcha_token: recaptchaToken  // ← ТОКЕН
                     };
@@ -1823,6 +1474,5 @@ async function generateAndDownloadLizingPDF() {
     } else {
         initLizingModal();
     }
-</script>
-</body>
-</html>
+    </script>
+{% endblock %}
