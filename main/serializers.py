@@ -37,6 +37,7 @@ class ContactFormSerializer(serializers.ModelSerializer):
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     priority_display = serializers.CharField(source='get_priority_display', read_only=True)
     region_display = serializers.CharField(source='get_region_display', read_only=True)
+    region = serializers.CharField(required=False, allow_blank=True, default='')
     
     class Meta:
         model = ContactForm
@@ -119,6 +120,19 @@ class ContactFormSerializer(serializers.ModelSerializer):
         
         contact_form = super().create(validated_data)
         return contact_form
+    
+    def validate_region(self, value):
+        from main.models import REGION_LABELS
+        
+        valid_keys = {key for key, _ in ContactForm._meta.get_field('region').choices}
+        if value in valid_keys:
+            return value
+        
+        for key, labels in REGION_LABELS.items():
+            if value in labels.values():
+                return key
+        
+        return value
 
 
 class JobApplicationSerializer(serializers.ModelSerializer):
@@ -472,6 +486,7 @@ class BecomeADealerPageSerializer(serializers.ModelSerializer):
 
 
 class BecomeADealerApplicationSerializer(serializers.ModelSerializer):
+    region = serializers.CharField(required=False, allow_blank=True, default='')
     class Meta:
         model = BecomeADealerApplication
         fields = [
@@ -479,6 +494,16 @@ class BecomeADealerApplicationSerializer(serializers.ModelSerializer):
             'region', 'phone', 'message'
         ]
     
+    def validate_region(self, value):
+        from main.models import REGION_LABELS
+        valid_keys = {key for key, _ in BecomeADealerApplication._meta.get_field('region').choices}
+        if value in valid_keys:
+            return value
+        for key, labels in REGION_LABELS.items():
+            if value in labels.values():
+                return key
+        return value
+
     def create(self, validated_data):
         validated_data['status'] = 'new'
         validated_data['priority'] = 'medium'
