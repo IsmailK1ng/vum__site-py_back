@@ -4,27 +4,46 @@ from django.utils.text import slugify
 from unidecode import unidecode
 from ckeditor.fields import RichTextField  
 from django.utils import timezone
-from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from datetime import timedelta, time as datetime_time
+from django.core.cache import cache 
 # ========== ОБЩИЕ CHOICES ==========
 
 REGION_CHOICES = [
-    ('Toshkent shahri', 'Toshkent shahri'),
-    ('Andijon viloyati', 'Andijon viloyati'),
-    ('Buxoro viloyati', 'Buxoro viloyati'),
-    ('Fargʻona viloyati', 'Fargʻona viloyati'),
-    ('Jizzax viloyati', 'Jizzax viloyati'),
-    ('Xorazm viloyati', 'Xorazm viloyati'),
-    ('Namangan viloyati', 'Namangan viloyati'),
-    ('Navoiy viloyati', 'Navoiy viloyati'),
-    ('Qashqadaryo viloyati', 'Qashqadaryo viloyati'),
-    ('Samarqand viloyati', 'Samarqand viloyati'),
-    ('Sirdaryo viloyati', 'Sirdaryo viloyati'),
-    ('Surxondaryo viloyati', 'Surxondaryo viloyati'),
-    ('Toshkent viloyati', 'Toshkent viloyati'),
-    ('Qoraqalpogʻiston Respublikasi', 'Qoraqalpogʻiston Respublikasi'),
+    ('tashkent_city',    'Toshkent shahri'),
+    ('andijan',          'Andijon viloyati'),
+    ('bukhara',          'Buxoro viloyati'),
+    ('fergana',          "Farg'ona viloyati"),
+    ('jizzakh',          'Jizzax viloyati'),
+    ('khorezm',          'Xorazm viloyati'),
+    ('namangan',         'Namangan viloyati'),
+    ('navoi',            'Navoiy viloyati'),
+    ('kashkadarya',      'Qashqadaryo viloyati'),
+    ('samarkand',        'Samarqand viloyati'),
+    ('syrdarya',         'Sirdaryo viloyati'),
+    ('surkhandarya',     'Surxondaryo viloyati'),
+    ('tashkent_region',  'Toshkent viloyati'),
+    ('karakalpakstan',   "Qoraqalpog'iston Respublikasi"),
 ]
+
+REGION_LABELS = {
+    'tashkent_city':   {'ru': 'г. Ташкент',                   'uz': 'Toshkent shahri',             'en': 'Tashkent city'},
+    'andijan':         {'ru': 'Андижанская область',           'uz': 'Andijon viloyati',            'en': 'Andijan region'},
+    'bukhara':         {'ru': 'Бухарская область',             'uz': 'Buxoro viloyati',             'en': 'Bukhara region'},
+    'fergana':         {'ru': 'Ферганская область',            'uz': "Farg'ona viloyati",           'en': 'Fergana region'},
+    'jizzakh':         {'ru': 'Джизакская область',            'uz': 'Jizzax viloyati',             'en': 'Jizzakh region'},
+    'khorezm':         {'ru': 'Хорезмская область',            'uz': 'Xorazm viloyati',             'en': 'Khorezm region'},
+    'namangan':        {'ru': 'Наманганская область',          'uz': 'Namangan viloyati',           'en': 'Namangan region'},
+    'navoi':           {'ru': 'Навоийская область',            'uz': 'Navoiy viloyati',             'en': 'Navoi region'},
+    'kashkadarya':     {'ru': 'Кашкадарьинская область',       'uz': 'Qashqadaryo viloyati',        'en': 'Kashkadarya region'},
+    'samarkand':       {'ru': 'Самаркандская область',         'uz': 'Samarqand viloyati',          'en': 'Samarkand region'},
+    'syrdarya':        {'ru': 'Сырдарьинская область',         'uz': 'Sirdaryo viloyati',           'en': 'Syrdarya region'},
+    'surkhandarya':    {'ru': 'Сурхандарьинская область',      'uz': 'Surxondaryo viloyati',        'en': 'Surkhandarya region'},
+    'tashkent_region': {'ru': 'Ташкентская область',           'uz': 'Toshkent viloyati',           'en': 'Tashkent region'},
+    'karakalpakstan':  {'ru': 'Республика Каракалпакстан',     'uz': "Qoraqalpog'iston Respublikasi", 'en': 'Republic of Karakalpakstan'},
+}
 
 STATUS_CHOICES = [
     ('new', 'Новая'),
@@ -41,7 +60,6 @@ PRIORITY_CHOICES = [
 # ========== 01. КОНТЕНТ - НОВОСТИ ==========
 
 class News(models.Model):
-    """Новости компании"""
     title = models.CharField("Заголовок", max_length=255)
     desc = models.TextField("Краткое описание для карточки", max_length=200, help_text="Отображается в превью новости")
     slug = models.SlugField("URL", max_length=255, unique=True, blank=True, help_text="Генерируется автоматически из заголовка")
@@ -63,7 +81,6 @@ class News(models.Model):
         return f"{self.created_at.strftime('%d.%m.%Y')} — {self.title[:50]}"
     
     def save(self, *args, **kwargs):
-        """Автогенерация slug из title при сохранении"""
         if not self.slug:
             title_for_slug = (
                 getattr(self, 'title_uz', None) or 
@@ -85,7 +102,6 @@ class News(models.Model):
         super().save(*args, **kwargs)
 
 class NewsBlock(models.Model):
-    """Гибкие блоки внутри новости"""
     BLOCK_TYPES = [
         ('text', 'Текст'),
         ('image', 'Изображение'),
@@ -129,7 +145,6 @@ class NewsBlock(models.Model):
 # ========== 02. КОНТЕНТ - ПРОДУКТЫ ==========
 
 class FeatureIcon(models.Model):
-    """Иконки для характеристик"""
     name = models.CharField("Название", max_length=100, unique=True)
     icon = models.FileField("Иконка", upload_to="features/icons/")
     order = models.PositiveIntegerField("Порядок", default=0)
@@ -143,7 +158,6 @@ class FeatureIcon(models.Model):
         return self.name
 
 class Product(models.Model):
-    """Грузовики FAW"""
     CATEGORY_CHOICES = [
         ('samosval', 'Samosvallar'),
         ('maxsus', 'Maxsus texnika'),
@@ -154,7 +168,6 @@ class Product(models.Model):
         ('tiger_vr', 'Tiger VR'),
     ]
     
-    # Основные поля
     title = models.CharField("Название модели", max_length=255)
     slug = models.SlugField("URL", max_length=255, unique=True)
     category = models.CharField("Категория", max_length=50, choices=CATEGORY_CHOICES)
@@ -247,7 +260,6 @@ class Product(models.Model):
         return f"{self.get_category_display()} — {self.title}"
     
     def get_slider_data(self):
-        """Возвращает данные для слайдера в формате JSON"""
         return {
             'year': self.slider_year,
             'title': self.title,
@@ -259,18 +271,15 @@ class Product(models.Model):
         }
     
     def get_all_categories(self):
-        """Получить все категории продукта (основную + дополнительные)"""
         categories = [self.category]
         
         if self.categories:
             additional = [cat.strip() for cat in self.categories.split(',') if cat.strip()]
             categories.extend(additional)
         
-        # Убираем дубликаты, сохраняя порядок
         return list(dict.fromkeys(categories))
         
     def get_all_categories_display(self):
-        """Получить названия всех категорий"""
         category_names = []
         for cat_slug in self.get_all_categories():
             for slug, name in self.CATEGORY_CHOICES:
@@ -280,7 +289,6 @@ class Product(models.Model):
         return category_names
 
 class ProductParameter(models.Model):
-    """Параметры грузовика"""
     CATEGORY_CHOICES = [
         ('main', _('Основные параметры')),
         ('engine', _('Двигатель')),
@@ -312,7 +320,6 @@ class ProductParameter(models.Model):
         return f"{self.get_category_display()}: {self.text[:50]}"
 
 class ProductFeature(models.Model):
-    """Характеристики с иконками"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='features')
     icon = models.ForeignKey(FeatureIcon, on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField("Название", max_length=100)
@@ -324,7 +331,6 @@ class ProductFeature(models.Model):
         ordering = ['order']
     
     def save(self, *args, **kwargs):
-        # Если order не задан (0 или пустой), ставим следующий по порядку
         if not self.order and self.product_id:
             max_order = ProductFeature.objects.filter(
                 product=self.product
@@ -338,7 +344,6 @@ class ProductFeature(models.Model):
         return self.name
 
 class ProductCardSpec(models.Model):
-    """Характеристики для карточки"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='card_specs')
     icon = models.ForeignKey(FeatureIcon, on_delete=models.SET_NULL, null=True, blank=True)
     value = models.CharField("Значение", max_length=100)
@@ -353,7 +358,6 @@ class ProductCardSpec(models.Model):
         return self.value
 
 class ProductGallery(models.Model):
-    """Галерея продукта"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery')
     image = models.ImageField("Изображение", upload_to="products/gallery/")
     order = models.PositiveIntegerField("Порядок", default=0)
@@ -369,7 +373,6 @@ class ProductGallery(models.Model):
 # ========== 03. КОНТЕНТ - ДИЛЕРЫ ==========
 
 class BecomeADealerPage(models.Model):
-    """Страница 'Стать дилером' (Singleton)"""
     title = models.CharField(
         "Заголовок", 
         max_length=255, 
@@ -406,7 +409,6 @@ class BecomeADealerPage(models.Model):
         return obj
 
 class DealerRequirement(models.Model):
-    """Требования к дилерам"""
     page = models.ForeignKey(
         BecomeADealerPage, 
         on_delete=models.CASCADE, 
@@ -424,7 +426,6 @@ class DealerRequirement(models.Model):
         return self.text[:50]
 
 class DealerService(models.Model):
-    """Услуги дилеров"""
     name = models.CharField("Название", max_length=100, unique=True)
     slug = models.SlugField("URL", max_length=100, unique=True)
     order = models.PositiveIntegerField("Порядок", default=0)
@@ -439,7 +440,6 @@ class DealerService(models.Model):
         return self.name
 
 class Dealer(models.Model):
-    """Дилеры FAW"""
     name = models.CharField("Название", max_length=255)
     city = models.CharField("Город", max_length=100)
     address = models.TextField("Адрес")
@@ -480,13 +480,11 @@ class Dealer(models.Model):
         ordering = ['order', 'city', 'name']
     
     def __str__(self):
-        # ✅ Улучшенный вывод для истории версий
         return f"{self.name} ({self.city})"
 
 # ========== 04. ЗАЯВКИ ==========
 
 class ContactForm(models.Model):
-    """Общие заявки с сайта"""
     name = models.CharField("Имя", max_length=255)
     region = models.CharField("Регион", max_length=100, choices=REGION_CHOICES)
     phone = models.CharField("Телефон", max_length=50)
@@ -536,7 +534,6 @@ class ContactForm(models.Model):
     )
     admin_comment = models.TextField("Комментарий", blank=True, null=True)
     
-    # Поля amoCRM (уже есть ниже)
     amocrm_status = models.CharField(
         "Статус amoCRM",
         max_length=20,
@@ -580,7 +577,6 @@ class ContactForm(models.Model):
         return f"{self.name} - {self.phone} ({self.created_at.strftime('%d.%m.%Y')})"
 
 class BecomeADealerApplication(models.Model):
-    """Заявки на дилерство"""
     name = models.CharField("ФИО", max_length=255)
     region = models.CharField("Регион", max_length=100, choices=REGION_CHOICES)
     phone = models.CharField("Телефон", max_length=50)
@@ -612,7 +608,6 @@ class BecomeADealerApplication(models.Model):
 # ========== 05. ВАКАНСИИ ==========
 
 class Vacancy(models.Model):
-    """Вакансии компании"""
     title = models.CharField("Название", max_length=255)
     slug = models.SlugField("URL", max_length=255, unique=True)
     short_description = models.TextField("Описание", max_length=500, blank=True)
@@ -628,7 +623,6 @@ class Vacancy(models.Model):
         ordering = ['order', '-created_at']
 
     def __str__(self):
-        # ✅ Улучшенный вывод для истории версий
         status = "✅ Активна" if self.is_active else "❌ Неактивна"
         return f"{self.title} — {status}"
     
@@ -636,7 +630,6 @@ class Vacancy(models.Model):
         return self.applications.count()
 
 class VacancyResponsibility(models.Model):
-    """Обязанности вакансии"""
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='responsibilities')
     title = models.CharField("Заголовок", max_length=255, blank=True)
     text = models.TextField("Описание")
@@ -651,7 +644,6 @@ class VacancyResponsibility(models.Model):
         return self.title or self.text[:50]
 
 class VacancyRequirement(models.Model):
-    """Требования к кандидату"""
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='requirements')
     text = models.CharField("Требование", max_length=500)
     order = models.PositiveIntegerField("Порядок", default=0)
@@ -665,7 +657,6 @@ class VacancyRequirement(models.Model):
         return self.text[:50]
 
 class VacancyCondition(models.Model):
-    """Условия работы"""
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='conditions')
     text = models.CharField("Условие", max_length=500)
     order = models.PositiveIntegerField("Порядок", default=0)
@@ -679,7 +670,6 @@ class VacancyCondition(models.Model):
         return self.text[:50]
 
 class VacancyIdealCandidate(models.Model):
-    """Портрет идеального кандидата"""
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='ideal_candidates')
     text = models.CharField("Качество", max_length=500)
     order = models.PositiveIntegerField("Порядок", default=0)
@@ -693,7 +683,6 @@ class VacancyIdealCandidate(models.Model):
         return self.text[:50]
 
 class JobApplication(models.Model):
-    """Заявки на вакансии"""
     vacancy = models.ForeignKey(
         Vacancy, 
         on_delete=models.CASCADE, 
@@ -718,13 +707,11 @@ class JobApplication(models.Model):
         return f"{self.vacancy.title} - {self.region}"
     
     def get_file_size(self):
-        """Размер файла резюме в MB"""
         return round(self.resume.size / (1024 * 1024), 2) if self.resume else 0
 
 # ========== amoCRM ТОКЕНЫ ==========
 
 class AmoCRMToken(models.Model):
-    """Хранение токенов доступа к amoCRM API"""
     access_token = models.TextField("Access Token")
     refresh_token = models.TextField("Refresh Token")
     expires_at = models.DateTimeField("Истекает")
@@ -742,53 +729,41 @@ class AmoCRMToken(models.Model):
             return f"❌ Токен истёк или не настроен"
     
     def save(self, *args, **kwargs):
-        # Всегда только 1 запись в таблице
         self.pk = 1
         super().save(*args, **kwargs)
     
     @classmethod
     def get_instance(cls):
-        """Получить единственный экземпляр токена"""
         obj, created = cls.objects.get_or_create(
             pk=1,
             defaults={
                 'access_token': '',
                 'refresh_token': '',
-                'expires_at': timezone.now() - timedelta(days=1)  # ← В ПРОШЛОМ!
+                'expires_at': timezone.now() - timedelta(days=1)  
             }
         )
         return obj
     
     def is_expired(self):
-        """Проверка: токен истёк или скоро истечёт?"""
         
         if not self.access_token or not self.refresh_token:
             return True
         
-        # Обновляем за 1 час до истечения
         return timezone.now() + timedelta(hours=1) >= self.expires_at
 
 # ========== DASHBOARD (прокси-модель для админки) ==========
 
 class Dashboard(models.Model):
-    """
-    Заглушка для отображения Dashboard в админке Django.
-    Это не настоящая таблица, используется только для меню.
-    """
-    
     class Meta:
-        managed = False  # Django не создаёт таблицу в БД
+        managed = False  
         verbose_name = " Dashboard"
         verbose_name_plural = " Аналитика Dashboard"
         
-        # Указываем на несуществующую таблицу
         db_table = 'dashboard_proxy_table'
         
-        # ✅ ДОБАВЛЯЕМ default_permissions для управления правами
-        default_permissions = ('view',)  # Только право на просмотр
+        default_permissions = ('view',)  
 
 class Promotion(models.Model):
-    """Акции и специальные предложения"""
     title = models.CharField(max_length=200, verbose_name=_("Заголовок"))
     description = models.TextField(verbose_name=_("Описание"))
     image = models.ImageField(upload_to='promotions/', blank=True, null=True, verbose_name=_("Изображение"))
@@ -816,7 +791,6 @@ class Promotion(models.Model):
         return self.title
     
     def is_valid(self):
-        """Проверка актуальности акции"""
         now = timezone.now()
         if not self.is_active:
             return False
@@ -829,11 +803,6 @@ class Promotion(models.Model):
 # ========== SEO META DATA ==========
 
 class PageMeta(models.Model):
-    """
-    SEO мета-данные для страниц сайта.
-    Мультиязычная модель для управления SEO через админку.
-    """
-    
     MODEL_CHOICES = [
         ('Page', 'Статическая страница'),
         ('Post', 'Новость'),
@@ -962,26 +931,20 @@ class PageMeta(models.Model):
         return f"{self.get_model_display()} — {self.key}"
     
     def save(self, *args, **kwargs):
-        """Автоматически заполняем key_order перед сохранением"""
         if self.key.isdigit():
-            # Если key - число, сохраняем как число
             self.key_order = int(self.key)
         else:
-            # Если key - текст (home, about), ставим большое число (в конец)
             self.key_order = 999999
         
         super().save(*args, **kwargs)
     
     def get_og_title(self):
-        """Возвращает OG title или обычный title"""
         return self.og_title or self.title
     
     def get_og_description(self):
-        """Возвращает OG description или обычный description"""
         return self.og_description or self.description
     
     def get_full_url(self):
-        """Генерирует полный URL на основе model и key"""
         if self.og_url:
             return self.og_url
         
@@ -1042,5 +1005,690 @@ class FAQItem(models.Model):
 
     def __str__(self):
         return self.question or f"FAQ #{self.pk}"
-        
-        return base_url
+    
+
+# ========== КОНТАКТЫ БОТА ==========
+
+class BotContacts(models.Model):
+
+    phone_main = models.CharField(
+        "Основной телефон",
+        max_length=50,
+        default="+998 71 000-00-00",
+        help_text="Например: +998 71 234-56-78",
+    )
+    phone_secondary = models.CharField(
+        "Дополнительный телефон",
+        max_length=50,
+        blank=True,
+        null=True,
+    )
+    email = models.EmailField(
+        "Email",
+        default="info@faw.uz",
+    )
+    address_ru = models.TextField(
+        "Адрес (RU)",
+        default="г. Ташкент, ул. Абдулла Каххара 2А",
+    )
+    address_uz = models.TextField(
+        "Адрес (UZ)",
+        default="Toshkent sh., Abdulla Kaxxar ko'chasi 2A",
+    )
+    address_en = models.TextField(
+        "Адрес (EN)",
+        blank=True,
+        null=True,
+    )
+    working_hours_ru = models.CharField(
+        "Рабочее время (RU)",
+        max_length=200,
+        default="Пн–Пт: 09:00–18:00, Сб: 09:00–14:00",
+    )
+    working_hours_uz = models.CharField(
+        "Рабочее время (UZ)",
+        max_length=200,
+        default="Du–Ju: 09:00–18:00, Sha: 09:00–14:00",
+    )
+    working_hours_en = models.CharField(
+        "Рабочее время (EN)",
+        max_length=200,
+        blank=True,
+        null=True,
+    )
+
+    # Соцсети
+    telegram_channel = models.CharField(
+        "Telegram канал",
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Например: https://t.me/faw_uzbekistan",
+    )
+    instagram = models.CharField(
+        "Instagram",
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Например: https://instagram.com/faw.uz",
+    )
+    youtube = models.CharField(
+        "YouTube",
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text="Ссылка на канал",
+    )
+    facebook = models.CharField(
+        "Facebook",
+        max_length=200,
+        blank=True,
+        null=True,
+    )
+    linkedin = models.CharField(
+        "LinkedIn",
+        max_length=200,
+        blank=True,
+        null=True,
+    )
+    website = models.URLField(
+        "Сайт",
+        default="https://faw.uz",
+    )
+
+    map_url = models.URLField(
+        "Ссылка на карту (2GIS/Google)",
+        blank=True,
+        null=True,
+        help_text="Ссылка на офис в 2GIS или Google Maps",
+    )
+
+    updated_at = models.DateTimeField("Обновлено", auto_now=True)
+
+    class Meta:
+        verbose_name = "Бот — Контакты"
+        verbose_name_plural = "Бот — Контакты"
+
+    def __str__(self):
+        return f"Контакты FAW.UZ (обновлено {self.updated_at.strftime('%d.%m.%Y')})"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get_instance(cls):
+        obj, _ = cls.objects.get_or_create(
+            pk=1,
+            defaults={
+                'phone_main': '+998 71 000-00-00',
+                'email': 'info@faw.uz',
+            },
+        )
+        return obj
+
+class TelegramUser(models.Model):
+
+    LANGUAGE_CHOICES = [
+        ('ru', 'Русский'),
+        ('uz', "O'zbekcha"),
+        ('en', 'English'),
+    ]
+
+    STATUS_CHOICES = [
+        ('new', 'Новый'),
+        ('interested', 'Интересующийся'),
+        ('hot', 'Горячий'),
+        ('client', 'Клиент'),
+        ('vip', 'VIP'),
+    ]
+
+    telegram_id = models.BigIntegerField(
+        "Telegram ID",
+        unique=True,
+        db_index=True,
+    )
+    username = models.CharField(
+        "Username",
+        max_length=100,
+        blank=True,
+        null=True,
+    )
+    first_name = models.CharField(
+        "Имя",
+        max_length=100,
+        blank=True,
+        null=True,
+    )
+    last_name = models.CharField(
+        "Фамилия",
+        max_length=100,
+        blank=True,
+        null=True,
+    )
+    middle_name = models.CharField(
+        "Отчество",
+        max_length=100,
+        blank=True,
+        null=True,
+    )
+    phone = models.CharField(
+        "Телефон",
+        max_length=20,
+        blank=True,
+        null=True,
+    )
+    age = models.PositiveSmallIntegerField(
+        "Возраст",
+        blank=True,
+        null=True,
+    )
+    region = models.CharField(
+        "Регион",
+        max_length=100,
+        choices=REGION_CHOICES,
+        blank=True,
+        null=True,
+    )
+    language = models.CharField(
+        "Язык",
+        max_length=5,
+        choices=LANGUAGE_CHOICES,
+        default='ru',
+    )
+    status = models.CharField(
+        "Статус клиента",
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='new',
+    )
+    is_blocked = models.BooleanField(
+        "Заблокировал бота",
+        default=False,
+        help_text="Пользователь нажал Stop или заблокировал бота",
+    )
+    notifications_enabled = models.BooleanField(
+        "Уведомления включены",
+        default=True,
+    )
+    # Источник — откуда пришёл в бот
+    referral_code = models.CharField(
+        "Реферальный код",
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="Код из ссылки ?start=ref_XXXXX",
+    )
+    referred_by = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='referrals',
+        verbose_name="Пригласил",
+    )
+    # Статистика
+    total_requests = models.PositiveIntegerField(
+        "Всего заявок",
+        default=0,
+    )
+    last_active = models.DateTimeField(
+        "Последняя активность",
+        auto_now=True,
+    )
+    created_at = models.DateTimeField(
+        "Дата регистрации",
+        auto_now_add=True,
+    )
+
+    class Meta:
+        verbose_name = "Бот — Пользователь"
+        verbose_name_plural = "Бот — Пользователи"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        name = self.first_name or self.username or str(self.telegram_id)
+        return f"{name} ({self.get_language_display()})"
+
+    @property
+    def full_name(self) -> str:
+        parts = filter(None, [self.last_name, self.first_name, self.middle_name])
+        return " ".join(parts) or "—"
+
+    def get_referral_link(self, bot_username: str) -> str:
+        return f"https://t.me/{bot_username}?start=ref_{self.telegram_id}"
+
+
+class TestDriveRequest(models.Model):
+
+    STATUS_CHOICES = [
+        ('new', 'Новая'),
+        ('confirmed', 'Подтверждена'),
+        ('visited', 'Клиент пришёл'),
+        ('no_show', 'Не явился'),
+        ('cancelled', 'Отменена'),
+    ]
+
+    user = models.ForeignKey(
+        TelegramUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='test_drives',
+        verbose_name="Пользователь",
+    )
+    dealer = models.ForeignKey(
+        Dealer,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='test_drive_requests',
+        verbose_name="Дилер",
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='test_drive_requests',
+        verbose_name="Модель",
+    )
+
+    client_name = models.CharField("Имя клиента", max_length=200)
+    client_phone = models.CharField("Телефон клиента", max_length=20)
+
+    preferred_date = models.DateField("Желаемая дата")
+    preferred_time = models.CharField(
+        "Желаемое время",
+        max_length=10,
+        help_text="Например: 10:00",
+    )
+    status = models.CharField(
+        "Статус",
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='new',
+        db_index=True,
+    )
+    reminder_sent = models.BooleanField(
+        "Напоминание отправлено",
+        default=False,
+    )
+    feedback_requested = models.BooleanField(
+        "Запрос отзыва отправлен",
+        default=False,
+    )
+    admin_comment = models.TextField(
+        "Комментарий менеджера",
+        blank=True,
+        null=True,
+    )
+    created_at = models.DateTimeField("Дата заявки", auto_now_add=True)
+    updated_at = models.DateTimeField("Дата обновления", auto_now=True)
+
+    class Meta:
+        verbose_name = "Бот — Заявка тест-драйв"
+        verbose_name_plural = "Бот — Заявки тест-драйв"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        date_str = self.preferred_date.strftime('%d.%m.%Y') if self.preferred_date else '—'
+        product_name = self.product.title if self.product else '—'
+        return f"{self.client_name} — {product_name} — {date_str}"
+
+
+class BotConfig(models.Model):
+    bot_token = models.CharField(
+        "Токен бота",
+        max_length=200,
+        help_text="Получить у @BotFather. При смене — бот автоматически переключится на новый.",
+    )
+    bot_username = models.CharField(
+        "Username бота",
+        max_length=100,
+        help_text="Например: faw_uz_bot (без @)",
+        blank=True,
+        null=True,
+    )
+    notify_chat_id = models.CharField(
+        "Chat ID для уведомлений",
+        max_length=50,
+        help_text="ID группы/канала куда летят уведомления о заявках из бота",
+    )
+    notify_chat_id_2 = models.CharField(
+        "Chat ID для уведомлений (резерв)",
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="Дополнительный чат, например личка старшего менеджера",
+    )
+    site_url = models.URLField(
+        "URL сайта",
+        default="https://faw.uz",
+        help_text="Используется в кнопках 'Подробнее на сайте'",
+    )
+    is_active = models.BooleanField(
+        "Бот активен",
+        default=True,
+        help_text="Если выключить — бот перестанет отвечать на сообщения",
+    )
+    use_webhook = models.BooleanField(
+        "Использовать Webhook",
+        default=False,
+        help_text="True = Webhook (прод), False = Polling (локально)",
+    )
+    webhook_url = models.URLField(
+        "Webhook URL",
+        blank=True,
+        null=True,
+        help_text="Например: https://faw.uz/bot/webhook/",
+    )
+    work_hours_start = models.TimeField(
+        "Начало рабочего дня",
+        default=datetime_time(9, 0),
+        help_text="Время по Ташкенту (UTC+5)",
+    )
+    work_hours_end = models.TimeField(
+        "Конец рабочего дня",
+        default=datetime_time(18, 0),
+        help_text="Время по Ташкенту (UTC+5)",
+    )
+
+    catalog_file = models.FileField(
+        "PDF каталог",
+        upload_to="bot/catalog/",
+        blank=True,
+        null=True,
+        help_text="PDF файл каталога. Отправляется пользователю по кнопке 'Скачать каталог'",
+    )
+
+    updated_at = models.DateTimeField("Последнее обновление", auto_now=True)
+
+    class Meta:
+        verbose_name = "Бот — Конфигурация"
+        verbose_name_plural = "Бот — Конфигурация"
+
+    def __str__(self):
+        status = "✅ Активен" if self.is_active else "❌ Выключен"
+        return f"Конфигурация бота — {status}"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get_instance(cls):
+        obj, _ = cls.objects.get_or_create(
+            pk=1,
+            defaults={
+                'bot_token': '',
+                'notify_chat_id': '',
+                'is_active': False,
+            },
+        )
+        return obj
+
+
+class BotMessage(models.Model):
+
+    LANGUAGE_CHOICES = [
+        ('ru', 'Русский'),
+        ('uz', "O'zbekcha"),
+        ('en', 'English'),
+    ]
+
+    key = models.CharField(
+        "Ключ",
+        max_length=100,
+        db_index=True,
+        help_text="Уникальный идентификатор текста. Например: welcome, main_menu, td_success",
+    )
+    language = models.CharField(
+        "Язык",
+        max_length=5,
+        choices=LANGUAGE_CHOICES,
+    )
+    text = models.TextField(
+        "Текст",
+        help_text="Поддерживает HTML теги: <b>, <i>, <code>. Переменные: {name}, {phone}",
+    )
+    description = models.CharField(
+        "Описание (для менеджера)",
+        max_length=200,
+        blank=True,
+        help_text="Где используется этот текст",
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Бот — Текст"
+        verbose_name_plural = "Бот — Тексты"
+        unique_together = ('key', 'language')
+        ordering = ['key', 'language']
+
+    def __str__(self):
+        return f"{self.key} [{self.language}]"
+
+
+class BotMenuItem(models.Model):
+    KEY_CHOICES = [
+        ('catalog', '🚗 Каталог'),
+        ('dealers', '🏢 Дилеры'),
+        ('news', '📰 Новости'),
+        ('promotions', '🎯 Акции'),
+        ('test_drive', '📋 Тест-драйв'),
+        ('lead', '📞 Оставить заявку'),
+        ('leasing', '💰 Лизинг'),
+        ('faq', '❓ FAQ'),
+        ('contacts', '📍 Контакты'),
+        ('profile', '👤 Профиль'),
+        ('language', '🌐 Язык'),
+    ]
+
+    key = models.CharField(
+        "Ключ",
+        max_length=50,
+        choices=KEY_CHOICES,
+        unique=True,
+    )
+    label_ru = models.CharField("Название (RU)", max_length=50)
+    label_uz = models.CharField("Название (UZ)", max_length=50)
+    label_en = models.CharField("Название (EN)", max_length=50)
+    emoji = models.CharField(
+        "Эмодзи",
+        max_length=5,
+        default="📌",
+    )
+    order = models.PositiveSmallIntegerField(
+        "Порядок",
+        default=0,
+        help_text="Чем меньше число — тем выше кнопка",
+    )
+    is_active = models.BooleanField(
+        "Активен",
+        default=True,
+        help_text="Скрыть пункт меню без удаления",
+    )
+
+    class Meta:
+        verbose_name = "Бот — Пункт меню"
+        verbose_name_plural = "Бот — Меню"
+        ordering = ['order']
+
+    def __str__(self):
+        status = "✅" if self.is_active else "❌"
+        return f"{status} {self.order}. {self.emoji} {self.label_ru}"
+
+    def get_label(self, language: str) -> str:
+        labels = {'ru': self.label_ru, 'uz': self.label_uz, 'en': self.label_en}
+        label = labels.get(language, self.label_ru)
+        if self.emoji:
+            return f"{self.emoji} {label}"
+        return label
+
+
+class BotBroadcast(models.Model):
+    TARGET_CHOICES = [
+        ('all', 'Все пользователи'),
+        ('ru', 'Только русскоязычные'),
+        ('uz', "Только узбекоязычные"),
+        ('en', 'Только англоязычные'),
+        ('hot', 'Горячие клиенты'),
+        ('vip', 'VIP клиенты'),
+        ('active_30', 'Активные за 30 дней'),
+        ('region', 'По региону'),
+    ]
+
+    STATUS_CHOICES = [
+        ('draft', 'Черновик'),
+        ('scheduled', 'Запланирована'),
+        ('sending', 'Отправляется'),
+        ('done', 'Отправлена'),
+        ('failed', 'Ошибка'),
+    ]
+
+    title = models.CharField(
+        "Название",
+        max_length=200,
+        help_text="Внутреннее название для менеджера",
+    )
+    text_ru = models.TextField("Текст (RU)", blank=True)
+    text_uz = models.TextField("Текст (UZ)", blank=True)
+    text_en = models.TextField("Текст (EN)", blank=True)
+    image = models.ImageField(
+        "Изображение",
+        upload_to="bot/broadcasts/",
+        blank=True,
+        null=True,
+        help_text="Опционально — прикрепить фото к рассылке",
+    )
+    button_text = models.CharField(
+        "Текст кнопки",
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Например: Узнать подробнее",
+    )
+    button_url = models.URLField(
+        "Ссылка кнопки",
+        blank=True,
+        null=True,
+    )
+    target = models.CharField(
+        "Аудитория",
+        max_length=20,
+        choices=TARGET_CHOICES,
+        default='all',
+    )
+    target_region = models.CharField(
+        "Регион (если выбран по региону)",
+        max_length=100,
+        choices=REGION_CHOICES,
+        blank=True,
+        null=True,
+    )
+    scheduled_at = models.DateTimeField(
+        "Запланировано на",
+        blank=True,
+        null=True,
+        help_text="Оставить пустым = отправить сразу после статуса 'Запланирована'",
+    )
+    status = models.CharField(
+        "Статус",
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='draft',
+        db_index=True,
+    )
+    total_recipients = models.PositiveIntegerField("Получателей", default=0)
+    sent_count = models.PositiveIntegerField("Отправлено", default=0)
+    failed_count = models.PositiveIntegerField("Ошибок", default=0)
+    blocked_count = models.PositiveIntegerField("Заблокировали бота", default=0)
+
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Создал",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    sent_at = models.DateTimeField("Отправлено в", blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Бот — Рассылка"
+        verbose_name_plural = "Бот — Рассылки"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.title} [{self.get_status_display()}]"
+
+    def get_text(self, language: str) -> str:
+        texts = {'ru': self.text_ru, 'uz': self.text_uz, 'en': self.text_en}
+        return texts.get(language) or self.text_ru
+
+
+class ProductWishlist(models.Model):
+    user = models.ForeignKey(
+        TelegramUser,
+        on_delete=models.CASCADE,
+        related_name='wishlist',
+        verbose_name="Пользователь",
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='wishlisted_by',
+        verbose_name="Продукт",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Бот — Избранное"
+        verbose_name_plural = "Бот — Избранное"
+        unique_together = ('user', 'product')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user} → {self.product.title}"
+
+
+class ProductViewHistory(models.Model):
+    user = models.ForeignKey(
+        TelegramUser,
+        on_delete=models.CASCADE,
+        related_name='view_history',
+        verbose_name="Пользователь",
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='views',
+        verbose_name="Продукт",
+    )
+    view_count = models.PositiveIntegerField("Количество просмотров", default=1)
+    last_viewed = models.DateTimeField("Последний просмотр", auto_now=True)
+
+    class Meta:
+        verbose_name = "Бот — История просмотров"
+        verbose_name_plural = "Бот — История просмотров"
+        unique_together = ('user', 'product')
+        ordering = ['-last_viewed']
+
+    def __str__(self):
+        return f"{self.user} → {self.product.title} ({self.view_count}x)"
+    
+# ═══════════════════════════════════════════════════════════════════
+# СИГНАЛЫ — автоматический сброс кеша бота при изменении в Admin
+# ═══════════════════════════════════════════════════════════════════
+
+@receiver(post_save, sender=BotContacts)
+def clear_bot_contacts_cache(sender, instance, **kwargs):
+    cache.delete('bot_contacts')
+
+
+@receiver(post_save, sender=BotConfig)
+def clear_bot_config_cache(sender, instance, **kwargs):
+    cache.delete('bot_config')
+
+
+@receiver(post_save, sender=BotMessage)
+def clear_bot_message_cache(sender, instance, **kwargs):
+    cache.delete(f'bot_msg_{instance.key}_{instance.language}')

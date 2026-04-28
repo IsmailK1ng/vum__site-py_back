@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.utils import timezone  # ← ДОБАВИТЬ
-from datetime import timedelta      # ← ДОБАВИТЬ
+from django.utils import timezone  
+from datetime import timedelta     
 from main.models import ContactForm, AmoCRMToken
 from unittest.mock import patch, MagicMock
 import json

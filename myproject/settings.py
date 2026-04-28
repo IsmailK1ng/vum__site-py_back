@@ -364,8 +364,17 @@ LOGGING = {
             'formatter': 'verbose',
             'encoding': 'utf-8',
         },
+        'bot_file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'logs' / 'bot.log',
+            'maxBytes': 1024 * 1024 * 10,
+            'backupCount': 5,
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
+        },
         'console': {
-            'level': 'WARNING', 
+            'level': 'DEBUG', 
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
@@ -403,6 +412,11 @@ LOGGING = {
         'myproject': { 
             'handlers': ['errors_file'],
             'level': 'WARNING',
+            'propagate': False,
+        },
+        'bot': {
+            'handlers': ['bot_file', 'console'],  
+            'level': 'INFO',
             'propagate': False,
         },
     },
@@ -454,3 +468,6 @@ RECAPTCHA_SITE_KEY = config('RECAPTCHA_SITE_KEY', default='')
 RECAPTCHA_SECRET_KEY = config('RECAPTCHA_SECRET_KEY', default='')
 RECAPTCHA_SCORE_THRESHOLD = config('RECAPTCHA_SCORE_THRESHOLD', default=0.5, cast=float)
 RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
+
+# ========== Redis ==========
+REDIS_URL = config('REDIS_URL', default='')
