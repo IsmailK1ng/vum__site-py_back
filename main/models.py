@@ -1692,3 +1692,17 @@ def clear_bot_config_cache(sender, instance, **kwargs):
 @receiver(post_save, sender=BotMessage)
 def clear_bot_message_cache(sender, instance, **kwargs):
     cache.delete(f'bot_msg_{instance.key}_{instance.language}')
+
+
+class BotFSMState(models.Model):
+    key = models.CharField(max_length=255, unique=True, db_index=True)
+    state = models.TextField(blank=True, null=True)
+    data = models.TextField(blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Бот — FSM состояние'
+        verbose_name_plural = 'Бот — FSM состояния'
+
+    def __str__(self):
+        return f'{self.key}: {self.state}'

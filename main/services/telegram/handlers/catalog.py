@@ -140,7 +140,6 @@ _CATALOG_FILE_NOT_FOUND = {
     'en': 'Catalog is temporarily unavailable. Please try later.',
 }
 
-# Все три варианта для фильтра handler
 _ALL_DOWNLOAD_LABELS: frozenset[str] = frozenset(_DOWNLOAD_CATALOG_LABEL.values())
 
 

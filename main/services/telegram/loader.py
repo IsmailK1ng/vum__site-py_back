@@ -3,9 +3,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.fsm.storage.redis import RedisStorage  
 from asgiref.sync import sync_to_async
-from django.conf import settings                   
 
 logger = logging.getLogger('bot')
 
@@ -18,6 +16,7 @@ def _load_config():
 
 async def create_bot_and_dispatcher() -> tuple[Bot, Dispatcher]:
     from main.services.telegram.middlewares.user_middleware import UserMiddleware
+    from main.services.telegram.fsm_storage import DatabaseStorage
 
     config = await _load_config()
 
@@ -38,9 +37,9 @@ async def create_bot_and_dispatcher() -> tuple[Bot, Dispatcher]:
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
 
-    storage = RedisStorage.from_url(settings.REDIS_URL)
+    storage = DatabaseStorage()
 
-    dp = Dispatcher(storage=storage)  # ← заменили
+    dp = Dispatcher(storage=storage)
 
     dp.message.middleware(UserMiddleware())
     dp.callback_query.middleware(UserMiddleware())
@@ -53,17 +52,8 @@ async def create_bot_and_dispatcher() -> tuple[Bot, Dispatcher]:
 
 def _register_handlers(dp: Dispatcher) -> None:
     from main.services.telegram.handlers import (
-        start,
-        catalog,
-        dealers,
-        test_drive,
-        lead,
-        faq,
-        profile,
-        news,
-        leasing,
-        contacts,
-        common,
+        start, catalog, dealers, test_drive,
+        lead, faq, profile, news, leasing, contacts, common,
     )
 
     dp.include_router(start.router)
