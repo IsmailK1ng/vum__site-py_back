@@ -7,6 +7,7 @@ from .models import (
     Product, ProductFeature, ProductCardSpec, ProductParameter,
     DealerService, Dealer, BecomeADealerPage, DealerRequirement, Promotion, PageMeta,
     FAQItem,
+    TeamDepartment, TeamMember,
 )
 
 
@@ -118,3 +119,14 @@ class PageMetaTranslationOptions(TranslationOptions):
 @register(FAQItem)
 class FAQItemTranslationOptions(TranslationOptions):
     fields = ('question', 'answer')
+
+
+# ========== КОМАНДА ==========
+@register(TeamDepartment)
+class TeamDepartmentTranslationOptions(TranslationOptions):
+    fields = ('title',)
+
+
+@register(TeamMember)
+class TeamMemberTranslationOptions(TranslationOptions):
+    fields = ('name', 'position')

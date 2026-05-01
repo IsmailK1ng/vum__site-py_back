@@ -1706,3 +1706,44 @@ class BotFSMState(models.Model):
 
     def __str__(self):
         return f'{self.key}: {self.state}'
+
+
+# ========== КОМАНДА ==========
+
+class TeamDepartment(models.Model):
+    title = models.CharField("Название блока", max_length=200,
+                             help_text="Например: Учредители, Генеральный директор, Отдел продаж")
+    order = models.PositiveIntegerField("Порядок отображения", default=0,
+                                       help_text="Чем меньше число, тем выше в списке")
+    is_active = models.BooleanField("Активен", default=True)
+
+    class Meta:
+        verbose_name = " - Команда: блок/отдел"
+        verbose_name_plural = "Команда — Блоки/отделы"
+        ordering = ['order']
+
+    def __str__(self):
+        return self.title
+
+
+class TeamMember(models.Model):
+    department = models.ForeignKey(
+        TeamDepartment,
+        on_delete=models.CASCADE,
+        related_name='members',
+        verbose_name="Блок/отдел",
+    )
+    name = models.CharField("Имя и фамилия", max_length=200)
+    position = models.CharField("Должность", max_length=200)
+    photo = models.ImageField("Фото", upload_to="team/", blank=True, null=True,
+                              help_text="Рекомендуемый размер: 400×400 px")
+    order = models.PositiveIntegerField("Порядок внутри блока", default=0)
+    is_active = models.BooleanField("Активен", default=True)
+
+    class Meta:
+        verbose_name = " - Команда: сотрудник"
+        verbose_name_plural = "Команда — Сотрудники"
+        ordering = ['department__order', 'order']
+
+    def __str__(self):
+        return f"{self.name} — {self.position}"
