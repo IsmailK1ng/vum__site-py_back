@@ -44,7 +44,7 @@ TEST_DRIVE_TIME_SLOTS = [
 
 
 PRODUCT_CATEGORIES = {
-    'samosval': {'ru': 'Самосвалы',   'uz': 'Самосваллар',    'en': 'Dump Trucks'},
+    'samosval': {'ru': 'Самосвалы',   'uz': 'Samosvallar',    'en': 'Dump Trucks'},
     'maxsus':   {'ru': 'Спецтехника', 'uz': 'Maxsus texnika', 'en': 'Special Equipment'},
     'furgon':   {'ru': 'Фургоны',     'uz': 'Avtofurgonlar',  'en': 'Vans'},
     'shassi':   {'ru': 'Шасси',       'uz': 'Shassilar',      'en': 'Chassis'},
@@ -480,8 +480,7 @@ class BotService:
         qs = (
             Product.objects
             .filter(is_active=True)
-            .exclude(slider_price_ru__isnull=True)
-            .exclude(slider_price_ru='')
+            .exclude(price__isnull=True)
             .prefetch_related('card_specs', 'features')
             .order_by('order', 'title')
         )
@@ -492,8 +491,7 @@ class BotService:
 
         result = []
         for p in qs:
-            price_str = _field(p, 'slider_price', language)
-            price_num = int(''.join(filter(str.isdigit, price_str))) if price_str else 0
+            price_num = int(p.price)
             if not price_num:
                 continue
 
@@ -511,7 +509,7 @@ class BotService:
                 'title':      _field(p, 'title', language),
                 'slug':       p.slug,
                 'price':      price_num,
-                'price_str':  price_str,
+                'price_str':  f"{price_num:,}".replace(',', ' '),
                 'year':       p.slider_year or '',
                 'power':      _field(p, 'slider_power', language),
                 'image_path': _image_path(p.card_image or p.main_image),
@@ -525,8 +523,7 @@ class BotService:
         qs = (
             Product.objects
             .filter(is_active=True)
-            .exclude(slider_price_ru__isnull=True)
-            .exclude(slider_price_ru='')
+            .exclude(price__isnull=True)
             .values('category')
             .annotate(count=Count('id'))
             .order_by('category')
@@ -547,8 +544,7 @@ class BotService:
         qs = (
             Product.objects
             .filter(is_active=True)
-            .exclude(slider_price_ru__isnull=True)
-            .exclude(slider_price_ru='')
+            .exclude(price__isnull=True)
             .exclude(categories__isnull=True)
             .exclude(categories='')
             .values('categories')
