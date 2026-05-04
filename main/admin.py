@@ -55,6 +55,7 @@ from .models import (
     TelegramUser, TestDriveRequest, BotConfig,
     BotMessage, BotMenuItem, BotBroadcast,
     ProductWishlist, ProductViewHistory, BotContacts,
+    TeamDepartment, TeamMember,
 )
 from .forms import PageMetaAdminForm
 from main.services.amocrm.token_manager import TokenManager
@@ -1937,3 +1938,67 @@ class BotConfigAdmin(admin.ModelAdmin):
 
     def _bot_restart(self, request, object_id):
         return self._bot_action(request, 'restart', 'Бот перезапущен.', 'Ошибка перезапуска. Проверьте логи.')
+
+
+# ========== КОМАНДА ==========
+
+class TeamMemberInline(ContentAdminMixin, TranslationTabularInline):
+    model = TeamMember
+    extra = 1
+    fields = (
+        'order', 'is_active', 'photo',
+        'name_uz', 'name_ru', 'name_en',
+        'position_uz', 'position_ru', 'position_en',
+    )
+    ordering = ('order',)
+    show_change_link = True
+
+
+@admin.register(TeamDepartment)
+class TeamDepartmentAdmin(ContentAdminMixin, TabbedTranslationAdmin):
+    list_display = ('order', 'title', 'members_count', 'is_active')
+    list_display_links = ('title',)
+    list_editable = ('order', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('title',)
+    ordering = ('order',)
+    inlines = [TeamMemberInline]
+
+    fieldsets = (
+        ('Основное', {
+            'fields': ('title', 'order', 'is_active'),
+        }),
+    )
+
+    def members_count(self, obj):
+        count = obj.members.filter(is_active=True).count()
+        return format_html('<b style="color:#28a745">{}</b>', count)
+    members_count.short_description = 'Сотрудников'
+
+
+@admin.register(TeamMember)
+class TeamMemberAdmin(ContentAdminMixin, TabbedTranslationAdmin):
+    list_display = ('order', 'photo_preview', 'name', 'position', 'department', 'is_active')
+    list_display_links = ('name',)
+    list_editable = ('order', 'is_active')
+    list_filter = ('department', 'is_active')
+    search_fields = ('name', 'position', 'department__title')
+    ordering = ('department__order', 'order')
+
+    fieldsets = (
+        ('Основное', {
+            'fields': ('department', 'order', 'is_active'),
+        }),
+        ('Данные сотрудника', {
+            'fields': ('photo', 'name', 'position'),
+        }),
+    )
+
+    def photo_preview(self, obj):
+        if obj.photo:
+            return format_html(
+                '<img src="{}" style="width:48px;height:48px;object-fit:cover;border-radius:50%;">',
+                obj.photo.url,
+            )
+        return '—'
+    photo_preview.short_description = 'Фото'

@@ -1,0 +1,123 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+<link rel="stylesheet" href="{% static 'css/team-page.css' %}">
+{% endblock %}
+
+{% block app_js %}{% endblock %}
+
+{% block schema_json %}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}","item":"{{ request.scheme }}://{{ request.get_host }}/"},{"@type":"ListItem","position":2,"name":"{% if LANGUAGE_CODE == 'uz' %}Jamoa{% elif LANGUAGE_CODE == 'ru' %}Команда{% else %}Team{% endif %}","item":"{{ request.build_absolute_uri }}"}]}</script>
+{% endblock %}
+
+{% block content %}
+
+  <!-- Loader -->
+  <div id="loader" class="loader" style="display: none;">
+    <div class="loader__wrapper">
+      <div class="loader__content">
+        <div class="loader__count"><span class="count__text">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  {% include 'main/includes/header.html' %}
+  <div class="mxd-block loading-wrap"></div>
+
+  <!-- Breadcrumbs -->
+  <nav class="mxd-section-filter pre-grid" aria-label="breadcrumb">
+    <div class="mxd-section-filter__inner animate-card-3">
+      <div class="mxd-grid-item-1">
+        <div class="section-filter">
+          <ol class="breadcrumb-ol">
+            <li><a href="{% url 'home' %}">{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}</a></li>
+            <li class="active" aria-current="page"><a href="{% url 'team' %}">{% if LANGUAGE_CODE == 'uz' %}Jamoa{% elif LANGUAGE_CODE == 'ru' %}Команда{% else %}Team{% endif %}</a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page title -->
+  <header class="faw-history-title fade-in">
+    <h1 class="reveal-type" style="text-align: center;">
+      {% if LANGUAGE_CODE == 'uz' %}VUM Jamoasi
+      {% elif LANGUAGE_CODE == 'ru' %}Команда VUM
+      {% else %}VUM Team{% endif %}
+    </h1>
+  </header>
+
+  <main id="mxd-page-content" class="mxd-page-content">
+    <div class="mxd-section padding-blog">
+      <div class="mxd-container grid-container">
+
+        {% for item in departments %}
+        <div class="team-department mxd-block">
+
+          <!-- Department title -->
+          <div class="team-department__header" style="text-align: center;">
+            <h2 class="reveal-type">{{ item.department.title }}</h2>
+          </div>
+
+          <!-- Members grid -->
+          <div class="team-members-grid">
+            {% for member in item.members %}
+            <div class="team-card animate-card-4">
+              <div class="team-card__inner bg-base-tint radius-m">
+                <div class="team-card__photo-wrap">
+                  {% if member.photo %}
+                  <img
+                    class="team-card__photo"
+                    data-src="{{ member.photo.url }}"
+                    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                    alt="{{ member.name }}"
+                    loading="lazy"
+                  >
+                  {% else %}
+                  <div class="team-card__photo-placeholder">
+                    <i class="ph ph-user"></i>
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="team-card__info">
+                  <h4 class="team-card__name">{{ member.name }}</h4>
+                  <p class="team-card__position t-small">{{ member.position }}</p>
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <p class="team-empty">
+              {% if LANGUAGE_CODE == 'uz' %}Hozircha xodimlar yo'q
+              {% elif LANGUAGE_CODE == 'ru' %}Сотрудников пока нет
+              {% else %}No members yet{% endif %}
+            </p>
+            {% endfor %}
+          </div>
+
+          {% if not forloop.last %}
+          <div class="team-department__divider"></div>
+          {% endif %}
+        </div>
+        {% empty %}
+        <div class="team-no-data mxd-block">
+          <p>
+            {% if LANGUAGE_CODE == 'uz' %}Jamoamiz haqida ma'lumot tez orada qo'shiladi
+            {% elif LANGUAGE_CODE == 'ru' %}Информация о команде скоро появится
+            {% else %}Team information coming soon{% endif %}
+          </p>
+        </div>
+        {% endfor %}
+
+      </div>
+    </div>
+  </main>
+
+  {% include 'main/includes/footer.html' %}
+
+  <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
+    <i class="ph ph-arrow-up"></i>
+  </a>
+
+{% endblock %}

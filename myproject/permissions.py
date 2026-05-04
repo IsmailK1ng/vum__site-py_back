@@ -5,13 +5,9 @@ from django.db.models import Q
 
 def setup_permissions():
     """Создание групп с правами доступа для FAW"""
-    
-    # ============================================
-    # 1. ГЛАВНЫЕ АДМИНЫ (почти всё)
-    # ============================================
+
     main_admins, created = Group.objects.get_or_create(name='Главные админы')
     if created or not main_admins.permissions.exists():
-        # Все права на main и kg
         all_permissions = Permission.objects.filter(
             content_type__app_label__in=['main', 'kg']
         )
@@ -24,11 +20,7 @@ def setup_permissions():
         )
         main_admins.permissions.add(*user_permissions)
     
-    # ============================================
-    # 2. КОНТЕНТ-АДМИНЫ (по странам)
-    # ============================================
-    
-    # 2a. КОНТЕНТ UZ
+ 
     content_uz, created = Group.objects.get_or_create(name='Контент UZ')
     if created or not content_uz.permissions.exists():
         content_models = [

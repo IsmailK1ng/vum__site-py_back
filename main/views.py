@@ -24,18 +24,19 @@ from rest_framework.response import Response
 from main.utils.recaptcha import verify_recaptcha, get_client_ip
 # ========== ЛОКАЛЬНЫЕ ИМПОРТЫ ==========
 from .models import (
-    News, 
-    ContactForm, 
-    JobApplication, 
-    Vacancy, 
+    News,
+    ContactForm,
+    JobApplication,
+    Vacancy,
     Product,
-    Dealer, 
-    DealerService, 
-    BecomeADealerPage, 
+    Dealer,
+    DealerService,
+    BecomeADealerPage,
     BecomeADealerApplication,
     Promotion,
     FAQItem,
-    REGION_CHOICES
+    REGION_CHOICES,
+    TeamDepartment,
 )
 from .serializers import (
     NewsSerializer, 
@@ -123,6 +124,23 @@ def services(request):
 def faq(request):
     faq_items = FAQItem.objects.filter(is_active=True).order_by('order')
     return render(request, 'main/faq.html', {'faq_items': faq_items})
+
+
+def team(request):
+    departments = (
+        TeamDepartment.objects
+        .filter(is_active=True)
+        .prefetch_related('members')
+        .order_by('order')
+    )
+    departments_with_members = [
+        {
+            'department': dept,
+            'members': dept.members.filter(is_active=True).order_by('order'),
+        }
+        for dept in departments
+    ]
+    return render(request, 'main/team.html', {'departments': departments_with_members})
 
 
 def product_detail(request, product_id):

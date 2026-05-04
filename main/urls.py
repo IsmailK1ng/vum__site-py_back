@@ -17,6 +17,7 @@ urlpatterns = [
     path('dealers/', views.dealers, name='dealers'),
     path('jobs/', views.jobs, name='jobs'),
     path('faq/', views.faq, name='faq'),
+    path('team/', views.team, name='team'),
     path('api/log-js-error/', views.log_js_error, name='log_js_error'),
 
     
