@@ -1693,6 +1693,16 @@ def clear_bot_config_cache(sender, instance, **kwargs):
 def clear_bot_message_cache(sender, instance, **kwargs):
     cache.delete(f'bot_msg_{instance.key}_{instance.language}')
 
+@receiver(post_save, sender=Dealer)
+def clear_dealer_cache(sender, instance, **kwargs):
+    cache.delete('bot_dealer_cities')
+    cache.delete('bot_dealers')
+
+@receiver(post_delete, sender=Dealer)
+def clear_dealer_cache_on_delete(sender, instance, **kwargs):
+    cache.delete('bot_dealer_cities')
+    cache.delete('bot_dealers')
+
 
 class BotFSMState(models.Model):
     key = models.CharField(max_length=255, unique=True, db_index=True)
