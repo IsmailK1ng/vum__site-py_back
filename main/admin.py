@@ -4,7 +4,6 @@ import json
 import logging
 import openpyxl
 import os
-import subprocess
 from datetime import datetime, timedelta
 from urllib.parse import unquote
 
@@ -71,7 +70,7 @@ admin.site.site_header = "Панель управления VUM"
 admin.site.site_title = "VUM Admin"
 admin.site.index_title = "Управление сайтами FAW"
 
-BOT_SERVICE_NAME = 'faw_bot'
+
 
 
 # ============ БАЗОВЫЕ МИКСИНЫ ============
@@ -1844,14 +1843,10 @@ class BotContactsAdmin(admin.ModelAdmin):
 
 @admin.register(BotConfig)
 class BotConfigAdmin(admin.ModelAdmin):
-    readonly_fields = ('updated_at', 'bot_status_display', 'bot_control_buttons')
+    readonly_fields = ('updated_at',)
 
     fieldsets = (
         ('Основные настройки', {'fields': ('bot_token', 'bot_username', 'is_active')}),
-        ('Управление ботом', {
-            'fields': ('bot_status_display', 'bot_control_buttons'),
-            'description': 'Управление процессом бота на сервере. Требует настроенного systemd сервиса.',
-        }),
         ('Уведомления', {'fields': ('notify_chat_id', 'notify_chat_id_2')}),
         ('Сайт и режим работы', {'fields': ('site_url', 'use_webhook', 'webhook_url')}),
         ('Рабочие часы', {'fields': ('work_hours_start', 'work_hours_end')}),
@@ -1859,86 +1854,6 @@ class BotConfigAdmin(admin.ModelAdmin):
         ('Служебное', {'fields': ('updated_at',), 'classes': ('collapse',)}),
     )
 
-    def _get_bot_status(self) -> tuple[bool, str]:
-        try:
-            result = subprocess.run(
-                ['systemctl', 'is-active', BOT_SERVICE_NAME],
-                capture_output=True, text=True, timeout=5,
-            )
-            is_running = result.stdout.strip() == 'active'
-            return is_running, result.stdout.strip()
-        except FileNotFoundError:
-            return False, 'systemd недоступен (локально)'
-        except subprocess.TimeoutExpired:
-            return False, 'timeout'
-        except Exception as exc:
-            logger.error('Bot status check failed: %s', exc)
-            return False, f'Ошибка: {exc}'
-
-    def bot_status_display(self, obj):
-        is_running, status_text = self._get_bot_status()
-        if 'недоступен' in status_text:
-            color, label = '#888', 'Локальная разработка — статус недоступен'
-        elif is_running:
-            color, label = '#28a745', 'Работает'
-        else:
-            color, label = '#dc3545', f'Остановлен ({status_text})'
-        return format_html('<span style="color:{};font-weight:bold;">{}</span>', color, label)
-    bot_status_display.short_description = 'Статус сервиса'
-
-    def bot_control_buttons(self, obj):
-        return format_html(
-            '<a class="button" href="bot-start/" style="background:#28a745;color:white;padding:6px 12px;border-radius:4px;text-decoration:none;margin-right:8px;">Запустить</a>'
-            '<a class="button" href="bot-stop/" style="background:#dc3545;color:white;padding:6px 12px;border-radius:4px;text-decoration:none;margin-right:8px;">Остановить</a>'
-            '<a class="button" href="bot-restart/" style="background:#fd7e14;color:white;padding:6px 12px;border-radius:4px;text-decoration:none;">Перезапустить</a>'
-        )
-    bot_control_buttons.short_description = 'Управление'
-
-    def get_urls(self):
-        return [
-            path('<path:object_id>/bot-start/', self.admin_site.admin_view(self._bot_start), name='botconfig-start'),
-            path('<path:object_id>/bot-stop/', self.admin_site.admin_view(self._bot_stop), name='botconfig-stop'),
-            path('<path:object_id>/bot-restart/', self.admin_site.admin_view(self._bot_restart), name='botconfig-restart'),
-        ] + super().get_urls()
-
-    def _run_systemctl(self, request, action: str):
-        try:
-            result = subprocess.run(
-                ['sudo', 'systemctl', action, BOT_SERVICE_NAME],
-                capture_output=True, text=True, timeout=15,
-            )
-            if result.returncode == 0:
-                logger.info('Bot service %s: success admin=%s', action, request.user)
-                return True
-            logger.error('Bot service %s failed: %s', action, result.stderr)
-            return False
-        except FileNotFoundError:
-            return None
-        except subprocess.TimeoutExpired:
-            return None
-        except Exception as exc:
-            logger.error('Bot control error action=%s: %s', action, exc)
-            return False
-
-    def _bot_action(self, request, action, success_msg, fail_msg):
-        result = self._run_systemctl(request, action)
-        if result is True:
-            self.message_user(request, success_msg, messages.SUCCESS)
-        elif result is None:
-            self.message_user(request, 'systemd недоступен. Используйте терминал.', messages.WARNING)
-        else:
-            self.message_user(request, fail_msg, messages.ERROR)
-        return HttpResponseRedirect('../')
-
-    def _bot_start(self, request, object_id):
-        return self._bot_action(request, 'start', 'Бот запущен.', 'Ошибка запуска. Проверьте логи.')
-
-    def _bot_stop(self, request, object_id):
-        return self._bot_action(request, 'stop', 'Бот остановлен.', 'Ошибка остановки. Проверьте логи.')
-
-    def _bot_restart(self, request, object_id):
-        return self._bot_action(request, 'restart', 'Бот перезапущен.', 'Ошибка перезапуска. Проверьте логи.')
-    
     def has_module_permission(self, request):
         return request.user.is_superuser
 
