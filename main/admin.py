@@ -1938,7 +1938,15 @@ class BotConfigAdmin(admin.ModelAdmin):
 
     def _bot_restart(self, request, object_id):
         return self._bot_action(request, 'restart', 'Бот перезапущен.', 'Ошибка перезапуска. Проверьте логи.')
+    
+    def has_module_permission(self, request):
+        return request.user.is_superuser
 
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
 
 # ========== КОМАНДА ==========
 
