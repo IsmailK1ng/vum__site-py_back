@@ -5,8 +5,8 @@ from unidecode import unidecode
 from ckeditor.fields import RichTextField  
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.db.models.signals import post_save, post_delete
 from datetime import timedelta, time as datetime_time
 from django.core.cache import cache 
 # ========== ОБЩИЕ CHOICES ==========
@@ -1706,3 +1706,13 @@ class BotFSMState(models.Model):
 
     def __str__(self):
         return f'{self.key}: {self.state}'
+
+@receiver(post_save, sender=Dealer)
+def clear_dealer_cache(sender, instance, **kwargs):
+    cache.delete('bot_dealer_cities')
+    cache.delete('bot_dealers')
+
+@receiver(post_delete, sender=Dealer)
+def clear_dealer_cache_on_delete(sender, instance, **kwargs):
+    cache.delete('bot_dealer_cities')
+    cache.delete('bot_dealers')
