@@ -702,11 +702,11 @@ class BotService:
                     'create_test_drive_lead: bad date format=%s', date_str,
                 )
 
+
         message_text = (
             f"Тест-драйв\n"
             f"Модель: {data.get('product_title', '—')}\n"
             f"Дата: {data.get('preferred_date', '—')}\n"
-            f"Время: {data.get('preferred_time', '—')}\n"
             f"Город: {data.get('city', '—')}"
         )
 
@@ -741,7 +741,7 @@ class BotService:
                         client_name=data.get('name', ''),
                         client_phone=data.get('phone', ''),
                         preferred_date=preferred_date,
-                        preferred_time=data.get('preferred_time', ''),
+                        preferred_time='',  
                         status='new',
                     )
                     TelegramUser.objects.filter(pk=user.pk).update(

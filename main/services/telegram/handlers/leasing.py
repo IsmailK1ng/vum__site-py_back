@@ -43,9 +43,9 @@ _BROWSE_LABELS = {
         'en': '📦 By body type',
     },
     'by_platform': {
-        'ru': '⚙️ По платформе Tiger',
-        'uz': '⚙️ Tiger platformasi',
-        'en': '⚙️ By Tiger platform',
+        'ru': '⚙️ По шасси',
+        'uz': "⚙️ Shassi bo'yicha",
+        'en': '⚙️ By chassis',
     },
 }
 
@@ -161,12 +161,12 @@ def _read_photo(image_path: str | None) -> bytes | None:
 def _build_browse_kb(lang: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
-            text=_BROWSE_LABELS['by_type'].get(lang, _BROWSE_LABELS['by_type']['ru']),
-            callback_data='lz_browse:by_type',
-        )],
-        [InlineKeyboardButton(
             text=_BROWSE_LABELS['by_platform'].get(lang, _BROWSE_LABELS['by_platform']['ru']),
             callback_data='lz_browse:by_platform',
+        )],
+        [InlineKeyboardButton(
+            text=_BROWSE_LABELS['by_type'].get(lang, _BROWSE_LABELS['by_type']['ru']),
+            callback_data='lz_browse:by_type',
         )],
     ])
 

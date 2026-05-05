@@ -22,7 +22,6 @@ class DealerStates(StatesGroup):
 class TestDriveStates(StatesGroup):
     choose_product = State()
     choose_date    = State()
-    choose_time    = State()
     choose_city    = State()
     confirm        = State()
 
@@ -40,4 +39,3 @@ class LeasingStates(StatesGroup):
     choose_down_payment = State()
     choose_term         = State()
     confirm             = State()
-

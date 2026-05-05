@@ -13,7 +13,7 @@ from asgiref.sync import sync_to_async
 from django.utils import timezone
 
 from main.models import TelegramUser
-from main.services.telegram.bot_service import BotService, TEST_DRIVE_TIME_SLOTS
+from main.services.telegram.bot_service import BotService
 from main.services.telegram.keyboards.common import BUTTON_LABELS, get_confirm_keyboard
 from main.services.telegram.keyboards.main_menu import get_main_menu_keyboard
 from main.services.telegram.states.fsm import TestDriveStates
@@ -75,7 +75,7 @@ _ERROR_TD = {
 
 @sync_to_async
 def _get_all_products(language: str) -> list[dict]:
-    return BotService.get_all_active_products(language)  
+    return BotService.get_all_active_products(language)
 
 
 @sync_to_async
@@ -120,21 +120,33 @@ def _build_list_keyboard(
 
 
 def _build_date_keyboard(language: str) -> ReplyKeyboardMarkup:
+    """
+    Первая строка — кнопка «Сегодня» с текущей датой.
+    Далее — следующие 14 дней по 3 кнопки в строке.
+    Последняя строка — «Назад».
+    """
     back_label = BUTTON_LABELS[language]['back']
     today = timezone.localdate()
-    dates = [
+    today_str = today.strftime('%d.%m.%Y')
+
+    future_dates = [
         (today + timedelta(days=i)).strftime('%d.%m.%Y')
         for i in range(1, _DATE_RANGE_DAYS + 1)
     ]
+
     rows: list[list[KeyboardButton]] = []
+
+    rows.append([KeyboardButton(text=today_str)])
+
     row: list[KeyboardButton] = []
-    for d in dates:
+    for d in future_dates:
         row.append(KeyboardButton(text=d))
         if len(row) == 3:
             rows.append(row)
             row = []
     if row:
         rows.append(row)
+
     rows.append([KeyboardButton(text=back_label)])
     return ReplyKeyboardMarkup(keyboard=rows, resize_keyboard=True)
 
@@ -143,7 +155,7 @@ def _is_valid_date(text: str) -> bool:
     try:
         parsed = datetime.strptime(text, '%d.%m.%Y').date()
         today = timezone.localdate()
-        return today < parsed <= today + timedelta(days=_DATE_RANGE_DAYS)
+        return today <= parsed <= today + timedelta(days=_DATE_RANGE_DAYS)
     except ValueError:
         return False
 
@@ -160,7 +172,6 @@ def _build_confirm_text(
             '<b>Заявка на тест-драйв:</b>\n\n'
             'Модель: <b>{product}</b>\n'
             'Дата: <b>{date}</b>\n'
-            'Время: <b>{time}</b>\n'
             'Город: <b>{city}</b>\n'
             'Имя: <b>{name}</b>\n'
             'Телефон: <b>{phone}</b>\n\n'
@@ -171,7 +182,6 @@ def _build_confirm_text(
             '<b>Test-drayv uchun ariza:</b>\n\n'
             'Model: <b>{product}</b>\n'
             'Sana: <b>{date}</b>\n'
-            'Vaqt: <b>{time}</b>\n'
             'Shahar: <b>{city}</b>\n'
             'Ism: <b>{name}</b>\n'
             'Telefon: <b>{phone}</b>\n\n'
@@ -182,7 +192,6 @@ def _build_confirm_text(
             '<b>Test drive request:</b>\n\n'
             'Model: <b>{product}</b>\n'
             'Date: <b>{date}</b>\n'
-            'Time: <b>{time}</b>\n'
             'City: <b>{city}</b>\n'
             'Name: <b>{name}</b>\n'
             'Phone: <b>{phone}</b>\n\n'
@@ -193,7 +202,6 @@ def _build_confirm_text(
     return templates.get(lang, templates['ru']).format(
         product=data.get('td_product_name', ''),
         date=data.get('td_date', ''),
-        time=data.get('td_time', ''),
         city=city,
         name=client_name or '—',
         phone=client_phone or '—',
@@ -294,31 +302,7 @@ async def handle_td_date(message: Message, state: FSMContext):
         return
 
     await state.update_data(td_date=message.text)
-    await state.set_state(TestDriveStates.choose_time)
-    text = await get_message('td_choose_time', lang)
-    await message.answer(
-        text,
-        reply_markup=_build_list_keyboard(TEST_DRIVE_TIME_SLOTS, lang, columns=3),
-    )
 
-
-@router.message(TestDriveStates.choose_time)
-async def handle_td_time(message: Message, state: FSMContext):
-    data = await state.get_data()
-    lang = data.get('language', 'ru')
-    back_label = BUTTON_LABELS[lang]['back']
-
-    if message.text == back_label:
-        text = await get_message('td_choose_date', lang)
-        await state.set_state(TestDriveStates.choose_date)
-        await message.answer(text, reply_markup=_build_date_keyboard(lang))
-        return
-
-    if message.text not in TEST_DRIVE_TIME_SLOTS:
-        await message.answer(await get_message('choose_from_list', lang))
-        return
-
-    await state.update_data(td_time=message.text)
     cities = await _get_cities()
     await state.set_state(TestDriveStates.choose_city)
     await message.answer(
@@ -338,12 +322,9 @@ async def handle_td_city(
     back_label = BUTTON_LABELS[lang]['back']
 
     if message.text == back_label:
-        text = await get_message('td_choose_time', lang)
-        await state.set_state(TestDriveStates.choose_time)
-        await message.answer(
-            text,
-            reply_markup=_build_list_keyboard(TEST_DRIVE_TIME_SLOTS, lang, columns=3),
-        )
+        text = await get_message('td_choose_date', lang)
+        await state.set_state(TestDriveStates.choose_date)
+        await message.answer(text, reply_markup=_build_date_keyboard(lang))
         return
 
     cities = await _get_cities()
@@ -401,7 +382,6 @@ async def handle_td_confirm(
         'region':         data.get('td_client_region', ''),
         'city':           data.get('td_city', ''),
         'preferred_date': data.get('td_date', ''),
-        'preferred_time': data.get('td_time', ''),
     })
 
     await state.clear()

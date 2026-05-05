@@ -92,9 +92,9 @@ BROWSE_MODE_LABELS = {
         'en': 'By body type',
     },
     'by_platform': {
-        'ru': 'По модели платформы',
-        'uz': "Platforma modeli bo'yicha",
-        'en': 'By platform model',
+        'ru': 'По шасси',
+        'uz': "Shassi bo'yicha",
+        'en': 'By chassis',
     },
 }
 
@@ -157,8 +157,8 @@ def _parse_callback_int(data: str) -> int | None:
 def _build_browse_mode_keyboard(language: str, has_catalog: bool = False) -> ReplyKeyboardMarkup:
     back_label = BUTTON_LABELS[language]['back']
     rows = [
-        [KeyboardButton(text=BROWSE_MODE_LABELS['by_type'][language])],
         [KeyboardButton(text=BROWSE_MODE_LABELS['by_platform'][language])],
+        [KeyboardButton(text=BROWSE_MODE_LABELS['by_type'][language])],
     ]
     if has_catalog:
         rows.append([KeyboardButton(text=_DOWNLOAD_CATALOG_LABEL[language])])
