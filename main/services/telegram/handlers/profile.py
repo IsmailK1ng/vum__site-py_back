@@ -1,4 +1,5 @@
 import logging
+import re
 
 from aiogram import F, Router
 from aiogram.filters import StateFilter
@@ -8,14 +9,17 @@ from aiogram.types import (
     CallbackQuery,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    KeyboardButton,
     Message,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
 )
 from asgiref.sync import sync_to_async
 
-from main.models import TelegramUser
+from main.models import TelegramUser, REGION_LABELS
 from main.services.telegram.bot_service import BotService
-from main.models import REGION_LABELS
 from main.services.telegram.keyboards.main_menu import get_main_menu_keyboard
+from main.services.telegram.states.fsm import EditProfileStates
 from main.services.telegram.triggers import PROFILE_TRIGGERS
 from main.services.telegram.utils import get_message, read_file
 
@@ -45,9 +49,9 @@ _TD_HEADER = {
 }
 
 _TD_FIELDS = {
-    'ru': '{product}\n{date} · {time}\nСтатус: {status}',
-    'uz': '{product}\n{date} · {time}\nHolat: {status}',
-    'en': '{product}\n{date} · {time}\nStatus: {status}',
+    'ru': '{product}\n{date}\nСтатус: {status}',
+    'uz': '{product}\n{date}\nHolat: {status}',
+    'en': '{product}\n{date}\nStatus: {status}',
 }
 
 _TD_STATUS_LABELS = {
@@ -85,6 +89,12 @@ _CANCEL_TD_BTN = {
     'en': 'Cancel test drive',
 }
 
+_EDIT_BTN = {
+    'ru': '✏️ Редактировать профиль',
+    'uz': '✏️ Profilni tahrirlash',
+    'en': '✏️ Edit profile',
+}
+
 _CANCEL_SUCCESS = {
     'ru': 'Тест-драйв отменён. Можете записаться снова.',
     'uz': 'Test-drayv bekor qilindi. Qayta yozilishingiz mumkin.',
@@ -110,11 +120,64 @@ _MODEL_NOT_FOUND = {
 }
 
 _CARD_LABELS = {
-    'site':   {'ru': 'Подробнее на сайте',       'uz': 'Saytda batafsil',                'en': 'Full specs on website'},
-    'price':  {'ru': 'Узнать цену',               'uz': 'Narxni bilish',                  'en': 'Get price'},
-    'td':     {'ru': 'Тест-драйв',                'uz': 'Test-drayv',                     'en': 'Test drive'},
-    'remove': {'ru': 'Убрать из избранного',      'uz': 'Sevimlilardan olib tashlash',    'en': 'Remove from favourites'},
+    'site':   {'ru': 'Подробнее на сайте',    'uz': 'Saytda batafsil',             'en': 'Full specs on website'},
+    'price':  {'ru': 'Узнать цену',            'uz': 'Narxni bilish',               'en': 'Get price'},
+    'td':     {'ru': 'Тест-драйв',             'uz': 'Test-drayv',                  'en': 'Test drive'},
+    'remove': {'ru': 'Убрать из избранного',   'uz': 'Sevimlilardan olib tashlash', 'en': 'Remove from favourites'},
 }
+
+# ─── Редактирование профиля — тексты ─────────────────────────────────────────
+
+_EDIT_ASK_NAME = {
+    'ru': 'Введите новое имя или нажмите «Оставить текущее»:\n\nТекущее: <b>{current}</b>',
+    'uz': "Yangi ismni kiriting yoki «Hozirgicha qoldirish»ni bosing:\n\nHozirgi: <b>{current}</b>",
+    'en': 'Enter a new name or tap "Keep current":\n\nCurrent: <b>{current}</b>',
+}
+
+_EDIT_ASK_PHONE = {
+    'ru': 'Введите новый номер телефона или нажмите «Оставить текущее»:\n\nТекущий: <b>{current}</b>',
+    'uz': "Yangi telefon raqamini kiriting yoki «Hozirgicha qoldirish»ni bosing:\n\nHozirgi: <b>{current}</b>",
+    'en': 'Enter a new phone number or tap "Keep current":\n\nCurrent: <b>{current}</b>',
+}
+
+_KEEP_BTN = {
+    'ru': 'Оставить текущее',
+    'uz': 'Hozirgicha qoldirish',
+    'en': 'Keep current',
+}
+
+_CANCEL_EDIT_BTN = {
+    'ru': 'Отменить',
+    'uz': 'Bekor qilish',
+    'en': 'Cancel',
+}
+
+_EDIT_SUCCESS = {
+    'ru': '✅ Профиль обновлён.',
+    'uz': '✅ Profil yangilandi.',
+    'en': '✅ Profile updated.',
+}
+
+_EDIT_CANCELLED = {
+    'ru': 'Редактирование отменено.',
+    'uz': 'Tahrirlash bekor qilindi.',
+    'en': 'Editing cancelled.',
+}
+
+_INVALID_PHONE = {
+    'ru': 'Некорректный номер. Введите номер в формате +998901234567 или 998901234567:',
+    'uz': "Noto'g'ri raqam. +998901234567 yoki 998901234567 formatida kiriting:",
+    'en': 'Invalid number. Enter in format +998901234567 or 998901234567:',
+}
+
+_INVALID_NAME = {
+    'ru': 'Имя слишком короткое. Введите минимум 2 символа:',
+    'uz': "Ism juda qisqa. Kamida 2 ta belgi kiriting:",
+    'en': 'Name is too short. Enter at least 2 characters:',
+}
+
+# Паттерн: опциональный +, затем цифры, итого 9–15 цифр
+_PHONE_RE = re.compile(r'^\+?\d{9,15}$')
 
 
 # ─── Async обёртки ───────────────────────────────────────────────────────────
@@ -149,6 +212,11 @@ def _get_config():
     return BotService.get_config()
 
 
+@sync_to_async
+def _update_user(telegram_id: int, **kwargs):
+    return BotService.update_user(telegram_id, **kwargs)
+
+
 # ─── Построение профиля ──────────────────────────────────────────────────────
 
 def _build_profile_text(
@@ -156,9 +224,6 @@ def _build_profile_text(
     lang: str,
     active_td=None,
 ) -> str:
-    from main.models import REGION_LABELS
-
-    # Получаем отображаемое название региона на языке пользователя
     region_key = user.region or ''
     region_display = REGION_LABELS.get(region_key, {}).get(lang) or region_key or '—'
 
@@ -192,7 +257,6 @@ def _build_profile_text(
             _TD_FIELDS.get(lang, _TD_FIELDS['ru']).format(
                 product=product_title,
                 date=active_td.preferred_date.strftime('%d.%m.%Y') if active_td.preferred_date else '—',
-                time=active_td.preferred_time or '—',
                 status=status_label,
             ),
         ]
@@ -218,6 +282,12 @@ def _build_profile_keyboard(
             callback_data='profile_wishlist_empty',
         )])
 
+    # Кнопка редактирования профиля
+    rows.append([InlineKeyboardButton(
+        text=_EDIT_BTN.get(lang, _EDIT_BTN['ru']),
+        callback_data='profile_edit',
+    )])
+
     if active_td:
         rows.append([InlineKeyboardButton(
             text=_CANCEL_TD_BTN.get(lang, _CANCEL_TD_BTN['ru']),
@@ -225,6 +295,17 @@ def _build_profile_keyboard(
         )])
 
     return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+def _build_keep_keyboard(lang: str) -> ReplyKeyboardMarkup:
+    """Клавиатура с кнопками «Оставить текущее» и «Отменить»."""
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text=_KEEP_BTN[lang])],
+            [KeyboardButton(text=_CANCEL_EDIT_BTN[lang])],
+        ],
+        resize_keyboard=True,
+    )
 
 
 def _build_wishlist_keyboard(items: list[dict], lang: str) -> InlineKeyboardMarkup:
@@ -306,7 +387,7 @@ async def show_profile(message: Message, user: TelegramUser, lang: str) -> None:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# HANDLERS
+# HANDLERS — профиль
 # ═══════════════════════════════════════════════════════════════════════════════
 
 @router.message(StateFilter('*'), F.text.in_(PROFILE_TRIGGERS))
@@ -326,13 +407,143 @@ async def handle_profile(
     await show_profile(message, user, lang)
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# HANDLERS — редактирование профиля
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.callback_query(F.data == 'profile_edit')
+async def handle_profile_edit_start(
+    callback: CallbackQuery,
+    state: FSMContext,
+    user: TelegramUser | None,
+):
+    if not user:
+        await callback.answer(_NOT_REGISTERED['ru'], show_alert=True)
+        return
+
+    lang = user.language or 'ru'
+    await state.set_state(EditProfileStates.edit_name)
+    await state.update_data(
+        edit_lang=lang,
+        edit_telegram_id=user.telegram_id,
+        # Сохраняем текущие значения — понадобятся если пользователь нажмёт «Оставить»
+        current_name=user.first_name or '',
+        current_phone=user.phone or '',
+    )
+
+    await callback.message.answer(
+        _EDIT_ASK_NAME[lang].format(current=user.first_name or '—'),
+        reply_markup=_build_keep_keyboard(lang),
+    )
+    await callback.answer()
+
+
+@router.message(EditProfileStates.edit_name)
+async def handle_edit_name(message: Message, state: FSMContext):
+    data = await state.get_data()
+    lang = data.get('edit_lang', 'ru')
+    keep_btn = _KEEP_BTN[lang]
+    cancel_btn = _CANCEL_EDIT_BTN[lang]
+
+    if message.text == cancel_btn:
+        await state.clear()
+        await message.answer(
+            _EDIT_CANCELLED[lang],
+            reply_markup=await get_main_menu_keyboard(lang),
+        )
+        return
+
+    if message.text == keep_btn:
+        # Имя не меняем — переходим к телефону с текущим именем
+        new_name = data.get('current_name', '')
+    else:
+        text = (message.text or '').strip()
+        if len(text) < 2:
+            await message.answer(
+                _INVALID_NAME[lang],
+                reply_markup=_build_keep_keyboard(lang),
+            )
+            return
+        new_name = text
+
+    await state.update_data(new_name=new_name)
+    await state.set_state(EditProfileStates.edit_phone)
+
+    current_phone = data.get('current_phone', '') or '—'
+    await message.answer(
+        _EDIT_ASK_PHONE[lang].format(current=current_phone),
+        reply_markup=_build_keep_keyboard(lang),
+    )
+
+
+@router.message(EditProfileStates.edit_phone)
+async def handle_edit_phone(message: Message, state: FSMContext, user: TelegramUser | None):
+    data = await state.get_data()
+    lang = data.get('edit_lang', 'ru')
+    keep_btn = _KEEP_BTN[lang]
+    cancel_btn = _CANCEL_EDIT_BTN[lang]
+
+    if message.text == cancel_btn:
+        await state.clear()
+        await message.answer(
+            _EDIT_CANCELLED[lang],
+            reply_markup=await get_main_menu_keyboard(lang),
+        )
+        return
+
+    if message.text == keep_btn:
+        new_phone = data.get('current_phone', '')
+    else:
+        phone = (message.text or '').strip().replace(' ', '').replace('-', '')
+        if not _PHONE_RE.match(phone):
+            await message.answer(
+                _INVALID_PHONE[lang],
+                reply_markup=_build_keep_keyboard(lang),
+            )
+            return
+        new_phone = phone
+
+    # Сохраняем в БД через BotService.update_user
+    telegram_id = data.get('edit_telegram_id')
+    new_name = data.get('new_name', '')
+
+    updated_user = await _update_user(
+        telegram_id,
+        first_name=new_name,
+        phone=new_phone,
+    )
+
+    await state.clear()
+
+    if updated_user:
+        logger.info(
+            'Profile updated: telegram_id=%s name=%s phone=%s',
+            telegram_id, new_name, new_phone,
+        )
+        await message.answer(
+            _EDIT_SUCCESS[lang],
+            reply_markup=ReplyKeyboardRemove(),
+        )
+        # Показываем обновлённый профиль сразу
+        await show_profile(message, updated_user, lang)
+    else:
+        logger.error('Profile update failed: telegram_id=%s', telegram_id)
+        await message.answer(
+            {'ru': 'Ошибка сохранения. Попробуйте позже.',
+             'uz': 'Saqlashda xatolik. Keyinroq urinib ko\'ring.',
+             'en': 'Save error. Please try again later.'}.get(lang, 'Error.'),
+            reply_markup=await get_main_menu_keyboard(lang),
+        )
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# HANDLERS — избранное
+# ═══════════════════════════════════════════════════════════════════════════════
+
 @router.callback_query(F.data == 'profile_wishlist')
 async def handle_wishlist(callback: CallbackQuery, user: TelegramUser | None):
     if not user:
-        await callback.answer(
-            _NOT_REGISTERED.get(user.language if user else 'ru', _NOT_REGISTERED['ru']),
-            show_alert=True,
-        )
+        await callback.answer(_NOT_REGISTERED['ru'], show_alert=True)
         return
 
     lang = user.language or 'ru'
@@ -429,6 +640,10 @@ async def handle_wishlist_remove(callback: CallbackQuery, user: TelegramUser | N
     except Exception:
         pass
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# HANDLERS — отмена тест-драйва
+# ═══════════════════════════════════════════════════════════════════════════════
 
 @router.callback_query(F.data.startswith('cancel_td:'))
 async def handle_cancel_td(callback: CallbackQuery, user: TelegramUser | None):

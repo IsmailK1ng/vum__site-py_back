@@ -39,3 +39,8 @@ class LeasingStates(StatesGroup):
     choose_down_payment = State()
     choose_term         = State()
     confirm             = State()
+
+
+class EditProfileStates(StatesGroup):
+    edit_name  = State()
+    edit_phone = State()
