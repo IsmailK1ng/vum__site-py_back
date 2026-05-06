@@ -1480,6 +1480,7 @@ class BotMenuItem(models.Model):
         ('contacts', '📍 Контакты'),
         ('profile', '👤 Профиль'),
         ('language', '🌐 Язык'),
+        ('partner', '🤝 Сотрудничество'),
     ]
 
     key = models.CharField(
@@ -1703,6 +1704,16 @@ def clear_dealer_cache_on_delete(sender, instance, **kwargs):
     cache.delete('bot_dealer_cities')
     cache.delete('bot_dealers')
 
+@receiver(post_save, sender=News)
+def clear_news_cache(sender, instance, **kwargs):
+    for lang in ['ru', 'uz', 'en']:
+        cache.delete(f'bot_news_{lang}')
+
+@receiver(post_delete, sender=News)
+def clear_news_cache_on_delete(sender, instance, **kwargs):
+    for lang in ['ru', 'uz', 'en']:
+        cache.delete(f'bot_news_{lang}')
+
 
 class BotFSMState(models.Model):
     key = models.CharField(max_length=255, unique=True, db_index=True)
@@ -1755,3 +1766,49 @@ class TeamMember(models.Model):
         verbose_name_plural = "Команда — Сотрудники"
         ordering = ['department__order', 'order']
 
+class PartnerApplication(models.Model):
+
+    OFFER_TYPE_CHOICES = [
+        ('advertising', 'Реклама'),
+        ('supplies',    'Поставки'),
+        ('it',          'IT услуги'),
+        ('finance',     'Финансы'),
+        ('logistics',   'Логистика'),
+        ('media',       'Медиа'),
+        ('other',       'Другое'),
+    ]
+
+    STATUS_CHOICES = [
+        ('new',      'Новая'),
+        ('viewed',   'Просмотрена'),
+        ('in_work',  'В работе'),
+        ('rejected', 'Отклонена'),
+    ]
+
+    full_name     = models.CharField('ФИО', max_length=200)
+    company       = models.CharField('Компания/фирма', max_length=200)
+    contact       = models.CharField('Контакт (телефон или Telegram)', max_length=100)
+    offer_type    = models.CharField('Тип предложения', max_length=50, choices=OFFER_TYPE_CHOICES)
+    proposal_file = models.FileField(
+        'Файл КП',
+        upload_to='bot/partners/',
+        blank=True,
+        null=True,
+    )
+    status        = models.CharField(
+        'Статус', max_length=20,
+        choices=STATUS_CHOICES,
+        default='new',
+        db_index=True,
+    )
+    admin_comment = models.TextField('Комментарий', blank=True, null=True)
+    telegram_id   = models.BigIntegerField('Telegram ID', blank=True, null=True)
+    created_at    = models.DateTimeField('Дата заявки', auto_now_add=True)
+
+    class Meta:
+        verbose_name        = 'Бот — Партнёрское предложение'
+        verbose_name_plural = 'Бот — Партнёрские предложения'
+        ordering            = ['-created_at']
+
+    def __str__(self):
+        return f"{self.full_name} — {self.company} ({self.get_offer_type_display()})"

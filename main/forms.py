@@ -10,15 +10,10 @@ from .widgets import (
 
 
 class PageMetaAdminForm(forms.ModelForm):
-    """
-    Форма для PageMeta с иконками подсказок
-    """
-    
     class Meta:
         model = PageMeta
         fields = '__all__'
         widgets = {
-            # ========== ИДЕНТИФИКАЦИЯ ==========
             'model': SelectWithHelp(
                 help_text=(
                     "<strong>Выберите категорию страницы:</strong>"
@@ -62,7 +57,6 @@ class PageMetaAdminForm(forms.ModelForm):
                 )
             ),
             
-            # ========== БАЗОВЫЕ META ==========
             'title': TextInputWithHelp(
                 attrs={'size': 80},
                 help_text=(
@@ -129,7 +123,6 @@ class PageMetaAdminForm(forms.ModelForm):
                 )
             ),
             
-            # ========== OPEN GRAPH ==========
             'og_title': TextInputWithHelp(
                 attrs={'size': 80},
                 help_text=(

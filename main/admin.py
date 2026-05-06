@@ -50,7 +50,7 @@ from .models import (
     BecomeADealerPage, DealerRequirement,
     BecomeADealerApplication, AmoCRMToken,
     Dashboard, Promotion, PageMeta, FAQItem,
-    REGION_CHOICES,
+    REGION_CHOICES, PartnerApplication,
     TelegramUser, TestDriveRequest, BotConfig,
     BotMessage, BotMenuItem, BotBroadcast,
     ProductWishlist, ProductViewHistory, BotContacts,
@@ -65,18 +65,12 @@ from main.services.dashboard.insights import generate_insights
 
 logger = logging.getLogger('bot')
 
-# ========== НАСТРОЙКИ АДМИНКИ ==========
 admin.site.site_header = "Панель управления VUM"
 admin.site.site_title = "VUM Admin"
 admin.site.index_title = "Управление сайтами FAW"
 
 
-
-
-# ============ БАЗОВЫЕ МИКСИНЫ ============
-
 class ContentAdminMixin:
-    """Миксин для контент-админов"""
 
     def has_module_permission(self, request):
         if request.user.is_superuser:
@@ -111,8 +105,6 @@ class ContentAdminMixin:
 
 
 class LeadManagerMixin:
-    """Миксин для лид-менеджеров"""
-
     def has_module_permission(self, request):
         if request.user.is_superuser:
             return True
@@ -136,8 +128,6 @@ class LeadManagerMixin:
 
 
 class AmoCRMAdminMixin:
-    """Миксин для управления amoCRM"""
-
     def has_module_permission(self, request):
         if request.user.is_superuser:
             return True
@@ -157,8 +147,6 @@ class AmoCRMAdminMixin:
 
 
 class CustomReversionMixin:
-    """Миксин для кастомного шаблона восстановления"""
-
     def get_urls(self):
         urls = super().get_urls()
         opts = self.model._meta
@@ -230,7 +218,6 @@ class CustomReversionMixin:
 
 
 def _add_recover_context(admin_instance, request, extra_context):
-    """Хелпер — добавляет кнопку восстановления в changelist если есть удалённые."""
     extra_context = extra_context or {}
     deleted_count = Version.objects.get_deleted(admin_instance.model).count()
     if deleted_count > 0:
@@ -239,7 +226,6 @@ def _add_recover_context(admin_instance, request, extra_context):
     return extra_context
 
 
-# ============ НОВОСТИ ============
 
 class NewsBlockInline(TranslationStackedInline):
     model = NewsBlock
@@ -320,8 +306,6 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
     def changelist_view(self, request, extra_context=None):
         return super().changelist_view(request, _add_recover_context(self, request, extra_context))
 
-
-# ============ ЗАЯВКИ ============
 
 @admin.register(ContactForm)
 class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
@@ -611,7 +595,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
             return JsonResponse({'error': str(exc)}, status=500)
 
 
-# ============ ВАКАНСИИ ============
 
 class VacancyResponsibilityInline(TranslationStackedInline):
     model = VacancyResponsibility
@@ -710,8 +693,6 @@ class JobApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
     is_processed_badge.short_description = 'Статус'
 
 
-# ============ ИКОНКИ ============
-
 @admin.register(FeatureIcon)
 class FeatureIconAdmin(ContentAdminMixin, admin.ModelAdmin):
     list_display = ['icon_preview', 'name', 'order']
@@ -725,7 +706,6 @@ class FeatureIconAdmin(ContentAdminMixin, admin.ModelAdmin):
     icon_preview.short_description = 'Превью'
 
 
-# ============ ДИЛЕРЫ ============
 
 @admin.register(DealerService)
 class DealerServiceAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
@@ -821,7 +801,6 @@ class DealerAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedT
         return super().changelist_view(request, _add_recover_context(self, request, extra_context))
 
 
-# ============ СТРАНИЦА "СТАТЬ ДИЛЕРОМ" ============
 
 class DealerRequirementInline(TranslationTabularInline):
     model = DealerRequirement
@@ -847,8 +826,6 @@ class BecomeADealerPageAdmin(ContentAdminMixin, TabbedTranslationAdmin):
         obj = BecomeADealerPage.get_instance()
         return self.changeform_view(request, str(obj.pk), '', extra_context)
 
-
-# ============ ЗАЯВКИ НА ДИЛЕРСТВО ============
 
 class BecomeADealerApplicationForm(forms.ModelForm):
     class Meta:
@@ -927,8 +904,6 @@ class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
         wb.save(response)
         return response
 
-
-# ============ ПРОДУКТЫ ============
 
 class ProductCategoryFilter(admin.SimpleListFilter):
     title = 'категория'
@@ -1174,7 +1149,6 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
         return JsonResponse({'suggestions': result})
 
 
-# ============ AMОCRM ТОКЕНЫ ============
 
 @admin.register(AmoCRMToken)
 class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
@@ -1284,7 +1258,6 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
         return render(request, 'main/amocrm_instructions.html', context)
 
 
-# ========== DASHBOARD ==========
 
 @admin.register(Dashboard)
 class DashboardAdmin(admin.ModelAdmin):
@@ -1925,3 +1898,99 @@ class TeamMemberAdmin(ContentAdminMixin, TabbedTranslationAdmin):
             )
         return '—'
     photo_preview.short_description = 'Фото'
+
+
+
+
+@admin.register(PartnerApplication)
+class PartnerApplicationAdmin(admin.ModelAdmin):
+    list_display  = [
+        'created_at', 'full_name', 'company', 'contact',
+        'offer_type_badge', 'status_badge', 'file_link', 'action_buttons',
+    ]
+    list_filter   = ['offer_type', 'status', 'created_at']
+    search_fields = ['full_name', 'company', 'contact']
+    readonly_fields = ['telegram_id', 'created_at', 'file_preview']
+    ordering      = ['-created_at']
+    list_per_page = 30
+    date_hierarchy = 'created_at'
+    fieldsets = (
+        ('Партнёр', {
+            'fields': ('full_name', 'company', 'contact', 'telegram_id'),
+        }),
+        ('Предложение', {
+            'fields': ('offer_type', 'proposal_file', 'file_preview'),
+        }),
+        ('Обработка', {
+            'fields': ('status', 'admin_comment', 'created_at'),
+        }),
+    )
+
+    def offer_type_badge(self, obj):
+        colors = {
+            'advertising': '#3b82f6',
+            'supplies':    '#10b981',
+            'it':          '#8b5cf6',
+            'finance':     '#f59e0b',
+            'logistics':   '#ef4444',
+            'media':       '#ec4899',
+            'other':       '#6b7280',
+        }
+        color = colors.get(obj.offer_type, '#6b7280')
+        return format_html(
+            '<span style="background:{};color:white;padding:4px 10px;'
+            'border-radius:6px;font-size:12px;font-weight:600;">{}</span>',
+            color, obj.get_offer_type_display(),
+        )
+    offer_type_badge.short_description = 'Тип'
+    offer_type_badge.admin_order_field = 'offer_type'
+
+    def status_badge(self, obj):
+        colors = {
+            'new':      '#f59e0b',
+            'viewed':   '#3b82f6',
+            'in_work':  '#10b981',
+            'rejected': '#ef4444',
+        }
+        color = colors.get(obj.status, '#6b7280')
+        return format_html(
+            '<span style="background:{};color:white;padding:4px 10px;'
+            'border-radius:6px;font-size:12px;font-weight:600;">{}</span>',
+            color, obj.get_status_display(),
+        )
+    status_badge.short_description = 'Статус'
+
+    def file_link(self, obj):
+        if obj.proposal_file:
+            return format_html(
+                '<a href="{}" target="_blank" '
+                'style="color:#3b82f6;font-weight:600;">Скачать КП</a>',
+                obj.proposal_file.url,
+            )
+        return format_html('<span style="color:#9ca3af;">Нет файла</span>')
+    file_link.short_description = 'КП файл'
+
+    def file_preview(self, obj):
+        if obj.proposal_file:
+            name = obj.proposal_file.name.split('/')[-1]
+            return format_html(
+                '<a href="{}" target="_blank" '
+                'style="color:#3b82f6;font-weight:600;">{}</a>',
+                obj.proposal_file.url, name,
+            )
+        return '—'
+    file_preview.short_description = 'Файл КП'
+
+    def action_buttons(self, obj):
+        return format_html(
+            '<div style="display:flex;gap:8px;">'
+            '<a href="{}"><img src="/static/media/icon-adminpanel/pencil.png" width="20" height="20"></a>'
+            '<a href="{}" onclick="return confirm(\'Удалить?\')"><img src="/static/media/icon-adminpanel/recycle-bin.png" width="20" height="20"></a>'
+            '</div>',
+            f'/admin/main/partnerapplication/{obj.id}/change/',
+            f'/admin/main/partnerapplication/{obj.id}/delete/',
+        )
+    action_buttons.short_description = 'Действия'
+
+    def has_add_permission(self, request):
+        return False

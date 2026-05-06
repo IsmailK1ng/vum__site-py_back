@@ -3,7 +3,6 @@ from django.utils import timezone
 from .models import Product, News
 
 class LanguageSpecificSitemap(Sitemap):
-    """Базовый класс для языковых sitemap"""
     protocol = 'https'
     
     def __init__(self, language):
@@ -11,14 +10,12 @@ class LanguageSpecificSitemap(Sitemap):
         super().__init__()
     
     def _get_url_prefix(self):
-        """Префикс для URL в зависимости от языка"""
         if self.language == 'uz':
             return ''
         return f'/{self.language}'
 
 
 class StaticPagesSitemap(LanguageSpecificSitemap):
-    """Статические страницы"""
     
     def items(self):
         return [
@@ -45,7 +42,6 @@ class StaticPagesSitemap(LanguageSpecificSitemap):
 
 
 class CategorySitemap(LanguageSpecificSitemap):
-    """Категории товаров"""
     
     def items(self):
         return [
@@ -79,7 +75,6 @@ class CategorySitemap(LanguageSpecificSitemap):
 
 
 class ProductsSitemap(LanguageSpecificSitemap):
-    """Товары"""
     
     def items(self):
         return Product.objects.filter(is_active=True)
@@ -96,7 +91,6 @@ class ProductsSitemap(LanguageSpecificSitemap):
 
 
 class NewsSitemap(LanguageSpecificSitemap):
-    """Новости"""
     
     def items(self):
         return News.objects.filter(is_active=True)
@@ -113,7 +107,6 @@ class NewsSitemap(LanguageSpecificSitemap):
 
 
 def get_sitemaps_for_language(language):
-    """Создает sitemap для конкретного языка"""
     return {
         'static': StaticPagesSitemap(language),
         'categories': CategorySitemap(language),

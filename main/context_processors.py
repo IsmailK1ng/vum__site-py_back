@@ -9,10 +9,6 @@ logger = logging.getLogger('django')
 
 
 def seo_meta(request):
-    """
-    Добавляет SEO мета-данные в контекст всех шаблонов.
-    """
-    
     full_path = request.get_full_path()
     path = request.path
     current_lang = get_language()

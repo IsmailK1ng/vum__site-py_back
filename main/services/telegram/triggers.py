@@ -63,3 +63,9 @@ LEAD_TRIGGERS: frozenset[str] = frozenset({
     'Ariza qoldirish',
     'Leave a request',
 })
+
+PARTNER_TRIGGERS: frozenset[str] = frozenset({
+    'Сотрудничество',
+    'Hamkorlik',
+    'Partnership',
+})

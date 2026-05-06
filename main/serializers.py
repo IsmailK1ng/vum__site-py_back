@@ -51,23 +51,19 @@ class ContactFormSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'status_display', 'priority_display', 'region_display']
     
     def validate_referer(self, value):
-        """Валидация referer - может быть пустым или относительным URL"""
         if value and len(value) > 500:
             raise serializers.ValidationError("Referer слишком длинный (макс 500 символов)")
         return value
     
     def validate_visitor_uid(self, value):
-        """Валидация visitor_uid от amoCRM Pixel"""
         if value:
             if not (value.replace('-', '').replace('_', '').isalnum() and len(value) <= 100):
                 raise serializers.ValidationError("Невалидный visitor_uid")
         return value
     
     def validate_utm_data(self, value):
-        """Валидация utm_data - может быть строкой или объектом"""
         if value:
             if isinstance(value, dict):
-                # Преобразуем объект в JSON строку
                 import json
                 return json.dumps(value, ensure_ascii=False)
             elif isinstance(value, str):
@@ -136,7 +132,6 @@ class ContactFormSerializer(serializers.ModelSerializer):
 
 
 class JobApplicationSerializer(serializers.ModelSerializer):
-    """Заявки на вакансии с валидацией резюме"""
     vacancy_title = serializers.CharField(source='vacancy.title', read_only=True)
     
     class Meta:
@@ -145,13 +140,10 @@ class JobApplicationSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'vacancy_title']
     
     def validate_resume(self, value):
-        """Валидация файла резюме"""
         try:
-            # Проверка размера (10 MB)
             if value.size > 10 * 1024 * 1024:
                 raise serializers.ValidationError("Fayl hajmi juda katta. Maksimal 10 MB")
             
-            # Проверка формата
             allowed_extensions = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png']
             file_ext = value.name.lower().split('.')[-1]
             if file_ext not in allowed_extensions:
@@ -160,16 +152,14 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             return value
         
         except serializers.ValidationError:
-            raise  # Пробрасываем ValidationError
+            raise 
         except Exception as e:
             logger.error(f"Критическая ошибка валидации резюме: {str(e)}", exc_info=True)
             raise serializers.ValidationError("Xatolik yuz berdi")
 
 
-# ========== ПРОДУКТЫ ==========
 
 class FeatureIconSerializer(serializers.ModelSerializer):
-    """Иконки для характеристик"""
     icon_url = serializers.SerializerMethodField()
 
     class Meta:
@@ -186,7 +176,6 @@ class FeatureIconSerializer(serializers.ModelSerializer):
 
 
 class ProductCardSpecSerializer(serializers.ModelSerializer):
-    """4 характеристики для карточки продукта"""
     icon = FeatureIconSerializer(read_only=True)
     
     class Meta:
@@ -194,8 +183,7 @@ class ProductCardSpecSerializer(serializers.ModelSerializer):
         fields = ['id', 'icon', 'value', 'order']
 
 
-class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer):  # ← ДОБАВЬ!
-    """Карточки продуктов для списка"""
+class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer):  
     card_specs = ProductCardSpecSerializer(many=True, read_only=True)
     image_url = serializers.SerializerMethodField()
     category_display = serializers.CharField(source='get_category_display', read_only=True)
@@ -215,18 +203,14 @@ class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer
         return getattr(obj, f'title_{lang}', None) or obj.title
     
     def get_all_categories(self, obj):
-        """Возвращает все категории продукта (основную + дополнительные)"""
         categories = [obj.category]  
         
-        # Добавляем дополнительные
         if obj.categories:
             additional = [cat.strip() for cat in obj.categories.split(',') if cat.strip()]
             categories.extend(additional)
         
-        # Убираем дубликаты
         categories = list(dict.fromkeys(categories))
         
-        # Возвращаем с названиями
         result = []
         for cat_slug in categories:
             for slug, name in Product.CATEGORY_CHOICES:
@@ -237,7 +221,6 @@ class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer
         return result
     
     def get_image_url(self, obj):
-        """Возвращает URL изображения для карточки"""
         image = obj.card_image if obj.card_image else obj.main_image
         if image:
             request = self.context.get('request')
@@ -248,7 +231,6 @@ class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer
 
 
 class ProductFeatureSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
-    """8 характеристик с иконками"""
     icon = FeatureIconSerializer(read_only=True)
     name = serializers.SerializerMethodField()
     
@@ -262,7 +244,6 @@ class ProductFeatureSerializer(LanguageSerializerMixin, serializers.ModelSeriali
 
 
 class ProductGallerySerializer(serializers.ModelSerializer):
-    """Галерея продукта"""
     image_url = serializers.SerializerMethodField()
     
     class Meta:
@@ -279,7 +260,6 @@ class ProductGallerySerializer(serializers.ModelSerializer):
 
 
 class ProductDetailSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
-    """Детальная страница продукта"""
     card_specs = ProductCardSpecSerializer(many=True, read_only=True)
     spec_groups = serializers.SerializerMethodField()
     features = ProductFeatureSerializer(many=True, read_only=True)
@@ -303,24 +283,19 @@ class ProductDetailSerializer(LanguageSerializerMixin, serializers.ModelSerializ
         ]
     
     def get_all_categories(self, obj):
-        """Возвращает все категории продукта с переводами"""
         language = self.get_current_language()
         
-        # Получаем все категории
         categories = [obj.category]
         if obj.categories:
             additional = [cat.strip() for cat in obj.categories.split(',') if cat.strip()]
             categories.extend(additional)
         
-        # Убираем дубликаты
         categories = list(dict.fromkeys(categories))
         
-        # Возвращаем с названиями на нужном языке
         result = []
         for cat_slug in categories:
             for slug, name in Product.CATEGORY_CHOICES:
                 if slug == cat_slug:
-                    # Здесь можно добавить переводы названий категорий если нужно
                     result.append({'slug': slug, 'name': name})
                     break
         
@@ -385,7 +360,6 @@ class ProductDetailSerializer(LanguageSerializerMixin, serializers.ModelSerializ
                     'parameters': []
                 }
             
-            # Получаем текст параметра на нужном языке
             text_value = getattr(param, f'text_{language}', None) or param.text or ''
             
             grouped[category]['parameters'].append({
@@ -422,9 +396,6 @@ class DealerServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = DealerService
         fields = ['id', 'name', 'slug']
-
-
-# main/serializers.py
 
 class DealerServiceSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
@@ -509,10 +480,8 @@ class BecomeADealerApplicationSerializer(serializers.ModelSerializer):
         validated_data['priority'] = 'medium'
         return super().create(validated_data)
     
-# ========== СЕРИАЛИЗАТОР ДЛЯ ВАКАНСИЙ ==========
 
 class VacancySerializer(LanguageSerializerMixin, serializers.ModelSerializer):
-    """Вакансии с поддержкой переводов"""
     title = serializers.SerializerMethodField()
     short_description = serializers.SerializerMethodField()
     contact_info = serializers.SerializerMethodField()
@@ -590,7 +559,6 @@ from .models import Promotion
 from main.serializers_base import LanguageSerializerMixin
 
 class PromotionSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
-    """Сериализатор акций с поддержкой языков"""
     title = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
     button_text = serializers.SerializerMethodField()

@@ -38,7 +38,6 @@ async def create_bot_and_dispatcher() -> tuple[Bot, Dispatcher]:
     )
 
     storage = DatabaseStorage()
-
     dp = Dispatcher(storage=storage)
 
     dp.message.middleware(UserMiddleware())
@@ -53,7 +52,7 @@ async def create_bot_and_dispatcher() -> tuple[Bot, Dispatcher]:
 def _register_handlers(dp: Dispatcher) -> None:
     from main.services.telegram.handlers import (
         start, catalog, dealers, test_drive,
-        lead, faq, profile, news, leasing, contacts, common,
+        lead, faq, profile, news, leasing, contacts, partner, common,
     )
 
     dp.include_router(start.router)
@@ -66,6 +65,7 @@ def _register_handlers(dp: Dispatcher) -> None:
     dp.include_router(news.router)
     dp.include_router(leasing.router)
     dp.include_router(contacts.router)
-    dp.include_router(common.router)
-
+    dp.include_router(partner.router)  
+    dp.include_router(common.router)  
+    
     logger.info('All handlers registered')

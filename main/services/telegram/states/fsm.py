@@ -44,3 +44,12 @@ class LeasingStates(StatesGroup):
 class EditProfileStates(StatesGroup):
     edit_name  = State()
     edit_phone = State()
+
+
+class PartnerStates(StatesGroup):
+    choose_type = State()
+    enter_name  = State()
+    enter_company = State()
+    enter_contact = State()
+    upload_file   = State()
+    confirm       = State()

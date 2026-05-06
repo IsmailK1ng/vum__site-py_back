@@ -623,12 +623,17 @@ class BotService:
     @classmethod
     def get_news(cls, language: str, limit: int = 5) -> list[dict]:
         limit = max(1, min(limit, 50))
+        cache_key = f'bot_news_{language}'
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return cached[:limit]
+
         qs = (
             News.objects
             .filter(is_active=True)
-            .order_by('-order', '-created_at', '-id')[:limit]
+            .order_by('-order', '-created_at', '-id')[:20]
         )
-        return [
+        result = [
             {
                 'id':         n.id,
                 'title':      _field(n, 'title', language),
@@ -639,6 +644,8 @@ class BotService:
             }
             for n in qs
         ]
+        cache.set(cache_key, result, timeout=300)
+        return result[:limit]
 
     @classmethod
     def get_active_promotions(cls, language: str) -> list[dict]:
