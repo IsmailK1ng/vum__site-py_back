@@ -65,15 +65,67 @@
 }
 
 .btn-mobile-icon {
-    width: 25.5rem;
-    height: 5.5rem;
-    padding: 0 1.2rem;
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem 1.8rem !important;
     -moz-border-radius: 2.8rem;
-    border-radius: 2.8rem;
+    border-radius: 2.8rem !important;
+    white-space: nowrap;
+    width: auto !important;
+    height: auto !important;
 }
 
 .btn-mobile-icon .btn-caption {
     display: block !important;
+}
+
+.btn-mobile-icon i {
+    flex-shrink: 0;
+    font-size: 1.2em;
+}
+
+/* Цена под кнопкой */
+.product-price-wrapper {
+    margin-top: 1.5rem;
+    display: block;
+    width: fit-content;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 18px 25px;
+    box-shadow: 7px 9px 5px 0px rgb(0 0 0 / 10%);
+    border: 1px solid rgb(235 235 235 / 82%);
+}
+
+.product-price-label {
+    font-size: 1.4rem;
+    color: #666;
+    margin-bottom: 0.3rem;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.product-price-value {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+body[data-theme="dark"] .product-price-wrapper {
+    background: rgba(22, 22, 22, 0.95);
+    border-color: rgb(60 60 60 / 80%);
+    box-shadow: 7px 9px 5px 0px rgb(225 225 225 / 10%);
+}
+
+body[data-theme="dark"] .product-price-label {
+    color: #999;
+}
+
+body[data-theme="dark"] .product-price-value {
+    color: #ffffff;
 }
 
 

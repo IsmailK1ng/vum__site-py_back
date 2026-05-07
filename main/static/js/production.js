@@ -449,6 +449,11 @@ class ProductsManager {
       wrapper.innerHTML = cardHTML;
       container.appendChild(wrapper);
     });
+
+    // Lenis вычисляет высоту страницы до загрузки карточек — обновляем после рендера
+    if (window.lenis) {
+      setTimeout(() => window.lenis.resize(), 100);
+    }
   }
 
   createCardHTML(product) {

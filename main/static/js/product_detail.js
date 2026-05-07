@@ -152,6 +152,7 @@ class ProductDetail {
 
         this.renderFeatures();
         this.renderSpecifications();
+        this.renderPrice();
         this.renderGallery();
         this.updateBreadcrumbs();
         this.generateSchemaMarkup();
@@ -277,6 +278,28 @@ class ProductDetail {
         </div>
         `;
         container.insertAdjacentHTML('beforeend', slideHTML);
+    }
+
+    renderPrice() {
+        const priceDisplay = document.getElementById('product-price-display');
+        if (!priceDisplay) return;
+
+        if (this.product.price && this.product.price > 0) {
+            const formatted = new Intl.NumberFormat('uz-UZ', {
+                style: 'decimal',
+                maximumFractionDigits: 0,
+            }).format(this.product.price);
+
+            const fromLabel = { uz: "dan", ru: "от", en: "from" };
+            const prefix = this.product.price_is_from
+                ? `${fromLabel[this.currentLanguage] || fromLabel['uz']} `
+                : '';
+
+            priceDisplay.textContent = `${prefix}${formatted} UZS`;
+        } else {
+            const onRequest = { uz: "Narx so'rang", ru: 'Цена по запросу', en: 'Price on request' };
+            priceDisplay.textContent = onRequest[this.currentLanguage] || onRequest['uz'];
+        }
     }
 
     initSwiper() {

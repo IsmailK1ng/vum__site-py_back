@@ -279,7 +279,7 @@ class ProductDetailSerializer(LanguageSerializerMixin, serializers.ModelSerializ
             'all_categories', 
             'main_image_url', 'card_image_url',
             'card_specs', 'spec_groups', 'features', 'gallery',
-            'is_active', 'is_featured', 'order'
+            'is_active', 'is_featured', 'order', 'price', 'price_is_from'
         ]
     
     def get_all_categories(self, obj):

@@ -128,6 +128,7 @@ function pageAppearance() {
 // Lenis Scroll Plugin Start
 // --------------------------------------------- //
 const lenis = new Lenis();
+window.lenis = lenis;
 lenis.on('scroll', ScrollTrigger.update);
 gsap.ticker.add((time) => {
   lenis.raf(time * 1000)

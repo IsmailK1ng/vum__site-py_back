@@ -136,6 +136,17 @@
                                             </span>
                                             <i class="ph-bold ph-arrow-up-right"></i>
                                         </a>
+                                        <div class="product-price-wrapper">
+                                            <span class="product-price-label">
+                                                {% if LANGUAGE_CODE == 'ru' %}Цена
+                                                {% elif LANGUAGE_CODE == 'en' %}Price
+                                                {% else %}Narx{% endif %}
+                                            </span>
+                                            <div class="product-price-value">
+                                                <!-- Загружается через JS -->
+                                                <span id="product-price-display">—</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="car-img_block">
