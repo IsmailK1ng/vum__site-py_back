@@ -156,6 +156,10 @@ class ProductDetail {
         this.renderGallery();
         this.updateBreadcrumbs();
         this.generateSchemaMarkup();
+
+        if (window.lenis) {
+            setTimeout(() => window.lenis.resize(), 100);
+        }
     }
 
     renderFeatures() {

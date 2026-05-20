@@ -37,6 +37,7 @@ from .models import (
     FAQItem,
     REGION_CHOICES,
     TeamDepartment,
+    TeamMember,
 )
 from .serializers import (
     NewsSerializer, 
@@ -110,7 +111,13 @@ def index(request):
 
 
 def about(request):
-    return render(request, 'main/about.html')
+    members = (
+        TeamMember.objects
+        .filter(is_active=True)
+        .select_related('department')
+        .order_by('department__order', 'order')[:12]
+    )
+    return render(request, 'main/about.html', {'members': members})
 
 
 def contact(request):
@@ -127,20 +134,14 @@ def faq(request):
 
 
 def team(request):
-    departments = (
-        TeamDepartment.objects
+    members = (
+        TeamMember.objects
         .filter(is_active=True)
-        .prefetch_related('members')
-        .order_by('order')
+        .select_related('department')
+        .prefetch_related('links')
+        .order_by('department__order', 'order')
     )
-    departments_with_members = [
-        {
-            'department': dept,
-            'members': dept.members.filter(is_active=True).order_by('order'),
-        }
-        for dept in departments
-    ]
-    return render(request, 'main/team.html', {'departments': departments_with_members})
+    return render(request, 'main/team.html', {'members': members})
 
 
 def product_detail(request, product_id):

@@ -959,3 +959,186 @@ body[data-theme="dark"] .close:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: rotate(90deg);
 }
+
+/* ===== TEAM SLIDER ===== */
+
+.team-slider-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.team-slider-title {
+  text-align: center;
+}
+
+.team-slider-title h2 {
+  margin-bottom: 1rem;
+}
+
+.team-slider-subtitle {
+  font-size: 1.6rem;
+  color: var(--t-muted);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Swiper Team */
+.team-slider-container {
+  position: relative;
+  padding: 0 2rem; /* место для стрелок */
+}
+
+.swiper-team {
+  overflow: hidden;
+}
+
+/* Убираем дефолтные стрелки Swiper если вдруг попали */
+.swiper-team .swiper-button-prev::after,
+.swiper-team .swiper-button-next::after {
+  display: none;
+}
+
+.swiper-team .swiper-slide {
+  opacity: 1 !important;
+  transform: none !important;
+  max-width: none;
+  width: auto;
+}
+
+/* ===== КАРТОЧКА УЧАСТНИКА ===== */
+.team-slider-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: var(--base-tint, #f5f5f5);
+  border-radius: var(--radius-m, 16px);
+  padding: 3rem 2rem 2.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  cursor: default;
+}
+
+.team-slider-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+}
+
+.team-slider-card__photo-wrap {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  flex-shrink: 0;
+  border: 3px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.team-slider-card__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.team-slider-card__photo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--base-tint, #ebebeb);
+  color: var(--t-muted, #aaa);
+  font-size: 4rem;
+}
+
+.team-slider-card__info {
+  flex: 1;
+  width: 100%;
+}
+
+.team-slider-card__name {
+  font: 600 1.8rem/1.3 var(--_font-accent);
+  color: var(--t-bright);
+  margin: 0 0 0.6rem;
+}
+
+.team-slider-card__position {
+  font: 400 1.3rem/1.4 var(--_font-accent);
+  color: var(--t-muted, #888);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ===== НАВИГАЦИЯ ===== */
+.team-slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.team-slider-btn-prev { left: -20px; }
+.team-slider-btn-next { right: -20px; }
+
+/* ===== ТЁМНАЯ ТЕМА ===== */
+[color-scheme="dark"] .team-slider-card {
+  background: #1a1a1a;
+  border-color: #333;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+[color-scheme="dark"] .team-slider-card:hover {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+[color-scheme="dark"] .team-slider-card__photo-wrap {
+  border-color: #444;
+}
+
+[color-scheme="dark"] .team-slider-card__name {
+  color: #fff;
+}
+
+[color-scheme="dark"] .team-slider-card__position {
+  color: #888;
+}
+
+/* ===== АДАПТИВ ===== */
+@media (max-width: 1024px) {
+  .team-slider-btn-prev { left: 0; }
+  .team-slider-btn-next { right: 0; }
+}
+
+@media (max-width: 767px) {
+  .team-slider-section { gap: 2.4rem; }
+
+  .team-slider-card {
+    padding: 2.5rem 1.5rem 2rem;
+  }
+
+  .team-slider-card__photo-wrap {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 1.5rem;
+  }
+
+  .team-slider-card__name { font-size: 1.6rem; }
+  .team-slider-card__position { font-size: 1.2rem; }
+}
+
+@media (max-width: 479px) {
+  .team-slider-card__photo-wrap {
+    width: 90px;
+    height: 90px;
+  }
+
+  .team-slider-btn-prev,
+  .team-slider-btn-next {
+    display: none;
+  }
+}

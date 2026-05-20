@@ -16,36 +16,16 @@
                 <div class="footer-blocks__card fullheight-card">
                     <div class="footer-blocks__nav">
                         <ul class="footer-nav">
+                            {% for item in nav_footer %}
                             <li class="footer-nav__item">
-                                <a href="{% url 'home' %}" class="footer-nav__link btn-anim">
-                                    <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}</span>
+                                <a href="{{ item.url }}" class="footer-nav__link btn-anim"
+                                    {% if item.open_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>
+                                    <span class="btn-caption">
+                                        {% if nav_lang == 'ru' %}{{ item.title_ru }}{% elif nav_lang == 'en' %}{{ item.title_en }}{% else %}{{ item.title_uz }}{% endif %}
+                                    </span>
                                 </a>
                             </li>
-                            <li class="footer-nav__item">
-                                <a href="{% url 'about' %}" class="footer-nav__link btn-anim">
-                                    <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Biz haqimizda{% elif LANGUAGE_CODE == 'ru' %}О нас{% else %}About us{% endif %}</span>
-                                </a>
-                            </li>
-                            <li class="footer-nav__item">
-                                <a href="{% url 'team' %}" class="footer-nav__link btn-anim">
-                                    <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Jamoamiz{% elif LANGUAGE_CODE == 'ru' %}Наша команда{% else %}Our Team{% endif %}</span>
-                                </a>
-                            </li>
-                            <li class="footer-nav__item">
-                                <a href="{% url 'services' %}" class="footer-nav__link btn-anim">
-                                    <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Xizmatlar{% elif LANGUAGE_CODE == 'ru' %}Услуги{% else %}Services{% endif %}</span>
-                                </a>
-                            </li>
-                            <li class="footer-nav__item">
-                                <a href="{% url 'news' %}" class="footer-nav__link btn-anim">
-                                    <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Yangiliklar{% elif LANGUAGE_CODE == 'ru' %}Новости{% else %}News{% endif %}</span>
-                                </a>
-                            </li>
-                            <li class="footer-nav__item">
-                                <a href="{% url 'contact' %}" class="footer-nav__link btn-anim">
-                                    <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Aloqa{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contact{% endif %}</span>
-                                </a>
-                            </li>
+                            {% endfor %}
                         </ul>
                     </div>
                     <div class="footer-blocks__links">
@@ -114,26 +94,14 @@
 
                         <div class="footer-blocks__socials">
                             <ul class="footer-socials">
+                                {% for social in social_links %}
                                 <li class="footer-socials__item">
-                                    <img data-src="{% static 'images/icons/main-social__icon/facebook.png' %}" alt="Facebook" class="footer-socials__icon" width="24" height="24" loading="lazy">
-                                    <a href="https://www.facebook.com/profile.php?id=61584077936316" class="footer-socials__link" target="_blank" rel="nofollow noopener noreferrer">Facebook</a>
+                                    {% if social.get_icon_url %}
+                                    <img data-src="{{ social.get_icon_url }}" alt="{{ social.display_title }}" class="footer-socials__icon" width="24" height="24" loading="lazy">
+                                    {% endif %}
+                                    <a href="{{ social.url }}" class="footer-socials__link" target="_blank" rel="nofollow noopener noreferrer">{{ social.display_title }}</a>
                                 </li>
-                                <li class="footer-socials__item">
-                                    <img data-src="{% static 'images/icons/main-social__icon/instagram.png' %}" alt="Instagram" class="footer-socials__icon" width="24" height="24" loading="lazy">
-                                    <a href="https://www.instagram.com/vum_faw_uzbekistan/" class="footer-socials__link" target="_blank" rel="nofollow noopener noreferrer">Instagram</a>
-                                </li>
-                                <li class="footer-socials__item">
-                                    <img data-src="{% static 'images/icons/main-social__icon/telegram.png' %}" alt="Telegram" class="footer-socials__icon" width="24" height="24" loading="lazy">
-                                    <a href="https://t.me/vum_faw_uzbekistan" class="footer-socials__link" target="_blank" rel="nofollow noopener noreferrer">Telegram</a>
-                                </li>
-                                <li class="footer-socials__item">
-                                    <img data-src="{% static 'images/icons/main-social__icon/youtube.png' %}" alt="YouTube" class="footer-socials__icon" width="24" height="24" loading="lazy">
-                                    <a href="https://www.youtube.com/@faw_uzbekistan" class="footer-socials__link" target="_blank" rel="nofollow noopener noreferrer">YouTube</a>
-                                </li>
-                                <li class="footer-socials__item">
-                                    <img data-src="{% static 'images/icons/main-social__icon/linkedin.png' %}" alt="LinkedIn" class="footer-socials__icon" width="24" height="24" loading="lazy">
-                                    <a href="https://www.linkedin.com/company/vanuniversalmotors/" class="footer-socials__link" target="_blank" rel="nofollow noopener noreferrer">LinkedIn</a>
-                                </li>
+                                {% endfor %}
                             </ul>
                         </div>
                     </div>

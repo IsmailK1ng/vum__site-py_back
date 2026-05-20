@@ -4,6 +4,7 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
 <link rel="stylesheet" href="{% static 'css/team-page.css' %}">
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1" defer></script>
 {% endblock %}
 
 {% block app_js %}{% endblock %}
@@ -53,62 +54,69 @@
     <div class="mxd-section padding-blog">
       <div class="mxd-container grid-container">
 
-        {% for item in departments %}
-        <div class="team-department mxd-block">
+          <div class="team-list">
+          {% for member in members %}
+          <div class="team-member-card bg-base-tint radius-m animate-card-4">
 
-          <!-- Department title -->
-          <div class="team-department__header" style="text-align: center;">
-            <h2 class="reveal-type">{{ item.department.title }}</h2>
-          </div>
-
-          <!-- Members grid -->
-          <div class="team-members-grid">
-            {% for member in item.members %}
-            <div class="team-card animate-card-4">
-              <div class="team-card__inner bg-base-tint radius-m">
-                <div class="team-card__photo-wrap">
-                  {% if member.photo %}
-                  <img
-                    class="team-card__photo"
-                    data-src="{{ member.photo.url }}"
-                    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-                    alt="{{ member.name }}"
-                    loading="lazy"
-                  >
-                  {% else %}
-                  <div class="team-card__photo-placeholder">
-                    <i class="ph ph-user"></i>
-                  </div>
-                  {% endif %}
-                </div>
-                <div class="team-card__info">
-                  <h4 class="team-card__name">{{ member.name }}</h4>
-                  <p class="team-card__position t-small">{{ member.position }}</p>
-                </div>
+            <!-- Фото -->
+            <div class="team-member-card__photo-wrap">
+              {% if member.photo %}
+              <img
+                class="team-member-card__photo"
+                data-src="{{ member.photo.url }}"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                alt="{{ member.name }}"
+                loading="lazy"
+              >
+              {% else %}
+              <div class="team-member-card__photo-placeholder">
+                <i class="ph ph-user"></i>
               </div>
+              {% endif %}
             </div>
-            {% empty %}
-            <p class="team-empty">
-              {% if LANGUAGE_CODE == 'uz' %}Hozircha xodimlar yo'q
-              {% elif LANGUAGE_CODE == 'ru' %}Сотрудников пока нет
-              {% else %}No members yet{% endif %}
-            </p>
-            {% endfor %}
-          </div>
 
-          {% if not forloop.last %}
-          <div class="team-department__divider"></div>
-          {% endif %}
+            <!-- Основная информация -->
+            <div class="team-member-card__main">
+              <h3 class="team-member-card__name">{{ member.name }}</h3>
+              <p class="team-member-card__dept">{{ member.department.title }}</p>
+              <p class="team-member-card__position">{{ member.position }}</p>
+            </div>
+
+            <!-- Контакты -->
+            {% if member.phone or member.email or member.links.all %}
+            <div class="team-member-card__contacts">
+              {% if member.phone %}
+              <div class="team-contact-item">
+                <i class="ph-fill ph-phone"></i>
+                <a href="tel:{{ member.phone }}">{{ member.phone }}</a>
+              </div>
+              {% endif %}
+              {% if member.email %}
+              <div class="team-contact-item">
+                <i class="ph-fill ph-envelope"></i>
+                <a href="mailto:{{ member.email }}">{{ member.email }}</a>
+              </div>
+              {% endif %}
+              {% for link in member.links.all %}
+              <div class="team-contact-item">
+                <i class="ph-fill {{ link.icon|default:'ph-link' }}"></i>
+                <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">{{ link.title }}</a>
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+          </div>
+          {% empty %}
+          <div class="team-no-data mxd-block">
+            <p>
+              {% if LANGUAGE_CODE == 'uz' %}Jamoamiz haqida ma'lumot tez orada qo'shiladi
+              {% elif LANGUAGE_CODE == 'ru' %}Информация о команде скоро появится
+              {% else %}Team information coming soon{% endif %}
+            </p>
+          </div>
+          {% endfor %}
         </div>
-        {% empty %}
-        <div class="team-no-data mxd-block">
-          <p>
-            {% if LANGUAGE_CODE == 'uz' %}Jamoamiz haqida ma'lumot tez orada qo'shiladi
-            {% elif LANGUAGE_CODE == 'ru' %}Информация о команде скоро появится
-            {% else %}Team information coming soon{% endif %}
-          </p>
-        </div>
-        {% endfor %}
 
       </div>
     </div>

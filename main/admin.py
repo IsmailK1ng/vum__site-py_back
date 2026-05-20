@@ -54,7 +54,7 @@ from .models import (
     TelegramUser, TestDriveRequest, BotConfig,
     BotMessage, BotMenuItem, BotBroadcast,
     ProductWishlist, ProductViewHistory, BotContacts,
-    TeamDepartment, TeamMember,
+    TeamDepartment, TeamMember, TeamMemberLink, NavItem, SocialLink,
 )
 from .forms import PageMetaAdminForm
 from main.services.amocrm.token_manager import TokenManager
@@ -1872,14 +1872,24 @@ class TeamDepartmentAdmin(ContentAdminMixin, TabbedTranslationAdmin):
     members_count.short_description = 'Сотрудников'
 
 
+class TeamMemberLinkInline(admin.TabularInline):
+    model   = TeamMemberLink
+    extra   = 1
+    fields  = ('order', 'title', 'url', 'icon')
+    ordering = ('order',)
+    verbose_name        = 'Ссылка'
+    verbose_name_plural = 'Ссылки (соцсети, сайт и др.)'
+
+
 @admin.register(TeamMember)
 class TeamMemberAdmin(ContentAdminMixin, TabbedTranslationAdmin):
-    list_display = ('order', 'photo_preview', 'name', 'position', 'department', 'is_active')
+    list_display       = ('order', 'photo_preview', 'name', 'position', 'department', 'is_active')
     list_display_links = ('name',)
-    list_editable = ('order', 'is_active')
-    list_filter = ('department', 'is_active')
-    search_fields = ('name', 'position', 'department__title')
-    ordering = ('department__order', 'order')
+    list_editable      = ('order', 'is_active')
+    list_filter        = ('department', 'is_active')
+    search_fields      = ('name', 'position', 'department__title')
+    ordering           = ('department__order', 'order')
+    inlines            = [TeamMemberLinkInline]
 
     fieldsets = (
         ('Основное', {
@@ -1887,6 +1897,9 @@ class TeamMemberAdmin(ContentAdminMixin, TabbedTranslationAdmin):
         }),
         ('Данные сотрудника', {
             'fields': ('photo', 'name', 'position'),
+        }),
+        ('Контакты', {
+            'fields': ('phone', 'email'),
         }),
     )
 
@@ -1992,5 +2005,57 @@ class PartnerApplicationAdmin(admin.ModelAdmin):
         )
     action_buttons.short_description = 'Действия'
 
-    def has_add_permission(self, request):
-        return False
+
+# ========== НАВИГАЦИЯ ==========
+
+class NavChildInline(admin.TabularInline):
+    model = NavItem
+    fk_name = 'parent'
+    extra = 0
+    fields = ('title_uz', 'title_ru', 'title_en', 'url', 'order', 'is_active', 'open_new_tab')
+    verbose_name = 'Дочерний пункт (подменю)'
+    verbose_name_plural = 'Подменю'
+    ordering = ('order',)
+
+
+@admin.register(NavItem)
+class NavItemAdmin(admin.ModelAdmin):
+    list_display  = ('title_ru', 'location', 'url', 'parent', 'order', 'is_active')
+    list_editable = ('order', 'is_active')
+    list_filter   = ('location', 'is_active')
+    list_display_links = ('title_ru',)
+    ordering      = ('location', 'order')
+    search_fields = ('title_ru', 'title_uz', 'title_en', 'url')
+    inlines       = [NavChildInline]
+
+    fieldsets = (
+        ('Названия', {
+            'fields': ('title_uz', 'title_ru', 'title_en'),
+        }),
+        ('Настройки', {
+            'fields': ('url', 'location', 'parent', 'order', 'is_active', 'open_new_tab'),
+        }),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('parent')
+
+
+# ========== СОЦИАЛЬНЫЕ СЕТИ ==========
+
+@admin.register(SocialLink)
+class SocialLinkAdmin(admin.ModelAdmin):
+    list_display  = ('network', 'display_title', 'url', 'order', 'is_active')
+    list_editable = ('order', 'is_active')
+    list_display_links = ('network',)
+    ordering      = ('order',)
+
+    fieldsets = (
+        (None, {
+            'fields': ('network', 'title', 'url', 'icon', 'order', 'is_active'),
+        }),
+    )
+
+    def display_title(self, obj):
+        return obj.display_title
+    display_title.short_description = 'Название'

@@ -1754,17 +1754,50 @@ class TeamMember(models.Model):
         related_name='members',
         verbose_name="Блок/отдел",
     )
-    name = models.CharField("Имя и фамилия", max_length=200)
+    name     = models.CharField("Имя и фамилия", max_length=200)
     position = models.CharField("Должность", max_length=200)
-    photo = models.ImageField("Фото", upload_to="team/", blank=True, null=True,
-                              help_text="Рекомендуемый размер: 400×400 px")
-    order = models.PositiveIntegerField("Порядок внутри блока", default=0)
+    photo    = models.ImageField("Фото", upload_to="team/", blank=True, null=True,
+                                 help_text="Рекомендуемый размер: 400×400 px")
+    phone    = models.CharField("Телефон", max_length=50, blank=True)
+    email    = models.EmailField("Email", max_length=200, blank=True)
+    order    = models.PositiveIntegerField("Порядок внутри блока", default=0)
     is_active = models.BooleanField("Активен", default=True)
 
     class Meta:
         verbose_name = " - Команда: сотрудник"
         verbose_name_plural = "Команда — Сотрудники"
         ordering = ['department__order', 'order']
+
+
+class TeamMemberLink(models.Model):
+    member = models.ForeignKey(
+        TeamMember,
+        on_delete=models.CASCADE,
+        related_name='links',
+        verbose_name='Сотрудник',
+    )
+    title = models.CharField(
+        'Название',
+        max_length=100,
+        help_text='Например: LinkedIn, Личный сайт, Telegram',
+    )
+    url   = models.URLField('Ссылка')
+    icon  = models.CharField(
+        'Иконка',
+        max_length=60,
+        blank=True,
+        default='ph-link',
+        help_text='Класс Phosphor-иконки: ph-globe, ph-linkedin-logo, ph-telegram-logo и т.д.',
+    )
+    order = models.PositiveIntegerField('Порядок', default=0)
+
+    class Meta:
+        verbose_name        = ' - Команда: ссылка сотрудника'
+        verbose_name_plural = 'Команда — Ссылки сотрудников'
+        ordering            = ['order']
+
+    def __str__(self):
+        return f'{self.member.name} — {self.title}'
 
 class PartnerApplication(models.Model):
 
@@ -1812,3 +1845,106 @@ class PartnerApplication(models.Model):
 
     def __str__(self):
         return f"{self.full_name} — {self.company} ({self.get_offer_type_display()})"
+
+
+# ========== НАВИГАЦИЯ (ХЕДЕР / ФУТЕР) ==========
+
+class NavItem(models.Model):
+    LOCATION_CHOICES = [
+        ('header', 'Хедер'),
+        ('footer', 'Футер'),
+        ('both',   'Хедер + Футер'),
+    ]
+
+    title_uz = models.CharField('Название (UZ)', max_length=100)
+    title_ru = models.CharField('Название (RU)', max_length=100)
+    title_en = models.CharField('Название (EN)', max_length=100)
+
+    url          = models.CharField(
+        'URL',
+        max_length=300,
+        help_text='Пример: /about/ или /products/?category=samosval — для родителя с подменю используйте javascript:void(0)'
+    )
+    location     = models.CharField('Место', max_length=10, choices=LOCATION_CHOICES, default='header')
+    parent       = models.ForeignKey(
+        'self',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='children',
+        verbose_name='Родительский пункт (подменю)',
+    )
+    order        = models.PositiveIntegerField('Порядок', default=0)
+    is_active    = models.BooleanField('Активен', default=True)
+    open_new_tab = models.BooleanField('Открывать в новой вкладке', default=False)
+
+    class Meta:
+        verbose_name        = 'Навигация — пункт меню'
+        verbose_name_plural = 'Навигация — меню (хедер/футер)'
+        ordering            = ['order']
+
+    def __str__(self):
+        parent_str = f' → {self.parent.title_ru}' if self.parent_id else ''
+        return f'[{self.get_location_display()}]{parent_str} {self.title_ru} ({self.order})'
+
+    def get_title(self, lang='uz'):
+        return getattr(self, f'title_{lang}', self.title_uz) or self.title_uz
+
+
+class SocialLink(models.Model):
+    NETWORK_CHOICES = [
+        ('facebook',  'Facebook'),
+        ('instagram', 'Instagram'),
+        ('telegram',  'Telegram'),
+        ('youtube',   'YouTube'),
+        ('linkedin',  'LinkedIn'),
+        ('tiktok',    'TikTok'),
+        ('twitter',   'X (Twitter)'),
+        ('custom',    'Другая'),
+    ]
+
+    ICON_MAP = {
+        'facebook':  'images/icons/main-social__icon/facebook.png',
+        'instagram': 'images/icons/main-social__icon/instagram.png',
+        'telegram':  'images/icons/main-social__icon/telegram.png',
+        'youtube':   'images/icons/main-social__icon/youtube.png',
+        'linkedin':  'images/icons/main-social__icon/linkedin.png',
+    }
+
+    network  = models.CharField('Соцсеть', max_length=20, choices=NETWORK_CHOICES)
+    title    = models.CharField(
+        'Название',
+        max_length=50,
+        blank=True,
+        help_text='Заполните только для варианта "Другая"',
+    )
+    url      = models.URLField('Ссылка')
+    icon     = models.ImageField(
+        'Иконка (своя)',
+        upload_to='socials/',
+        blank=True,
+        null=True,
+        help_text='Загружайте только для варианта "Другая". Для известных соцсетей иконка берётся автоматически.',
+    )
+    order    = models.PositiveIntegerField('Порядок', default=0)
+    is_active = models.BooleanField('Активен', default=True)
+
+    class Meta:
+        verbose_name        = 'Навигация — Социальная сеть'
+        verbose_name_plural = 'Навигация — Социальные сети'
+        ordering            = ['order']
+
+    def __str__(self):
+        return self.display_title
+
+    @property
+    def display_title(self):
+        if self.network == 'custom':
+            return self.title or 'Другая'
+        return self.get_network_display()
+
+    def get_icon_url(self):
+        from django.templatetags.static import static
+        if self.icon:
+            return self.icon.url
+        path = self.ICON_MAP.get(self.network)
+        return static(path) if path else ''

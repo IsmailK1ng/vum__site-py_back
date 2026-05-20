@@ -2,10 +2,47 @@
 
 from django.utils.translation import get_language
 from django.conf import settings
-from .models import PageMeta
+from .models import PageMeta, NavItem, SocialLink
 import logging
 
 logger = logging.getLogger('django')
+
+
+def nav_menu(request):
+    lang = get_language()
+    if lang:
+        lang = lang.split('-')[0]
+    if lang not in ('uz', 'ru', 'en'):
+        lang = 'uz'
+
+    try:
+        items = list(
+            NavItem.objects.filter(is_active=True)
+            .select_related('parent')
+            .order_by('order')
+        )
+    except Exception:
+        items = []
+
+    def build_tree(location):
+        roots = [i for i in items if i.parent_id is None and i.location in (location, 'both')]
+        for root in roots:
+            root.children_cache = [
+                c for c in items if c.parent_id == root.pk
+            ]
+        return roots
+
+    try:
+        social_links = list(SocialLink.objects.filter(is_active=True).order_by('order'))
+    except Exception:
+        social_links = []
+
+    return {
+        'nav_header':   build_tree('header'),
+        'nav_footer':   build_tree('footer'),
+        'nav_lang':     lang,
+        'social_links': social_links,
+    }
 
 
 def seo_meta(request):
