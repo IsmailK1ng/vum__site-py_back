@@ -1750,9 +1750,11 @@ class TeamDepartment(models.Model):
 class TeamMember(models.Model):
     department = models.ForeignKey(
         TeamDepartment,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='members',
         verbose_name="Блок/отдел",
+        blank=True,
+        null=True,
     )
     name     = models.CharField("Имя и фамилия", max_length=200)
     position = models.CharField("Должность", max_length=200)

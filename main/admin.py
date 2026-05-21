@@ -1883,17 +1883,17 @@ class TeamMemberLinkInline(admin.TabularInline):
 
 @admin.register(TeamMember)
 class TeamMemberAdmin(ContentAdminMixin, TabbedTranslationAdmin):
-    list_display       = ('order', 'photo_preview', 'name', 'position', 'department', 'is_active')
+    list_display       = ('order', 'photo_preview', 'name', 'position', 'is_active')
     list_display_links = ('name',)
     list_editable      = ('order', 'is_active')
-    list_filter        = ('department', 'is_active')
-    search_fields      = ('name', 'position', 'department__title')
-    ordering           = ('department__order', 'order')
+    list_filter        = ('is_active',)
+    search_fields      = ('name', 'position')
+    ordering           = ('order',)
     inlines            = [TeamMemberLinkInline]
 
     fieldsets = (
         ('Основное', {
-            'fields': ('department', 'order', 'is_active'),
+            'fields': ('order', 'is_active'),
         }),
         ('Данные сотрудника', {
             'fields': ('photo', 'name', 'position'),

@@ -1127,6 +1127,45 @@ if (testimonialsSlider) {
 // --------------------------------------------- //
 
 // --------------------------------------------- //
+// Swiper Slider - Team Start
+// --------------------------------------------- //
+const teamSliderEl = document.querySelector('.swiper-team');
+if (teamSliderEl) {
+  const teamSwiper = new Swiper('.swiper-team', {
+    slidesPerView: 1.2,
+    spaceBetween: 24,
+    grabCursor: true,
+    loop: true,
+    speed: 800,
+    autoplay: {
+      delay: 2500,
+      disableOnInteraction: false,
+    },
+    navigation: {
+      nextEl: '.team-slider-btn-next',
+      prevEl: '.team-slider-btn-prev',
+    },
+    breakpoints: {
+      576:  { slidesPerView: 2, spaceBetween: 24 },
+      992:  { slidesPerView: 3, spaceBetween: 24 },
+      1200: { slidesPerView: 4, spaceBetween: 24 },
+      1500: { slidesPerView: 5, spaceBetween: 24 },
+    },
+  });
+
+  // Пауза при наведении
+  teamSliderEl.addEventListener('mouseenter', function () {
+    teamSwiper.autoplay.stop();
+  });
+  teamSliderEl.addEventListener('mouseleave', function () {
+    teamSwiper.autoplay.start();
+  });
+}
+// --------------------------------------------- //
+// Swiper Slider - Team End
+// --------------------------------------------- //
+
+// --------------------------------------------- //
 // Swiper Slider - Testimonials #02 Start
 // --------------------------------------------- //
 const testimonialsSlider2 = document.querySelector(".testimonials-slider-2");

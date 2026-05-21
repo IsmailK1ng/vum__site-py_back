@@ -916,6 +916,65 @@
     </div>
   </div>
   <!-- Section - Experience End -->
+
+  {% if members %}
+  <!-- Section - Team Slider Start -->
+  <div class="mxd-section padding-grid-pre-pinned" style="margin-top: 45px;">
+    <div class="mxd-container grid-container">
+      <div class="mxd-block team-slider-section">
+
+        <div class="team-slider-title">
+          <h2 class="team-slider-title__heading reveal-type">{% if LANGUAGE_CODE == 'uz' %}Bizning jamoa{% elif LANGUAGE_CODE == 'ru' %}Наша команда{% else %}Our Team{% endif %}</h2>
+          <a class="btn btn-anim btn-default btn-mobile-icon btn-outline slide-right-up team-slider-link"
+             style="gap: 0;"
+             href="{% url 'team' %}"
+             aria-label="{% if LANGUAGE_CODE == 'uz' %}Jamoa sahifasiga o'tish{% elif LANGUAGE_CODE == 'ru' %}Перейти на страницу команды{% else %}Go to team page{% endif %}">
+            <i class="ph-bold ph-arrow-up-right"></i>
+          </a>
+        </div>
+
+        <div class="team-slider-container">
+          <div class="swiper swiper-team">
+            <div class="swiper-wrapper">
+              {% for member in members %}
+              <div class="swiper-slide no-blur">
+                <div class="team-slider-card">
+                  <div class="team-slider-card__photo-wrap">
+                    {% if member.photo %}
+                    <img class="team-slider-card__photo" src="{{ member.photo.url }}" alt="{{ member.name }}" loading="lazy">
+                    {% else %}
+                    <div class="team-slider-card__photo-placeholder">
+                      <i class="ph ph-user"></i>
+                    </div>
+                    {% endif %}
+                  </div>
+                  <div class="team-slider-card__info">
+                    <h5 class="team-slider-card__name">{{ member.name }}</h5>
+                    <p class="team-slider-card__position">{{ member.position }}</p>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="team-slider-btn team-slider-btn-prev">
+            <a class="btn btn-round btn-round-small btn-outline" href="#0">
+              <i class="ph ph-arrow-left"></i>
+            </a>
+          </div>
+          <div class="team-slider-btn team-slider-btn-next">
+            <a class="btn btn-round btn-round-small btn-outline" href="#0">
+              <i class="ph ph-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- Section - Team Slider End -->
+  {% endif %}
+
   <!-- Футер (начало) -->
   {% include 'main/includes/footer.html' %}
   <!-- Футер (конец) -->

@@ -57,7 +57,7 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    row-gap: 10px;
+    row-gap: 15px;
 }
 
 .team-member-card__name {
