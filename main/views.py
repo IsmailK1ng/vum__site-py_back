@@ -114,8 +114,7 @@ def about(request):
     members = (
         TeamMember.objects
         .filter(is_active=True)
-        .select_related('department')
-        .order_by('department__order', 'order')[:12]
+        .order_by('order')[:12]
     )
     return render(request, 'main/about.html', {'members': members})
 
@@ -137,9 +136,8 @@ def team(request):
     members = (
         TeamMember.objects
         .filter(is_active=True)
-        .select_related('department')
         .prefetch_related('links')
-        .order_by('department__order', 'order')
+        .order_by('order')
     )
     return render(request, 'main/team.html', {'members': members})
 

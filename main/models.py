@@ -1768,7 +1768,7 @@ class TeamMember(models.Model):
     class Meta:
         verbose_name = " - Команда: сотрудник"
         verbose_name_plural = "Команда — Сотрудники"
-        ordering = ['department__order', 'order']
+        ordering = ['order']
 
 
 class TeamMemberLink(models.Model):

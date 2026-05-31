@@ -1086,5 +1086,10 @@
       const element = document.getElementById(counter.id);
       if (element) observer.observe(element);
     });
+
+    // Нормализация имён в карточках команды: "KOMILJON IBROHIM" -> "Komiljon Ibrohim"
+    document.querySelectorAll('.team-slider-card__name').forEach(el => {
+      el.textContent = el.textContent.toLowerCase().replace(/(^|\s)\S/g, ch => ch.toUpperCase());
+    });
   </script>
 {% endblock %}

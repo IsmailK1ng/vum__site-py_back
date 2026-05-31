@@ -65,6 +65,7 @@
     font-weight: 700;
     line-height: 1.3;
     margin: 0 0 0.5rem;
+    text-transform: capitalize;
 }
 
 .team-member-card__dept {

@@ -127,4 +127,11 @@
     <i class="ph ph-arrow-up"></i>
   </a>
 
+  <script>
+    // Нормализация имён: "KOMILJON IBROHIM ULUG'BEK O'G'LI" -> "Komiljon Ibrohim Ulug'bek O'g'li"
+    document.querySelectorAll('.team-member-card__name').forEach(el => {
+      el.textContent = el.textContent.toLowerCase().replace(/(^|\s)\S/g, ch => ch.toUpperCase());
+    });
+  </script>
+
 {% endblock %}
