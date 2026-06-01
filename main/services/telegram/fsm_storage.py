@@ -4,6 +4,7 @@ from typing import Any
 
 from aiogram.fsm.storage.base import BaseStorage, StorageKey, StateType
 from asgiref.sync import sync_to_async
+from django.db import close_old_connections
 
 logger = logging.getLogger('bot')
 
@@ -17,6 +18,7 @@ class DatabaseStorage(BaseStorage):
     @sync_to_async
     def _get_record(self, raw_key: str):
         from main.models import BotFSMState
+        close_old_connections()
         try:
             return BotFSMState.objects.get(key=raw_key)
         except BotFSMState.DoesNotExist:
@@ -25,6 +27,7 @@ class DatabaseStorage(BaseStorage):
     @sync_to_async
     def _save_record(self, raw_key: str, state: str | None, data: str) -> None:
         from main.models import BotFSMState
+        close_old_connections()
         BotFSMState.objects.update_or_create(
             key=raw_key,
             defaults={'state': state, 'data': data},
@@ -33,6 +36,7 @@ class DatabaseStorage(BaseStorage):
     @sync_to_async
     def _delete_record(self, raw_key: str) -> None:
         from main.models import BotFSMState
+        close_old_connections()
         BotFSMState.objects.filter(key=raw_key).delete()
 
     async def set_state(self, key: StorageKey, state: StateType = None) -> None:
