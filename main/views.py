@@ -247,44 +247,6 @@ def news_detail(request, slug):
         return redirect('news')
 
 
-def set_language_get(request):
-    """Переключение языка с правильным редиректом"""
-    language = request.GET.get('language') or request.POST.get('language')
-
-    if language and language in ['uz', 'ru', 'en']:
-        request.session['_language'] = language
-
-        # Получаем URL, на который нужно вернуться после смены языка
-        next_url = request.POST.get('next') or request.GET.get('next') or '/'
-
-        # Убираем языковой префикс из текущего URL (если есть)
-        # Например: /ru/about/ -> /about/ или /en/products/ -> /products/
-        for lang_code in ['uz', 'ru', 'en']:
-            if next_url.startswith(f'/{lang_code}/'):
-                next_url = next_url[len(f'/{lang_code}'):]
-                break
-
-        # Добавляем новый языковой префикс
-        if language == 'uz':
-            # Для узбекского языка префикс не нужен
-            final_url = next_url if next_url.startswith('/') else f'/{next_url}'
-        else:
-            # Для русского и английского добавляем префикс
-            final_url = f'/{language}{next_url}' if next_url.startswith('/') else f'/{language}/{next_url}'
-
-        response = redirect(final_url)
-        response.set_cookie(
-            settings.LANGUAGE_COOKIE_NAME,
-            language,
-            max_age=365*24*60*60,
-            path='/',
-            samesite='Lax'
-        )
-        return response
-
-    return redirect('/')
-
-
 # === API ViewSets ===
 
 class NewsViewSet(viewsets.ModelViewSet):

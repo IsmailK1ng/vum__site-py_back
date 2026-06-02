@@ -1,4 +1,4 @@
-{% load static %}
+{% load static seo_tags %}
     <!-- Футер -->
     <footer id="mxd-footer" class="mxd-footer">
         <!-- Полноширинный текст -->
@@ -18,7 +18,7 @@
                         <ul class="footer-nav">
                             {% for item in nav_footer %}
                             <li class="footer-nav__item">
-                                <a href="{{ item.url }}" class="footer-nav__link btn-anim"
+                                <a href="{{ item.url|with_lang_prefix:LANGUAGE_CODE }}" class="footer-nav__link btn-anim"
                                     {% if item.open_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>
                                     <span class="btn-caption">
                                         {% if nav_lang == 'ru' %}{{ item.title_ru }}{% elif nav_lang == 'en' %}{{ item.title_en }}{% else %}{{ item.title_uz }}{% endif %}

@@ -1,4 +1,4 @@
-{% load static %}
+{% load static seo_tags %}
     <nav id="header" class="mxd-nav__wrap" data-lenis-prevent="">
         <!-- Логотип -->
         <div class="mxd-header__logo loading__fade">
@@ -15,7 +15,7 @@
                 <li class="desktop-menu__item">
                     {% with children=item.children_cache %}
                     {% if children %}
-                    <a href="{{ item.url }}" class="desktop-menu__link"
+                    <a href="{{ item.url|with_lang_prefix:LANGUAGE_CODE }}" class="desktop-menu__link"
                         {% if item.open_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>
                         {% if nav_lang == 'ru' %}{{ item.title_ru }}{% elif nav_lang == 'en' %}{{ item.title_en }}{% else %}{{ item.title_uz }}{% endif %}
                         <span class="desktop-menu__arrow">▼</span>
@@ -23,7 +23,7 @@
                     <ul class="desktop-submenu">
                         {% for child in children %}
                         <li class="desktop-submenu__item">
-                            <a href="{{ child.url }}" class="desktop-submenu__link"
+                            <a href="{{ child.url|with_lang_prefix:LANGUAGE_CODE }}" class="desktop-submenu__link"
                                 {% if child.open_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>
                                 {% if nav_lang == 'ru' %}{{ child.title_ru }}{% elif nav_lang == 'en' %}{{ child.title_en }}{% else %}{{ child.title_uz }}{% endif %}
                             </a>
@@ -31,7 +31,7 @@
                         {% endfor %}
                     </ul>
                     {% else %}
-                    <a href="{{ item.url }}" class="desktop-menu__link"
+                    <a href="{{ item.url|with_lang_prefix:LANGUAGE_CODE }}" class="desktop-menu__link"
                         {% if item.open_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>
                         {% if nav_lang == 'ru' %}{{ item.title_ru }}{% elif nav_lang == 'en' %}{{ item.title_en }}{% else %}{{ item.title_uz }}{% endif %}
                     </a>
@@ -116,7 +116,7 @@
                                         <ul class="submenu">
                                             {% for child in children %}
                                             <li class="submenu__item">
-                                                <a href="{{ child.url }}"
+                                                <a href="{{ child.url|with_lang_prefix:LANGUAGE_CODE }}"
                                                     {% if child.open_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>
                                                     {% if nav_lang == 'ru' %}{{ child.title_ru }}{% elif nav_lang == 'en' %}{{ child.title_en }}{% else %}{{ child.title_uz }}{% endif %}
                                                 </a>
@@ -126,7 +126,7 @@
                                     </li>
                                     {% else %}
                                     <li class="main-menu__item">
-                                        <a class="main-menu__link btn" href="{{ item.url }}"
+                                        <a class="main-menu__link btn" href="{{ item.url|with_lang_prefix:LANGUAGE_CODE }}"
                                             {% if item.open_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>
                                             <span class="btn-caption">
                                                 {% if nav_lang == 'ru' %}{{ item.title_ru }}{% elif nav_lang == 'en' %}{{ item.title_en }}{% else %}{{ item.title_uz }}{% endif %}

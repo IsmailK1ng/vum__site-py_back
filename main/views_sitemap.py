@@ -1,14 +1,27 @@
+from django.conf import settings
 from django.http import HttpResponse
 from django.utils import timezone
 from datetime import datetime
 from .sitemaps import get_sitemaps_for_language
 
 
+def _sitemap_base(request):
+    """Базовый URL для всех ссылок в sitemap.
+
+    Прод: всегда https://faw.uz — независимо от Host. Это синхронизирует
+    sitemap с canonical и hreflang (см. seo_tags.py:_canonical_base).
+    DEBUG: текущий request.get_host() для удобства локалки.
+    """
+    if settings.DEBUG:
+        return f"{request.scheme}://{request.get_host()}"
+    return "https://faw.uz"
+
+
 def sitemap_index(request):
     """Главный sitemap-индекс"""
-    base_url = request.build_absolute_uri('/').rstrip('/')
+    base_url = _sitemap_base(request)
     now = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
-    
+
     xml_content = f'''<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
@@ -24,18 +37,19 @@ def sitemap_index(request):
     <lastmod>{now}</lastmod>
   </sitemap>
 </sitemapindex>'''
-    
+
     return HttpResponse(xml_content, content_type='application/xml')
 
 
 def _generate_sitemap_xml(request, sitemaps):
     """Генерирует XML для языкового sitemap с правильным форматом дат"""
     urls = []
-    
+    base_url = _sitemap_base(request)
+
     for section, site in sitemaps.items():
         for item in site.items():
-            loc = site.get_protocol() + '://' + request.get_host() + site.location(item)
-            
+            loc = base_url + site.location(item)
+
             # Получаем lastmod и форматируем в ISO с миллисекундами
             lastmod_date = site.lastmod(item) if hasattr(site, 'lastmod') else None
             if lastmod_date:
@@ -46,7 +60,7 @@ def _generate_sitemap_xml(request, sitemaps):
                     lastmod = datetime.combine(lastmod_date, datetime.min.time()).strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
             else:
                 lastmod = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
-            
+
             urls.append({
                 'loc': loc,
                 'lastmod': lastmod

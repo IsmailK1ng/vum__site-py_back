@@ -1,14 +1,23 @@
+from datetime import datetime, timezone as dt_timezone
+from django.conf import settings
 from django.contrib.sitemaps import Sitemap
 from django.utils import timezone
 from .models import Product, News
 
+# Дата последнего значимого изменения статических страниц.
+# Не используем datetime.now() — иначе Google думает что страница постоянно меняется,
+# и тратит crawl budget на лишнюю переиндексацию. Меняй вручную при значимом редизайне.
+STATIC_PAGES_LASTMOD = datetime(2026, 1, 1, tzinfo=dt_timezone.utc)
+
+
 class LanguageSpecificSitemap(Sitemap):
-    protocol = 'https'
-    
+    # protocol динамический: https на проде, http в DEBUG (чтобы локальные тесты не выглядели как https://localhost)
+    protocol = 'http' if settings.DEBUG else 'https'
+
     def __init__(self, language):
         self.language = language
         super().__init__()
-    
+
     def _get_url_prefix(self):
         if self.language == 'uz':
             return ''
@@ -16,7 +25,7 @@ class LanguageSpecificSitemap(Sitemap):
 
 
 class StaticPagesSitemap(LanguageSpecificSitemap):
-    
+
     def items(self):
         return [
             ('home', '/'),
@@ -30,15 +39,14 @@ class StaticPagesSitemap(LanguageSpecificSitemap):
             ('dealers', '/dealers/'),
             ('jobs', '/jobs/'),
         ]
-    
+
     def location(self, item):
         name, path = item
         prefix = self._get_url_prefix()
         return f'{prefix}{path}'
-    
+
     def lastmod(self, item):
-        from datetime import datetime
-        return datetime.now(timezone.get_current_timezone())
+        return STATIC_PAGES_LASTMOD
 
 
 class CategorySitemap(LanguageSpecificSitemap):
@@ -60,47 +68,45 @@ class CategorySitemap(LanguageSpecificSitemap):
         return f'{prefix}/products/?category={category_slug}'
     
     def lastmod(self, item):
-        from datetime import datetime
-        
         category_slug, _ = item
         latest_product = Product.objects.filter(
             category=category_slug,
             is_active=True
         ).order_by('-updated_at').first()
-        
+
         if latest_product:
             return latest_product.updated_at
-        
-        return datetime.now(timezone.get_current_timezone())
+
+        return STATIC_PAGES_LASTMOD
 
 
 class ProductsSitemap(LanguageSpecificSitemap):
-    
+
     def items(self):
         return Product.objects.filter(is_active=True)
-    
+
     def location(self, obj):
         prefix = self._get_url_prefix()
         return f'{prefix}/products/{obj.slug}/'
-    
+
     def lastmod(self, obj):
-        from datetime import datetime, time
+        from datetime import time
         if isinstance(obj.updated_at, datetime):
             return obj.updated_at
         return datetime.combine(obj.updated_at, time.min, tzinfo=timezone.get_current_timezone())
 
 
 class NewsSitemap(LanguageSpecificSitemap):
-    
+
     def items(self):
         return News.objects.filter(is_active=True)
-    
+
     def location(self, obj):
         prefix = self._get_url_prefix()
         return f'{prefix}/news/{obj.slug}/'
-    
+
     def lastmod(self, obj):
-        from datetime import datetime, time
+        from datetime import time
         if isinstance(obj.updated_at, datetime):
             return obj.updated_at
         return datetime.combine(obj.updated_at, time.min, tzinfo=timezone.get_current_timezone())

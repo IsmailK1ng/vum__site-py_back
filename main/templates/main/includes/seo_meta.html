@@ -5,7 +5,7 @@
   {% if page_meta.keywords %}
     <meta name="keywords" content="{{ page_meta.keywords }}">
   {% endif %}
-  
+
   <meta property="og:title" content="{{ page_meta.get_og_title }}">
   <meta property="og:description" content="{{ page_meta.get_og_description }}">
   <meta property="og:type" content="{{ page_meta.og_type }}">
@@ -17,7 +17,54 @@
     <meta property="og:image:height" content="630">
   {% endif %}
 {% else %}
-  <title>FAW Trucks в Узбекистане</title>
-  <meta name="description" content="FAW Trucks в Узбекистане">
-  <meta name="keywords" content="FAW Trucks в Узбекистане">
+  {# Fallback когда нет записи в PageMeta. Локализован чтобы пользователь и соцсети получали мета на правильном языке. #}
+  {% if LANGUAGE_CODE == 'ru' %}
+    {% with seo_t="FAW Trucks Узбекистан — официальный производитель грузовых автомобилей" seo_d="Van Universal Motors (VUM) — официальный дилер и производитель грузовых автомобилей FAW в Узбекистане. Каталог, дилеры, лизинг." %}
+      <title>{{ seo_t }}</title>
+      <meta name="description" content="{{ seo_d }}">
+      <meta name="keywords" content="FAW, грузовики, Узбекистан, VUM, лизинг, дилеры, FAW Trucks">
+      <meta property="og:title" content="{{ seo_t }}">
+      <meta property="og:description" content="{{ seo_d }}">
+      <meta property="og:type" content="website">
+      <meta property="og:site_name" content="VUM — FAW Trucks Uzbekistan">
+      <meta property="og:url" content="{{ current_page_url }}">
+    {% endwith %}
+  {% elif LANGUAGE_CODE == 'en' %}
+    {% with seo_t="FAW Trucks Uzbekistan — official truck manufacturer" seo_d="Van Universal Motors (VUM) — official dealer and manufacturer of FAW trucks in Uzbekistan. Catalog, dealers, leasing." %}
+      <title>{{ seo_t }}</title>
+      <meta name="description" content="{{ seo_d }}">
+      <meta name="keywords" content="FAW, trucks, Uzbekistan, VUM, leasing, dealers, FAW Trucks">
+      <meta property="og:title" content="{{ seo_t }}">
+      <meta property="og:description" content="{{ seo_d }}">
+      <meta property="og:type" content="website">
+      <meta property="og:site_name" content="VUM — FAW Trucks Uzbekistan">
+      <meta property="og:url" content="{{ current_page_url }}">
+    {% endwith %}
+  {% else %}
+    {% with seo_t="FAW Trucks O‘zbekiston — yuk avtomobillarining rasmiy ishlab chiqaruvchisi" seo_d="Van Universal Motors (VUM) — O‘zbekistondagi FAW yuk mashinalarining rasmiy dileri va ishlab chiqaruvchisi. Katalog, dilerlar, lizing." %}
+      <title>{{ seo_t }}</title>
+      <meta name="description" content="{{ seo_d }}">
+      <meta name="keywords" content="FAW, yuk mashinalari, O‘zbekiston, VUM, lizing, dilerlar, FAW Trucks">
+      <meta property="og:title" content="{{ seo_t }}">
+      <meta property="og:description" content="{{ seo_d }}">
+      <meta property="og:type" content="website">
+      <meta property="og:site_name" content="VUM — FAW Trucks Uzbekistan">
+      <meta property="og:url" content="{{ current_page_url }}">
+    {% endwith %}
+  {% endif %}
+{% endif %}
+
+{# Open Graph: язык страницы и альтернативные локали — для Facebook, LinkedIn и др. соцсетей #}
+{% if LANGUAGE_CODE == 'ru' %}
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:locale:alternate" content="uz_UZ">
+  <meta property="og:locale:alternate" content="en_US">
+{% elif LANGUAGE_CODE == 'en' %}
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="uz_UZ">
+  <meta property="og:locale:alternate" content="ru_RU">
+{% else %}
+  <meta property="og:locale" content="uz_UZ">
+  <meta property="og:locale:alternate" content="ru_RU">
+  <meta property="og:locale:alternate" content="en_US">
 {% endif %}
