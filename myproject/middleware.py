@@ -179,7 +179,35 @@ class AutoLanguageMiddleware:
             target += f'?{qs}'
         return HttpResponseRedirect(target)
 
+    def _strip_lang_prefix(self, path):
+        """Убирает /ru/ или /en/ префикс если есть. Возвращает путь без префикса."""
+        for lang in self.NON_DEFAULT_LANGS:
+            if path.startswith(f'/{lang}/'):
+                return path[len(f'/{lang}'):]
+            if path == f'/{lang}':
+                return '/'
+        return path
+
+    def _build_url_for_lang(self, request, target_lang):
+        """Строит URL для целевого языка из текущего пути (заменяя/убирая префикс)."""
+        clean_path = self._strip_lang_prefix(request.path)
+        if target_lang == 'uz':
+            new_path = clean_path
+        else:
+            new_path = f'/{target_lang}{clean_path}' if clean_path != '/' else f'/{target_lang}/'
+        qs = request.META.get('QUERY_STRING', '')
+        return new_path + (f'?{qs}' if qs else '')
+
     def __call__(self, request):
+        """Простая и предсказуемая логика без race condition'ов:
+
+        1) Первый заход на `/` без cookie → auto-detect по Accept-Language → редирект.
+        2) Заход на URL с префиксом (/ru/..., /en/...) → синхронизируем cookie.
+        3) Всё остальное → URL диктует язык, никаких редиректов.
+
+        Это избавляет от проблем с back/forward button (нет агрессивных
+        cookie-based редиректов на каждом запросе).
+        """
         try:
             if self._should_skip(request) or self._is_bot(request):
                 return self.get_response(request)
@@ -187,32 +215,32 @@ class AutoLanguageMiddleware:
             cookie_lang = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
             url_lang = self._url_prefix_lang(request.path)
 
-            # === URL без префикса (UZ-зона) ===
-            if url_lang is None:
-                # cookie на non-default языке → редирект на префиксную версию
-                if cookie_lang in self.NON_DEFAULT_LANGS:
-                    return self._redirect_to_lang(request, cookie_lang)
-
-                # cookie=uz → юзер явно выбрал UZ
-                if cookie_lang == 'uz':
-                    return self.get_response(request)
-
-                # cookie нет → автоопределение по Accept-Language
+            # === Кейс 1: первый заход на главную без cookie — auto-detect ===
+            if request.path == '/' and not cookie_lang:
                 detected = self._detect_browser_lang(request)
                 if detected in self.NON_DEFAULT_LANGS:
                     response = self._redirect_to_lang(request, detected)
                     self._set_lang_cookie(response, detected)
                     return response
+                # Дефолтный язык — остаёмся на /, ставим cookie
+                response = self.get_response(request)
+                self._set_lang_cookie(response, settings.LANGUAGE_CODE)
+                return response
 
-                # UZ или не определили → остаёмся, cookie не ставим
-                # (не хотим "пачкать" cookie до явного выбора)
-                return self.get_response(request)
-
-            # === URL с префиксом (/ru/... или /en/...) ===
-            response = self.get_response(request)
-            if cookie_lang != url_lang:
+            # === Кейс 2: URL с префиксом — синхронизируем cookie ===
+            if url_lang and cookie_lang != url_lang:
+                response = self.get_response(request)
                 self._set_lang_cookie(response, url_lang)
-            return response
+                return response
+
+            # === Кейс 3: URL без префикса и cookie ещё нет — ставим UZ ===
+            if not url_lang and not cookie_lang:
+                response = self.get_response(request)
+                self._set_lang_cookie(response, settings.LANGUAGE_CODE)
+                return response
+
+            # === Кейс 4: всё совпадает — просто пропускаем ===
+            return self.get_response(request)
 
         except Exception as e:
             logger.error(f"Ошибка в AutoLanguageMiddleware: {e}", exc_info=True)

@@ -151,10 +151,43 @@
     </nav>
 
     <script>
-    function switchLanguage(lang) {
-        document.getElementById('language-input').value = lang;
-        document.getElementById('next-input').value = window.location.pathname + window.location.search;
-        sessionStorage.setItem('languageChanged', 'true');
-        document.querySelector('.language-switcher-form').submit();
+    // Переключение языка через fetch + replace вместо обычного submit:
+    // браузер ЗАМЕЩАЕТ текущую запись истории на новый URL (вместо добавления),
+    // поэтому back-button после переключения идёт на ИСТИННУЮ предыдущую страницу.
+    async function switchLanguage(lang) {
+        try {
+            const form = document.querySelector('.language-switcher-form');
+            const csrf = form.querySelector('[name=csrfmiddlewaretoken]').value;
+            const currentPath = window.location.pathname + window.location.search;
+
+            // Ставим cookie через POST. БЕЗ redirect:'manual' — пусть fetch
+            // дойдёт до конечного редиректа, тогда Set-Cookie точно применится
+            // ДО следующей навигации (избегаем race condition).
+            await fetch('/set-language/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrf,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'language=' + encodeURIComponent(lang) +
+                      '&next=' + encodeURIComponent(currentPath),
+                credentials: 'same-origin',
+            });
+
+            // Считаем новый URL клиентски (для replace в истории)
+            let newPath = currentPath.replace(/^\/(ru|en)(\/|$)/, '/');
+            if (lang !== 'uz') {
+                newPath = '/' + lang + (newPath === '/' ? '/' : newPath);
+            }
+
+            // Замещаем текущую запись истории — back пропустит её
+            window.location.replace(newPath);
+        } catch (e) {
+            // Fallback: обычный submit формы
+            document.getElementById('language-input').value = lang;
+            document.getElementById('next-input').value = window.location.pathname + window.location.search;
+            document.querySelector('.language-switcher-form').submit();
+        }
     }
+
     </script>
