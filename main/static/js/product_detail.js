@@ -410,8 +410,8 @@ class ProductDetail {
             "@context": "https://schema.org",
             "@type": "Product",
             "name": this.product.title,
-            "image": this.product.main_image_url || null, // 
-            "description": this.product.title, // 
+            "image": this.product.main_image_url || null,
+            "description": this.product.title,
             "brand": {
                 "@type": "Brand",
                 "name": "FAW"
@@ -427,6 +427,24 @@ class ProductDetail {
         if (this.product.gallery && this.product.gallery.length > 0) {
             productSchema.image = this.product.gallery.map(img => img.image_url);
         }
+
+        // Offers — обязательно для Google Rich Results (Product schema).
+        // Без offers/review/aggregateRating страница не попадает в карусели/расширенные результаты.
+        productSchema.offers = {
+            "@type": "Offer",
+            "url": currentUrl,
+            "priceCurrency": "UZS",
+            "price": (this.product.price && this.product.price > 0)
+                ? this.product.price.toString()
+                : "0",
+            "availability": "https://schema.org/InStock",
+            "itemCondition": "https://schema.org/NewCondition",
+            "seller": {
+                "@type": "Organization",
+                "name": "Van Universal Motors",
+                "url": baseUrl
+            }
+        };
 
         // BreadcrumbList Schema (без изменений)
         const breadcrumbSchema = {

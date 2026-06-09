@@ -16,6 +16,18 @@
     --border-color: #e0e0e0;
 }
 
+@media (max-width: 1400px) {
+    :root {
+        --image-height: 50%;
+    }
+}
+
+@media (max-width: 926px) {
+    :root {
+        --image-height: 47%;
+    }
+}
+
 /* ===== КОНТЕЙНЕРЫ ===== */
 .mxd-section {
     padding: 60px 0;
@@ -114,7 +126,7 @@
     grid-template-columns: repeat(3, 1fr);
     gap: var(--card-gap);
     width: 100%;
-    padding: 0rem 14rem 0rem 14rem;
+    padding: 0rem 10rem;
     align-items: stretch;
 }
 
@@ -175,13 +187,12 @@
 /* ===== HEADER КАРТОЧКИ ===== */
 .slide-header-row {
     display: flex;
-    align-items: flex-start;
+    align-items: flex-end;
     flex-direction: column;
     gap: 0;
     width: 100%;
-    padding: 12px 10px 30px 10px;
+    padding: 5px 10px;
     border-bottom: 1px solid var(--border-color);
-    height: var(--header-height);
     position: relative;
 }
 
@@ -213,9 +224,6 @@
 }
 
 .slide-header__meta {
-    position: absolute;
-    bottom: 8px;
-    right: 10px;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -241,8 +249,7 @@
     align-items: flex-start;
     width: 100%;
     padding: 7px 15px;
-    height: var(--text-height);
-    min-height: var(--text-height);
+    min-height: 80px;
     max-height: var(--text-height);
     margin-top: -12px;
     overflow: hidden;
@@ -254,11 +261,23 @@
     line-height: 1.5;
     color: var(--text-secondary);
     display: -webkit-box;
-    -webkit-line-clamp: 4;
+    -webkit-line-clamp: 3 !important;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
     max-height: 100%;
+}
+
+@media (max-width: 926px) {
+    .slide-text__content {
+        -webkit-line-clamp: 2 !important;
+    }
+}
+
+@media (max-width: 682px) {
+    .slide-text__content {
+        -webkit-line-clamp: 4 !important;
+    }
 }
 
 /* ===== ИЗОБРАЖЕНИЕ КАРТОЧКИ ===== */

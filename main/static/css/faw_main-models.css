@@ -1,6 +1,34 @@
 /* =================================
    ОСНОВНЫЕ СТИЛИ СТРАНИЦЫ
    ================================= */
+
+/* Mobile-first: меньшие брейкпойнты ВЫШЕ, большие НИЖЕ.
+   Иначе при 1600px+ оба медиа сработают, и победит последний — то есть 768px-вариант. */
+
+@media only screen and (min-width: 768px) {
+    h2 {
+        font-size: 5.5rem;
+    }
+}
+
+@media only screen and (min-width: 992px) {
+    h2 {
+        font-size: 6.5rem;
+    }
+}
+
+@media only screen and (min-width: 1200px) {
+    h2 {
+        font-size: 7.5rem;
+    }
+}
+
+@media only screen and (min-width: 1600px) {
+    h2 {
+        font-size: 10.5rem;
+    }
+}
+
 .mxd-page-content {
     padding-top: 0 !important;
 }
@@ -38,12 +66,32 @@
     position: relative;
 }
 
-.mxd-hero-06__img img {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 45%;
+/* Контейнер картинки — flex-item внутри .row, выравниваем картинку справа-внизу */
+.mxd-hero-06__img {
+    flex: 0 0 45%;
+    max-width: 45%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
     z-index: 1;
+}
+
+.mxd-hero-06__img img {
+    width: 110%;
+    height: auto;
+    display: block;
+}
+
+/* Левый блок (заголовок + описание) — заполняет оставшееся пространство */
+.hero-06-headline__descr .row {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: nowrap;
+}
+
+.hero-06-headline__descr .header-custom__content {
+    flex: 1;
+    min-width: 0;
 }
 
 .mxd-hero-06__btn-mobile {
@@ -659,12 +707,31 @@ body[data-theme="dark"] .hero-05-title__item {
     }
 }
 
+/* < 992px: столбик — текст сверху, картинка снизу */
+@media (max-width: 991.98px) {
+    .hero-06-headline__descr .row {
+        flex-wrap: wrap;
+    }
+
+    .hero-06-headline__descr .header-custom__content {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .mxd-hero-06__img {
+        flex: 0 0 100%;
+        max-width: 100%;
+        justify-content: center;
+    }
+}
+
 /* Mobile Landscape */
 @media (max-width: 576px) {
     .mxd-hero-06__content {
         height: 25vh;
     }
 
+    .mxd-hero-06__img,
     .mxd-hero-06__img img {
         display: none;
     }
