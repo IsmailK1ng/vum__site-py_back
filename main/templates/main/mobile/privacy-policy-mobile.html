@@ -1,0 +1,532 @@
+{% load static %}<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Политика конфиденциальности — VUM ERP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Полный набор Phosphor иконок с CDN -->
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1" defer></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #1A56DB;
+      --blue-light: #EEF3FF;
+      --dark: #111827;
+      --mid: #374151;
+      --muted: #6B7280;
+      --border: #E5E7EB;
+      --bg: #F9FAFB;
+      --white: #ffffff;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--mid);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: -0.3px;
+    }
+
+    .logo span {
+      color: var(--dark);
+    }
+
+    .lang-switcher {
+      display: flex;
+      gap: 6px;
+    }
+
+    .lang-btn {
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+    }
+
+    .lang-btn:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .lang-btn.active {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: var(--white);
+    }
+
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    .hero {
+      background: var(--blue);
+      border-radius: 16px;
+      padding: 40px 40px;
+      margin-bottom: 40px;
+      color: var(--white);
+    }
+
+    .hero-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 12px;
+    }
+
+    .hero h1 {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-meta {
+      font-size: 13px;
+      opacity: 0.75;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 16px;
+    }
+
+    .card h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card h2 .icon {
+      width: 36px;
+      height: 36px;
+      background: var(--blue-light);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--blue);
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .card p {
+      color: var(--mid);
+      margin-bottom: 12px;
+    }
+
+    .card p:last-child { margin-bottom: 0; }
+
+    .data-list {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .data-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .data-list li .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--blue);
+      border-radius: 50%;
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+
+    .data-list li strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 2px;
+    }
+
+    .data-list li span {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .contact-card {
+      background: var(--blue-light);
+      border: 1px solid #C7D9FF;
+      border-radius: 12px;
+      padding: 24px 32px;
+      margin-top: 8px;
+    }
+
+    .contact-card p {
+      margin-bottom: 6px;
+      color: var(--mid);
+    }
+
+    .contact-card a {
+      color: var(--blue);
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .lang-content { display: none; }
+    .lang-content.active { display: block; }
+
+    @media (max-width: 600px) {
+      .hero { padding: 28px 24px; }
+      .hero h1 { font-size: 22px; }
+      .card { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">VUM<span> ERP</span></div>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('ru')">RU</button>
+      <button class="lang-btn" onclick="setLang('uz')">UZ</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===== RUSSIAN ===== -->
+  <div class="lang-content active" id="lang-ru">
+    <div class="hero">
+      <div class="hero-label">VAN UNIVERSAL MOTORS</div>
+      <h1>Политика конфиденциальности</h1>
+      <div class="hero-meta">Мобильное приложение VUM ERP &nbsp;·&nbsp; Последнее обновление: июнь 2026</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-file-text"></i></span>Общие положения</h2>
+      <p>Настоящая Политика конфиденциальности описывает, как мобильное приложение <strong>VUM ERP</strong>, разработанное компанией VAN UNIVERSAL MOTORS, собирает, использует и защищает данные пользователей.</p>
+      <p>Приложение предназначено исключительно для сотрудников компании VAN UNIVERSAL MOTORS. Доступ к приложению предоставляется только авторизованным пользователям.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-database"></i></span>Какие данные мы собираем</h2>
+      <ul class="data-list">
+        <li>
+          <div class="dot"></div>
+          <div>
+            <strong>Учётные данные</strong>
+            <span>Логин и пароль сотрудника для входа в систему ERP. Пароли хранятся в зашифрованном виде.</span>
+          </div>
+        </li>
+        <li>
+          <div class="dot"></div>
+          <div>
+            <strong>Геолокация</strong>
+            <span>Местоположение устройства используется для производственных и логистических задач в рамках работы с ERP системой.</span>
+          </div>
+        </li>
+        <li>
+          <div class="dot"></div>
+          <div>
+            <strong>Камера (QR-сканер)</strong>
+            <span>Доступ к камере используется исключительно для сканирования QR-кодов в рамках рабочих процессов.</span>
+          </div>
+        </li>
+        <li>
+          <div class="dot"></div>
+          <div>
+            <strong>Фотографии</strong>
+            <span>Приложение может запрашивать доступ к галерее для загрузки фотографий в рамках рабочих задач.</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-target"></i></span>Цели использования данных</h2>
+      <p>Все собранные данные используются исключительно в следующих целях:</p>
+      <ul class="data-list">
+        <li><div class="dot"></div><div><span>Аутентификация и авторизация сотрудников в системе ERP</span></div></li>
+        <li><div class="dot"></div><div><span>Выполнение производственных и логистических задач компании</span></div></li>
+        <li><div class="dot"></div><div><span>Обеспечение функциональности приложения</span></div></li>
+        <li><div class="dot"></div><div><span>Отправка push-уведомлений о рабочих событиях</span></div></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-shield-check"></i></span>Защита данных</h2>
+      <p>Мы применяем технические и организационные меры для защиты ваших данных:</p>
+      <ul class="data-list">
+        <li><div class="dot"></div><div><span>Передача данных осуществляется по защищённому протоколу HTTPS</span></div></li>
+        <li><div class="dot"></div><div><span>Данные хранятся на защищённых серверах компании</span></div></li>
+        <li><div class="dot"></div><div><span>Доступ к данным ограничен только авторизованными сотрудниками</span></div></li>
+        <li><div class="dot"></div><div><span>Данные не передаются третьим лицам</span></div></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-user-circle"></i></span>Права пользователей</h2>
+      <p>Как сотрудник компании, вы имеете право:</p>
+      <ul class="data-list">
+        <li><div class="dot"></div><div><span>Запросить информацию о хранящихся данных</span></div></li>
+        <li><div class="dot"></div><div><span>Обратиться с запросом на изменение или удаление данных</span></div></li>
+        <li><div class="dot"></div><div><span>Отказаться от сбора геолокации через настройки устройства</span></div></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-envelope-simple"></i></span>Контакты</h2>
+      <p>По вопросам конфиденциальности данных обращайтесь:</p>
+      <div class="contact-card">
+        <p><strong>VAN UNIVERSAL MOTORS</strong></p>
+        <p>Email: <a href="mailto:it@faw.uz">it@faw.uz</a></p>
+        <p>Сайт: <a href="https://faw.uz" target="_blank">https://faw.uz</a></p>
+        <p>Адрес: г. Ташкент, Узбекистан</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== UZBEK ===== -->
+  <div class="lang-content" id="lang-uz">
+    <div class="hero">
+      <div class="hero-label">VAN UNIVERSAL MOTORS</div>
+      <h1>Maxfiylik siyosati</h1>
+      <div class="hero-meta">VUM ERP mobil ilovasi &nbsp;·&nbsp; Oxirgi yangilanish: iyun 2026</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-file-text"></i></span>Umumiy qoidalar</h2>
+      <p>Ushbu Maxfiylik siyosati VAN UNIVERSAL MOTORS tomonidan ishlab chiqilgan <strong>VUM ERP</strong> mobil ilovasi foydalanuvchilar ma'lumotlarini qanday to'plashi, ishlatishi va himoya qilishini tavsiflaydi.</p>
+      <p>Ilova faqat VAN UNIVERSAL MOTORS kompaniyasi xodimlari uchun mo'ljallangan. Ilovaga kirish faqat vakolatli foydalanuvchilarga beriladi.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-database"></i></span>Qanday ma'lumotlar to'planadi</h2>
+      <ul class="data-list">
+        <li>
+          <div class="dot"></div>
+          <div>
+            <strong>Hisob ma'lumotlari</strong>
+            <span>ERP tizimiga kirish uchun xodimning login va paroli. Parollar shifrlangan holda saqlanadi.</span>
+          </div>
+        </li>
+        <li>
+          <div class="dot"></div>
+          <div>
+            <strong>Geolokatsiya</strong>
+            <span>Qurilma joylashuvi ERP tizimi doirasidagi ishlab chiqarish va logistika vazifalari uchun ishlatiladi.</span>
+          </div>
+        </li>
+        <li>
+          <div class="dot"></div>
+          <div>
+            <strong>Kamera (QR-skaner)</strong>
+            <span>Kameraga kirish faqat ish jarayonlarida QR-kodlarni skanerlash uchun ishlatiladi.</span>
+          </div>
+        </li>
+        <li>
+          <div class="dot"></div>
+          <div>
+            <strong>Fotosuratlar</strong>
+            <span>Ilova ish vazifalari doirasida fotosuratlarni yuklash uchun galereyaga kirish so'rashi mumkin.</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-target"></i></span>Ma'lumotlardan foydalanish maqsadlari</h2>
+      <ul class="data-list">
+        <li><div class="dot"></div><div><span>ERP tizimida xodimlarni autentifikatsiya qilish va vakolatini tasdiqlash</span></div></li>
+        <li><div class="dot"></div><div><span>Kompaniyaning ishlab chiqarish va logistika vazifalarini bajarish</span></div></li>
+        <li><div class="dot"></div><div><span>Ilovaning funksionalligini ta'minlash</span></div></li>
+        <li><div class="dot"></div><div><span>Ish hodisalari haqida push-bildirishnomalar yuborish</span></div></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-shield-check"></i></span>Ma'lumotlarni himoya qilish</h2>
+      <ul class="data-list">
+        <li><div class="dot"></div><div><span>Ma'lumotlar HTTPS xavfsiz protokoli orqali uzatiladi</span></div></li>
+        <li><div class="dot"></div><div><span>Ma'lumotlar kompaniyaning himoyalangan serverlarida saqlanadi</span></div></li>
+        <li><div class="dot"></div><div><span>Ma'lumotlarga kirish faqat vakolatli xodimlar bilan cheklangan</span></div></li>
+        <li><div class="dot"></div><div><span>Ma'lumotlar uchinchi shaxslarga berilmaydi</span></div></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-user-circle"></i></span>Foydalanuvchi huquqlari</h2>
+      <ul class="data-list">
+        <li><div class="dot"></div><div><span>Saqlanayotgan ma'lumotlar haqida ma'lumot so'rash</span></div></li>
+        <li><div class="dot"></div><div><span>Ma'lumotlarni o'zgartirish yoki o'chirish bo'yicha so'rov yuborish</span></div></li>
+        <li><div class="dot"></div><div><span>Qurilma sozlamalari orqali geolokatsiya to'plashdan voz kechish</span></div></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-envelope-simple"></i></span>Aloqa</h2>
+      <p>Ma'lumotlar maxfiyligi bo'yicha murojaat qiling:</p>
+      <div class="contact-card">
+        <p><strong>VAN UNIVERSAL MOTORS</strong></p>
+        <p>Email: <a href="mailto:it@faw.uz">it@faw.uz</a></p>
+        <p>Sayt: <a href="https://faw.uz" target="_blank">https://faw.uz</a></p>
+        <p>Manzil: Toshkent shahri, O'zbekiston</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ENGLISH ===== -->
+  <div class="lang-content" id="lang-en">
+    <div class="hero">
+      <div class="hero-label">VAN UNIVERSAL MOTORS</div>
+      <h1>Privacy Policy</h1>
+      <div class="hero-meta">VUM ERP Mobile Application &nbsp;·&nbsp; Last updated: June 2026</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-file-text"></i></span>General Provisions</h2>
+      <p>This Privacy Policy describes how the <strong>VUM ERP</strong> mobile application, developed by VAN UNIVERSAL MOTORS, collects, uses, and protects user data.</p>
+      <p>The application is intended exclusively for employees of VAN UNIVERSAL MOTORS. Access is granted only to authorized users.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-database"></i></span>Data We Collect</h2>
+      <ul class="data-list">
+        <li>
+          <div class="dot"></div>
+          <div>
+            <strong>Account Credentials</strong>
+            <span>Employee login and password for accessing the ERP system. Passwords are stored in encrypted form.</span>
+          </div>
+        </li>
+        <li>
+          <div class="dot"></div>
+          <div>
+            <strong>Geolocation</strong>
+            <span>Device location is used for production and logistics tasks within the ERP system workflow.</span>
+          </div>
+        </li>
+        <li>
+          <div class="dot"></div>
+          <div>
+            <strong>Camera (QR Scanner)</strong>
+            <span>Camera access is used exclusively for scanning QR codes as part of work processes.</span>
+          </div>
+        </li>
+        <li>
+          <div class="dot"></div>
+          <div>
+            <strong>Photos</strong>
+            <span>The application may request access to the gallery for uploading photos as part of work tasks.</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-target"></i></span>Purpose of Data Use</h2>
+      <ul class="data-list">
+        <li><div class="dot"></div><div><span>Authentication and authorization of employees in the ERP system</span></div></li>
+        <li><div class="dot"></div><div><span>Execution of company production and logistics tasks</span></div></li>
+        <li><div class="dot"></div><div><span>Ensuring application functionality</span></div></li>
+        <li><div class="dot"></div><div><span>Sending push notifications about work events</span></div></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-shield-check"></i></span>Data Protection</h2>
+      <ul class="data-list">
+        <li><div class="dot"></div><div><span>Data is transmitted via secure HTTPS protocol</span></div></li>
+        <li><div class="dot"></div><div><span>Data is stored on the company's secured servers</span></div></li>
+        <li><div class="dot"></div><div><span>Data access is restricted to authorized employees only</span></div></li>
+        <li><div class="dot"></div><div><span>Data is not shared with third parties</span></div></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-user-circle"></i></span>User Rights</h2>
+      <ul class="data-list">
+        <li><div class="dot"></div><div><span>Request information about stored data</span></div></li>
+        <li><div class="dot"></div><div><span>Submit a request to modify or delete data</span></div></li>
+        <li><div class="dot"></div><div><span>Opt out of geolocation collection via device settings</span></div></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon"><i class="ph ph-envelope-simple"></i></span>Contact</h2>
+      <p>For privacy-related inquiries, please contact us:</p>
+      <div class="contact-card">
+        <p><strong>VAN UNIVERSAL MOTORS</strong></p>
+        <p>Email: <a href="mailto:it@faw.uz">it@faw.uz</a></p>
+        <p>Website: <a href="https://faw.uz" target="_blank">https://faw.uz</a></p>
+        <p>Address: Tashkent, Uzbekistan</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  function setLang(lang) {
+    document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.lang-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('lang-' + lang).classList.add('active');
+    document.querySelector(`[onclick="setLang('${lang}')"]`).classList.add('active');
+    document.documentElement.lang = lang;
+  }
+</script>
+
+</body>
+</html>

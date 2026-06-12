@@ -10,6 +10,7 @@ from django.views.i18n import set_language as django_set_language
 from django.utils import translation
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from kg.views import kg_stats_dashboard
+from main.views import privacy_policy_mobile
 from main.views_sitemap import sitemap_index, sitemap_uz, sitemap_ru, sitemap_en
 
 admin.site.site_header = "FAW Admin"
@@ -49,6 +50,10 @@ urlpatterns = [
 
     path('admin/kg/stats/', kg_stats_dashboard, name='kg-stats'),
     path('admin/', admin.site.urls),
+
+    # Политика конфиденциальности мобильного приложения VUM ERP
+    # (standalone-страница со своим переключателем языков, вне i18n_patterns)
+    path('privacy-policy/mobile/', privacy_policy_mobile, name='privacy_policy_mobile'),
     # Встроенный Django view: меняет язык, ставит cookie, корректно переписывает URL
     # на новый языковой префикс (через translate_url) и редиректит на 'next'.
     path('set-language/', set_language, name='set_language'),

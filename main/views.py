@@ -146,6 +146,12 @@ def product_detail(request, product_id):
     return render(request, 'main/product_detail.html', {'product_id': product_id})
 
 
+def privacy_policy_mobile(request):
+    """Политика конфиденциальности мобильного приложения VUM ERP.
+    Standalone-страница с переключателем языков RU/UZ/EN (внутри шаблона)."""
+    return render(request, 'main/mobile/privacy-policy-mobile.html')
+
+
 def become_a_dealer(request):
     try:
         page_data = BecomeADealerPage.get_instance()
