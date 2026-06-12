@@ -13,7 +13,7 @@
 
 @media only screen and (min-width: 992px) {
     h2 {
-        font-size: 6.5rem;
+        font-size: 6rem;
     }
 }
 
@@ -64,34 +64,46 @@
     justify-content: flex-end !important;
     align-items: flex-start;
     position: relative;
+    height: 100%;
 }
 
-/* Контейнер картинки — flex-item внутри .row, выравниваем картинку справа-внизу */
+/* === Hero — flex-row БЕЗ position: absolute === */
+/* Родители: должны быть на 100% ширины, иначе flex-row внутри схлопывается */
+.mxd-hero-06__headline,
+.hero-06-headline__descr {
+    width: 100%;
+}
+
+/* Главный flex-row: текст слева + картинка справа, выровнены по нижнему краю */
+.hero-06-headline__descr > .row {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-end;
+    margin: 0 !important;
+    gap: 1rem;
+}
+
+/* Левая колонка (заголовок + описание) занимает 55% */
+.hero-06-headline__descr .header-custom__content {
+    flex: 1 1 55%;
+    min-width: 0;
+}
+
+/* Правая колонка (картинка) — 45% строки */
 .mxd-hero-06__img {
     flex: 0 0 45%;
     max-width: 45%;
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
-    z-index: 1;
 }
 
+/* Картинка заполняет свой 45%-контейнер */
 .mxd-hero-06__img img {
-    width: 110%;
+    width: 100%;
     height: auto;
     display: block;
-}
-
-/* Левый блок (заголовок + описание) — заполняет оставшееся пространство */
-.hero-06-headline__descr .row {
-    display: flex;
-    align-items: flex-end;
-    flex-wrap: nowrap;
-}
-
-.hero-06-headline__descr .header-custom__content {
-    flex: 1;
-    min-width: 0;
+    z-index: 1;
 }
 
 .mxd-hero-06__btn-mobile {
@@ -195,7 +207,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    margin-bottom: 10rem;
+    margin-bottom: 5rem;
 }
 
 .filter-container {
@@ -278,10 +290,10 @@
     min-width: 350px;
     width: 100%;
     height: 100%;
-    background: transparent;
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(312deg, #353941 0%, #000000 100%);
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
@@ -297,7 +309,10 @@
     justify-content: center;
     width: 100%;
     height: 400px;
-    background: linear-gradient(360deg, #00000033 0%, #ffffff 55% 100%);
+    /* Сначала solid-white background чтобы тёмный фон карточки точно не просвечивал,
+       а сверху lin-gradient для визуального эффекта */
+    background-color: #ffffff;
+    background-image: linear-gradient(360deg, rgba(0, 0, 0, 0.2) 0%, transparent 20%);
     text-align: center;
 }
 
@@ -327,9 +342,8 @@
 
 .truck-info {
     row-gap: 10px;
-    min-height: 310px;
+    min-height: 265px;
     /* height: 100%; */
-    background: linear-gradient(312deg, #353941 0%, #000000 100%);
     color: #fff;
     padding: 15px;
     position: relative;
@@ -570,6 +584,10 @@ body[data-theme="dark"] .hero-05-title__item {
     .truck-title {
         font-size: 20px;
     }
+
+    .mxd-hero-06__content {
+        height: 50vh;
+    }
 }
 
 /* Tablet Landscape */
@@ -640,21 +658,38 @@ body[data-theme="dark"] .hero-05-title__item {
 
 @media (max-width: 992px) {
     .mxd-hero-06__content {
-        height: 55vh;
-    }
-
-    .mxd-hero-06__img img {
-        width: 55%;
+        height: 70vh;
     }
 
     .models_title {
         font-size: 5rem;
     }
+
+    /* < 992: layout столбик — текст сверху, картинка снизу по центру */
+    .hero-06-headline__descr > .row {
+        flex-wrap: wrap !important;
+    }
+
+    .hero-06-headline__descr .header-custom__content,
+    .mxd-hero-06__img {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .mxd-hero-06__img {
+        justify-content: center;
+    }
+
+    /* Чтоб картинка не занимала всё на планшете — ограничиваем */
+    .mxd-hero-06__img img {
+        max-width: 70%;
+        margin: 0 auto;
+    }
 }
 
 @media (max-width: 882px) {
     .mxd-hero-06__content {
-        height: 45vh;
+        height: 60vh;
     }
 
     .hero-05-title__item.title-item-image svg {
@@ -674,7 +709,7 @@ body[data-theme="dark"] .hero-05-title__item {
 /* Tablet Portrait */
 @media (max-width: 768px) {
     .mxd-hero-06__content {
-        height: 45vh;
+        height: 55vh;
     }
 
     .stack-item {
@@ -707,31 +742,12 @@ body[data-theme="dark"] .hero-05-title__item {
     }
 }
 
-/* < 992px: столбик — текст сверху, картинка снизу */
-@media (max-width: 991.98px) {
-    .hero-06-headline__descr .row {
-        flex-wrap: wrap;
-    }
-
-    .hero-06-headline__descr .header-custom__content {
-        flex: 0 0 100%;
-        max-width: 100%;
-    }
-
-    .mxd-hero-06__img {
-        flex: 0 0 100%;
-        max-width: 100%;
-        justify-content: center;
-    }
-}
-
 /* Mobile Landscape */
 @media (max-width: 576px) {
     .mxd-hero-06__content {
-        height: 25vh;
+        height: 22vh;
     }
 
-    .mxd-hero-06__img,
     .mxd-hero-06__img img {
         display: none;
     }
@@ -743,18 +759,33 @@ body[data-theme="dark"] .hero-05-title__item {
     }
 }
 
-/* Mobile Portrait */
+/* Fix overflow длинных слов (типа "Kombinatsiyalangan") в названиях */
+.faw-truck-card,
+.truck-info,
+.truck-image-container,
+.faw-truck-card-container {
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+.truck-title {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+}
+
+/* Mobile Portrait — одна колонка */
 @media (max-width: 480px) {
     .faw-truck-card-container {
-        grid-template-columns: none;
+        grid-template-columns: 1fr;
         justify-content: center;
-        padding: 0 2.6rem;
+        padding: 0 1.5rem;
     }
 
     .faw-truck-card {
         min-width: unset;
         margin: 10px auto;
-        max-width: 300px;
+        max-width: 400px;
         width: 100%;
         height: auto;
     }
@@ -792,6 +823,21 @@ body[data-theme="dark"] .hero-05-title__item {
 
     .spec-value {
         font-size: 16px;
+    }
+}
+
+/* Extra small portrait (≤ 380px) — самые узкие экраны */
+@media (max-width: 380px) {
+    .faw-truck-card-container {
+        padding: 0 1rem;
+    }
+
+    .faw-truck-card {
+        max-width: 100%;
+    }
+
+    .truck-title {
+        font-size: 18px;
     }
 }
 
@@ -972,5 +1018,56 @@ body[data-theme="dark"] .hero-05-title__item {
 @media only screen and (min-width: 1200px) {
     .mxd-blog-pagination {
         margin: 3rem 6.5rem;
+    }
+}
+
+@media (max-width: 996px) {
+    
+    .section-filter {
+        margin-bottom: 2rem;
+    }
+
+}
+
+/* Planshet (481-1199px) — форсим 2 колонки, чтобы не схлопывалось в одну при ~962 */
+@media (min-width: 481px) and (max-width: 1199px) {
+    .faw-truck-card-container {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 0 2rem;
+        gap: 16px;
+    }
+
+    .faw-truck-card {
+        min-width: 0;
+        max-width: 100%;
+        margin: 0;
+    }
+
+    .truck-image-container {
+        height: 260px;
+    }
+}
+
+/* Поджать внутренности карточки на узких планшетах чтобы 2 колонки помещались */
+@media (min-width: 481px) and (max-width: 768px) {
+    .faw-truck-card-container {
+        padding: 0 1rem;
+    }
+
+    .truck-image-container {
+        height: 220px;
+    }
+
+    .truck-title {
+        font-size: 16px;
+    }
+
+    .truck-info {
+        padding: 12px;
+        min-height: auto;
+    }
+
+    .spec-item {
+        max-width: 100%;
     }
 }

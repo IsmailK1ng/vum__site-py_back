@@ -37,6 +37,14 @@
     transition: background 0.2s ease;
 }
 
+/* Длинные слова в вопросе должны переноситься, иначе они вылазят за карточку */
+.faq-question > span:first-child {
+    min-width: 0;
+    flex: 1;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
 .faq-question:hover {
     background: rgba(0, 0, 0, 0.03);
 }
@@ -158,6 +166,24 @@
 
 /* ---------- Медиа ---------- */
 @media (max-width: 768px) {
+    /* Заголовок страницы — поджимаем шрифт и отступы (был ~80px+ из-за глобального h1) */
+    .faw-history-title {
+        margin: 3rem 0 2rem !important;
+        padding: 0 1.5rem;
+    }
+
+    .faw-history-title h1 {
+        font-size: clamp(2.4rem, 7vw, 4rem) !important;
+        line-height: 1.15 !important;
+        letter-spacing: -0.5px !important;
+        word-break: break-word;
+    }
+
+    /* Зазор между заголовком и FAQ-блоком */
+    .mxd-page-content > .mxd-section:first-child {
+        padding-top: 0;
+    }
+
     .faq-question {
         padding: 18px 20px;
         font-size: 15px;
@@ -170,6 +196,15 @@
 
     .faq-form-section {
         margin-top: 4rem;
+    }
+
+    .faq-form-section .faw-history-title {
+        margin: 0 0 0.5rem !important;
+    }
+
+    .faq-form-section .faw-history-title h2 {
+        font-size: clamp(2rem, 6vw, 3.2rem) !important;
+        line-height: 1.2 !important;
     }
 
     .faq-form-wrap input,
@@ -189,6 +224,15 @@
 }
 
 @media (max-width: 480px) {
+    .faw-history-title {
+        margin: 2rem 0 1.5rem !important;
+        padding: 0 1rem;
+    }
+
+    .faw-history-title h1 {
+        font-size: clamp(2rem, 8vw, 2.8rem) !important;
+    }
+
     .faq-question {
         padding: 16px;
         font-size: 14px;

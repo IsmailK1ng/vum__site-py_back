@@ -44,6 +44,14 @@
     <link rel="stylesheet" href="{% static 'css/plugins.css' %}">
     <link rel="stylesheet" href="{% static 'css/main_site.css' %}">
     <link rel="stylesheet" href="{% static 'css/site_main.css' %}">
+
+    <!-- Глобальный фикс центровки контейнера: в main_site.css у .mxd-container нет
+         margin: 0 auto, поэтому на широких экранах он прижимается к левому краю.
+         Здесь добавляем центрирование. Страничный CSS ниже может переопределить. -->
+    <style>
+        .mxd-container { margin-left: auto !important; margin-right: auto !important; }
+    </style>
+
     <!-- Страничный CSS — каждая страница добавляет свой -->
     {% block extra_css %}{% endblock %}
 

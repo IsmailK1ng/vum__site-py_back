@@ -36,6 +36,41 @@
   transition: opacity 0.5s ease;
   z-index: 1;
 }
+
+/* < 769px: в mxd-promo блоке убираем чёрный фон + логотип FAW TRUCKS,
+   оставляем только фото. Плюс отключаем zoom-out scroll-анимацию,
+   которая на мобиле выглядит криво. */
+@media (max-width: 768.98px) {
+  /* Скрываем контент с логотипом и текстом */
+  .mxd-promo .mxd-promo__content {
+    display: none !important;
+  }
+
+  /* Убираем чёрный градиент-overlay (он закрывал левую треть) */
+  .mxd-promo .mxd-promo__bg {
+    background: none !important;
+  }
+
+  /* Растягиваем фото на весь блок */
+  .mxd-promo .mxd-promo__bg::before {
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+  }
+
+  /* Отключаем zoom-out scroll-анимацию (JS задаёт transform через anim-zoom-out-container) */
+  .mxd-promo .mxd-promo__inner.anim-zoom-out-container,
+  .mxd-promo .mxd-promo__inner {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
 </style>
 {% endblock %}
 
