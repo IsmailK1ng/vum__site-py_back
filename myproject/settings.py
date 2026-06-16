@@ -67,8 +67,11 @@ LANGUAGES = [
     ('ky', _("Кыргызский")),
 ]
 
-MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz' 
-MODELTRANSLATION_LANGUAGES = ('uz', 'ru', 'en')
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz'
+# Порядок здесь = порядок табов в админке TabbedTranslationAdmin.
+# Первый язык = активный по умолчанию. RU первый — чтоб не кликать каждый раз.
+# На URL-роутинг и базовое поле (без суффикса) НЕ влияет.
+MODELTRANSLATION_LANGUAGES = ('ru', 'uz', 'en')
 MODELTRANSLATION_FALLBACK_LANGUAGES = {
     'default': (),
 }
@@ -220,10 +223,47 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {'min_length': 8},
+    },
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
+
+# Хеширование паролей — встроенный PBKDF2 (без внешних зависимостей).
+# Безопасен по умолчанию; при росте системы можно вернуть Argon2 первым в списке.
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.ScryptPasswordHasher',
+]
+
+# ============ AUTH ============
+# Глобальные LOGIN_URL/LOGIN_REDIRECT_URL/LOGOUT_REDIRECT_URL НЕ ставим:
+# иначе при выходе из админки Django редиректил бы на dealer_login.
+# Дилерские view (dealer_login/dealer_logout/dealer_shop) делают редиректы сами,
+# а @login_required(login_url='dealer_login') передаёт URL явно.
+
+# ============ СЕССИИ И COOKIES (БЕЗОПАСНОСТЬ) ============
+
+# Сессия живёт 8 часов с последней активности
+SESSION_COOKIE_AGE = 60 * 60 * 8
+SESSION_SAVE_EVERY_REQUEST = True            # обновляет expiry на каждом запросе
+
+# JS не может прочитать cookie — защита от XSS-кражи сессии
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'              # защита от CSRF (cross-site post-запросы)
+
+# CSRF: HttpOnly выключен (Django нужен JS-доступ для AJAX), SameSite=Lax
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# Защита от clickjacking — нельзя встраивать сайт в iframe
+X_FRAME_OPTIONS = 'DENY'
+
+# Не отсылать Referer при переходах на сторонние сайты
+SECURE_REFERRER_POLICY = 'same-origin'
 
 # ============ ЛОКАЛИЗАЦИЯ ============
 
@@ -291,7 +331,12 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    # X_FRAME_OPTIONS = 'DENY'
+    X_FRAME_OPTIONS = 'DENY'
+
+    # HSTS — заставляет браузер ходить только по HTTPS на год вперёд
+    SECURE_HSTS_SECONDS = 60 * 60 * 24 * 365
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 # ============ ЯЗЫКОВЫЕ COOKIES ============
 
@@ -332,6 +377,25 @@ CKEDITOR_CONFIGS = {
         'resize_enabled': True,
         'forcePasteAsPlainText': False,
         'allowedContent': True,
+    },
+    # Профиль для запчастей: текст + базовое форматирование, БЕЗ Image/Iframe/Table.
+    'text_only': {
+        'toolbar': 'TextOnly',
+        'toolbar_TextOnly': [
+            ['Undo', 'Redo'],
+            ['Bold', 'Italic', 'Underline', 'Strike'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'],
+            ['Link', 'Unlink'],
+            ['RemoveFormat'],
+            ['Source'],
+        ],
+        'height': 250,
+        'width': '100%',
+        # table убираем вместе с зависимыми (tabletools/tableselection/tableresize),
+        # иначе CKEditor ругается 'editor-plugin-required: table requiredBy: tabletools'
+        'removePlugins': 'elementspath,exportpdf,image,iframe,table,tabletools,tableselection,tableresize',
+        'resize_enabled': True,
+        'forcePasteAsPlainText': True,
     },
 }
 

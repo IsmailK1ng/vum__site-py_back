@@ -1,0 +1,472 @@
+{% load static %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="same-origin">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{{ part.name_ru|default:part.name }} — VUM</title>
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1a1a1a;
+    }
+
+    /* ===== HEADER (тот же что в shop) ===== */
+    .dealer-header {
+      background: #ffffff;
+      border-bottom: 1px solid #e3e8ef;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .dealer-header__logo img { height: 30px; width: auto; }
+    .dealer-header__user { display: flex; align-items: center; gap: 14px; }
+    .dealer-header__avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      object-fit: cover; border: 1.5px solid #e3e8ef;
+    }
+    .dealer-header__avatar--placeholder {
+      background: #1f3a5f; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px;
+    }
+    .dealer-header__name { font-size: 14px; font-weight: 600; }
+    .dealer-header__logout {
+      background: transparent;
+      border: 1.5px solid #d6dce5;
+      padding: 8px 16px;
+      font-size: 13px; font-weight: 600;
+      color: #3a4452;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.18s, border-color 0.18s;
+    }
+    .dealer-header__logout:hover {
+      background: #f5f7fa;
+      border-color: #1f3a5f;
+      color: #1f3a5f;
+    }
+    .dealer-logout-form { display: inline; margin: 0; }
+
+    /* ===== Иконка корзины ===== */
+    .cart-icon-link {
+      position: relative;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1.5px solid #e3e8ef;
+      color: #3a4452;
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .cart-icon-link:hover { border-color: #1f3a5f; color: #1f3a5f; }
+    .cart-icon-link svg { width: 20px; height: 20px; }
+    .cart-icon-link__badge {
+      position: absolute; top: -4px; right: -4px;
+      min-width: 18px; height: 18px;
+      padding: 0 5px;
+      background: #c75050; color: #fff;
+      border-radius: 9px;
+      font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid #fff;
+      line-height: 1;
+    }
+
+    /* ===== MAIN ===== */
+    .dealer-main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px 28px 64px;
+    }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: #5a6470; font-size: 14px; text-decoration: none;
+      margin-bottom: 20px;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: #1f3a5f; }
+
+    /* ===== ОСНОВНАЯ КАРТОЧКА ===== */
+    .detail-card {
+      background: #fff;
+      border: 1px solid #e3e8ef;
+      border-radius: 14px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 28px;
+      margin-bottom: 32px;
+    }
+
+    /* ----- Галерея ----- */
+    .detail-gallery__main {
+      aspect-ratio: 1 / 1;
+      background: #f0f3f7;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .detail-gallery__main img {
+      width: 100%; height: 100%; object-fit: contain;
+    }
+    .detail-gallery__main--empty { color: #b6bfcc; font-size: 14px; }
+    .detail-gallery__thumbs {
+      display: flex; gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .detail-gallery__thumb {
+      width: 64px; height: 64px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      cursor: pointer;
+      background: #f0f3f7;
+      padding: 0;
+      transition: border-color 0.15s;
+    }
+    .detail-gallery__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .detail-gallery__thumb.is-active { border-color: #1f3a5f; }
+
+    /* ----- Правая колонка ----- */
+    .detail-info { display: flex; flex-direction: column; min-width: 0; }
+    .detail-info__sku {
+      font-size: 12px; font-weight: 600; color: #7a8290;
+      text-transform: uppercase; letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+    .detail-info__title {
+      margin: 0 0 14px;
+      font-size: 24px; font-weight: 700; line-height: 1.25;
+      color: #0f1419;
+    }
+    .detail-info__meta {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      margin-bottom: 16px;
+      color: #5a6470; font-size: 13px;
+    }
+    .detail-info__meta span strong { color: #1a1a1a; font-weight: 600; }
+    .detail-info__description {
+      flex: 1;
+      background: #fafbfd;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #2a3340;
+      overflow-wrap: break-word;
+    }
+    .detail-info__description--empty { color: #9aa3b0; font-style: italic; }
+    .detail-info__description p { margin: 0 0 10px; }
+    .detail-info__description p:last-child { margin-bottom: 0; }
+
+    /* ----- Подвал карточки (цена / стоки / стэппер) ----- */
+    .detail-footer {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid #eef1f5;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 18px;
+    }
+    .detail-footer__price { font-size: 24px; font-weight: 700; color: #1f3a5f; white-space: nowrap; }
+    .detail-footer__stock { font-size: 13px; color: #5a6470; }
+    .detail-footer__stock--zero { color: #c75050; font-weight: 600; }
+    .detail-footer__stepper {
+      display: inline-flex; align-items: center;
+      border: 1.5px solid #d6dce5; border-radius: 8px;
+      overflow: hidden;
+    }
+    .detail-footer__stepper button {
+      background: #fff; border: none; padding: 8px 14px;
+      font-size: 18px; font-weight: 700; cursor: pointer; color: #1f3a5f;
+      line-height: 1;
+    }
+    .detail-footer__stepper button:hover { background: #f5f7fa; }
+    .detail-footer__stepper button:disabled { color: #c4cad3; cursor: not-allowed; }
+    .detail-footer__stepper input {
+      width: 56px; text-align: center;
+      border: none; border-left: 1.5px solid #d6dce5; border-right: 1.5px solid #d6dce5;
+      padding: 8px 4px;
+      font-size: 14px; font-weight: 600;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+    .detail-footer__stepper input::-webkit-outer-spin-button,
+    .detail-footer__stepper input::-webkit-inner-spin-button {
+      -webkit-appearance: none; margin: 0;
+    }
+    .detail-footer__add {
+      padding: 12px 22px;
+      background: #1f3a5f; color: #fff; border: none;
+      border-radius: 8px;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .detail-footer__add:hover { background: #2a4d7a; }
+    .detail-footer__add:disabled { background: #b6bfcc; cursor: not-allowed; }
+
+    /* ===== РЕКОМЕНДАЦИИ ===== */
+    .recs__title {
+      margin: 0 0 16px;
+      font-size: 18px; font-weight: 700; color: #0f1419;
+    }
+    .recs__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .rec-card {
+      background: #fff;
+      border: 1px solid #e3e8ef;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.18s, box-shadow 0.18s;
+    }
+    .rec-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+    }
+    .rec-card__image {
+      aspect-ratio: 1 / 1;
+      background: #f0f3f7;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .rec-card__image img { width: 100%; height: 100%; object-fit: cover; }
+    .rec-card__image--empty { color: #b6bfcc; font-size: 12px; }
+    .rec-card__body {
+      padding: 12px 14px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .rec-card__sku {
+      font-size: 10px; color: #7a8290; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .rec-card__name {
+      margin: 0;
+      font-size: 13px; font-weight: 600; color: #1a1a1a;
+      line-height: 1.35;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .rec-card__price {
+      margin-top: 4px;
+      font-size: 14px; font-weight: 700; color: #1f3a5f;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #1f3a5f; color: #fff;
+      padding: 12px 20px; border-radius: 8px;
+      font-size: 14px; font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 768px) {
+      .detail-card { grid-template-columns: 1fr; padding: 16px; gap: 18px; }
+      .dealer-header { padding: 12px 16px; }
+      .dealer-header__name { display: none; }
+      .dealer-main { padding: 16px; }
+      .detail-info__title { font-size: 20px; }
+      .detail-footer { gap: 12px; }
+      .detail-footer__price { font-size: 20px; }
+      .recs__grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="dealer-header">
+    <div class="dealer-header__logo">
+      <a href="{% url 'dealer_shop' %}"><img src="{% static 'images/LOGO-VUM.png' %}" alt="VUM"></a>
+    </div>
+    <div class="dealer-header__user">
+      <a href="{% url 'dealer_cart' %}" class="cart-icon-link" aria-label="Корзина">
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        <span class="cart-icon-link__badge" id="cart-badge" style="display:none"></span>
+      </a>
+      <button type="button" class="profile-trigger" aria-label="Профиль">
+        {% if profile.avatar %}
+          <img class="dealer-header__avatar" src="{{ profile.avatar.url }}" alt="{{ profile.name }}">
+        {% else %}
+          <div class="dealer-header__avatar dealer-header__avatar--placeholder">{{ profile.name|slice:":1"|upper }}</div>
+        {% endif %}
+        <span class="dealer-header__name">{{ profile.name }}</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="dealer-main">
+    <a href="{% url 'dealer_shop' %}" class="back-link">← Назад к каталогу</a>
+
+    <section class="detail-card">
+      {# ===== Галерея ===== #}
+      <div class="detail-gallery">
+        {% with images=part.images.all %}
+          {% if images %}
+            <div class="detail-gallery__main">
+              <img id="gallery-main-img" src="{{ images.0.image.url }}" alt="{{ part.name_ru|default:part.name }}">
+            </div>
+            {% if images.count > 1 %}
+              <div class="detail-gallery__thumbs">
+                {% for img in images %}
+                  <button type="button" class="detail-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-src="{{ img.image.url }}">
+                    <img src="{{ img.image.url }}" alt="">
+                  </button>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="detail-gallery__main detail-gallery__main--empty">Нет фото</div>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      {# ===== Инфа ===== #}
+      <div class="detail-info">
+        <span class="detail-info__sku">{{ part.part_number }}</span>
+        <h1 class="detail-info__title">{{ part.name_ru|default:part.name }}</h1>
+
+        <div class="detail-info__meta">
+          <span>Тип: <strong>{{ part.type.name_ru|default:part.type.name }}</strong></span>
+          {% if part.truck %}
+            <span>Грузовик: <strong>{{ part.truck.title }}</strong></span>
+          {% endif %}
+        </div>
+
+        <div class="detail-info__description {% if not part.description_ru and not part.description %}detail-info__description--empty{% endif %}">
+          {% if part.description_ru %}{{ part.description_ru|safe }}{% elif part.description %}{{ part.description|safe }}{% else %}Описание не заполнено.{% endif %}
+        </div>
+
+        <div class="detail-footer">
+          <div class="detail-footer__price">{{ part.price|floatformat:0 }} UZS</div>
+          {% if part.quantity %}
+            <div class="detail-footer__stock">Кол-во: <strong>{{ part.quantity }}</strong></div>
+          {% else %}
+            <div class="detail-footer__stock detail-footer__stock--zero">Нет в наличии</div>
+          {% endif %}
+
+          <div class="detail-footer__stepper" data-max="{{ part.quantity }}">
+            <button type="button" data-action="dec" aria-label="Уменьшить">−</button>
+            <input type="number" id="qty-input" value="{% if part.quantity %}1{% else %}0{% endif %}" min="0" max="{{ part.quantity }}">
+            <button type="button" data-action="inc" aria-label="Увеличить">+</button>
+          </div>
+
+          <button type="button" class="detail-footer__add" id="add-to-cart-btn" {% if not part.quantity %}disabled{% endif %}>
+            Добавить в корзину
+          </button>
+        </div>
+      </div>
+    </section>
+
+    {# ===== РЕКОМЕНДАЦИИ ===== #}
+    {% if recommendations %}
+      <section class="recs">
+        <h2 class="recs__title">Похожие запчасти</h2>
+        <div class="recs__grid">
+          {% for r in recommendations %}
+            <a class="rec-card" href="{% url 'dealer_part_detail' r.id %}">
+              <div class="rec-card__image{% if not r.images.all %} rec-card__image--empty{% endif %}">
+                {% with first_image=r.images.first %}
+                  {% if first_image %}<img src="{{ first_image.image.url }}" alt="" loading="lazy">{% else %}<span>Нет фото</span>{% endif %}
+                {% endwith %}
+              </div>
+              <div class="rec-card__body">
+                <span class="rec-card__sku">{{ r.part_number }}</span>
+                <h3 class="rec-card__name">{{ r.name_ru|default:r.name }}</h3>
+                <span class="rec-card__price">{{ r.price|floatformat:0 }} UZS</span>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  {% include 'main/dealer/_profile_modal.html' %}
+
+  <script src="{% static 'js/dealer-cart.js' %}"></script>
+  <script>
+    DealerCart.bindBadge(document.getElementById('cart-badge'));
+
+    (function(){
+      // ===== Галерея =====
+      var mainImg = document.getElementById('gallery-main-img');
+      document.querySelectorAll('.detail-gallery__thumb').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          mainImg.src = btn.dataset.src;
+          document.querySelectorAll('.detail-gallery__thumb').forEach(function(b){
+            b.classList.toggle('is-active', b === btn);
+          });
+        });
+      });
+
+      // ===== Стэппер количества =====
+      var stepper = document.querySelector('.detail-footer__stepper');
+      if (stepper) {
+        var max = parseInt(stepper.dataset.max || '0', 10);
+        var input = stepper.querySelector('input');
+        stepper.addEventListener('click', function(e){
+          if (e.target.tagName !== 'BUTTON') return;
+          var cur = parseInt(input.value || '0', 10) || 0;
+          var action = e.target.dataset.action;
+          if (action === 'inc' && cur < max) cur += 1;
+          if (action === 'dec' && cur > 0) cur -= 1;
+          input.value = cur;
+        });
+        input.addEventListener('change', function(){
+          var v = parseInt(input.value, 10);
+          if (isNaN(v) || v < 0) v = 0;
+          if (v > max) v = max;
+          input.value = v;
+        });
+      }
+
+      // ===== Toast + добавление в корзину (заглушка) =====
+      var toast = document.getElementById('toast');
+      var toastTimer = null;
+      function showToast(text){
+        toast.textContent = text;
+        toast.classList.add('is-visible');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function(){
+          toast.classList.remove('is-visible');
+        }, 2200);
+      }
+      var addBtn = document.getElementById('add-to-cart-btn');
+      if (addBtn) {
+        addBtn.addEventListener('click', function(){
+          var qty = parseInt(document.getElementById('qty-input').value || '0', 10);
+          if (qty < 1) {
+            showToast('Укажите количество больше 0');
+            return;
+          }
+          DealerCart.add({{ part.id }}, qty);
+          showToast('Добавлено в корзину: ' + qty + ' шт.');
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

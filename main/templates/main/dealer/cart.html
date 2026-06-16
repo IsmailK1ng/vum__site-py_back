@@ -1,0 +1,493 @@
+{% load static %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="same-origin">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Корзина — VUM</title>
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1a1a1a;
+    }
+
+    /* ===== HEADER (общий стиль) ===== */
+    .dealer-header {
+      background: #ffffff;
+      border-bottom: 1px solid #e3e8ef;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .dealer-header__logo img { height: 30px; width: auto; }
+    .dealer-header__user { display: flex; align-items: center; gap: 14px; }
+    .dealer-header__avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 1.5px solid #e3e8ef; }
+    .dealer-header__avatar--placeholder { background: #1f3a5f; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; }
+    .dealer-header__name { font-size: 14px; font-weight: 600; }
+    .dealer-header__logout { background: transparent; border: 1.5px solid #d6dce5; padding: 8px 16px; font-size: 13px; font-weight: 600; color: #3a4452; border-radius: 8px; cursor: pointer; transition: background 0.18s, border-color 0.18s; }
+    .dealer-header__logout:hover { background: #f5f7fa; border-color: #1f3a5f; color: #1f3a5f; }
+    .dealer-logout-form { display: inline; margin: 0; }
+
+    /* ===== Иконка корзины в header ===== */
+    .cart-icon-link {
+      position: relative;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1.5px solid #e3e8ef;
+      color: #3a4452;
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .cart-icon-link:hover { border-color: #1f3a5f; color: #1f3a5f; }
+    .cart-icon-link.is-current { background: #1f3a5f; color: #fff; border-color: #1f3a5f; }
+    .cart-icon-link svg { width: 20px; height: 20px; }
+    .cart-icon-link__badge {
+      position: absolute; top: -4px; right: -4px;
+      min-width: 18px; height: 18px;
+      padding: 0 5px;
+      background: #c75050; color: #fff;
+      border-radius: 9px;
+      font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid #fff;
+      line-height: 1;
+    }
+
+    /* ===== MAIN ===== */
+    .dealer-main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px 28px 64px;
+    }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: #5a6470; font-size: 14px; text-decoration: none;
+      margin-bottom: 20px;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: #1f3a5f; }
+    .cart-title { margin: 0 0 20px; font-size: 24px; font-weight: 700; color: #0f1419; }
+
+    /* ===== LAYOUT 2 колонки ===== */
+    .cart-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ===== СПИСОК ПОЗИЦИЙ ===== */
+    .cart-items { display: flex; flex-direction: column; gap: 12px; }
+    .cart-item {
+      background: #fff;
+      border: 1px solid #e3e8ef;
+      border-radius: 12px;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      gap: 16px;
+      align-items: center;
+    }
+    .cart-item__image {
+      width: 80px; height: 80px;
+      border-radius: 8px; overflow: hidden;
+      background: #f0f3f7;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cart-item__image img { width: 100%; height: 100%; object-fit: cover; }
+    .cart-item__image--empty { color: #b6bfcc; font-size: 11px; }
+    .cart-item__info { min-width: 0; }
+    .cart-item__sku { font-size: 11px; font-weight: 600; color: #7a8290; text-transform: uppercase; letter-spacing: 0.5px; }
+    .cart-item__name {
+      margin: 4px 0 6px;
+      font-size: 15px; font-weight: 600; color: #1a1a1a;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .cart-item__price-line { font-size: 13px; color: #5a6470; }
+    .cart-item__price-line strong { color: #1f3a5f; }
+    .cart-item__actions { display: flex; align-items: center; gap: 12px; }
+    .cart-item__stepper {
+      display: inline-flex; align-items: center;
+      border: 1.5px solid #d6dce5; border-radius: 8px;
+      overflow: hidden;
+    }
+    .cart-item__stepper button {
+      background: #fff; border: none; padding: 6px 12px;
+      font-size: 16px; font-weight: 700; cursor: pointer; color: #1f3a5f;
+      line-height: 1;
+    }
+    .cart-item__stepper button:hover { background: #f5f7fa; }
+    .cart-item__stepper button:disabled { color: #c4cad3; cursor: not-allowed; }
+    .cart-item__stepper input {
+      width: 44px; text-align: center;
+      border: none; border-left: 1.5px solid #d6dce5; border-right: 1.5px solid #d6dce5;
+      padding: 6px 4px;
+      font-size: 14px; font-weight: 600;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+    .cart-item__stepper input::-webkit-outer-spin-button,
+    .cart-item__stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .cart-item__remove {
+      background: transparent; border: none; cursor: pointer;
+      color: #c75050; font-size: 12px; font-weight: 600;
+      padding: 4px 8px; border-radius: 6px;
+      transition: background 0.15s;
+    }
+    .cart-item__remove:hover { background: #ffeaea; }
+
+    /* ===== EMPTY ===== */
+    .cart-empty {
+      background: #fff;
+      border: 1px solid #e3e8ef;
+      border-radius: 14px;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .cart-empty__title { font-size: 18px; font-weight: 600; color: #3a4452; margin: 0 0 8px; }
+    .cart-empty__text { color: #7a8290; font-size: 14px; margin: 0 0 18px; }
+    .cart-empty__cta {
+      display: inline-block; padding: 10px 22px;
+      background: #1f3a5f; color: #fff; text-decoration: none;
+      border-radius: 8px; font-size: 14px; font-weight: 600;
+      transition: background 0.15s;
+    }
+    .cart-empty__cta:hover { background: #2a4d7a; }
+
+    /* ===== SIDEBAR ===== */
+    .cart-sidebar { display: flex; flex-direction: column; gap: 12px; position: sticky; top: 78px; }
+    .cart-sidebar__block {
+      background: #fff;
+      border: 1px solid #e3e8ef;
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .cart-sidebar__title { margin: 0 0 12px; font-size: 16px; font-weight: 700; color: #0f1419; }
+    .cart-breakdown {
+      display: flex; flex-direction: column; gap: 4px;
+      margin: 0; padding: 0;
+      font-family: 'Roboto Mono', 'SF Mono', Consolas, monospace;
+      font-size: 13px; color: #3a4452;
+      list-style: none;
+    }
+    .cart-breakdown__line { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+    .cart-breakdown__formula { color: #7a8290; }
+    .cart-breakdown__formula b { color: #3a4452; font-weight: 600; }
+    .cart-breakdown__sub { color: #1a1a1a; font-weight: 600; }
+    .cart-breakdown__divider {
+      border: none; border-top: 1px dashed #d6dce5;
+      margin: 10px 0;
+    }
+    .cart-total {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 15px;
+    }
+    .cart-total__label { color: #5a6470; font-weight: 600; }
+    .cart-total__sum { font-size: 22px; font-weight: 700; color: #1f3a5f; }
+
+    .cart-pay-btn {
+      width: 100%;
+      padding: 14px;
+      background: #1f3a5f; color: #fff; border: none;
+      border-radius: 8px;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .cart-pay-btn:hover { background: #2a4d7a; }
+    .cart-pay-btn:disabled { background: #b6bfcc; cursor: not-allowed; }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #1f3a5f; color: #fff;
+      padding: 12px 20px; border-radius: 8px;
+      font-size: 14px; font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 900px) {
+      .cart-layout { grid-template-columns: 1fr; }
+      .cart-sidebar { position: static; }
+    }
+    @media (max-width: 600px) {
+      .dealer-header { padding: 12px 16px; }
+      .dealer-header__name { display: none; }
+      .dealer-main { padding: 16px; }
+      .cart-item { grid-template-columns: 60px 1fr; gap: 12px; padding: 10px; }
+      .cart-item__image { width: 60px; height: 60px; }
+      .cart-item__actions { grid-column: 1 / -1; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+  <header class="dealer-header">
+    <div class="dealer-header__logo">
+      <a href="{% url 'dealer_shop' %}"><img src="{% static 'images/LOGO-VUM.png' %}" alt="VUM"></a>
+    </div>
+    <div class="dealer-header__user">
+      <a href="{% url 'dealer_cart' %}" class="cart-icon-link is-current" aria-label="Корзина">
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        <span class="cart-icon-link__badge" id="cart-badge" style="display:none"></span>
+      </a>
+      <button type="button" class="profile-trigger" aria-label="Профиль">
+        {% if profile.avatar %}
+          <img class="dealer-header__avatar" src="{{ profile.avatar.url }}" alt="{{ profile.name }}">
+        {% else %}
+          <div class="dealer-header__avatar dealer-header__avatar--placeholder">{{ profile.name|slice:":1"|upper }}</div>
+        {% endif %}
+        <span class="dealer-header__name">{{ profile.name }}</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="dealer-main">
+    <a href="{% url 'dealer_shop' %}" class="back-link">← Назад к каталогу</a>
+    <h1 class="cart-title">Корзина</h1>
+
+    {# Контейнер заполняется JS #}
+    <div id="cart-root"><div class="cart-empty"><p class="cart-empty__title">Загрузка…</p></div></div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  {% include 'main/dealer/_profile_modal.html' %}
+
+  <script src="{% static 'js/dealer-cart.js' %}"></script>
+  <script>
+    (function(){
+      DealerCart.bindBadge(document.getElementById('cart-badge'));
+
+      var root = document.getElementById('cart-root');
+      var toast = document.getElementById('toast');
+      var toastTimer = null;
+      function showToast(text){
+        toast.textContent = text;
+        toast.classList.add('is-visible');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function(){ toast.classList.remove('is-visible'); }, 2200);
+      }
+
+      // Форматирование чисел с пробелами как разделителями тысяч
+      function fmt(n){
+        return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+      }
+
+      // Шаблон HTML одной позиции
+      function itemHTML(item){
+        var imgHTML = item.image_url
+          ? '<img src="' + item.image_url + '" alt="">'
+          : '<span>Нет фото</span>';
+        return ''
+          + '<div class="cart-item" data-id="' + item.id + '">'
+          + '  <div class="cart-item__image' + (item.image_url ? '' : ' cart-item__image--empty') + '">' + imgHTML + '</div>'
+          + '  <div class="cart-item__info">'
+          + '    <div class="cart-item__sku">' + escapeHtml(item.part_number) + '</div>'
+          + '    <h3 class="cart-item__name">' + escapeHtml(item.name) + '</h3>'
+          + '    <div class="cart-item__price-line">Цена: <strong>' + fmt(item.price) + ' UZS</strong> · в наличии: ' + item.quantity_available + '</div>'
+          + '  </div>'
+          + '  <div class="cart-item__actions">'
+          + '    <div class="cart-item__stepper" data-max="' + item.quantity_available + '">'
+          + '      <button type="button" data-action="dec" aria-label="Уменьшить">−</button>'
+          + '      <input type="number" value="' + item.qty + '" min="0" max="' + item.quantity_available + '">'
+          + '      <button type="button" data-action="inc" aria-label="Увеличить">+</button>'
+          + '    </div>'
+          + '    <button type="button" class="cart-item__remove" data-action="remove" aria-label="Удалить">✕</button>'
+          + '  </div>'
+          + '</div>';
+      }
+
+      function escapeHtml(s){
+        return String(s || '').replace(/[&<>"']/g, function(c){
+          return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+        });
+      }
+
+      function emptyHTML(){
+        return ''
+          + '<div class="cart-empty">'
+          + '  <p class="cart-empty__title">Корзина пуста</p>'
+          + '  <p class="cart-empty__text">Добавьте запчасти из каталога — они появятся здесь.</p>'
+          + '  <a href="{% url "dealer_shop" %}" class="cart-empty__cta">В каталог</a>'
+          + '</div>';
+      }
+
+      // Главный рендер: подгружает данные по ID из localStorage и рисует страницу
+      function render(){
+        var stored = DealerCart.getItems();
+        if (stored.length === 0) {
+          root.innerHTML = emptyHTML();
+          return;
+        }
+
+        var ids = stored.map(function(i){ return i.id; }).join(',');
+        fetch('{% url "dealer_cart_api" %}?ids=' + encodeURIComponent(ids), {
+          credentials: 'same-origin'
+        })
+          .then(function(r){ return r.json(); })
+          .then(function(data){
+            // Сопоставляем серверные данные с qty из localStorage.
+            // Также фильтруем те ID что сервер не вернул (запчасть деактивирована/удалена).
+            var serverMap = {};
+            (data.items || []).forEach(function(it){ serverMap[it.id] = it; });
+
+            var enriched = [];
+            var staleIds = [];
+            stored.forEach(function(it){
+              var s = serverMap[it.id];
+              if (s) {
+                // Если qty больше доступного — обрезаем
+                var qty = Math.min(it.qty, s.quantity_available || 0);
+                if (qty < 1) { staleIds.push(it.id); return; }
+                enriched.push(Object.assign({}, s, { qty: qty }));
+              } else {
+                staleIds.push(it.id);
+              }
+            });
+
+            // Удаляем из localStorage то чего нет на сервере или закончилось
+            staleIds.forEach(function(id){ DealerCart.remove(id); });
+
+            if (enriched.length === 0) {
+              root.innerHTML = emptyHTML();
+              return;
+            }
+
+            renderLoaded(enriched);
+          })
+          .catch(function(){
+            root.innerHTML = '<div class="cart-empty"><p class="cart-empty__title">Ошибка загрузки</p><p class="cart-empty__text">Не удалось получить данные. Обновите страницу.</p></div>';
+          });
+      }
+
+      function renderLoaded(items){
+        var itemsHtml = items.map(itemHTML).join('');
+
+        var breakdownLines = items.map(function(it){
+          var sub = it.price * it.qty;
+          return ''
+            + '<li class="cart-breakdown__line" data-id="' + it.id + '">'
+            + '  <span class="cart-breakdown__formula"><b>' + it.qty + '</b> × ' + fmt(it.price) + '</span>'
+            + '  <span class="cart-breakdown__sub" data-role="sub">' + fmt(sub) + '</span>'
+            + '</li>';
+        }).join('');
+
+        var total = items.reduce(function(s, it){ return s + it.price * it.qty; }, 0);
+
+        var sidebar = ''
+          + '<aside class="cart-sidebar">'
+          + '  <div class="cart-sidebar__block">'
+          + '    <h2 class="cart-sidebar__title">Сумма</h2>'
+          + '    <ul class="cart-breakdown" id="cart-breakdown">' + breakdownLines + '</ul>'
+          + '    <hr class="cart-breakdown__divider">'
+          + '    <div class="cart-total">'
+          + '      <span class="cart-total__label">Итого:</span>'
+          + '      <span class="cart-total__sum" id="cart-total">' + fmt(total) + ' UZS</span>'
+          + '    </div>'
+          + '  </div>'
+          + '  <div class="cart-sidebar__block">'
+          + '    <h2 class="cart-sidebar__title">Оплата</h2>'
+          + '    <button type="button" class="cart-pay-btn" id="cart-pay-btn">Оформить заказ</button>'
+          + '  </div>'
+          + '</aside>';
+
+        root.innerHTML = '<div class="cart-layout"><div class="cart-items">' + itemsHtml + '</div>' + sidebar + '</div>';
+
+        wireUp(items);
+      }
+
+      // События стэппера/удаления + пересчёт сайдбара без полного перерендера
+      function wireUp(items){
+        var byId = {};
+        items.forEach(function(it){ byId[it.id] = it; });
+
+        function recomputeSidebar(){
+          var total = 0;
+          var breakdown = document.getElementById('cart-breakdown');
+          if (!breakdown) return;
+          Object.values(byId).forEach(function(it){
+            var line = breakdown.querySelector('[data-id="' + it.id + '"]');
+            if (!line) return;
+            var sub = it.price * it.qty;
+            total += sub;
+            line.querySelector('[data-role="sub"]').textContent = fmt(sub);
+            line.querySelector('.cart-breakdown__formula').innerHTML = '<b>' + it.qty + '</b> × ' + fmt(it.price);
+          });
+          document.getElementById('cart-total').textContent = fmt(total) + ' UZS';
+        }
+
+        document.querySelectorAll('.cart-item').forEach(function(card){
+          var id = parseInt(card.dataset.id, 10);
+          var stepper = card.querySelector('.cart-item__stepper');
+          var input = stepper.querySelector('input');
+          var max = parseInt(stepper.dataset.max, 10);
+
+          stepper.addEventListener('click', function(e){
+            if (e.target.tagName !== 'BUTTON') return;
+            var cur = parseInt(input.value || '0', 10) || 0;
+            if (e.target.dataset.action === 'inc' && cur < max) cur += 1;
+            if (e.target.dataset.action === 'dec' && cur > 0) cur -= 1;
+            if (cur === 0) { handleRemove(id, card); return; }
+            input.value = cur;
+            byId[id].qty = cur;
+            DealerCart.setQuantity(id, cur);
+            recomputeSidebar();
+          });
+
+          input.addEventListener('change', function(){
+            var v = parseInt(input.value, 10);
+            if (isNaN(v) || v < 0) v = 0;
+            if (v > max) v = max;
+            input.value = v;
+            if (v === 0) { handleRemove(id, card); return; }
+            byId[id].qty = v;
+            DealerCart.setQuantity(id, v);
+            recomputeSidebar();
+          });
+
+          card.querySelector('[data-action="remove"]').addEventListener('click', function(){
+            handleRemove(id, card);
+          });
+        });
+
+        function handleRemove(id, card){
+          DealerCart.remove(id);
+          delete byId[id];
+          card.remove();
+          // Удалить строку в breakdown
+          var line = document.querySelector('#cart-breakdown [data-id="' + id + '"]');
+          if (line) line.remove();
+          if (Object.keys(byId).length === 0) {
+            root.innerHTML = emptyHTML();
+            return;
+          }
+          recomputeSidebar();
+        }
+
+        document.getElementById('cart-pay-btn').addEventListener('click', function(){
+          // TODO: реальная отправка заказа — пока заглушка
+          showToast('Заказ отправлен (заглушка)');
+        });
+      }
+
+      render();
+    })();
+  </script>
+</body>
+</html>

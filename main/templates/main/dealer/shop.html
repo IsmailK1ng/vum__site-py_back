@@ -1,0 +1,402 @@
+{% load static %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="same-origin">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Магазин запчастей — VUM</title>
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1a1a1a;
+    }
+
+    /* ===== HEADER ===== */
+    .dealer-header {
+      background: #ffffff;
+      border-bottom: 1px solid #e3e8ef;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .dealer-header__logo img { height: 30px; width: auto; }
+    .dealer-header__user {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .dealer-header__avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid #e3e8ef;
+    }
+    .dealer-header__avatar--placeholder {
+      background: #1f3a5f;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .dealer-header__name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    .dealer-header__logout {
+      background: transparent;
+      border: 1.5px solid #d6dce5;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #3a4452;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.18s, border-color 0.18s;
+    }
+    .dealer-header__logout:hover {
+      background: #f5f7fa;
+      border-color: #1f3a5f;
+      color: #1f3a5f;
+    }
+    .dealer-logout-form { display: inline; margin: 0; }
+
+    /* ===== Иконка корзины ===== */
+    .cart-icon-link {
+      position: relative;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1.5px solid #e3e8ef;
+      color: #3a4452;
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .cart-icon-link:hover { border-color: #1f3a5f; color: #1f3a5f; }
+    .cart-icon-link svg { width: 20px; height: 20px; }
+    .cart-icon-link__badge {
+      position: absolute; top: -4px; right: -4px;
+      min-width: 18px; height: 18px;
+      padding: 0 5px;
+      background: #c75050; color: #fff;
+      border-radius: 9px;
+      font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid #fff;
+      line-height: 1;
+    }
+
+    /* ===== MAIN ===== */
+    .dealer-main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 28px 64px;
+    }
+    .shop-toolbar {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .shop-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #0f1419;
+    }
+    .shop-count {
+      color: #7a8290;
+      font-size: 14px;
+    }
+
+    /* ===== FILTER BAR ===== */
+    .shop-filters {
+      background: #ffffff;
+      border: 1px solid #e3e8ef;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: 1fr 220px 220px auto auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .shop-filters__input,
+    .shop-filters__select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #d6dce5;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #fff;
+      color: #1a1a1a;
+      transition: border-color 0.15s;
+      outline: none;
+      font-family: inherit;
+    }
+    .shop-filters__input:focus,
+    .shop-filters__select:focus { border-color: #1f3a5f; }
+    .shop-filters__submit {
+      padding: 10px 18px;
+      background: #1f3a5f;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .shop-filters__submit:hover { background: #2a4d7a; }
+    .shop-filters__reset {
+      padding: 10px 16px;
+      color: #7a8290;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: 1.5px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .shop-filters__reset:hover {
+      color: #1f3a5f;
+      border-color: #d6dce5;
+    }
+    @media (max-width: 720px) {
+      .shop-filters { grid-template-columns: 1fr; }
+    }
+
+    /* ===== GRID ===== */
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    /* ===== CARD ===== */
+    .part-card {
+      background: #ffffff;
+      border: 1px solid #e3e8ef;
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+      /* теперь это <a> — сбрасываем дефолты ссылки */
+      text-decoration: none;
+      color: inherit;
+    }
+    .part-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+    .part-card__image {
+      aspect-ratio: 4 / 3;
+      background: #f0f3f7;
+      overflow: hidden;
+      position: relative;
+    }
+    .part-card__image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .part-card__image--empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #b6bfcc;
+      font-size: 13px;
+    }
+    .part-card__body {
+      padding: 14px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+    .part-card__sku {
+      font-size: 11px;
+      font-weight: 600;
+      color: #7a8290;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .part-card__name {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a1a;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .part-card__truck {
+      font-size: 12px;
+      color: #7a8290;
+    }
+    .part-card__bottom {
+      margin-top: auto;
+      padding-top: 10px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .part-card__price {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1f3a5f;
+      white-space: nowrap;
+    }
+    .part-card__stock {
+      font-size: 12px;
+      color: #5a6470;
+    }
+    .part-card__stock--zero { color: #c75050; font-weight: 600; }
+
+    /* ===== EMPTY STATE ===== */
+    .shop-empty {
+      text-align: center;
+      padding: 80px 20px;
+      color: #7a8290;
+    }
+    .shop-empty__title {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #3a4452;
+    }
+    .shop-empty__text { margin: 0; font-size: 14px; }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 600px) {
+      .dealer-header { padding: 12px 16px; }
+      .dealer-header__name { display: none; }
+      .dealer-main { padding: 20px 16px 40px; }
+      .shop-title { font-size: 20px; }
+      .shop-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
+      }
+      .part-card__body { padding: 10px 12px 12px; }
+      .part-card__name { font-size: 13px; }
+      .part-card__price { font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="dealer-header">
+    <div class="dealer-header__logo">
+      <img src="{% static 'images/LOGO-VUM.png' %}" alt="VUM">
+    </div>
+    <div class="dealer-header__user">
+      <a href="{% url 'dealer_cart' %}" class="cart-icon-link" aria-label="Корзина">
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        <span class="cart-icon-link__badge" id="cart-badge" style="display:none"></span>
+      </a>
+      <button type="button" class="profile-trigger" aria-label="Профиль">
+        {% if profile.avatar %}
+          <img class="dealer-header__avatar" src="{{ profile.avatar.url }}" alt="{{ profile.name }}">
+        {% else %}
+          <div class="dealer-header__avatar dealer-header__avatar--placeholder">{{ profile.name|slice:":1"|upper }}</div>
+        {% endif %}
+        <span class="dealer-header__name">{{ profile.name }}</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="dealer-main">
+    <div class="shop-toolbar">
+      <h1 class="shop-title">Магазин запчастей</h1>
+      <span class="shop-count">Найдено: {{ parts|length }}</span>
+    </div>
+
+    <form class="shop-filters" method="get" action="">
+      <input
+        type="search"
+        name="q"
+        class="shop-filters__input"
+        placeholder="Поиск по артикулу или названию"
+        value="{{ search_query }}"
+      >
+      <select name="truck" class="shop-filters__select">
+        <option value="">Все грузовики</option>
+        {% for t in trucks_with_parts %}<option value="{{ t.id }}"{% if selected_truck == t.id|stringformat:"s" %} selected{% endif %}>{{ t.title }}</option>{% endfor %}
+      </select>
+      <select name="type" class="shop-filters__select">
+        <option value="">Все типы</option>
+        {% for pt in types_with_parts %}<option value="{{ pt.id }}"{% if selected_type == pt.id|stringformat:"s" %} selected{% endif %}>{{ pt.name_ru|default:pt.name }}</option>{% endfor %}
+      </select>
+      <button type="submit" class="shop-filters__submit">Применить</button>
+      {% if search_query or selected_truck or selected_type %}
+        <a href="{% url 'dealer_shop' %}" class="shop-filters__reset">Сбросить</a>
+      {% endif %}
+    </form>
+
+    {% if parts %}
+      <div class="shop-grid">
+        {% for part in parts %}
+          <a class="part-card" href="{% url 'dealer_part_detail' part.id %}">
+            <div class="part-card__image{% if not part.images.all %} part-card__image--empty{% endif %}">
+              {% with first_image=part.images.first %}
+                {% if first_image %}
+                  <img src="{{ first_image.image.url }}" alt="{{ part.name_ru|default:part.name }}" loading="lazy">
+                {% else %}
+                  <span>Нет фото</span>
+                {% endif %}
+              {% endwith %}
+            </div>
+            <div class="part-card__body">
+              <span class="part-card__sku">{{ part.part_number }}</span>
+              <h2 class="part-card__name">{{ part.name_ru|default:part.name }}</h2>
+              <div class="part-card__bottom">
+                <span class="part-card__price">{{ part.price|floatformat:0 }} UZS</span>
+                {% if part.quantity %}
+                  <span class="part-card__stock">В наличии: {{ part.quantity }}</span>
+                {% else %}
+                  <span class="part-card__stock part-card__stock--zero">Нет в наличии</span>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="shop-empty">
+        <p class="shop-empty__title">Каталог пуст</p>
+        <p class="shop-empty__text">Запчасти появятся после того, как администратор их добавит.</p>
+      </div>
+    {% endif %}
+  </main>
+
+  {% include 'main/dealer/_profile_modal.html' %}
+
+  <script src="{% static 'js/dealer-cart.js' %}"></script>
+  <script>
+    DealerCart.bindBadge(document.getElementById('cart-badge'));
+  </script>
+</body>
+</html>

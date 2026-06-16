@@ -55,8 +55,10 @@ from .models import (
     BotMessage, BotMenuItem, BotBroadcast,
     ProductWishlist, ProductViewHistory, BotContacts,
     TeamDepartment, TeamMember, TeamMemberLink, NavItem, SocialLink,
+    DealerProfile,
+    SparePart, SparePartImage, SparePartType,
 )
-from .forms import PageMetaAdminForm
+from .forms import PageMetaAdminForm, DealerProfileAdminForm, SparePartAdminForm
 from main.services.amocrm.token_manager import TokenManager
 from main.services.amocrm.lead_sender import LeadSender
 from main.services.dashboard.analytics import calculate_kpi
@@ -1036,6 +1038,62 @@ class ProductGalleryInline(admin.TabularInline):
     fields = ('image', 'order')
     verbose_name = 'Фото'
     verbose_name_plural = 'Галерея'
+
+
+# ========== МАГАЗИН — ЗАПЧАСТИ ==========
+
+class SparePartImageInline(admin.TabularInline):
+    """Несколько фото для одной запчасти. Лимит 5 МБ зашит в model validator."""
+    model = SparePartImage
+    extra = 1
+    fields = ('image', 'order')
+    verbose_name = 'Фото'
+    verbose_name_plural = 'Фото запчасти'
+
+
+@admin.register(SparePartType)
+class SparePartTypeAdmin(TabbedTranslationAdmin):
+    """Тип — переводимое поле name. RU обязателен, UZ/EN опционально."""
+    list_display  = ('display_name', 'parts_count', 'created_at')
+    search_fields = ('name', 'name_ru', 'name_uz', 'name_en')
+    ordering      = ('name_ru',)
+
+    def display_name(self, obj):
+        return obj.name_ru or obj.name or '—'
+    display_name.short_description = 'Название (RU)'
+
+    def parts_count(self, obj):
+        return obj.parts.count()
+    parts_count.short_description = 'Запчастей'
+
+
+@admin.register(SparePart)
+class SparePartAdmin(TabbedTranslationAdmin):
+    form            = SparePartAdminForm
+    list_display    = ('part_number', 'name', 'type', 'truck', 'quantity', 'price', 'is_active', 'updated_at')
+    list_filter     = ('is_active', 'type', 'truck')
+    search_fields   = ('part_number', 'name', 'name_ru', 'name_uz', 'name_en')
+    list_editable   = ('quantity', 'price', 'is_active')
+    autocomplete_fields = ('truck',)
+    inlines         = [SparePartImageInline]
+
+    fieldsets = (
+        ('Основное', {
+            'fields': (
+                ('part_number', 'is_active'),
+                'type',
+                'name',
+                'description',
+            ),
+        }),
+        ('Цена и склад', {
+            'fields': (('quantity', 'price'),),
+        }),
+        ('Привязка', {
+            'fields': ('truck',),
+            'description': 'Опционально. Можно привязать к конкретной модели грузовика.',
+        }),
+    )
 
 
 @admin.register(Product)
@@ -2059,3 +2117,81 @@ class SocialLinkAdmin(admin.ModelAdmin):
     def display_title(self, obj):
         return obj.display_title
     display_title.short_description = 'Название'
+
+
+# ========== ДИЛЕРЫ (АВТОРИЗАЦИЯ) ==========
+
+@admin.register(DealerProfile)
+class DealerProfileAdmin(admin.ModelAdmin):
+    form               = DealerProfileAdminForm
+    list_display       = ('avatar_preview', 'name', 'username_display', 'company_name', 'inn', 'is_active', 'created_at')
+    list_display_links = ('name',)
+    list_editable      = ('is_active',)
+    list_filter        = ('is_active',)
+    search_fields      = ('name', 'user__username', 'company_name', 'inn', 'contract_number')
+    ordering           = ('name',)
+    readonly_fields    = ('created_at', 'updated_at')
+
+    fieldsets = (
+        ('Учётные данные', {
+            'fields': ('username', 'password1', 'password2'),
+            'description': 'При создании задайте логин и пароль. При редактировании оставьте поля пароля пустыми, чтобы не менять.',
+        }),
+        ('Профиль', {
+            'fields': ('name', 'avatar', 'is_active'),
+        }),
+        ('Юридические данные', {
+            'fields': ('company_name', 'inn', 'contract_number'),
+            'description': 'Реквизиты дилера для договорной работы.',
+        }),
+        ('Служебное', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',),
+        }),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user')
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            from django.contrib.auth.models import User
+            user = User.objects.create_user(
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password1'],
+            )
+            user.is_active = obj.is_active
+            user.save(update_fields=['is_active'])
+            obj.user = user
+        else:
+            new_password = form.cleaned_data.get('password1')
+            if new_password:
+                obj.user.set_password(new_password)
+            if obj.user.is_active != obj.is_active:
+                obj.user.is_active = obj.is_active
+            obj.user.save()
+        super().save_model(request, obj, form, change)
+
+    def delete_model(self, request, obj):
+        user = obj.user
+        super().delete_model(request, obj)
+        user.delete()
+
+    def delete_queryset(self, request, queryset):
+        user_ids = list(queryset.values_list('user_id', flat=True))
+        super().delete_queryset(request, queryset)
+        from django.contrib.auth.models import User
+        User.objects.filter(id__in=user_ids).delete()
+
+    def avatar_preview(self, obj):
+        if obj.avatar:
+            return format_html(
+                '<img src="{}" style="width:40px;height:40px;object-fit:cover;border-radius:50%;border:1px solid #ddd;">',
+                obj.avatar.url,
+            )
+        return format_html('<div style="width:40px;height:40px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;color:#999;font-size:18px;">👤</div>')
+    avatar_preview.short_description = 'Аватар'
+
+    def username_display(self, obj):
+        return obj.user.username
+    username_display.short_description = 'Логин'

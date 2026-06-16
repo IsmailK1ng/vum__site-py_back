@@ -4,15 +4,23 @@
 import json
 import logging
 from datetime import datetime, timedelta
+from functools import wraps
 
 # ========== DJANGO CORE ==========
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import authenticate
+from django.core import signing
 from django.db.models import Count, Q, Avg
 from django.db.models.functions import TruncHour, TruncDate
 from django.http import HttpResponseRedirect, HttpResponseForbidden, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.utils import translation, timezone
+from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.http import require_http_methods
 
 # ========== DJANGO REST FRAMEWORK ==========
 from django_filters.rest_framework import DjangoFilterBackend
@@ -38,7 +46,10 @@ from .models import (
     REGION_CHOICES,
     TeamDepartment,
     TeamMember,
+    DealerProfile,
+    SparePart, SparePartType,
 )
+from .forms import DealerLoginForm, DealerPasswordChangeForm
 from .serializers import (
     NewsSerializer, 
     ContactFormSerializer, 
@@ -140,6 +151,295 @@ def team(request):
         .order_by('order')
     )
     return render(request, 'main/team.html', {'members': members})
+
+
+# ========== ДИЛЕРСКАЯ АВТОРИЗАЦИЯ (ОТДЕЛЬНЫЙ COOKIE) ==========
+# Сознательно НЕ используем Django session/auth_login — иначе дилер и
+# админ делили бы один cookie `sessionid` и затирали друг друга.
+# Здесь свой подписанный cookie 'dealer_sid' — параллельно с админской сессией.
+
+DEALER_COOKIE_NAME    = 'dealer_sid'
+DEALER_COOKIE_MAX_AGE = 60 * 60 * 8  # 8 часов
+DEALER_COOKIE_SALT    = 'main.dealer-auth.v1'
+
+
+def _set_dealer_cookie(response, profile_id):
+    signed = signing.dumps({'pid': profile_id}, salt=DEALER_COOKIE_SALT)
+    response.set_cookie(
+        DEALER_COOKIE_NAME,
+        signed,
+        max_age=DEALER_COOKIE_MAX_AGE,
+        httponly=True,           # JS не достанет — защита от XSS
+        samesite='Lax',          # cross-site post-запросы не присылают cookie
+        secure=not settings.DEBUG,
+    )
+
+
+def _clear_dealer_cookie(response):
+    response.delete_cookie(DEALER_COOKIE_NAME)
+
+
+def _get_dealer_profile_from_request(request):
+    """Читает cookie, проверяет подпись, возвращает активный DealerProfile или None."""
+    raw = request.COOKIES.get(DEALER_COOKIE_NAME)
+    if not raw:
+        return None
+    try:
+        data = signing.loads(raw, salt=DEALER_COOKIE_SALT, max_age=DEALER_COOKIE_MAX_AGE)
+    except signing.BadSignature:
+        # подделка или испорченный cookie
+        return None
+    profile_id = data.get('pid')
+    if not profile_id:
+        return None
+    profile = (
+        DealerProfile.objects
+        .filter(id=profile_id, is_active=True)
+        .select_related('user')
+        .first()
+    )
+    if profile and profile.user.is_active:
+        return profile
+    return None
+
+
+def dealer_required(view_func):
+    """Декоратор для дилерских view. Кладёт DealerProfile в request.dealer_profile.
+    При отсутствии/истечении cookie — редирект на dealer_login и удаление невалидного cookie.
+    """
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        profile = _get_dealer_profile_from_request(request)
+        if not profile:
+            response = redirect('dealer_login')
+            _clear_dealer_cookie(response)
+            return response
+        request.dealer_profile = profile
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+@sensitive_post_parameters('password')
+@never_cache
+@require_http_methods(['GET', 'POST'])
+def dealer_login(request):
+    """Страница входа для дилеров.
+    - При уже валидном dealer_sid cookie — редирект в магазин.
+    - На ошибке отдаём одинаковое сообщение (без намёков что именно неверно).
+    - authenticate() сверяет пароль через User-таблицу, но Django session НЕ создаётся.
+    """
+    if _get_dealer_profile_from_request(request):
+        return redirect('dealer_shop')
+
+    form = DealerLoginForm(request.POST or None)
+
+    if request.method == 'POST' and form.is_valid():
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        user = authenticate(request, username=username, password=password)
+
+        if user is None:
+            messages.error(request, 'Неверный логин или пароль.')
+            logger.warning(
+                'Dealer login failed: username=%s ip=%s ua=%s',
+                username,
+                request.META.get('REMOTE_ADDR'),
+                request.META.get('HTTP_USER_AGENT', '')[:200],
+            )
+        else:
+            profile = DealerProfile.objects.filter(user=user, is_active=True).first()
+            if not profile or not user.is_active:
+                messages.error(request, 'Учётная запись неактивна или не является дилерской.')
+                logger.warning('Dealer login blocked (no/inactive profile): username=%s', username)
+            else:
+                logger.info('Dealer login: username=%s ip=%s', username, request.META.get('REMOTE_ADDR'))
+                next_url = request.GET.get('next') or reverse('dealer_shop')
+                response = redirect(next_url)
+                _set_dealer_cookie(response, profile.id)
+                return response
+
+    return render(request, 'main/dealer/login.html', {'form': form})
+
+
+@require_http_methods(['POST', 'GET'])
+def dealer_logout(request):
+    profile = _get_dealer_profile_from_request(request)
+    if profile:
+        logger.info('Dealer logout: username=%s', profile.user.username)
+    response = redirect('dealer_login')
+    _clear_dealer_cookie(response)
+    return response
+
+
+@never_cache
+@dealer_required
+def dealer_shop(request):
+    """Магазин запчастей дилера (главный экран кабинета).
+    Auth через signed cookie 'dealer_sid' — НЕ через Django session.
+    """
+    profile = request.dealer_profile
+
+    # Параметры фильтрации
+    q          = (request.GET.get('q') or '').strip()
+    truck_id   = (request.GET.get('truck') or '').strip()
+    type_id    = (request.GET.get('type') or '').strip()
+
+    parts = (
+        SparePart.objects
+        .filter(is_active=True)
+        .select_related('truck', 'type')
+        .prefetch_related('images')
+    )
+
+    # Поиск по артикулу ИЛИ названию (RU и base). icontains — case-insensitive.
+    if q:
+        parts = parts.filter(
+            Q(part_number__icontains=q)
+            | Q(name__icontains=q)
+            | Q(name_ru__icontains=q)
+        )
+
+    # Фильтры по селектам — только если значение валидное число
+    if truck_id.isdigit():
+        parts = parts.filter(truck_id=int(truck_id))
+    if type_id.isdigit():
+        parts = parts.filter(type_id=int(type_id))
+
+    parts = parts.order_by('-updated_at')
+
+    # Списки для селектов в фильтр-баре — только сущности, у которых есть запчасти
+    trucks_with_parts = (
+        Product.objects
+        .filter(spare_parts__is_active=True)
+        .distinct()
+        .order_by('title')
+    )
+    types_with_parts = (
+        SparePartType.objects
+        .filter(parts__is_active=True)
+        .distinct()
+        .order_by('name')
+    )
+
+    return render(request, 'main/dealer/shop.html', {
+        'profile': profile,
+        'parts': parts,
+        'trucks_with_parts': trucks_with_parts,
+        'types_with_parts': types_with_parts,
+        'selected_truck': truck_id,
+        'selected_type': type_id,
+        'search_query': q,
+    })
+
+
+@never_cache
+@dealer_required
+def dealer_part_detail(request, part_id):
+    """Карточка конкретной запчасти + рекомендации.
+    Приоритет рекомендаций: тот же тип ИЛИ тот же грузовик (без дублей).
+    Если таких нет — fallback на 4 свежих активных запчасти.
+    """
+    profile = request.dealer_profile
+
+    part = (
+        SparePart.objects
+        .select_related('truck', 'type')
+        .prefetch_related('images')
+        .filter(is_active=True)
+        .filter(pk=part_id)
+        .first()
+    )
+    if not part:
+        messages.warning(request, 'Запчасть не найдена или снята с продажи.')
+        return redirect('dealer_shop')
+
+    # Рекомендации: тот же тип ИЛИ тот же грузовик, исключая саму запчасть
+    rec_qs = (
+        SparePart.objects
+        .filter(is_active=True)
+        .exclude(pk=part.pk)
+        .select_related('truck', 'type')
+        .prefetch_related('images')
+    )
+    rec_filter = Q(type=part.type)
+    if part.truck_id:
+        rec_filter |= Q(truck=part.truck)
+    recommendations = list(rec_qs.filter(rec_filter).order_by('-updated_at')[:4])
+
+    # Fallback — берём свежие активные запчасти если по типу/грузовику ничего
+    if not recommendations:
+        recommendations = list(rec_qs.order_by('-updated_at')[:4])
+
+    return render(request, 'main/dealer/shop_detail.html', {
+        'profile': profile,
+        'part': part,
+        'recommendations': recommendations,
+    })
+
+
+@never_cache
+@dealer_required
+def dealer_cart_view(request):
+    """Страница корзины. Содержимое тащим из localStorage клиента — здесь только shell."""
+    return render(request, 'main/dealer/cart.html', {'profile': request.dealer_profile})
+
+
+@sensitive_post_parameters('current_password', 'new_password', 'new_password_confirm')
+@dealer_required
+@require_http_methods(['POST'])
+def dealer_change_password(request):
+    """JSON-endpoint смены пароля из модалки кабинета.
+    Текущий пароль обязателен. После смены сессия дилера (cookie dealer_sid) НЕ
+    инвалидируется — нет смысла, в нём нет user_id, только profile_id.
+    """
+    profile = request.dealer_profile
+    form = DealerPasswordChangeForm(request.POST, user=profile.user)
+    if not form.is_valid():
+        # Возвращаем ошибки в формате {field: [messages]}
+        return JsonResponse({'ok': False, 'errors': form.errors}, status=400)
+
+    profile.user.set_password(form.cleaned_data['new_password'])
+    profile.user.save(update_fields=['password'])
+    logger.info('Dealer password changed: username=%s', profile.user.username)
+    return JsonResponse({'ok': True})
+
+
+@dealer_required
+@require_http_methods(['GET'])
+def dealer_cart_api(request):
+    """Возвращает данные по запчастям из ?ids=1,2,3 — для рендера корзины на клиенте.
+    Только активные запчасти. Если ID нет в БД — клиент молча отбросит.
+    """
+    raw = (request.GET.get('ids') or '').strip()
+    ids = []
+    for token in raw.split(','):
+        token = token.strip()
+        if token.isdigit():
+            ids.append(int(token))
+    ids = ids[:100]  # защита от слишком больших запросов
+
+    if not ids:
+        return JsonResponse({'items': []})
+
+    parts = (
+        SparePart.objects
+        .filter(id__in=ids, is_active=True)
+        .select_related('type')
+        .prefetch_related('images')
+    )
+    items = []
+    for p in parts:
+        first_image = p.images.first()
+        items.append({
+            'id': p.id,
+            'part_number': p.part_number,
+            'name': p.name_ru or p.name,
+            'type': (p.type.name_ru or p.type.name) if p.type_id else None,
+            'price': float(p.price),
+            'quantity_available': p.quantity,
+            'image_url': first_image.image.url if first_image else None,
+        })
+    return JsonResponse({'items': items})
 
 
 def product_detail(request, product_id):

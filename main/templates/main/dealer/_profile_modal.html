@@ -1,0 +1,304 @@
+{% comment %}
+  Профиль-модалка дилера: инфо + смена пароля + выход.
+  Включается в shop.html / shop_detail.html / cart.html.
+  Требует в контексте: `profile` (DealerProfile).
+  Триггер открытия — любой элемент с классом `.profile-trigger`.
+{% endcomment %}
+<style>
+  .profile-modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .profile-modal[hidden] { display: none; }
+  .profile-modal__backdrop {
+    position: absolute; inset: 0;
+    background: rgba(15, 20, 25, 0.55);
+    backdrop-filter: blur(2px);
+    animation: profile-modal-fade 0.18s ease-out;
+  }
+  .profile-modal__dialog {
+    position: relative;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    width: 100%; max-width: 420px;
+    max-height: 90vh; overflow-y: auto;
+    padding: 28px 28px 24px;
+    animation: profile-modal-slide 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+  }
+  @keyframes profile-modal-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes profile-modal-slide { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
+
+  .profile-modal__close {
+    position: absolute; top: 14px; right: 14px;
+    width: 32px; height: 32px;
+    background: transparent; border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    color: #7a8290; font-size: 22px; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, color 0.15s;
+  }
+  .profile-modal__close:hover { background: #f0f3f7; color: #1f3a5f; }
+
+  .profile-modal__title { margin: 0 0 18px; font-size: 16px; font-weight: 600; color: #0f1419; letter-spacing: -0.2px; }
+
+  .profile-modal__avatar-wrap { text-align: center; margin-bottom: 18px; }
+  .profile-modal__avatar-wrap img,
+  .profile-modal__avatar-placeholder {
+    width: 84px; height: 84px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    object-fit: cover;
+    border: 2px solid #e3e8ef;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .profile-modal__avatar-placeholder {
+    background: #1f3a5f; color: #fff;
+    font-size: 32px; font-weight: 700;
+  }
+  .profile-modal__name { font-size: 18px; font-weight: 700; color: #0f1419; }
+
+  .profile-modal__fields { margin: 0 0 22px; padding: 16px 0 0; border-top: 1px solid #eef1f5; }
+  .profile-modal__fields dt { font-size: 12px; color: #7a8290; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+  .profile-modal__fields dd { margin: 0 0 14px; font-size: 14px; color: #1a1a1a; word-break: break-word; }
+  .profile-modal__fields dd:last-child { margin-bottom: 0; }
+
+  .profile-modal__actions { display: flex; gap: 10px; padding-top: 18px; border-top: 1px solid #eef1f5; }
+  .profile-modal__actions > * { flex: 1; }
+  .profile-modal__actions form { margin: 0; }
+  .profile-modal__actions form button { width: 100%; }
+
+  .profile-modal__btn {
+    padding: 11px 14px;
+    border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    font-family: inherit;
+  }
+  .profile-modal__btn--primary { background: #1f3a5f; color: #fff; border-color: #1f3a5f; }
+  .profile-modal__btn--primary:hover { background: #2a4d7a; border-color: #2a4d7a; }
+  .profile-modal__btn--outline { background: transparent; color: #3a4452; border-color: #d6dce5; }
+  .profile-modal__btn--outline:hover { border-color: #1f3a5f; color: #1f3a5f; }
+  .profile-modal__btn--danger { background: transparent; color: #c75050; border-color: #e5c1c1; }
+  .profile-modal__btn--danger:hover { background: #ffeaea; border-color: #c75050; }
+
+  .profile-modal__form .profile-modal__field { margin-bottom: 14px; }
+  .profile-modal__form label { display: block; font-size: 12px; font-weight: 600; color: #5a6470; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .profile-modal__form input[type="password"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid #d6dce5;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    background: #fff;
+    transition: border-color 0.15s;
+    font-family: inherit;
+  }
+  .profile-modal__form input[type="password"]:focus { border-color: #1f3a5f; }
+  .profile-modal__form small { display: block; margin-top: 4px; color: #9aa3b0; font-size: 11px; }
+  .profile-modal__error { margin-top: 4px; color: #c75050; font-size: 12px; font-weight: 600; min-height: 14px; }
+
+  .profile-modal__success {
+    text-align: center; padding: 30px 10px;
+  }
+  .profile-modal__success__icon { font-size: 42px; color: #2c9f4e; margin-bottom: 10px; }
+  .profile-modal__success__text { font-size: 16px; font-weight: 600; color: #0f1419; }
+
+  /* Триггер (обёртка над аватаркой и именем) */
+  .profile-trigger {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: transparent; border: none;
+    padding: 4px 8px; border-radius: 24px;
+    cursor: pointer;
+    font: inherit; color: inherit;
+    transition: background 0.15s;
+  }
+  .profile-trigger:hover { background: #f0f3f7; }
+  .profile-trigger:focus-visible { outline: 2px solid #1f3a5f; outline-offset: 2px; }
+</style>
+
+<div class="profile-modal" id="profile-modal" hidden>
+  <div class="profile-modal__backdrop" data-close></div>
+  <div class="profile-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+    <button type="button" class="profile-modal__close" data-close aria-label="Закрыть">×</button>
+
+    {# ===== Вид: инфо ===== #}
+    <div class="profile-modal__view" data-view="info">
+      <h2 class="profile-modal__title" id="profile-modal-title">Профиль</h2>
+      <div class="profile-modal__avatar-wrap">
+        {% if profile.avatar %}
+          <img src="{{ profile.avatar.url }}" alt="{{ profile.name }}">
+        {% else %}
+          <div class="profile-modal__avatar-placeholder">{{ profile.name|slice:":1"|upper }}</div>
+        {% endif %}
+        <div class="profile-modal__name">{{ profile.name }}</div>
+      </div>
+      <dl class="profile-modal__fields">
+        <dt>Юр. название</dt>
+        <dd>{{ profile.company_name|default:"—" }}</dd>
+        <dt>ИНН</dt>
+        <dd>{{ profile.inn|default:"—" }}</dd>
+        <dt>Номер договора</dt>
+        <dd>{{ profile.contract_number|default:"—" }}</dd>
+      </dl>
+      <div class="profile-modal__actions">
+        <button type="button" class="profile-modal__btn profile-modal__btn--outline" data-action="show-password">
+          Сменить пароль
+        </button>
+        <form method="post" action="{% url 'dealer_logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="profile-modal__btn profile-modal__btn--danger">Выйти</button>
+        </form>
+      </div>
+    </div>
+
+    {# ===== Вид: смена пароля ===== #}
+    <div class="profile-modal__view" data-view="password" hidden>
+      <h2 class="profile-modal__title">Смена пароля</h2>
+      <form id="profile-password-form" class="profile-modal__form" autocomplete="off">
+        {% csrf_token %}
+        <div class="profile-modal__field">
+          <label for="pwd-current">Текущий пароль</label>
+          <input type="password" id="pwd-current" name="current_password" autocomplete="current-password" required>
+          <div class="profile-modal__error" data-error-for="current_password"></div>
+        </div>
+        <div class="profile-modal__field">
+          <label for="pwd-new">Новый пароль</label>
+          <input type="password" id="pwd-new" name="new_password" autocomplete="new-password" required>
+          <small>Минимум 8 символов, не должен быть слишком простым.</small>
+          <div class="profile-modal__error" data-error-for="new_password"></div>
+        </div>
+        <div class="profile-modal__field">
+          <label for="pwd-confirm">Повторите новый пароль</label>
+          <input type="password" id="pwd-confirm" name="new_password_confirm" autocomplete="new-password" required>
+          <div class="profile-modal__error" data-error-for="new_password_confirm"></div>
+        </div>
+        <div class="profile-modal__actions">
+          <button type="button" class="profile-modal__btn profile-modal__btn--outline" data-action="show-info">← Назад</button>
+          <button type="submit" class="profile-modal__btn profile-modal__btn--primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+
+    {# ===== Вид: успех ===== #}
+    <div class="profile-modal__view" data-view="success" hidden>
+      <div class="profile-modal__success">
+        <div class="profile-modal__success__icon">✓</div>
+        <div class="profile-modal__success__text">Пароль успешно изменён</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    var modal   = document.getElementById('profile-modal');
+    var dialog  = modal.querySelector('.profile-modal__dialog');
+    var form    = document.getElementById('profile-password-form');
+    var CHANGE_URL = '{% url "dealer_change_password" %}';
+
+    function getCSRFToken(){
+      var prefix = 'csrftoken=';
+      var parts = document.cookie.split(';');
+      for (var i = 0; i < parts.length; i++) {
+        var c = parts[i].trim();
+        if (c.indexOf(prefix) === 0) return c.substring(prefix.length);
+      }
+      // Фолбэк — берём из <input name=csrfmiddlewaretoken> внутри формы
+      var input = form.querySelector('[name=csrfmiddlewaretoken]');
+      return input ? input.value : '';
+    }
+
+    function openModal(){
+      modal.removeAttribute('hidden');
+      showView('info');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(){
+      modal.setAttribute('hidden', '');
+      document.body.style.overflow = '';
+      form.reset();
+      clearErrors();
+    }
+    function showView(name){
+      modal.querySelectorAll('[data-view]').forEach(function(v){
+        if (v.dataset.view === name) v.removeAttribute('hidden');
+        else v.setAttribute('hidden', '');
+      });
+      clearErrors();
+    }
+    function clearErrors(){
+      modal.querySelectorAll('.profile-modal__error').forEach(function(el){
+        el.textContent = '';
+      });
+    }
+    function showErrors(errors){
+      // errors: { field: [messages], ... }
+      Object.keys(errors).forEach(function(field){
+        var msg = (errors[field] || []).join(' ');
+        var slot = modal.querySelector('[data-error-for="' + field + '"]');
+        if (slot) {
+          slot.textContent = msg;
+        } else if (field === '__all__') {
+          // Общая ошибка — в последнее поле
+          var last = modal.querySelector('[data-error-for="new_password_confirm"]');
+          if (last) last.textContent = msg;
+        }
+      });
+    }
+
+    // Триггеры открытия — все элементы с .profile-trigger на странице
+    document.querySelectorAll('.profile-trigger').forEach(function(t){
+      t.addEventListener('click', openModal);
+    });
+
+    // Закрытие по клику на крестик / бэкдроп
+    modal.addEventListener('click', function(e){
+      if (e.target.hasAttribute('data-close')) closeModal();
+      if (e.target.dataset.action === 'show-password') showView('password');
+      if (e.target.dataset.action === 'show-info') showView('info');
+    });
+
+    // Esc
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && !modal.hasAttribute('hidden')) closeModal();
+    });
+
+    // Сабмит формы смены пароля — AJAX
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      clearErrors();
+      var submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Сохраняем...';
+
+      var data = new FormData(form);
+      fetch(CHANGE_URL, {
+        method: 'POST',
+        body: data,
+        credentials: 'same-origin',
+        headers: { 'X-CSRFToken': getCSRFToken() }
+      })
+        .then(function(r){
+          return r.json().then(function(json){ return { status: r.status, body: json }; });
+        })
+        .then(function(res){
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Сохранить';
+          if (res.body && res.body.ok) {
+            form.reset();
+            showView('success');
+            setTimeout(closeModal, 1800);
+          } else {
+            showErrors((res.body && res.body.errors) || { '__all__': ['Не удалось сменить пароль'] });
+          }
+        })
+        .catch(function(){
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Сохранить';
+          showErrors({ '__all__': ['Ошибка сети. Попробуйте ещё раз.'] });
+        });
+    });
+  })();
+</script>

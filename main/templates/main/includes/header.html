@@ -76,6 +76,12 @@
                 <i class="ph-bold ph-arrow-up-right"></i>
             </a>
             {% endif %}
+            {% if request.resolver_match.url_name == 'services' %}
+            <a class="btn btn-anim btn-default btn-mobile-icon btn-outline slide-right-up" style="gap: 0;"
+                href="/dealer" target="_blank" aria-label="Запчасти">
+                <i class="ph-bold ph-arrow-up-right"></i>
+            </a>
+            {% endif %}
         </div>
 
         <!-- Гамбургер -->

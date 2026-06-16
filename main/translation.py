@@ -8,6 +8,7 @@ from .models import (
     DealerService, Dealer, BecomeADealerPage, DealerRequirement, Promotion, PageMeta,
     FAQItem,
     TeamDepartment, TeamMember,
+    SparePart, SparePartType,
 )
 
 
@@ -130,3 +131,17 @@ class TeamDepartmentTranslationOptions(TranslationOptions):
 @register(TeamMember)
 class TeamMemberTranslationOptions(TranslationOptions):
     fields = ('name', 'position')
+
+
+# ========== МАГАЗИН ==========
+# Только RU обязателен; UZ/EN пока опциональны и заполняются позже.
+@register(SparePart)
+class SparePartTranslationOptions(TranslationOptions):
+    fields = ('name', 'description')
+    required_languages = ('ru',)
+
+
+@register(SparePartType)
+class SparePartTypeTranslationOptions(TranslationOptions):
+    fields = ('name',)
+    required_languages = ('ru',)

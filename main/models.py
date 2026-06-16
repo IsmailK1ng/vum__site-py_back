@@ -8,7 +8,8 @@ from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
 from django.db.models.signals import post_save, post_delete
 from datetime import timedelta, time as datetime_time
-from django.core.cache import cache 
+from django.core.cache import cache
+from .validators import validate_image_size
 # ========== ОБЩИЕ CHOICES ==========
 
 REGION_CHOICES = [
@@ -64,8 +65,8 @@ class News(models.Model):
     desc = models.TextField("Краткое описание для карточки", max_length=200, help_text="Отображается в превью новости")
     slug = models.SlugField("URL", max_length=255, unique=True, blank=True, help_text="Генерируется автоматически из заголовка")
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="Автор")
-    author_photo = models.ImageField("Фото автора", upload_to="authors/", blank=True, null=True)
-    preview_image = models.ImageField("Главное фото", upload_to="news/previews/", blank=True, null=True)
+    author_photo = models.ImageField("Фото автора", upload_to="authors/", blank=True, null=True, validators=[validate_image_size])
+    preview_image = models.ImageField("Главное фото", upload_to="news/previews/", blank=True, null=True, validators=[validate_image_size])
     is_active = models.BooleanField("Активна", default=True, help_text="Показывать новость на сайте")
     order = models.PositiveIntegerField("Порядок", default=0, help_text="Чем больше число, тем выше в списке")
     
@@ -126,7 +127,7 @@ class NewsBlock(models.Model):
     )
     
     text = RichTextField("Текст", blank=True, null=True, config_name='default')
-    image = models.ImageField("Фото", upload_to="news/images/", blank=True, null=True)
+    image = models.ImageField("Фото", upload_to="news/images/", blank=True, null=True, validators=[validate_image_size])
     youtube_url = models.URLField("YouTube ссылка", blank=True, null=True)
     video_file = models.FileField("Видео файл", upload_to="news/videos/", blank=True, null=True)
     order = models.PositiveIntegerField("Порядок", default=0)
@@ -191,12 +192,13 @@ class Product(models.Model):
         default=False,
         help_text="Если включено, перед ценой будет отображаться слово 'от'"
     )
-    main_image = models.ImageField("Главное изображение", upload_to="products/main/")
+    main_image = models.ImageField("Главное изображение", upload_to="products/main/", validators=[validate_image_size])
     card_image = models.ImageField(
         "Изображение для карточки",
         upload_to="products/cards/",
         blank=True,
-        null=True
+        null=True,
+        validators=[validate_image_size],
     )
     
     # ========== НОВЫЕ ПОЛЯ ДЛЯ СЛАЙДЕРА ==========
@@ -205,7 +207,8 @@ class Product(models.Model):
         upload_to="products/slider/",
         blank=True,
         null=True,
-        help_text="Рекомендуемый размер: 420x210px. Если не указано, используется main_image"
+        help_text="Рекомендуемый размер: 420x210px. Если не указано, используется main_image",
+        validators=[validate_image_size],
     )
     slider_year = models.CharField(
         "Год для слайдера",
@@ -359,7 +362,7 @@ class ProductCardSpec(models.Model):
 
 class ProductGallery(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery')
-    image = models.ImageField("Изображение", upload_to="products/gallery/")
+    image = models.ImageField("Изображение", upload_to="products/gallery/", validators=[validate_image_size])
     order = models.PositiveIntegerField("Порядок", default=0)
     
     class Meta:
@@ -468,7 +471,7 @@ class Dealer(models.Model):
         verbose_name="Услуги", 
         related_name='dealers'
     )
-    logo = models.ImageField("Логотип", upload_to="dealers/logos/", blank=True, null=True)
+    logo = models.ImageField("Логотип", upload_to="dealers/logos/", blank=True, null=True, validators=[validate_image_size])
     is_active = models.BooleanField("Активен", default=True)
     order = models.PositiveIntegerField("Порядок", default=0)
     created_at = models.DateTimeField("Дата создания", auto_now_add=True)
@@ -766,7 +769,7 @@ class Dashboard(models.Model):
 class Promotion(models.Model):
     title = models.CharField(max_length=200, verbose_name=_("Заголовок"))
     description = models.TextField(verbose_name=_("Описание"))
-    image = models.ImageField(upload_to='promotions/', blank=True, null=True, verbose_name=_("Изображение"))
+    image = models.ImageField(upload_to='promotions/', blank=True, null=True, verbose_name=_("Изображение"), validators=[validate_image_size])
     link = models.URLField(blank=True, null=True, verbose_name=_("Ссылка"))
     button_text = models.CharField(max_length=50, default="Batafsil", verbose_name=_("Текст кнопки"))
     
@@ -908,7 +911,8 @@ class PageMeta(models.Model):
         upload_to="seo/og_images/",
         blank=True,
         null=True,
-        help_text="Картинка для соцсетей (рекомендуется: 1200x630px)"
+        help_text="Картинка для соцсетей (рекомендуется: 1200x630px)",
+        validators=[validate_image_size],
     )
     
     # ========== СЛУЖЕБНЫЕ ПОЛЯ ==========
@@ -1559,6 +1563,7 @@ class BotBroadcast(models.Model):
         blank=True,
         null=True,
         help_text="Опционально — прикрепить фото к рассылке",
+        validators=[validate_image_size],
     )
     button_text = models.CharField(
         "Текст кнопки",
@@ -1759,7 +1764,8 @@ class TeamMember(models.Model):
     name     = models.CharField("Имя и фамилия", max_length=200)
     position = models.CharField("Должность", max_length=200)
     photo    = models.ImageField("Фото", upload_to="team/", blank=True, null=True,
-                                 help_text="Рекомендуемый размер: 400×400 px")
+                                 help_text="Рекомендуемый размер: 400×400 px",
+                                 validators=[validate_image_size])
     phone    = models.CharField("Телефон", max_length=50, blank=True)
     email    = models.EmailField("Email", max_length=200, blank=True)
     order    = models.PositiveIntegerField("Порядок внутри блока", default=0)
@@ -1926,6 +1932,7 @@ class SocialLink(models.Model):
         blank=True,
         null=True,
         help_text='Загружайте только для варианта "Другая". Для известных соцсетей иконка берётся автоматически.',
+        validators=[validate_image_size],
     )
     order    = models.PositiveIntegerField('Порядок', default=0)
     is_active = models.BooleanField('Активен', default=True)
@@ -1950,3 +1957,207 @@ class SocialLink(models.Model):
             return self.icon.url
         path = self.ICON_MAP.get(self.network)
         return static(path) if path else ''
+
+
+# ========== ДИЛЕРЫ (АВТОРИЗАЦИЯ) ==========
+
+class DealerProfile(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='dealer_profile',
+        verbose_name='Учётная запись',
+    )
+    name = models.CharField(
+        'Наименование / Имя',
+        max_length=200,
+        help_text='Название компании или ФИО дилера, отображается в кабинете',
+    )
+    avatar = models.ImageField(
+        'Аватар',
+        upload_to='dealers/avatars/',
+        blank=True,
+        null=True,
+        help_text='Необязательно. Рекомендуемый размер: 200×200 px',
+        validators=[validate_image_size],
+    )
+    # blank=True на модели — чтоб миграция прошла на старых записях без default-боли.
+    # Required-валидация делается в DealerProfileAdminForm.
+    company_name = models.CharField(
+        'Юр. название',
+        max_length=255,
+        blank=True,
+        help_text='Полное название организации. Например: ООО "Тмыв денег"',
+    )
+    inn = models.CharField(
+        'ИНН',
+        max_length=20,
+        blank=True,
+        db_index=True,
+        help_text='Только цифры. Например: 304445333',
+    )
+    contract_number = models.CharField(
+        'Номер договора',
+        max_length=100,
+        blank=True,
+        help_text='Например: 12345/2026',
+    )
+    is_active = models.BooleanField(
+        'Активен',
+        default=True,
+        help_text='Снимите галку, чтобы заблокировать вход без удаления учётки',
+    )
+    created_at = models.DateTimeField('Создан', auto_now_add=True)
+    updated_at = models.DateTimeField('Обновлён', auto_now=True)
+
+    class Meta:
+        verbose_name        = 'Дилер (учётная запись)'
+        verbose_name_plural = 'Дилеры — учётные записи'
+        ordering            = ['name']
+
+    def __str__(self):
+        return f'{self.name} ({self.user.username})'
+
+
+# ========== МАГАЗИН: ЗАПЧАСТИ ==========
+
+def normalize_type_name(value):
+    """Нормализация названия типа запчасти.
+    - strip пробелов с краёв
+    - схлопывает множественные пробелы в один
+    - возвращает '' для пустых/None
+    Регистр НЕ меняем — храним как впервые ввёл пользователь, дедуп идёт через iexact.
+    """
+    if not value:
+        return ''
+    return ' '.join(str(value).split())
+
+
+class SparePartType(models.Model):
+    """Справочник типов запчастей (двигатель / тормоза / фильтр и т.п.).
+    Дедуп case-insensitive по name_ru — выполняется в get_or_create_normalized().
+    unique=True НЕ ставим: после регистрации в modeltranslation база-поле name
+    отражает текущий язык, а PK-дедуп нам не нужен — application-level лучше.
+    """
+
+    # blank=True обязательно: иначе modeltranslation делает name_uz required
+    # (дефолтный язык в settings) даже при required_languages=('ru',).
+    name = models.CharField(
+        'Название типа',
+        max_length=100,
+        blank=True,
+        help_text='Например: Двигатель, Тормоза, Фильтр',
+    )
+    created_at = models.DateTimeField('Создан', auto_now_add=True)
+
+    class Meta:
+        verbose_name        = 'Магазин — Тип запчасти'
+        verbose_name_plural = 'Магазин — Типы запчастей'
+        ordering            = ['name']
+
+    def __str__(self):
+        # Приоритет RU (мы храним сюда), затем UZ/EN/base fallback
+        return getattr(self, 'name_ru', None) or self.name or '(без названия)'
+
+    @classmethod
+    def get_or_create_normalized(cls, raw_name):
+        """Возвращает существующий тип (case-insensitive по name_ru) или создаёт новый.
+        Вернёт None для пустого значения — валидация обязательности на уровне формы.
+        """
+        name = normalize_type_name(raw_name)
+        if not name:
+            return None
+        existing = cls.objects.filter(name_ru__iexact=name).first()
+        if existing:
+            return existing
+        # Заполняем name_ru (основной), и базу name тоже — чтоб не была пустой при
+        # обращении до того как пользователь добавит UZ/EN
+        return cls.objects.create(name=name, name_ru=name)
+
+
+class SparePart(models.Model):
+    """Запчасть/деталь для магазина. Артикул уникален, имя переводится (RU обязателен)."""
+
+    part_number = models.CharField(
+        'Артикул (номер детали)',
+        max_length=100,
+        unique=True,
+        db_index=True,
+        help_text='Уникальный номер запчасти. Например: 1001-AKB-FAW',
+    )
+    # blank=True — иначе modeltranslation делает name_uz обязательным в форме,
+    # даже при required_languages=('ru',) (нюанс modeltranslation + default-язык 'uz').
+    name = models.CharField(
+        'Наименование',
+        max_length=255,
+        blank=True,
+        help_text='Краткое название запчасти',
+    )
+    description = RichTextField(
+        'Описание',
+        blank=True,
+        null=True,
+        config_name='text_only',
+        help_text='Подробное описание запчасти (только текст и форматирование, без изображений)',
+    )
+    type = models.ForeignKey(
+        SparePartType,
+        verbose_name='Тип запчасти',
+        on_delete=models.PROTECT,
+        related_name='parts',
+        help_text='Категория запчасти. Можно выбрать существующий тип или ввести новый.',
+    )
+    quantity = models.PositiveIntegerField(
+        'Количество на складе',
+        default=0,
+    )
+    price = models.DecimalField(
+        'Цена (UZS)',
+        max_digits=12,
+        decimal_places=2,
+    )
+    truck = models.ForeignKey(
+        Product,
+        verbose_name='Грузовик (опционально)',
+        on_delete=models.SET_NULL,
+        related_name='spare_parts',
+        null=True,
+        blank=True,
+        help_text='Привязка к модели грузовика. Можно оставить пустым.',
+    )
+    is_active = models.BooleanField('В продаже', default=True)
+    created_at = models.DateTimeField('Создано', auto_now_add=True)
+    updated_at = models.DateTimeField('Обновлено', auto_now=True)
+
+    class Meta:
+        verbose_name        = 'Магазин — Запчасть'
+        verbose_name_plural = 'Магазин — Запчасти'
+        ordering            = ['-created_at']
+
+    def __str__(self):
+        return f'{self.part_number} — {self.name}'
+
+
+class SparePartImage(models.Model):
+    """Фото запчасти. Несколько фото на одну запчасть, ограничение 5 МБ."""
+
+    part = models.ForeignKey(
+        SparePart,
+        on_delete=models.CASCADE,
+        related_name='images',
+        verbose_name='Запчасть',
+    )
+    image = models.ImageField(
+        'Фото',
+        upload_to='spare-parts/',
+        validators=[validate_image_size],
+    )
+    order = models.PositiveIntegerField('Порядок', default=0)
+
+    class Meta:
+        verbose_name        = 'Фото запчасти'
+        verbose_name_plural = 'Фото запчастей'
+        ordering            = ['order', 'id']
+
+    def __str__(self):
+        return f'Фото {self.order + 1} для {self.part.part_number}'

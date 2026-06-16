@@ -5,5 +5,9 @@ class MainConfig(AppConfig):
     name = 'main'
     
     def ready(self):
-        import main.admin     
-        import main.signals   
+        import main.admin
+        import main.signals
+        # Регистрация сигналов очистки orphan-файлов
+        # (старый файл удаляется при замене ImageField или удалении объекта)
+        from main.signals_cleanup import register_all
+        register_all()

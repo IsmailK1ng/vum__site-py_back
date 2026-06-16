@@ -20,7 +20,15 @@ urlpatterns = [
     path('team/', views.team, name='team'),
     path('api/log-js-error/', views.log_js_error, name='log_js_error'),
 
-    
+    # ========== ДИЛЕРСКИЙ МАГАЗИН ==========
+    path('dealer/login/', views.dealer_login, name='dealer_login'),
+    path('dealer/logout/', views.dealer_logout, name='dealer_logout'),
+    path('dealer/', views.dealer_shop, name='dealer_shop'),
+    path('dealer/part/<int:part_id>/', views.dealer_part_detail, name='dealer_part_detail'),
+    path('dealer/cart/', views.dealer_cart_view, name='dealer_cart'),
+    path('dealer/api/cart-parts/', views.dealer_cart_api, name='dealer_cart_api'),
+    path('dealer/change-password/', views.dealer_change_password, name='dealer_change_password'),
+
     # ========== DASHBOARD ==========
     path('admin/dashboard/', views.dashboard_view, name='admin_dashboard'),
     path('admin/dashboard/api/data/', views.dashboard_api_data, name='dashboard_api_data'),
