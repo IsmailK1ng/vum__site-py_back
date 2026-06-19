@@ -1,0 +1,280 @@
+{% load static %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="same-origin">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Заказ №{{ invoice.number }}/{{ invoice.year }} — VUM</title>
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f5f7fa; color: #1a1a1a; }
+
+    .dealer-header { background: #fff; border-bottom: 1px solid #e3e8ef; padding: 0 28px; display: flex; align-items: stretch; justify-content: space-between; position: sticky; top: 0; z-index: 10; gap: 24px; }
+    .dealer-header__logo { display: flex; align-items: center; }
+    .dealer-header__logo img { height: 30px; width: auto; }
+    .staff-tabs { display: flex; align-items: stretch; gap: 0; flex: 1; }
+    .staff-tabs__link { display: inline-flex; align-items: center; padding: 18px 18px; color: #5a6470; text-decoration: none; font-size: 14px; font-weight: 600; border-bottom: 3px solid transparent; transition: color 0.15s, border-color 0.15s, background 0.15s; }
+    .staff-tabs__link:hover { color: #1f3a5f; background: #f8fafc; }
+    .staff-tabs__link.is-current { color: #1f3a5f; border-bottom-color: #1f3a5f; }
+    .dealer-header__user { display: flex; align-items: center; gap: 14px; }
+    .dealer-header__avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 1.5px solid #e3e8ef; }
+    .dealer-header__avatar--placeholder { background: #1f3a5f; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; }
+    .dealer-header__name { font-size: 14px; font-weight: 600; }
+    .staff-role-badge { font-size: 10px; color: #fff; background: #1f3a5f; padding: 2px 8px; border-radius: 8px; margin-left: 8px; text-transform: uppercase; font-weight: 700; }
+
+    .dealer-main { max-width: 980px; margin: 0 auto; padding: 24px 28px 64px; }
+    .back-link { display: inline-flex; gap: 6px; color: #5a6470; font-size: 14px; text-decoration: none; margin-bottom: 16px; }
+    .back-link:hover { color: #1f3a5f; }
+
+    .order-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+    .order-title { margin: 0; font-size: 24px; font-weight: 700; color: #0f1419; }
+    .order-meta-line { color: #5a6470; font-size: 13px; margin-top: 4px; }
+
+    /* ===== Карточки данных ===== */
+    .card {
+      background: #fff; border: 1px solid #e3e8ef; border-radius: 14px;
+      padding: 22px; margin-bottom: 16px;
+    }
+    .card__title { font-size: 13px; font-weight: 700; color: #7a8290; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .field-row { display: flex; gap: 14px; margin-bottom: 8px; font-size: 14px; }
+    .field-row__label { width: 150px; flex-shrink: 0; color: #7a8290; }
+    .field-row__value { color: #1a1a1a; font-weight: 600; word-break: break-word; }
+
+    /* ===== Таблица позиций ===== */
+    .items-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .items-table th, .items-table td { padding: 8px 12px; border-bottom: 1px solid #eef1f5; text-align: left; }
+    .items-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; color: #7a8290; font-weight: 600; background: #f8fafc; }
+    .items-table td.qty, .items-table td.price, .items-table td.sum { text-align: right; white-space: nowrap; }
+    .items-table tr:last-child td { border-bottom: 0; }
+    .items-total { display: flex; justify-content: space-between; padding: 14px 12px 4px; font-size: 15px; }
+    .items-total__sum { font-weight: 700; color: #1f3a5f; font-size: 18px; }
+
+    /* ===== Статус + действия ===== */
+    .status-badge {
+      display: inline-block; padding: 5px 12px; border-radius: 12px;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
+      text-transform: uppercase; color: #fff;
+    }
+    .status-badge--pending_payment { background: #e08b00; }
+    .status-badge--paid            { background: #2c9f4e; }
+    .status-badge--in_transit      { background: #1f7ec7; }
+    .status-badge--delivered       { background: #5a6470; }
+
+    .status-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .status-btn {
+      padding: 10px 18px; background: #1f3a5f; color: #fff; border: none;
+      border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: background 0.15s; font-family: inherit;
+    }
+    .status-btn:hover { background: #2a4d7a; }
+    .status-btn:disabled { background: #b6bfcc; cursor: not-allowed; }
+
+    .status-locked-hint { color: #888; font-size: 13px; font-style: italic; margin-top: 10px; }
+
+    /* ===== Toast ===== */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #1f3a5f; color: #fff; padding: 12px 20px;
+      border-radius: 8px; font-size: 14px; font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s;
+    }
+    .toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+    @media (max-width: 720px) {
+      .dealer-header { padding: 0 16px; }
+      .dealer-header__name { display: none; }
+      .dealer-main { padding: 16px; }
+      .field-row { flex-direction: column; gap: 2px; }
+      .field-row__label { width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="dealer-header">
+    <div class="dealer-header__logo">
+      <a href="{% url 'staff_orders_list' %}"><img src="{% static 'images/LOGO-VUM.png' %}" alt="VUM"></a>
+    </div>
+    <nav class="staff-tabs">
+      <a href="{% url 'staff_orders_list' %}" class="staff-tabs__link is-current">Заказы</a>
+      {% if profile.is_service %}
+        <a href="{% url 'staff_parts_list' %}" class="staff-tabs__link">Запчасти</a>
+      {% endif %}
+    </nav>
+    <div class="dealer-header__user">
+      <button type="button" class="profile-trigger" aria-label="Профиль" style="display:inline-flex;align-items:center;gap:10px;background:transparent;border:none;padding:4px 8px;border-radius:24px;cursor:pointer;font:inherit;color:inherit;">
+        {% if profile.avatar %}
+          <img class="dealer-header__avatar" src="{{ profile.avatar.url }}" alt="{{ profile.name }}">
+        {% else %}
+          <div class="dealer-header__avatar dealer-header__avatar--placeholder">{{ profile.name|slice:":1"|upper }}</div>
+        {% endif %}
+        <span class="dealer-header__name">{{ profile.name }}<span class="staff-role-badge">{{ profile.get_role_display }}</span></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="dealer-main">
+    <a href="{% url 'staff_orders_list' %}" class="back-link">← Все заказы</a>
+
+    <div class="order-head">
+      <div>
+        <h1 class="order-title">Заказ №{{ invoice.number }}/{{ invoice.year }}</h1>
+        <div class="order-meta-line">{{ invoice.date }} · Дилер: {{ invoice.dealer_name }}</div>
+      </div>
+      <span class="status-badge status-badge--{{ invoice.status }}" id="status-display">{{ invoice.status_label }}</span>
+    </div>
+
+    {# ===== Действия по статусу ===== #}
+    <div class="card">
+      <h2 class="card__title">Управление статусом</h2>
+      {% if next_options %}
+        <div class="status-actions" id="status-actions">
+          {% for opt in next_options %}
+            <button type="button" class="status-btn" data-new-status="{{ opt.value }}">→ {{ opt.label }}</button>
+          {% endfor %}
+        </div>
+      {% elif profile.is_service and invoice.status == 'pending_payment' %}
+        <div class="status-locked-hint">⏳ Сначала бухгалтер должен подтвердить оплату.</div>
+      {% elif profile.is_service and invoice.status == 'in_transit' %}
+        <div class="status-locked-hint">Заказ в пути. Дилер сам подтвердит получение — статус сменится на «Доставлено» автоматически.</div>
+      {% elif invoice.status == 'delivered' %}
+        <div class="status-locked-hint">✓ Заказ доставлен и закрыт.</div>
+      {% else %}
+        <div class="status-locked-hint">Доступных переходов для вашей роли нет.</div>
+      {% endif %}
+    </div>
+
+    {# ===== Реквизиты покупателя ===== #}
+    <div class="card">
+      <h2 class="card__title">Покупатель</h2>
+      <div class="field-row"><span class="field-row__label">Юр. название</span><span class="field-row__value">{{ buyer.name|default:"—" }}</span></div>
+      <div class="field-row"><span class="field-row__label">ИНН</span><span class="field-row__value">{{ buyer.inn|default:"—" }}</span></div>
+      <div class="field-row"><span class="field-row__label">№ договора</span><span class="field-row__value">{{ buyer.contract_number|default:"—" }}</span></div>
+    </div>
+
+    {# ===== Позиции ===== #}
+    <div class="card">
+      <h2 class="card__title">Позиции</h2>
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Наименование</th>
+            <th class="qty">Кол-во</th>
+            <th>Ед.</th>
+            <th class="price">Цена</th>
+            <th class="sum">Сумма</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ item.name }}</td>
+              <td class="qty">{{ item.quantity }}</td>
+              <td>{{ item.unit }}</td>
+              <td class="price">{{ item.price_formatted }}</td>
+              <td class="sum">{{ item.sum_formatted }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="items-total">
+        <span>Итого:</span>
+        <span class="items-total__sum">{{ totals.amount_formatted }} {{ totals.currency }}</span>
+      </div>
+      <div style="margin-top:6px;color:#5a6470;font-size:13px;">{{ totals.amount_in_words }}</div>
+    </div>
+
+    {# ===== Открыть полный документ ===== #}
+    <div class="card" style="text-align:center;">
+      <p style="margin:0 0 14px;color:#5a6470;font-size:14px;">
+        Тут — сводка по заказу. Полный счёт-фактуру с подписями можно открыть отдельно (печатается на A4).
+      </p>
+      <a href="{% url 'staff_invoice_view' invoice.id %}" class="open-doc-btn">
+        📄 Открыть документ
+      </a>
+    </div>
+  </main>
+
+  <style>
+    .open-doc-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 26px;
+      background: #1f3a5f; color: #fff;
+      border-radius: 8px;
+      font-size: 14px; font-weight: 600;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .open-doc-btn:hover { background: #2a4d7a; color: #fff; }
+  </style>
+
+  <div class="toast" id="toast"></div>
+
+  {% include 'main/dealer/_profile_modal.html' %}
+
+  <script>
+    (function(){
+      function getCSRFToken(){
+        var prefix = 'csrftoken=';
+        var parts = document.cookie.split(';');
+        for (var i = 0; i < parts.length; i++) {
+          var c = parts[i].trim();
+          if (c.indexOf(prefix) === 0) return c.substring(prefix.length);
+        }
+        return '';
+      }
+
+      var toast = document.getElementById('toast');
+      var toastTimer = null;
+      function showToast(text){
+        toast.textContent = text;
+        toast.classList.add('is-visible');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function(){ toast.classList.remove('is-visible'); }, 2200);
+      }
+
+      var actions = document.getElementById('status-actions');
+      if (!actions) return;
+
+      actions.addEventListener('click', function(e){
+        var btn = e.target.closest('button[data-new-status]');
+        if (!btn) return;
+        var newStatus = btn.dataset.newStatus;
+        if (!confirm('Перевести заказ в статус «' + btn.textContent.replace('→ ', '').trim() + '»?')) return;
+
+        btn.disabled = true;
+        var fd = new FormData();
+        fd.append('status', newStatus);
+        fetch('{% url "staff_change_status" invoice.id %}', {
+          method: 'POST',
+          credentials: 'same-origin',
+          body: fd,
+          headers: { 'X-CSRFToken': getCSRFToken() }
+        })
+          .then(function(r){ return r.json().then(function(json){ return { status: r.status, body: json }; }); })
+          .then(function(res){
+            if (res.body && res.body.ok) {
+              showToast('Статус обновлён');
+              // Перезагружаем чтобы пересчитать доступные переходы
+              setTimeout(function(){ window.location.reload(); }, 700);
+            } else {
+              btn.disabled = false;
+              showToast(res.body && res.body.error ? res.body.error : 'Ошибка');
+            }
+          })
+          .catch(function(){
+            btn.disabled = false;
+            showToast('Ошибка сети.');
+          });
+      });
+    })();
+  </script>
+</body>
+</html>

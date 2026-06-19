@@ -57,6 +57,7 @@ from .models import (
     TeamDepartment, TeamMember, TeamMemberLink, NavItem, SocialLink,
     DealerProfile,
     SparePart, SparePartImage, SparePartType,
+    Invoice, InvoiceItem,
 )
 from .forms import PageMetaAdminForm, DealerProfileAdminForm, SparePartAdminForm
 from main.services.amocrm.token_manager import TokenManager
@@ -1065,6 +1066,88 @@ class SparePartTypeAdmin(TabbedTranslationAdmin):
     def parts_count(self, obj):
         return obj.parts.count()
     parts_count.short_description = 'Запчастей'
+
+
+class InvoiceItemInline(admin.TabularInline):
+    """Позиции счёта — read-only, история. Изменять через корзину дилера, не вручную."""
+    model = InvoiceItem
+    extra = 0
+    can_delete = False
+    fields = ('name', 'quantity', 'unit', 'price', 'sum')
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(Invoice)
+class InvoiceAdmin(admin.ModelAdmin):
+    list_display    = ('display_number', 'dealer', 'status', 'status_badge', 'buyer_company_name', 'total_amount', 'confirmed_at')
+    list_filter     = ('status', 'year', 'dealer')
+    search_fields   = ('number', 'buyer_company_name', 'buyer_inn', 'buyer_contract_number', 'dealer__name', 'dealer__user__username')
+    list_editable   = ('status',)
+    date_hierarchy  = 'confirmed_at'
+    readonly_fields = (
+        'dealer', 'year', 'number',
+        'buyer_company_name', 'buyer_inn', 'buyer_contract_number',
+        'total_amount', 'created_at', 'confirmed_at',
+    )
+    inlines         = [InvoiceItemInline]
+    ordering        = ('-year', '-number')
+
+    fieldsets = (
+        ('Заказ', {
+            'fields': (('year', 'number'), 'dealer', 'status'),
+            'description': 'Статус — единственное поле которое можно менять. Остальное — снапшот на момент подтверждения.',
+        }),
+        ('Реквизиты покупателя (снапшот)', {
+            'fields': ('buyer_company_name', 'buyer_inn', 'buyer_contract_number'),
+        }),
+        ('Сумма и даты', {
+            'fields': ('total_amount', 'created_at', 'confirmed_at'),
+        }),
+    )
+
+    def display_number(self, obj):
+        return f'№{obj.number}/{obj.year}'
+    display_number.short_description = 'Номер'
+    display_number.admin_order_field = '-year'
+
+    def status_badge(self, obj):
+        """Цветной бейдж статуса — для визуальной фильтрации в списке."""
+        colors = {
+            Invoice.STATUS_PENDING_PAYMENT: '#e08b00',  # оранжевый
+            Invoice.STATUS_PAID:            '#2c9f4e',  # зелёный
+            Invoice.STATUS_IN_TRANSIT:      '#1f7ec7',  # синий
+            Invoice.STATUS_DELIVERED:       '#5a6470',  # серый (завершено)
+        }
+        color = colors.get(obj.status, '#888')
+        return format_html(
+            '<span style="background:{}; color:#fff; padding:3px 10px; '
+            'border-radius:12px; font-size:11px; font-weight:600; white-space:nowrap;">{}</span>',
+            color, obj.get_status_display()
+        )
+    status_badge.short_description = ' '
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        # Подтверждённые счета удалять нельзя — нумерация поплывёт.
+        # Черновики (если каким-то образом попали в админку) удалять можно.
+        if obj is None:
+            return True
+        return obj.is_draft
+
+    def get_queryset(self, request):
+        # В админке показываем ТОЛЬКО подтверждённые заказы (number is not null),
+        # черновики дилеров — это технический мусор, не для админа.
+        return (
+            super().get_queryset(request)
+            .filter(number__isnull=False)
+            .select_related('dealer', 'dealer__user')
+            .prefetch_related('items')
+        )
 
 
 @admin.register(SparePart)
@@ -2124,12 +2207,12 @@ class SocialLinkAdmin(admin.ModelAdmin):
 @admin.register(DealerProfile)
 class DealerProfileAdmin(admin.ModelAdmin):
     form               = DealerProfileAdminForm
-    list_display       = ('avatar_preview', 'name', 'username_display', 'company_name', 'inn', 'is_active', 'created_at')
+    list_display       = ('avatar_preview', 'name', 'username_display', 'role', 'company_name', 'inn', 'is_active', 'created_at')
     list_display_links = ('name',)
     list_editable      = ('is_active',)
-    list_filter        = ('is_active',)
+    list_filter        = ('role', 'is_active')
     search_fields      = ('name', 'user__username', 'company_name', 'inn', 'contract_number')
-    ordering           = ('name',)
+    ordering           = ('role', 'name')
     readonly_fields    = ('created_at', 'updated_at')
 
     fieldsets = (
@@ -2137,12 +2220,13 @@ class DealerProfileAdmin(admin.ModelAdmin):
             'fields': ('username', 'password1', 'password2'),
             'description': 'При создании задайте логин и пароль. При редактировании оставьте поля пароля пустыми, чтобы не менять.',
         }),
-        ('Профиль', {
-            'fields': ('name', 'avatar', 'is_active'),
+        ('Роль и профиль', {
+            'fields': ('role', 'name', 'avatar', 'is_active'),
+            'description': 'Дилер — покупатель. Сервис — заказы и склад. Бухгалтер — оплата.',
         }),
         ('Юридические данные', {
             'fields': ('company_name', 'inn', 'contract_number'),
-            'description': 'Реквизиты дилера для договорной работы.',
+            'description': 'Обязательно только для роли «Дилер» (для счетов на оплату).',
         }),
         ('Служебное', {
             'fields': ('created_at', 'updated_at'),

@@ -1962,11 +1962,32 @@ class SocialLink(models.Model):
 # ========== ДИЛЕРЫ (АВТОРИЗАЦИЯ) ==========
 
 class DealerProfile(models.Model):
+    # ===== Роли в кабинете =====
+    # Дилер — стандартный покупатель.
+    # Сервис — сотрудник склада, видит все заказы + правит остатки запчастей.
+    # Бухгалтер — видит только заказы и подтверждает оплату.
+    ROLE_DEALER     = 'dealer'
+    ROLE_SERVICE    = 'service'
+    ROLE_ACCOUNTANT = 'accountant'
+    ROLE_CHOICES = [
+        (ROLE_DEALER,     'Дилер'),
+        (ROLE_SERVICE,    'Сотрудник сервиса'),
+        (ROLE_ACCOUNTANT, 'Бухгалтер'),
+    ]
+
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
         related_name='dealer_profile',
         verbose_name='Учётная запись',
+    )
+    role = models.CharField(
+        'Роль',
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default=ROLE_DEALER,
+        db_index=True,
+        help_text='Дилер — покупатель. Сервис — обработка заказов и склад. Бухгалтер — оплата.',
     )
     name = models.CharField(
         'Наименование / Имя',
@@ -2016,7 +2037,24 @@ class DealerProfile(models.Model):
         ordering            = ['name']
 
     def __str__(self):
-        return f'{self.name} ({self.user.username})'
+        return f'{self.name} ({self.user.username}) — {self.get_role_display()}'
+
+    @property
+    def is_dealer(self):
+        return self.role == self.ROLE_DEALER
+
+    @property
+    def is_service(self):
+        return self.role == self.ROLE_SERVICE
+
+    @property
+    def is_accountant(self):
+        return self.role == self.ROLE_ACCOUNTANT
+
+    @property
+    def is_staff_user(self):
+        """Сотрудник (сервис ИЛИ бухгалтер) — для общих staff-страниц."""
+        return self.role in (self.ROLE_SERVICE, self.ROLE_ACCOUNTANT)
 
 
 # ========== МАГАЗИН: ЗАПЧАСТИ ==========
@@ -2161,3 +2199,119 @@ class SparePartImage(models.Model):
 
     def __str__(self):
         return f'Фото {self.order + 1} для {self.part.part_number}'
+
+
+# ========== СЧЕТА ДИЛЕРАМ ==========
+
+class Invoice(models.Model):
+    """Счёт на оплату для дилера.
+
+    Особенности:
+    - Нумерация (year, number) — сквозная по году, общая для всех дилеров.
+      Сбрасывается каждый Новый год.
+    - В полях buyer_* и total — снапшот данных дилера и сумм НА МОМЕНТ создания.
+      Если дилер потом сменит ИНН или цены деталей изменятся — старый счёт
+      продолжит показывать исходные значения.
+    """
+
+    dealer = models.ForeignKey(
+        'DealerProfile',
+        verbose_name='Дилер',
+        on_delete=models.PROTECT,           # счёт удалять руками — не вместе с дилером
+        related_name='invoices',
+    )
+
+    # year/number = NULL → счёт ещё не подтверждён (черновик).
+    # Присваиваются в dealer_invoice_confirm атомарно.
+    year = models.PositiveIntegerField(
+        'Год',
+        db_index=True,
+        null=True, blank=True,
+        help_text='Присваивается при подтверждении. Сбрасывается каждый Новый год.',
+    )
+    number = models.PositiveIntegerField(
+        'Номер',
+        null=True, blank=True,
+        help_text='Сквозной номер внутри года (1, 2, 3 ...). Пусто = черновик.',
+    )
+    confirmed_at = models.DateTimeField('Подтверждён', null=True, blank=True)
+
+    # ===== Статусы заказа =====
+    STATUS_PENDING_PAYMENT = 'pending_payment'
+    STATUS_PAID            = 'paid'
+    STATUS_IN_TRANSIT      = 'in_transit'
+    STATUS_DELIVERED       = 'delivered'
+    STATUS_CHOICES = [
+        (STATUS_PENDING_PAYMENT, 'Ожидание оплаты'),
+        (STATUS_PAID,            'Оплачено'),
+        (STATUS_IN_TRANSIT,      'В пути'),
+        (STATUS_DELIVERED,       'Доставлено'),
+    ]
+    status = models.CharField(
+        'Статус',
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING_PAYMENT,
+        db_index=True,
+        help_text='После подтверждения — "Ожидание оплаты". Меняется админом.',
+    )
+
+    # Снапшот реквизитов покупателя — чтобы счёт не "поплыл" при изменении профиля
+    buyer_company_name   = models.CharField('Покупатель — юр. название', max_length=255, blank=True)
+    buyer_inn            = models.CharField('Покупатель — ИНН',          max_length=20,  blank=True)
+    buyer_contract_number = models.CharField('Покупатель — № договора',   max_length=100, blank=True)
+
+    total_amount = models.DecimalField(
+        'Итоговая сумма (UZS)',
+        max_digits=14, decimal_places=2,
+        default=0,
+    )
+
+    created_at = models.DateTimeField('Создан', auto_now_add=True)
+
+    class Meta:
+        verbose_name        = 'Магазин — Счёт'
+        verbose_name_plural = 'Магазин — Счета'
+        ordering            = ['-year', '-number']
+        # Гарантия что (год, номер) уникальны — на уровне БД, а не только в коде.
+        # При гонке вторая параллельная вставка с тем же номером упадёт с IntegrityError.
+        constraints = [
+            models.UniqueConstraint(fields=['year', 'number'], name='invoice_year_number_unique'),
+        ]
+
+    def __str__(self):
+        if self.number is None:
+            return f'Черновик #{self.id} — {self.dealer.name}'
+        return f'№{self.number}/{self.year} — {self.dealer.name}'
+
+    @property
+    def is_draft(self):
+        """True если счёт ещё не подтверждён (нет номера)."""
+        return self.number is None
+
+
+class InvoiceItem(models.Model):
+    """Позиция счёта — снапшот товара на момент создания."""
+
+    invoice  = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='items', verbose_name='Счёт')
+    part     = models.ForeignKey(            # для аналитики — какой именно товар
+        SparePart,
+        on_delete=models.SET_NULL,           # удаление товара не ломает старые счета
+        related_name='+',
+        null=True, blank=True,
+        verbose_name='Запчасть (если ещё есть в БД)',
+    )
+
+    name     = models.CharField('Наименование', max_length=255)
+    quantity = models.PositiveIntegerField('Количество', default=1)
+    unit     = models.CharField('Единица', max_length=20, default='шт')
+    price    = models.DecimalField('Цена',  max_digits=14, decimal_places=2)
+    sum      = models.DecimalField('Сумма', max_digits=14, decimal_places=2)
+
+    class Meta:
+        verbose_name        = 'Позиция счёта'
+        verbose_name_plural = 'Позиции счёта'
+        ordering            = ['id']
+
+    def __str__(self):
+        return f'{self.name} × {self.quantity}'

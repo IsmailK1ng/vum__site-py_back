@@ -219,15 +219,10 @@ class DealerProfileAdminForm(forms.ModelForm):
 
     class Meta:
         model = DealerProfile
-        fields = ['name', 'avatar', 'company_name', 'inn', 'contract_number', 'is_active']
+        fields = ['role', 'name', 'avatar', 'company_name', 'inn', 'contract_number', 'is_active']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # На модели company_name/inn/contract_number blank=True (чтоб не сломать
-        # старые записи). На форме делаем обязательными.
-        self.fields['company_name'].required = True
-        self.fields['inn'].required = True
-        self.fields['contract_number'].required = True
 
         if self.instance and self.instance.pk:
             self.fields['username'].initial = self.instance.user.username
@@ -237,24 +232,18 @@ class DealerProfileAdminForm(forms.ModelForm):
             self.fields['password1'].required = True
             self.fields['password2'].required = True
 
-    def clean_username(self):
-        username = self.cleaned_data.get('username', '').strip()
-        if self.instance and self.instance.pk:
-            return self.instance.user.username
-        if User.objects.filter(username__iexact=username).exists():
-            raise forms.ValidationError('Пользователь с таким логином уже существует.')
-        return username
-
-    def clean_inn(self):
-        inn = (self.cleaned_data.get('inn') or '').strip()
-        if not inn.isdigit():
-            raise forms.ValidationError('ИНН должен содержать только цифры.')
-        if len(inn) < 5 or len(inn) > 15:
-            raise forms.ValidationError('ИНН должен быть длиной от 5 до 15 цифр.')
-        return inn
-
     def clean(self):
         cleaned = super().clean()
+        role = cleaned.get('role') or DealerProfile.ROLE_DEALER
+
+        # Юр.данные обязательны ТОЛЬКО для дилеров — у них формируются счета.
+        # Сервису и бухгалтеру эти поля не нужны.
+        if role == DealerProfile.ROLE_DEALER:
+            for field in ('company_name', 'inn', 'contract_number'):
+                if not (cleaned.get(field) or '').strip():
+                    self.add_error(field, 'Обязательно для роли «Дилер».')
+
+        # Пароль (как было)
         pwd1 = cleaned.get('password1')
         pwd2 = cleaned.get('password2')
         if pwd1 or pwd2:
@@ -266,6 +255,25 @@ class DealerProfileAdminForm(forms.ModelForm):
                 except forms.ValidationError as e:
                     self.add_error('password1', e)
         return cleaned
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username', '').strip()
+        if self.instance and self.instance.pk:
+            return self.instance.user.username
+        if User.objects.filter(username__iexact=username).exists():
+            raise forms.ValidationError('Пользователь с таким логином уже существует.')
+        return username
+
+    def clean_inn(self):
+        inn = (self.cleaned_data.get('inn') or '').strip()
+        # Пустой ИНН допустим для не-дилеров — на обязательность проверит clean() по роли.
+        if not inn:
+            return ''
+        if not inn.isdigit():
+            raise forms.ValidationError('ИНН должен содержать только цифры.')
+        if len(inn) < 5 or len(inn) > 15:
+            raise forms.ValidationError('ИНН должен быть длиной от 5 до 15 цифр.')
+        return inn
 
 
 class DealerPasswordChangeForm(forms.Form):

@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate
 from django.core import signing
-from django.db.models import Count, Q, Avg
+from django.db.models import Count, Q, Avg, F
 from django.db.models.functions import TruncHour, TruncDate
 from django.http import HttpResponseRedirect, HttpResponseForbidden, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -48,7 +48,11 @@ from .models import (
     TeamMember,
     DealerProfile,
     SparePart, SparePartType,
+    Invoice, InvoiceItem,
 )
+from django.db import transaction, IntegrityError
+from decimal import Decimal
+from main.utils.invoice_format import format_uzs, format_date_ru, amount_in_words_uzs
 from .forms import DealerLoginForm, DealerPasswordChangeForm
 from .serializers import (
     NewsSerializer, 
@@ -203,9 +207,12 @@ def _get_dealer_profile_from_request(request):
     return None
 
 
-def dealer_required(view_func):
-    """Декоратор для дилерских view. Кладёт DealerProfile в request.dealer_profile.
-    При отсутствии/истечении cookie — редирект на dealer_login и удаление невалидного cookie.
+def _role_required(role_check, view_func):
+    """Общий конструктор декоратора, проверяющий cookie + роль.
+
+    role_check(profile) → bool: True если роль подходит.
+    Не подошла роль → редирект в кабинет той роли которая ему доступна
+    (а не logout — чтоб сотрудник случайно зайдя на /dealer/ не вылетал).
     """
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
@@ -214,9 +221,39 @@ def dealer_required(view_func):
             response = redirect('dealer_login')
             _clear_dealer_cookie(response)
             return response
+        if not role_check(profile):
+            return redirect(_landing_url_for(profile))
         request.dealer_profile = profile
         return view_func(request, *args, **kwargs)
     return wrapper
+
+
+def _landing_url_for(profile):
+    """Куда вести пользователя сразу после логина / при попытке открыть чужой раздел."""
+    if profile.is_dealer:
+        return reverse('dealer_shop')
+    # Сервис и бухгалтер — оба на список заказов
+    return reverse('staff_orders_list')
+
+
+def dealer_required(view_func):
+    """Только для роли 'dealer' (покупатель). Чужие роли → их собственная landing."""
+    return _role_required(lambda p: p.is_dealer, view_func)
+
+
+def staff_required(view_func):
+    """Сервис ИЛИ бухгалтер."""
+    return _role_required(lambda p: p.is_staff_user, view_func)
+
+
+def service_required(view_func):
+    """Только сервис (раздел склада, изменения остатков)."""
+    return _role_required(lambda p: p.is_service, view_func)
+
+
+def accountant_required(view_func):
+    """Только бухгалтер."""
+    return _role_required(lambda p: p.is_accountant, view_func)
 
 
 @sensitive_post_parameters('password')
@@ -228,8 +265,9 @@ def dealer_login(request):
     - На ошибке отдаём одинаковое сообщение (без намёков что именно неверно).
     - authenticate() сверяет пароль через User-таблицу, но Django session НЕ создаётся.
     """
-    if _get_dealer_profile_from_request(request):
-        return redirect('dealer_shop')
+    existing_profile = _get_dealer_profile_from_request(request)
+    if existing_profile:
+        return redirect(_landing_url_for(existing_profile))
 
     form = DealerLoginForm(request.POST or None)
 
@@ -253,7 +291,8 @@ def dealer_login(request):
                 logger.warning('Dealer login blocked (no/inactive profile): username=%s', username)
             else:
                 logger.info('Dealer login: username=%s ip=%s', username, request.META.get('REMOTE_ADDR'))
-                next_url = request.GET.get('next') or reverse('dealer_shop')
+                # Куда уводим зависит от роли. ?next= уважаем только если он есть.
+                next_url = request.GET.get('next') or _landing_url_for(profile)
                 response = redirect(next_url)
                 _set_dealer_cookie(response, profile.id)
                 return response
@@ -440,6 +479,670 @@ def dealer_cart_api(request):
             'image_url': first_image.image.url if first_image else None,
         })
     return JsonResponse({'items': items})
+
+
+@never_cache
+@dealer_required
+@require_http_methods(['POST'])
+def dealer_cart_checkout(request):
+    """Создание ЧЕРНОВИКА счёта из корзины.
+
+    Принимает JSON: {"items": [{"id": <part_id>, "qty": <int>}, ...]}.
+    Создаёт Invoice БЕЗ номера/года (черновик) + InvoiceItem.
+    Склад НЕ списываем — это делается в confirm.
+    Прежние черновики этого дилера удаляются (1 черновик за раз).
+    """
+    profile = request.dealer_profile
+
+    if not profile.company_name or not profile.inn or not profile.contract_number:
+        return JsonResponse({
+            'ok': False,
+            'error': 'Реквизиты компании не заполнены. Свяжитесь с администратором.',
+        }, status=400)
+
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+        raw_items = payload.get('items') or []
+        assert isinstance(raw_items, list)
+    except (json.JSONDecodeError, AssertionError, UnicodeDecodeError):
+        return JsonResponse({'ok': False, 'error': 'Некорректный формат данных'}, status=400)
+
+    if not raw_items:
+        return JsonResponse({'ok': False, 'error': 'Корзина пуста'}, status=400)
+
+    requested = {}
+    for it in raw_items:
+        try:
+            pid = int(it['id'])
+            qty = int(it['qty'])
+        except (TypeError, ValueError, KeyError):
+            continue
+        if pid > 0 and qty > 0:
+            requested[pid] = requested.get(pid, 0) + qty
+
+    if not requested:
+        return JsonResponse({'ok': False, 'error': 'Не указаны корректные позиции'}, status=400)
+
+    parts_by_id = {
+        p.id: p
+        for p in SparePart.objects.filter(id__in=requested.keys(), is_active=True)
+    }
+    if not parts_by_id:
+        return JsonResponse({'ok': False, 'error': 'Ни одна позиция недоступна'}, status=400)
+
+    try:
+        with transaction.atomic():
+            # Чистим старые черновики этого дилера — пусть будет максимум один
+            Invoice.objects.filter(dealer=profile, number__isnull=True).delete()
+
+            # Создаём пустой черновик (без year/number — присвоятся при подтверждении)
+            invoice = Invoice.objects.create(
+                dealer=profile,
+                year=None,
+                number=None,
+                buyer_company_name=profile.company_name,
+                buyer_inn=profile.inn,
+                buyer_contract_number=profile.contract_number,
+                total_amount=Decimal('0'),
+            )
+
+            total = Decimal('0')
+            for pid, qty in requested.items():
+                part = parts_by_id.get(pid)
+                if not part:
+                    continue
+                actual_qty = min(qty, part.quantity)
+                if actual_qty < 1:
+                    continue
+                line_sum = (part.price * actual_qty).quantize(Decimal('0.01'))
+                InvoiceItem.objects.create(
+                    invoice=invoice,
+                    part=part,
+                    name=part.name_ru or part.name,
+                    quantity=actual_qty,
+                    unit='шт',
+                    price=part.price,
+                    sum=line_sum,
+                )
+                total += line_sum
+
+            if total == 0:
+                raise ValueError('Ни одной позиции не оказалось в наличии')
+
+            invoice.total_amount = total
+            invoice.save(update_fields=['total_amount'])
+    except ValueError as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=400)
+
+    logger.info('Invoice draft created: id=%d dealer=%s total=%s',
+                invoice.id, profile.user.username, total)
+
+    return JsonResponse({
+        'ok': True,
+        'invoice_id': invoice.id,
+        'redirect_url': f'/dealer/invoice/{invoice.id}/?from=checkout',
+    })
+
+
+@never_cache
+@dealer_required
+@require_http_methods(['POST'])
+def dealer_invoice_confirm(request, invoice_id):
+    """Подтверждение черновика: атомарно списываем склад + присваиваем номер."""
+    profile = request.dealer_profile
+
+    try:
+        with transaction.atomic():
+            # Блокируем черновик
+            invoice = (
+                Invoice.objects
+                .select_for_update()
+                .filter(id=invoice_id, dealer=profile, number__isnull=True)
+                .first()
+            )
+            if not invoice:
+                return JsonResponse({
+                    'ok': False, 'error': 'Черновик не найден или уже подтверждён'
+                }, status=404)
+
+            items = list(invoice.items.all())
+            if not items:
+                return JsonResponse({'ok': False, 'error': 'Черновик пустой'}, status=400)
+
+            # Блокируем все запчасти которые надо списать
+            part_ids = [it.part_id for it in items if it.part_id]
+            parts_locked = {
+                p.id: p
+                for p in SparePart.objects.select_for_update().filter(id__in=part_ids)
+            }
+
+            # Проверяем остатки на момент подтверждения (мог истощиться)
+            for it in items:
+                if not it.part_id:
+                    return JsonResponse({
+                        'ok': False,
+                        'error': f'Запчасть «{it.name}» удалена из каталога',
+                    }, status=400)
+                part = parts_locked.get(it.part_id)
+                if not part or not part.is_active:
+                    return JsonResponse({
+                        'ok': False,
+                        'error': f'Запчасть «{it.name}» больше не доступна',
+                    }, status=400)
+                if part.quantity < it.quantity:
+                    return JsonResponse({
+                        'ok': False,
+                        'error': f'Недостаточно «{it.name}» на складе. Доступно: {part.quantity}, требуется: {it.quantity}',
+                    }, status=400)
+
+            # Списываем со склада через F() — атомарно
+            for it in items:
+                SparePart.objects.filter(id=it.part_id).update(
+                    quantity=F('quantity') - it.quantity
+                )
+
+            # Присваиваем номер: блокируем последнюю строку года
+            year = timezone.now().year
+            last = (
+                Invoice.objects
+                .select_for_update()
+                .filter(year=year, number__isnull=False)
+                .order_by('-number')
+                .first()
+            )
+            next_number = (last.number + 1) if last else 1
+
+            invoice.year = year
+            invoice.number = next_number
+            invoice.confirmed_at = timezone.now()
+            invoice.save(update_fields=['year', 'number', 'confirmed_at'])
+    except IntegrityError:
+        # Гонка на UniqueConstraint(year, number) — крайне маловероятна,
+        # но если случится — клиент перезагрузит и повторит
+        return JsonResponse({'ok': False, 'error': 'Попробуйте ещё раз'}, status=409)
+
+    logger.info('Invoice confirmed: №%d/%d dealer=%s',
+                invoice.number, invoice.year, profile.user.username)
+
+    return JsonResponse({
+        'ok': True,
+        'redirect_url': f'/dealer/invoice/{invoice.id}/?from=confirm',
+    })
+
+
+@never_cache
+@dealer_required
+@require_http_methods(['POST'])
+def dealer_invoice_mark_received(request, invoice_id):
+    """Дилер подтверждает что груз получил → статус 'Доставлено'.
+    Доступно только для своих счетов, только из статуса 'В пути'.
+    """
+    profile = request.dealer_profile
+
+    with transaction.atomic():
+        invoice = (
+            Invoice.objects
+            .select_for_update()
+            .filter(
+                id=invoice_id,
+                dealer=profile,
+                number__isnull=False,
+                status=Invoice.STATUS_IN_TRANSIT,
+            )
+            .first()
+        )
+        if not invoice:
+            return JsonResponse({
+                'ok': False,
+                'error': 'Заказ не найден, не ваш, или ещё не в пути',
+            }, status=404)
+
+        invoice.status = Invoice.STATUS_DELIVERED
+        invoice.save(update_fields=['status'])
+
+    logger.info(
+        'Invoice received by dealer: №%d/%d username=%s',
+        invoice.number, invoice.year, profile.user.username,
+    )
+    return JsonResponse({
+        'ok': True,
+        'new_status': Invoice.STATUS_DELIVERED,
+        'new_status_label': invoice.get_status_display(),
+    })
+
+
+@never_cache
+@dealer_required
+@require_http_methods(['POST'])
+def dealer_invoice_cancel(request, invoice_id):
+    """Отмена черновика — удаляет его. Подтверждённые счета удалить нельзя."""
+    profile = request.dealer_profile
+    deleted, _ = Invoice.objects.filter(
+        id=invoice_id, dealer=profile, number__isnull=True,
+    ).delete()
+    if deleted:
+        logger.info('Invoice draft cancelled: id=%d dealer=%s',
+                    invoice_id, profile.user.username)
+    return JsonResponse({'ok': True})
+
+
+@never_cache
+@dealer_required
+def dealer_invoices_list(request):
+    """История счетов текущего дилера. Только подтверждённые (без черновиков)."""
+    profile = request.dealer_profile
+    invoices = (
+        Invoice.objects
+        .filter(dealer=profile, number__isnull=False)   # черновики скрываем
+        .order_by('-year', '-number')
+    )
+
+    # year/number → строка чтоб Django не вставлял пробел-разделитель тысяч (USE_THOUSAND_SEPARATOR=True)
+    items_ctx = [
+        {
+            'id': inv.id,
+            'number': str(inv.number),
+            'year': str(inv.year),
+            'date': format_date_ru(inv.confirmed_at or inv.created_at),
+            'total_formatted': format_uzs(inv.total_amount),
+            'contract_number': inv.buyer_contract_number,
+            'status': inv.status,
+            'status_label': inv.get_status_display(),
+        }
+        for inv in invoices
+    ]
+
+    return render(request, 'main/dealer/invoices_list.html', {
+        'profile': profile,
+        'invoices': items_ctx,
+    })
+
+
+@never_cache
+@dealer_required
+@require_http_methods(['GET'])
+def dealer_invoice(request, invoice_id):
+    """Рендер счёта (черновик или подтверждённый) для своего дилера."""
+    profile = request.dealer_profile
+    invoice = (
+        Invoice.objects
+        .filter(id=invoice_id, dealer=profile)
+        .prefetch_related('items')
+        .first()
+    )
+    if not invoice:
+        messages.warning(request, 'Счёт не найден.')
+        return redirect('dealer_shop')
+
+    items_ctx = [
+        {
+            'name': it.name,
+            'quantity': it.quantity,
+            'unit': it.unit,
+            'price_formatted': format_uzs(it.price),
+            'sum_formatted': format_uzs(it.sum),
+        }
+        for it in invoice.items.all()
+    ]
+
+    is_draft = invoice.is_draft
+    # Для черновика дата = момент создания; для подтверждённого = confirmed_at
+    invoice_date = invoice.created_at if is_draft else (invoice.confirmed_at or invoice.created_at)
+
+    # Дилер может подтвердить получение только если счёт «В пути»
+    can_mark_received = (not is_draft) and invoice.status == Invoice.STATUS_IN_TRANSIT
+
+    return render(request, 'main/dealer/invoice.html', {
+        'invoice': {
+            'id': invoice.id,
+            'is_draft': is_draft,
+            # str() — против USE_THOUSAND_SEPARATOR=True ('2026' вместо '2 026')
+            'number': str(invoice.number) if invoice.number is not None else '',
+            'year': str(invoice.year) if invoice.year is not None else '',
+            'date': format_date_ru(invoice_date),
+            'status': invoice.status,
+            'status_label': invoice.get_status_display(),
+            'can_mark_received': can_mark_received,
+        },
+        'buyer': {
+            'name': invoice.buyer_company_name,
+            'inn': invoice.buyer_inn,
+            'contract_number': invoice.buyer_contract_number,
+        },
+        'items': items_ctx,
+        'totals': {
+            'amount_formatted': format_uzs(invoice.total_amount),
+            'currency': 'UZS',
+            'amount_in_words': amount_in_words_uzs(invoice.total_amount),
+        },
+    })
+
+
+# ========== STAFF (СОТРУДНИКИ СЕРВИСА + БУХГАЛТЕР) ==========
+
+# Правила переходов статусов по ролям.
+# Бухгалтер ставит "оплачено", сервис двигает дальше до "в пути",
+# финальный шаг "доставлено" подтверждает САМ ДИЛЕР у себя в счёте.
+ALLOWED_STATUS_TRANSITIONS = {
+    DealerProfile.ROLE_ACCOUNTANT: {
+        Invoice.STATUS_PENDING_PAYMENT: [Invoice.STATUS_PAID],
+    },
+    DealerProfile.ROLE_SERVICE: {
+        Invoice.STATUS_PAID: [Invoice.STATUS_IN_TRANSIT],
+    },
+    DealerProfile.ROLE_DEALER: {
+        Invoice.STATUS_IN_TRANSIT: [Invoice.STATUS_DELIVERED],
+    },
+}
+
+
+def _allowed_next_statuses(profile, current_status):
+    """Доступные статусы для смены, исходя из роли и текущего."""
+    return ALLOWED_STATUS_TRANSITIONS.get(profile.role, {}).get(current_status, [])
+
+
+@never_cache
+@staff_required
+def staff_orders_list(request):
+    """Список ВСЕХ подтверждённых заказов — общий для сервиса и бухгалтера.
+    Фильтры: ?status=, ?q= (по номеру / имени дилера / ИНН)
+    """
+    profile = request.dealer_profile
+    qs = (
+        Invoice.objects
+        .filter(number__isnull=False)
+        .select_related('dealer')
+        .order_by('-confirmed_at')
+    )
+
+    status_filter = (request.GET.get('status') or '').strip()
+    q = (request.GET.get('q') or '').strip()
+
+    if status_filter and status_filter in dict(Invoice.STATUS_CHOICES):
+        qs = qs.filter(status=status_filter)
+
+    if q:
+        # Если строка — число → ищем по номеру; иначе — по имени/ИНН
+        if q.isdigit():
+            qs = qs.filter(number=int(q))
+        else:
+            qs = qs.filter(
+                Q(buyer_company_name__icontains=q)
+                | Q(buyer_inn__icontains=q)
+                | Q(dealer__name__icontains=q)
+            )
+
+    items_ctx = [
+        {
+            'id': inv.id,
+            'number': str(inv.number),
+            'year': str(inv.year),
+            'date': format_date_ru(inv.confirmed_at or inv.created_at),
+            'dealer_name': inv.dealer.name,
+            'buyer_company_name': inv.buyer_company_name,
+            'total_formatted': format_uzs(inv.total_amount),
+            'status': inv.status,
+            'status_label': inv.get_status_display(),
+        }
+        for inv in qs[:200]   # ограничиваем — пагинация будет позже
+    ]
+
+    return render(request, 'main/dealer/staff_orders.html', {
+        'profile': profile,
+        'invoices': items_ctx,
+        'status_filter': status_filter,
+        'search_query': q,
+        'status_choices': Invoice.STATUS_CHOICES,
+    })
+
+
+@never_cache
+@staff_required
+def staff_order_detail(request, invoice_id):
+    """Просмотр конкретного заказа сотрудником + доступные действия по статусу."""
+    profile = request.dealer_profile
+    invoice = (
+        Invoice.objects
+        .filter(id=invoice_id, number__isnull=False)
+        .select_related('dealer')
+        .prefetch_related('items')
+        .first()
+    )
+    if not invoice:
+        messages.warning(request, 'Заказ не найден.')
+        return redirect('staff_orders_list')
+
+    items_ctx = [
+        {
+            'name': it.name,
+            'quantity': it.quantity,
+            'unit': it.unit,
+            'price_formatted': format_uzs(it.price),
+            'sum_formatted': format_uzs(it.sum),
+        }
+        for it in invoice.items.all()
+    ]
+
+    # Какие переходы доступны этой роли с текущего статуса
+    next_options = [
+        {'value': s, 'label': dict(Invoice.STATUS_CHOICES)[s]}
+        for s in _allowed_next_statuses(profile, invoice.status)
+    ]
+
+    return render(request, 'main/dealer/staff_order_detail.html', {
+        'profile': profile,
+        'invoice': {
+            'id': invoice.id,
+            'number': str(invoice.number),
+            'year': str(invoice.year),
+            'date': format_date_ru(invoice.confirmed_at or invoice.created_at),
+            'dealer_name': invoice.dealer.name,
+            'status': invoice.status,
+            'status_label': invoice.get_status_display(),
+        },
+        'buyer': {
+            'name': invoice.buyer_company_name,
+            'inn': invoice.buyer_inn,
+            'contract_number': invoice.buyer_contract_number,
+        },
+        'items': items_ctx,
+        'totals': {
+            'amount_formatted': format_uzs(invoice.total_amount),
+            'currency': 'UZS',
+            'amount_in_words': amount_in_words_uzs(invoice.total_amount),
+        },
+        'next_options': next_options,
+    })
+
+
+@never_cache
+@staff_required
+@require_http_methods(['POST'])
+def staff_change_status(request, invoice_id):
+    """Смена статуса заказа.
+    Бухгалтер: pending → paid. Сервис: paid → in_transit → delivered.
+    Любой другой переход — 403.
+    """
+    profile = request.dealer_profile
+    new_status = (request.POST.get('status') or '').strip()
+
+    if new_status not in dict(Invoice.STATUS_CHOICES):
+        return JsonResponse({'ok': False, 'error': 'Неизвестный статус'}, status=400)
+
+    with transaction.atomic():
+        invoice = (
+            Invoice.objects
+            .select_for_update()
+            .filter(id=invoice_id, number__isnull=False)
+            .first()
+        )
+        if not invoice:
+            return JsonResponse({'ok': False, 'error': 'Заказ не найден'}, status=404)
+
+        allowed = _allowed_next_statuses(profile, invoice.status)
+        if new_status not in allowed:
+            return JsonResponse({
+                'ok': False,
+                'error': 'У вашей роли нет права на этот переход',
+            }, status=403)
+
+        invoice.status = new_status
+        invoice.save(update_fields=['status'])
+
+    logger.info(
+        'Status changed: invoice=№%d/%d by=%s (%s) → %s',
+        invoice.number, invoice.year, profile.user.username, profile.role, new_status,
+    )
+    return JsonResponse({
+        'ok': True,
+        'new_status': new_status,
+        'new_status_label': invoice.get_status_display(),
+    })
+
+
+@never_cache
+@staff_required
+def staff_invoice_view(request, invoice_id):
+    """Рендер ПОЛНОГО документа счёта для сотрудника (тот же шаблон что у дилера).
+    Никаких действий: ни «Получил», ни смены статуса — только просмотр и печать.
+    """
+    profile = request.dealer_profile
+    invoice = (
+        Invoice.objects
+        .filter(id=invoice_id, number__isnull=False)
+        .prefetch_related('items')
+        .first()
+    )
+    if not invoice:
+        messages.warning(request, 'Счёт не найден.')
+        return redirect('staff_orders_list')
+
+    items_ctx = [
+        {
+            'name': it.name,
+            'quantity': it.quantity,
+            'unit': it.unit,
+            'price_formatted': format_uzs(it.price),
+            'sum_formatted': format_uzs(it.sum),
+        }
+        for it in invoice.items.all()
+    ]
+    invoice_date = invoice.confirmed_at or invoice.created_at
+
+    return render(request, 'main/dealer/invoice.html', {
+        'profile': profile,
+        'invoice': {
+            'id': invoice.id,
+            'is_draft': False,
+            'number': str(invoice.number),
+            'year': str(invoice.year),
+            'date': format_date_ru(invoice_date),
+            'status': invoice.status,
+            'status_label': invoice.get_status_display(),
+            'can_mark_received': False,         # сотрудник не дилер
+            'back_url': reverse('staff_order_detail', args=[invoice.id]),
+            'back_label': '← К управлению заказом',
+        },
+        'buyer': {
+            'name': invoice.buyer_company_name,
+            'inn': invoice.buyer_inn,
+            'contract_number': invoice.buyer_contract_number,
+        },
+        'items': items_ctx,
+        'totals': {
+            'amount_formatted': format_uzs(invoice.total_amount),
+            'currency': 'UZS',
+            'amount_in_words': amount_in_words_uzs(invoice.total_amount),
+        },
+    })
+
+
+@never_cache
+@service_required
+def staff_parts_list(request):
+    """Список всех запчастей — только для сервиса. Можно править остаток."""
+    profile = request.dealer_profile
+    q = (request.GET.get('q') or '').strip()
+
+    parts = SparePart.objects.select_related('type', 'truck').order_by('part_number')
+    if q:
+        parts = parts.filter(
+            Q(part_number__icontains=q)
+            | Q(name__icontains=q)
+            | Q(name_ru__icontains=q)
+        )
+
+    items_ctx = [
+        {
+            'id': p.id,
+            'part_number': p.part_number,
+            'name': p.name_ru or p.name,
+            'type': (p.type.name_ru or p.type.name) if p.type_id else '—',
+            'truck': p.truck.title if p.truck_id else '—',
+            'quantity': p.quantity,
+            'price_formatted': format_uzs(p.price),
+            'is_active': p.is_active,
+        }
+        for p in parts[:500]
+    ]
+
+    return render(request, 'main/dealer/staff_parts.html', {
+        'profile': profile,
+        'parts': items_ctx,
+        'search_query': q,
+    })
+
+
+@never_cache
+@service_required
+@require_http_methods(['POST'])
+def staff_part_update_quantity(request, part_id):
+    """POST. Установить новое значение количества запчасти (или прирастить).
+
+    Тело: {"quantity": <int>} — устанавливает новое значение.
+            ИЛИ {"delta": <int>} — прирост (можно и отрицательный).
+    """
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({'ok': False, 'error': 'Некорректный JSON'}, status=400)
+
+    new_quantity = payload.get('quantity', None)
+    delta = payload.get('delta', None)
+
+    with transaction.atomic():
+        part = SparePart.objects.select_for_update().filter(id=part_id).first()
+        if not part:
+            return JsonResponse({'ok': False, 'error': 'Запчасть не найдена'}, status=404)
+
+        if new_quantity is not None:
+            try:
+                new_quantity = int(new_quantity)
+                if new_quantity < 0:
+                    raise ValueError
+            except (TypeError, ValueError):
+                return JsonResponse({'ok': False, 'error': 'quantity должен быть ≥ 0'}, status=400)
+            part.quantity = new_quantity
+        elif delta is not None:
+            try:
+                delta = int(delta)
+            except (TypeError, ValueError):
+                return JsonResponse({'ok': False, 'error': 'delta должен быть числом'}, status=400)
+            new_val = part.quantity + delta
+            if new_val < 0:
+                return JsonResponse({
+                    'ok': False,
+                    'error': f'Нельзя уйти в минус (текущий остаток: {part.quantity})',
+                }, status=400)
+            part.quantity = new_val
+        else:
+            return JsonResponse({'ok': False, 'error': 'Нужен quantity или delta'}, status=400)
+
+        part.save(update_fields=['quantity'])
+
+    logger.info('Stock updated: part=%s qty=%d by=%s',
+                part.part_number, part.quantity, request.dealer_profile.user.username)
+    return JsonResponse({'ok': True, 'quantity': part.quantity})
 
 
 def product_detail(request, product_id):

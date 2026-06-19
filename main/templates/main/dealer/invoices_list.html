@@ -1,0 +1,207 @@
+{% load static %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="same-origin">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>История счетов — VUM</title>
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f5f7fa; color: #1a1a1a; }
+
+    .dealer-header { background: #fff; border-bottom: 1px solid #e3e8ef; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+    .dealer-header__logo img { height: 30px; width: auto; }
+    .dealer-header__user { display: flex; align-items: center; gap: 14px; }
+    .dealer-header__avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 1.5px solid #e3e8ef; }
+    .dealer-header__avatar--placeholder { background: #1f3a5f; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; }
+    .dealer-header__name { font-size: 14px; font-weight: 600; }
+    .header-icon-link {
+      position: relative; display: inline-flex; align-items: center; justify-content: center;
+      width: 38px; height: 38px; border-radius: 50%;
+      border: 1.5px solid #e3e8ef; color: #3a4452;
+      text-decoration: none; transition: border-color 0.15s, color 0.15s;
+    }
+    .header-icon-link:hover { border-color: #1f3a5f; color: #1f3a5f; }
+    .header-icon-link.is-current { background: #1f3a5f; color: #fff; border-color: #1f3a5f; }
+    .header-icon-link svg { width: 20px; height: 20px; }
+    .header-icon-link__badge {
+      position: absolute; top: -4px; right: -4px;
+      min-width: 18px; height: 18px; padding: 0 5px;
+      background: #c75050; color: #fff; border-radius: 9px;
+      font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid #fff; line-height: 1;
+    }
+
+    .dealer-main { max-width: 1100px; margin: 0 auto; padding: 24px 28px 64px; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; color: #5a6470; font-size: 14px; text-decoration: none; margin-bottom: 20px; transition: color 0.15s; }
+    .back-link:hover { color: #1f3a5f; }
+    .page-title { margin: 0 0 20px; font-size: 24px; font-weight: 700; color: #0f1419; }
+    .page-subtitle { color: #7a8290; font-size: 14px; margin: -14px 0 24px; }
+
+    /* ===== Таблица счетов ===== */
+    .invoices-table {
+      width: 100%;
+      background: #fff;
+      border: 1px solid #e3e8ef;
+      border-radius: 14px;
+      overflow: hidden;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .invoices-table th, .invoices-table td {
+      text-align: left;
+      padding: 14px 18px;
+      border-bottom: 1px solid #eef1f5;
+      font-size: 14px;
+    }
+    .invoices-table thead th {
+      background: #f8fafc;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #7a8290;
+      font-weight: 600;
+    }
+    .invoices-table tbody tr:last-child td { border-bottom: 0; }
+    .invoices-table tbody tr:hover td { background: #fafbfd; }
+    .invoices-table td.number   { font-weight: 700; color: #1f3a5f; white-space: nowrap; }
+    .invoices-table td.sum      { text-align: right; font-weight: 700; white-space: nowrap; }
+    .invoices-table td.contract { color: #5a6470; }
+    .invoices-table td.actions  { text-align: right; white-space: nowrap; }
+    .invoices-table__view {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px;
+      background: transparent;
+      color: #1f3a5f;
+      text-decoration: none;
+      border: 1.5px solid #d6dce5;
+      border-radius: 6px;
+      font-size: 12px; font-weight: 600;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .invoices-table__view:hover { background: #1f3a5f; color: #fff; border-color: #1f3a5f; }
+
+    /* ===== Бейдж статуса ===== */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      color: #fff;
+    }
+    .status-badge--pending_payment { background: #e08b00; }
+    .status-badge--paid            { background: #2c9f4e; }
+    .status-badge--in_transit      { background: #1f7ec7; }
+    .status-badge--delivered       { background: #5a6470; }
+
+    /* ===== Empty ===== */
+    .empty-state {
+      background: #fff;
+      border: 1px solid #e3e8ef;
+      border-radius: 14px;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .empty-state__title { font-size: 18px; font-weight: 600; color: #3a4452; margin: 0 0 8px; }
+    .empty-state__text { color: #7a8290; font-size: 14px; margin: 0 0 18px; }
+    .empty-state__cta {
+      display: inline-block; padding: 10px 22px;
+      background: #1f3a5f; color: #fff; text-decoration: none;
+      border-radius: 8px; font-size: 14px; font-weight: 600;
+      transition: background 0.15s;
+    }
+    .empty-state__cta:hover { background: #2a4d7a; }
+
+    @media (max-width: 600px) {
+      .dealer-header { padding: 12px 16px; }
+      .dealer-header__name { display: none; }
+      .dealer-main { padding: 16px; }
+      .invoices-table th, .invoices-table td { padding: 10px 12px; font-size: 13px; }
+      .invoices-table td.contract { display: none; }
+      .invoices-table th.contract { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="dealer-header">
+    <div class="dealer-header__logo">
+      <a href="{% url 'dealer_shop' %}"><img src="{% static 'images/LOGO-VUM.png' %}" alt="VUM"></a>
+    </div>
+    <div class="dealer-header__user">
+      <a href="{% url 'dealer_invoices_list' %}" class="header-icon-link is-current" aria-label="История счетов">
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+      </a>
+      <a href="{% url 'dealer_cart' %}" class="header-icon-link" aria-label="Корзина">
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        <span class="header-icon-link__badge" id="cart-badge" style="display:none"></span>
+      </a>
+      <button type="button" class="profile-trigger" aria-label="Профиль">
+        {% if profile.avatar %}
+          <img class="dealer-header__avatar" src="{{ profile.avatar.url }}" alt="{{ profile.name }}">
+        {% else %}
+          <div class="dealer-header__avatar dealer-header__avatar--placeholder">{{ profile.name|slice:":1"|upper }}</div>
+        {% endif %}
+        <span class="dealer-header__name">{{ profile.name }}</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="dealer-main">
+    <a href="{% url 'dealer_shop' %}" class="back-link">← Назад к каталогу</a>
+    <h1 class="page-title">История счетов</h1>
+    <p class="page-subtitle">Всего счетов: {{ invoices|length }}</p>
+
+    {% if invoices %}
+      <table class="invoices-table">
+        <thead>
+          <tr>
+            <th>Номер</th>
+            <th>Дата</th>
+            <th>Статус</th>
+            <th class="contract">№ договора</th>
+            <th class="sum">Сумма</th>
+            <th class="actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inv in invoices %}
+            <tr>
+              <td class="number">№{{ inv.number }}/{{ inv.year }}</td>
+              <td>{{ inv.date }}</td>
+              <td><span class="status-badge status-badge--{{ inv.status }}">{{ inv.status_label }}</span></td>
+              <td class="contract">{{ inv.contract_number|default:"—" }}</td>
+              <td class="sum">{{ inv.total_formatted }} UZS</td>
+              <td class="actions">
+                <a href="{% url 'dealer_invoice' inv.id %}" class="invoices-table__view">Открыть</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty-state">
+        <p class="empty-state__title">Счетов пока нет</p>
+        <p class="empty-state__text">После оформления заказа из корзины счёт появится здесь.</p>
+        <a href="{% url 'dealer_shop' %}" class="empty-state__cta">В каталог</a>
+      </div>
+    {% endif %}
+  </main>
+
+  {% include 'main/dealer/_profile_modal.html' %}
+
+  <script src="{% static 'js/dealer-cart.js' %}"></script>
+  <script>
+    DealerCart.bindBadge(document.getElementById('cart-badge'));
+  </script>
+</body>
+</html>

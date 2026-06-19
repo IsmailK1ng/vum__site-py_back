@@ -242,6 +242,9 @@
       <a href="{% url 'dealer_shop' %}"><img src="{% static 'images/LOGO-VUM.png' %}" alt="VUM"></a>
     </div>
     <div class="dealer-header__user">
+      <a href="{% url 'dealer_invoices_list' %}" class="cart-icon-link" aria-label="История счетов">
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+      </a>
       <a href="{% url 'dealer_cart' %}" class="cart-icon-link is-current" aria-label="Корзина">
         <svg fill="currentColor" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
         <span class="cart-icon-link__badge" id="cart-badge" style="display:none"></span>
@@ -480,10 +483,59 @@
           recomputeSidebar();
         }
 
-        document.getElementById('cart-pay-btn').addEventListener('click', function(){
-          // TODO: реальная отправка заказа — пока заглушка
-          showToast('Заказ отправлен (заглушка)');
+        var payBtn = document.getElementById('cart-pay-btn');
+        payBtn.addEventListener('click', function(){
+          if (Object.keys(byId).length === 0) {
+            showToast('Корзина пуста');
+            return;
+          }
+          payBtn.disabled = true;
+          payBtn.textContent = 'Оформляем...';
+
+          // Собираем актуальные id+qty из byId — клиент мог менять stepper
+          var itemsPayload = Object.values(byId).map(function(it){
+            return { id: it.id, qty: it.qty };
+          });
+
+          fetch('{% url "dealer_cart_checkout" %}', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify({ items: itemsPayload })
+          })
+            .then(function(r){
+              return r.json().then(function(json){ return { status: r.status, body: json }; });
+            })
+            .then(function(res){
+              if (res.body && res.body.ok) {
+                // Корзину НЕ чистим — на черновике юзер может отменить и вернуться сюда.
+                // Очистка произойдёт только при подтверждении счёта (в invoice.html).
+                window.location.href = res.body.redirect_url;
+              } else {
+                payBtn.disabled = false;
+                payBtn.textContent = 'Оформить заказ';
+                showToast(res.body && res.body.error ? res.body.error : 'Ошибка оформления');
+              }
+            })
+            .catch(function(){
+              payBtn.disabled = false;
+              payBtn.textContent = 'Оформить заказ';
+              showToast('Ошибка сети. Попробуйте ещё раз.');
+            });
         });
+      }
+
+      function getCSRFToken(){
+        var prefix = 'csrftoken=';
+        var parts = document.cookie.split(';');
+        for (var i = 0; i < parts.length; i++) {
+          var c = parts[i].trim();
+          if (c.indexOf(prefix) === 0) return c.substring(prefix.length);
+        }
+        return '';
       }
 
       render();
