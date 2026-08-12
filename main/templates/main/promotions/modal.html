@@ -3,15 +3,15 @@
 {% load i18n %}
 
 <!-- Модальное окно для акций -->
-<div id="promotionModal" class="promo-modal">
+<!-- data-lenis-prevent: иначе плагин плавного скролла Lenis перехватывает колесо
+     и внутренний overflow-y модалки не прокручивается -->
+<div id="promotionModal" class="promo-modal" data-lenis-prevent>
     <div class="promo-modal-content">
         <span class="promo-close">&times;</span>
         
         <div class="promo-slider">
             <!-- Слайды будут загружены через JavaScript -->
         </div>
-        
-
     </div>
 </div>
 
@@ -22,10 +22,15 @@
     z-index: 9999;
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    bottom: 0;
     background-color: rgba(0, 0, 0, 0.6);
     animation: fadeIn 0.3s ease;
+    /* скроллит именно оверлей — карточка любой высоты остаётся доступной целиком */
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 5vh 0;
 }
 
 @keyframes fadeIn {
@@ -36,12 +41,12 @@
 .promo-modal-content {
     position: relative;
     background-color: #fff;
-    margin: 5% auto;
+    margin: 0 auto;
     padding: 0;
     border-radius: 12px;
     width: 90%;
     max-width: 700px;
-    max-height: 80vh;
+    /* высота по контенту: ничего не режем, за скролл отвечает .promo-modal */
     overflow: hidden;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     animation: slideDown 0.3s ease;
@@ -97,17 +102,23 @@
     display: block;
 }
 
+/* Фиксированная высота обязательна: без неё height:100% у img резолвится в auto,
+   object-fit не срабатывает и картинка просто обрезается по overflow */
 .promo-image {
     width: 100%;
-    max-height: 400px;
+    height: min(45vh, 380px);
     overflow: hidden;
     position: relative;
+    background: #f7f7f7;
 }
 
+/* contain — картинки акций приходят с разными пропорциями
+   (от 699x451 до вертикальных 3024x4032), показываем целиком без обрезки */
 .promo-image img {
+    display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 /* Стрелки навигации */
@@ -119,17 +130,37 @@
     background: rgba(0, 0, 0, 0.4);
     color: white;
     border: none;
+    /* сбрасываем дефолтный padding кнопки — иначе круг превращается в овал */
+    padding: 0;
+    box-sizing: border-box;
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    font-size: 28px;
-    line-height: 1;
     cursor: pointer;
     transition: all 0.3s ease;
     z-index: 50;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Иконка — SVG, а не символ «‹»: у глифа кавычки несимметричные боковые
+   отступы и он сидит выше базовой линии, поэтому визуально уезжает из центра */
+.promo-prev svg,
+.promo-next svg {
+    display: block;
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+.promo-prev svg {
+    margin: 0 3px 0 0;
 }
 
 .promo-prev {
@@ -218,16 +249,63 @@
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
+/* Ряд действий: «Подробнее» + «Больше не показывать» для конкретной акции */
+.promo-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* Вторичная кнопка: контурная, в пару к чёрной «Подробнее» */
+.promo-dismiss {
+    display: inline-block;
+    padding: 10px 26px;
+    background: #fff;
+    color: #1a1a1a;
+    border: 2px solid #1a1a1a;
+    border-radius: 25px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.promo-dismiss:hover {
+    background: #1a1a1a;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
 @media (max-width: 768px) {
+    .promo-modal {
+        padding: 3vh 0;
+    }
+
     .promo-modal-content {
         width: 95%;
-        margin: 10% auto;
     }
-    
+
+    .promo-image {
+        height: min(38vh, 280px);
+    }
+
     .promo-content {
         padding: 20px;
     }
-    
+
+    .promo-actions {
+        gap: 12px;
+    }
+
+    .promo-dismiss {
+        padding: 9px 20px;
+        font-size: 14px;
+    }
+
     .promo-content h2 {
         font-size: 22px;
     }
@@ -236,7 +314,12 @@
     .promo-next {
         width: 35px;
         height: 35px;
-        font-size: 22px;
+    }
+
+    .promo-prev svg,
+    .promo-next svg {
+        width: 15px;
+        height: 15px;
     }
     
     .promo-prev {
@@ -266,10 +349,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('promotionModal');
     const closeBtn = document.querySelector('.promo-close');
     const sliderContainer = document.querySelector('.promo-slider');
-    
+
+    // Акция скрывается только явным нажатием «Больше не показывать» на её слайде.
+    // Простое закрытие крестиком/ESC ничего не отключает — акция покажется снова.
+    const DISMISS_COOKIE = 'dismissedPromotions';
+    const DISMISS_DAYS = 1;
+    const DISMISS_LABEL = "{% if LANGUAGE_CODE == 'uz' %}Boshqa ko'rsatilmasin{% elif LANGUAGE_CODE == 'ru' %}Больше не показывать{% else %}Don't show again{% endif %}";
+
     let currentSlide = 0;
     let promotions = [];
-    let viewedPromotions = [];
+    let dismissedPromotions = [];
     
     // Получаем короткий код языка (uz, ru, en) — единообразно с другими скриптами
     const currentLang = (document.documentElement.lang ||
@@ -277,9 +366,8 @@ document.addEventListener('DOMContentLoaded', function() {
         getCookie('django_language') ||
         'uz').split('-')[0].toLowerCase();
     
-    // Загружаем просмотренные акции из cookie
-    loadViewedPromotions();
-    // console.log('👁️ Viewed promotions:', viewedPromotions);
+    // Загружаем отключённые акции из cookie
+    loadDismissedPromotions();
     
     // Загружаем акции через API
     const apiUrl = `/api/${currentLang}/promotions/`;
@@ -296,8 +384,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Проверяем формат ответа (может быть массив или объект с results)
             const allPromotions = Array.isArray(data) ? data : (data.results || []);
             
-            // Фильтруем непросмотренные акции
-            promotions = allPromotions.filter(promo => !isPromotionViewed(promo.id));
+            // Убираем только те акции, которые пользователь сам отключил
+            promotions = allPromotions.filter(promo => !isPromotionDismissed(promo.id));
             
             // console.log(`✅ Total: ${allPromotions.length} promotions, Unviewed: ${promotions.length}`);
             
@@ -336,8 +424,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Добавляем навигацию только если больше 1 акции
                 if (promotions.length > 1) {
                     html += `
-                        <button class="promo-prev" data-action="prev" aria-label="Предыдущая">‹</button>
-                        <button class="promo-next" data-action="next" aria-label="Следующая">›</button>
+                        <button class="promo-prev" data-action="prev" aria-label="Предыдущая">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <polyline points="15.5 5.5 8.5 12 15.5 18.5"></polyline>
+                            </svg>
+                        </button>
+                        <button class="promo-next" data-action="next" aria-label="Следующая">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <polyline points="8.5 5.5 15.5 12 8.5 18.5"></polyline>
+                            </svg>
+                        </button>
                         <div class="promo-dots"></div>
                     `;
                 }
@@ -351,6 +447,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="promo-description">${promo.description}</div>
             `;
             
+            html += `<div class="promo-actions">`;
+
             if (promo.link) {
                 html += `
                     <a href="${promo.link}" class="promo-button" target="_blank">
@@ -358,7 +456,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     </a>
                 `;
             }
-            
+
+            // Кнопка отключает только свою акцию
+            html += `
+                <button type="button" class="promo-dismiss"
+                        data-action="dismiss" data-promo-id="${promo.id}">
+                    ${DISMISS_LABEL}
+                </button>
+            `;
+
+            html += '</div>';
+
             html += '</div>';
             slide.innerHTML = html;
             sliderContainer.appendChild(slide);
@@ -402,59 +510,52 @@ document.addEventListener('DOMContentLoaded', function() {
         // console.log('✅ Slides rendered');
     }
     
-    // Управление просмотренными акциями
-    function loadViewedPromotions() {
-        const cookie = getCookie('viewedPromotions');
-        if (cookie) {
-            try {
-                const data = JSON.parse(decodeURIComponent(cookie));
-                const today = new Date().toDateString();
-                
-                // Если дата в cookie сегодняшняя - загружаем ID
-                if (data.date === today) {
-                    viewedPromotions = data.ids || [];
-                } else {
-                    // Если новый день - сбрасываем
-                    viewedPromotions = [];
-                    clearViewedPromotions();
-                }
-            } catch (e) {
-                console.error('Error parsing viewed promotions:', e);
-                viewedPromotions = [];
-            }
+    // Управление отключёнными акциями
+    function loadDismissedPromotions() {
+        const cookie = getCookie(DISMISS_COOKIE);
+        if (!cookie) return;
+
+        try {
+            const ids = JSON.parse(decodeURIComponent(cookie));
+            dismissedPromotions = Array.isArray(ids) ? ids : [];
+        } catch (e) {
+            console.error('Error parsing dismissed promotions:', e);
+            dismissedPromotions = [];
         }
     }
-    
-    function saveViewedPromotions() {
-        const today = new Date().toDateString();
-        const data = {
-            date: today,
-            ids: viewedPromotions
-        };
-        
+
+    function saveDismissedPromotions() {
         const expires = new Date();
-        expires.setHours(23, 59, 59, 999); // До конца дня
-        
-        document.cookie = `viewedPromotions=${encodeURIComponent(JSON.stringify(data))};expires=${expires.toUTCString()};path=/`;
-        // console.log('💾 Saved viewed promotions:', viewedPromotions);
+        expires.setTime(expires.getTime() + DISMISS_DAYS * 24 * 60 * 60 * 1000);
+
+        document.cookie = `${DISMISS_COOKIE}=${encodeURIComponent(JSON.stringify(dismissedPromotions))};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
     }
-    
-    function clearViewedPromotions() {
-        document.cookie = 'viewedPromotions=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/';
+
+    function isPromotionDismissed(promoId) {
+        return dismissedPromotions.includes(promoId);
     }
-    
-    function isPromotionViewed(promoId) {
-        return viewedPromotions.includes(promoId);
-    }
-    
-    function markPromotionAsViewed(promoId) {
-        if (!viewedPromotions.includes(promoId)) {
-            viewedPromotions.push(promoId);
-            saveViewedPromotions();
-            // console.log(`✓ Promotion ${promoId} marked as viewed`);
+
+    // Отключаем одну конкретную акцию: она уходит из слайдера,
+    // остальные продолжаем показывать. Если убрали последнюю — закрываем модалку.
+    function dismissPromotion(promoId) {
+        if (!dismissedPromotions.includes(promoId)) {
+            dismissedPromotions.push(promoId);
+            saveDismissedPromotions();
         }
+
+        const position = currentSlide;
+        promotions = promotions.filter(promo => promo.id !== promoId);
+
+        if (promotions.length === 0) {
+            closeModal();
+            return;
+        }
+
+        renderSlides();
+        // Остаёмся на той же позиции — её занимает следующая акция
+        showSlide(Math.min(position, promotions.length - 1));
     }
-    
+
     // Проверка cookie
     function getCookie(name) {
         const value = `; ${document.cookie}`;
@@ -474,10 +575,13 @@ document.addEventListener('DOMContentLoaded', function() {
             // console.log('👁️ Showing modal');
             modal.style.display = 'block';
             document.body.style.overflow = 'hidden';
+
+            // Останавливаем Lenis, чтобы фон не ехал под модалкой
+            if (window.lenis) {
+                window.lenis.stop();
+            }
+
             showSlide(0);
-            
-            // Помечаем текущую акцию как просмотренную
-            markPromotionAsViewed(promotions[0].id);
         }
     }
     
@@ -486,6 +590,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // console.log('❌ Closing modal');
         modal.style.display = 'none';
         document.body.style.overflow = 'auto';
+
+        if (window.lenis) {
+            window.lenis.start();
+        }
     }
     
     // Переключение слайдов
@@ -509,16 +617,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Помечаем текущую акцию как просмотренную
-        if (promotions[currentSlide]) {
-            markPromotionAsViewed(promotions[currentSlide].id);
-        }
-        
         // console.log('📍 Showing slide:', currentSlide + 1);
     }
     
     // События
     closeBtn.addEventListener('click', closeModal);
+
+    // Делегирование: кнопки живут внутри слайдов и пересоздаются при ререндере
+    sliderContainer.addEventListener('click', function(event) {
+        const btn = event.target.closest('[data-action="dismiss"]');
+        if (!btn) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        dismissPromotion(Number(btn.dataset.promoId));
+    });
     
     window.addEventListener('click', function(event) {
         if (event.target === modal) {
