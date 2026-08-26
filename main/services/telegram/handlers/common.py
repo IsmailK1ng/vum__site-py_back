@@ -15,7 +15,7 @@ logger = logging.getLogger('bot')
 router = Router(name='common')
 
 
-@router.message(StateFilter('*'), F.text.in_(LANGUAGE_TRIGGERS))
+@router.message(StateFilter('*'), LANGUAGE_TRIGGERS)
 async def handle_language_menu(
     message: Message,
     state: FSMContext,
@@ -28,7 +28,7 @@ async def handle_language_menu(
     )
 
 
-@router.message(StateFilter('*'), F.text.in_(PROFILE_TRIGGERS))
+@router.message(StateFilter('*'), PROFILE_TRIGGERS)
 async def handle_profile_any_state(
     message: Message,
     state: FSMContext,

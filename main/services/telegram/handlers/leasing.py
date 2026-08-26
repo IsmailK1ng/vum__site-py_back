@@ -432,7 +432,7 @@ async def _send_result(
 
 
 
-@router.message(F.text.in_(LEASING_TRIGGERS))
+@router.message(LEASING_TRIGGERS)
 async def handle_leasing_enter(message: Message, state: FSMContext, user: TelegramUser | None):
     lang = user.language if user else 'ru'
     await state.clear()

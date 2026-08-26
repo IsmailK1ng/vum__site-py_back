@@ -183,20 +183,22 @@ class ProductCardSpecSerializer(serializers.ModelSerializer):
         fields = ['id', 'icon', 'value', 'order']
 
 
-class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer):  
+class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
     card_specs = ProductCardSpecSerializer(many=True, read_only=True)
     image_url = serializers.SerializerMethodField()
     category_display = serializers.CharField(source='get_category_display', read_only=True)
     all_categories = serializers.SerializerMethodField()
-    
+    has_discount = serializers.BooleanField(read_only=True)
+
     title = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Product
         fields = [
             'id', 'title', 'slug', 'category', 'category_display',
             'all_categories',
-            'image_url', 'card_specs', 'is_featured', 'order', 'price', 'price_is_from'
+            'image_url', 'card_specs', 'is_featured', 'order',
+            'price', 'price_is_from', 'discount_price', 'has_discount'
         ]
     def get_title(self, obj):
         lang = self.get_current_language()
@@ -268,18 +270,19 @@ class ProductDetailSerializer(LanguageSerializerMixin, serializers.ModelSerializ
     card_image_url = serializers.SerializerMethodField()
     category_display = serializers.CharField(source='get_category_display', read_only=True)
     title = serializers.SerializerMethodField()
-    
-   
+    has_discount = serializers.BooleanField(read_only=True)
+
     all_categories = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Product
         fields = [
             'id', 'title', 'slug', 'category', 'category_display',
-            'all_categories', 
+            'all_categories',
             'main_image_url', 'card_image_url',
             'card_specs', 'spec_groups', 'features', 'gallery',
-            'is_active', 'is_featured', 'order', 'price', 'price_is_from'
+            'is_active', 'is_featured', 'order',
+            'price', 'price_is_from', 'discount_price', 'has_discount'
         ]
     
     def get_all_categories(self, obj):

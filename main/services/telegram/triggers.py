@@ -1,71 +1,50 @@
-LANGUAGE_TRIGGERS: frozenset[str] = frozenset({
-    'Сменить язык',
-    "Tilni o'zgartirish",
-    'Change language',
-})
+"""
+Триггеры кнопок главного меню.
 
-PROFILE_TRIGGERS: frozenset[str] = frozenset({
-    'Мой профиль',
-    'Mening profilim',
-    'My profile',
-})
+Раньше здесь лежали захардкоженные frozenset со строками кнопок
+('Каталог', 'Katalog', 'Catalog', ...). Проблема: подписи кнопок
+(BotMenuItem.label_ru/uz/en) редактируются в Django Admin, а эти
+frozenset — нет. Правка подписи в админке молча ломала роутинг:
+хендлер переставал узнавать кнопку, без единой ошибки в логах.
 
-CATALOG_TRIGGERS: frozenset[str] = frozenset({
-    'Каталог',
-    'Katalog',
-    'Catalog',
-})
+Теперь MenuTrigger — это aiogram-фильтр, который на каждое сообщение
+спрашивает у BotService.get_menu_item_labels(key) актуальные подписи
+по стабильному key (BotMenuItem.KEY_CHOICES), а не по тексту. Правка
+label_* в админке сразу (в пределах TTL кеша — 5 минут, см.
+_MSG_CACHE_TTL) отражается на роутинге без деплоя.
+"""
+from aiogram.filters import BaseFilter
+from aiogram.types import Message
+from asgiref.sync import sync_to_async
 
-TD_TRIGGERS: frozenset[str] = frozenset({
-    'Тест-драйв',
-    'Test-drayv',
-    'Test drive',
-})
+from main.services.telegram.bot_service import BotService
 
-LEASING_TRIGGERS: frozenset[str] = frozenset({
-    'Лизинг',
-    'Lizing',
-    'Leasing',
-})
 
-CONTACTS_TRIGGERS: frozenset[str] = frozenset({
-    'Контакты',
-    'Kontaktlar',
-    'Contacts',
-})
+@sync_to_async
+def _get_labels(key: str) -> frozenset:
+    return BotService.get_menu_item_labels(key)
 
-NEWS_TRIGGERS: frozenset[str] = frozenset({
-    'Новости',
-    'Yangiliklar',
-    'News',
-})
 
-PROMOTIONS_TRIGGERS: frozenset[str] = frozenset({
-    'Акции',
-    'Aksiyalar',
-    'Promotions',
-})
+class MenuTrigger(BaseFilter):
+    def __init__(self, key: str):
+        self.key = key
 
-DEALERS_TRIGGERS: frozenset[str] = frozenset({
-    'Дилеры',
-    'Dilerlar',
-    'Dealers',
-})
+    async def __call__(self, message: Message) -> bool:
+        if not message.text:
+            return False
+        labels = await _get_labels(self.key)
+        return message.text in labels
 
-FAQ_TRIGGERS: frozenset[str] = frozenset({
-    'Вопросы и ответы',
-    'Savol va javoblar',
-    'FAQ',
-})
 
-LEAD_TRIGGERS: frozenset[str] = frozenset({
-    'Оставить заявку',
-    'Ariza qoldirish',
-    'Leave a request',
-})
-
-PARTNER_TRIGGERS: frozenset[str] = frozenset({
-    'Сотрудничество',
-    'Hamkorlik',
-    'Partnership',
-})
+LANGUAGE_TRIGGERS = MenuTrigger('language')
+PROFILE_TRIGGERS = MenuTrigger('profile')
+CATALOG_TRIGGERS = MenuTrigger('catalog')
+TD_TRIGGERS = MenuTrigger('test_drive')
+LEASING_TRIGGERS = MenuTrigger('leasing')
+CONTACTS_TRIGGERS = MenuTrigger('contacts')
+NEWS_TRIGGERS = MenuTrigger('news')
+PROMOTIONS_TRIGGERS = MenuTrigger('promotions')
+DEALERS_TRIGGERS = MenuTrigger('dealers')
+FAQ_TRIGGERS = MenuTrigger('faq')
+LEAD_TRIGGERS = MenuTrigger('lead')
+PARTNER_TRIGGERS = MenuTrigger('partner')

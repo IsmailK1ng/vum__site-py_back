@@ -21,6 +21,15 @@ BOT_MESSAGES = [
             'en': 'Language changed. Main menu:',
         },
     },
+    {
+        'key': 'bot_disabled',
+        'description': 'Бот выключен через BotConfig.is_active (kill-switch, см. MaintenanceMiddleware)',
+        'texts': {
+            'ru': 'Бот временно недоступен. Пожалуйста, зайдите позже.',
+            'uz': 'Bot vaqtincha ishlamayapti. Iltimos, keyinroq urinib ko\'ring.',
+            'en': 'The bot is temporarily unavailable. Please try again later.',
+        },
+    },
 
     # ─── Регистрация ───────────────────────────────────────────────────────
     {

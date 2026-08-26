@@ -212,7 +212,7 @@ def _build_confirm_text(
 # HANDLERS
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@router.message(F.text.in_(TD_TRIGGERS))
+@router.message(TD_TRIGGERS)
 async def handle_td_enter(
     message: Message,
     state: FSMContext,

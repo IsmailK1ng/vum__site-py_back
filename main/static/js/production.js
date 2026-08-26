@@ -346,12 +346,21 @@ class ProductsManager {
     }
   }
 
+  // Цена, по которой машина реально продаётся: со скидкой, если акция активна.
+  // Используется в диапазонах цен и в schema.org, чтобы они не расходились с карточкой.
+  getEffectivePrice(product) {
+    if (product.has_discount && product.discount_price) {
+      return Number(product.discount_price);
+    }
+    return product.price != null ? Number(product.price) : null;
+  }
+
   generateSchemaMarkup() {
     const baseUrl = `${window.location.protocol}//${window.location.host}`;
 
     // Вычисляем диапазон цен для AggregateOffer
     const prices = this.filteredProducts
-      .map(p => p.price)
+      .map(p => this.getEffectivePrice(p))
       .filter(price => price != null && price > 0);
 
     const minPrice = prices.length > 0 ? Math.min(...prices) : null;
@@ -393,10 +402,11 @@ class ProductsManager {
         };
 
         // Добавляем информацию о цене, если она есть
-        if (product.price && product.price > 0) {
+        const effectivePrice = this.getEffectivePrice(product);
+        if (effectivePrice && effectivePrice > 0) {
           productSchema.item.offers = {
             "@type": "Offer",
-            "price": product.price,
+            "price": effectivePrice,
             "priceCurrency": "UZS",
             "availability": "https://schema.org/InStock"
           };
@@ -487,22 +497,32 @@ class ProductsManager {
     // Форматируем цену, если она есть
     let priceHTML = '';
     if (product.price && product.price > 0) {
-      const formattedPrice = new Intl.NumberFormat('uz-UZ', {
+      const formatPrice = (value) => new Intl.NumberFormat('uz-UZ', {
         style: 'decimal',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
-      }).format(product.price);
+      }).format(value);
 
       const fromLabel = { 'uz': 'dan', 'ru': 'от', 'en': 'from' };
       const fromPrefix = product.price_is_from
         ? `<span class="price-label">${fromLabel[this.currentLanguage] || fromLabel['uz']}</span> `
         : '';
 
-      priceHTML = `
-        <div class="truck-price">
-          ${fromPrefix}<span class="price-value">${formattedPrice} UZS</span>
-        </div>
-      `;
+      // При акции старая цена зачёркивается, актуальной становится цена со скидкой
+      if (product.has_discount && product.discount_price) {
+        priceHTML = `
+          <div class="truck-price has-discount">
+            ${fromPrefix}<span class="price-old">${formatPrice(product.price)}</span>
+            <span class="price-value">${formatPrice(product.discount_price)} UZS</span>
+          </div>
+        `;
+      } else {
+        priceHTML = `
+          <div class="truck-price">
+            ${fromPrefix}<span class="price-value">${formatPrice(product.price)} UZS</span>
+          </div>
+        `;
+      }
     }
 
     return `
@@ -695,7 +715,7 @@ class ProductsManager {
   updatePriceRange() {
     // Вычисляем минимальную и максимальную цену для текущей категории
     const prices = this.filteredProducts
-      .map(p => p.price)
+      .map(p => this.getEffectivePrice(p))
       .filter(price => price != null && price > 0);
 
     if (prices.length === 0) return; // Нет цен - не показываем

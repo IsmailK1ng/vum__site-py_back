@@ -4,7 +4,7 @@ import json
 import logging
 import openpyxl
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from urllib.parse import unquote
 
 # ========== DJANGO ==========
@@ -36,8 +36,6 @@ from openpyxl.styles import Font, PatternFill, Alignment
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.exceptions import TelegramForbiddenError, TelegramBadRequest
 
 # ========== ЛОКАЛЬНЫЕ ИМПОРТЫ ==========
 from .models import (
@@ -52,7 +50,7 @@ from .models import (
     Dashboard, Promotion, PageMeta, FAQItem,
     REGION_CHOICES, PartnerApplication,
     TelegramUser, TestDriveRequest, BotConfig,
-    BotMessage, BotMenuItem, BotBroadcast,
+    BotMessage, BotMenuItem, BotBroadcast, BotGroup,
     ProductWishlist, ProductViewHistory, BotContacts,
     TeamDepartment, TeamMember, TeamMemberLink, NavItem, SocialLink,
     DealerProfile,
@@ -1182,7 +1180,7 @@ class SparePartAdmin(TabbedTranslationAdmin):
 @admin.register(Product)
 class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
     form = ProductCategoriesForm
-    list_display = ['thumbnail', 'title', 'all_categories_display', 'is_active', 'is_featured', 'slider_order', 'order', 'seo_button']
+    list_display = ['thumbnail', 'title', 'all_categories_display', 'discount_display', 'is_active', 'is_featured', 'slider_order', 'order', 'seo_button']
     list_filter = [ProductCategoryFilter, 'is_active', 'is_featured']
     search_fields = ['title', 'slug']
     list_editable = ['is_active', 'is_featured', 'slider_order', 'order']
@@ -1198,13 +1196,18 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
                 ('title', 'slug'),
                 'selected_categories',
                 'price_combined',
+                'discount_price',
                 ('order', 'is_active', 'is_featured'),
                 ('main_image', 'card_image'),
             ),
         }),
         ('Настройки главного слайдера', {
             'classes': ('collapse',),
-            'fields': ('slider_image', 'slider_order', 'slider_price', ('slider_power', 'slider_fuel_consumption')),
+            'fields': (
+                'slider_image', 'slider_order',
+                'slider_price', 'slider_price_old',
+                ('slider_power', 'slider_fuel_consumption'),
+            ),
         }),
     )
     inlines = [ProductParameterInline, ProductFeatureInline, ProductCardSpecInline, ProductGalleryInline]
@@ -1215,6 +1218,16 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
             return format_html('<img src="{}" width="80" height="50" style="object-fit:cover;border-radius:4px;"/>', img.url)
         return '—'
     thumbnail.short_description = 'Фото'
+
+    def discount_display(self, obj):
+        """Видно сразу в списке, у каких моделей сейчас идёт акция."""
+        if not obj.has_discount:
+            return '—'
+        percent = round((obj.price - obj.discount_price) / obj.price * 100)
+        return format_html(
+            '<span style="color:#c0392b;font-weight:600;white-space:nowrap;">−{}%</span>', percent
+        )
+    discount_display.short_description = 'Скидка'
 
     def all_categories_display(self, obj):
         categories = obj.get_all_categories()
@@ -1850,7 +1863,7 @@ class BotBroadcastAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Контент', {'fields': ('title', 'text_ru', 'text_uz', 'text_en', 'image', 'button_text', 'button_url')}),
-        ('Аудитория', {'fields': ('target', 'target_region', 'scheduled_at')}),
+        ('Аудитория', {'fields': ('target', 'target_region', 'send_to_groups', 'scheduled_at')}),
         ('Статус', {'fields': ('status',)}),
         ('Статистика', {
             'fields': ('total_recipients', 'sent_count', 'failed_count', 'blocked_count', 'sent_at'),
@@ -1862,6 +1875,12 @@ class BotBroadcastAdmin(admin.ModelAdmin):
 
     @admin.action(description='Запустить рассылку сейчас')
     def send_now(self, request, queryset):
+        """
+        Выбор получателей, отправка и учёт статуса — в
+        main.services.telegram.broadcast_sender.send_broadcast(), общей
+        с cron-командой send_broadcasts. Здесь только подготовка Bot и
+        цикл по выбранным в списке рассылкам.
+        """
         broadcasts = list(queryset.filter(status__in=['draft', 'scheduled']))
         if not broadcasts:
             self.message_user(request, 'Нет рассылок для отправки (только draft/scheduled).', level='warning')
@@ -1872,68 +1891,62 @@ class BotBroadcastAdmin(admin.ModelAdmin):
             self.message_user(request, 'BotConfig не настроен — токен отсутствует.', level='error')
             return
 
+        from main.services.telegram.broadcast_sender import send_broadcast
+
         async def _run():
             bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+            results = []
             try:
                 for broadcast in broadcasts:
-                    qs = TelegramUser.objects.filter(is_blocked=False)
-                    target_filters = {
-                        'ru': {'language': 'ru'}, 'uz': {'language': 'uz'}, 'en': {'language': 'en'},
-                        'hot': {'status': 'hot'}, 'vip': {'status': 'vip'},
-                    }
-                    if broadcast.target in target_filters:
-                        qs = qs.filter(**target_filters[broadcast.target])
-                    elif broadcast.target == 'active_30':
-                        qs = qs.filter(last_active__gte=timezone.now() - timedelta(days=30))
-                    elif broadcast.target == 'region' and broadcast.target_region:
-                        qs = qs.filter(region=broadcast.target_region)
-
-                    recipients = list(qs.values('telegram_id', 'language'))
-                    BotBroadcast.objects.filter(pk=broadcast.pk).update(
-                        status='sending', total_recipients=len(recipients)
-                    )
-
-                    sent = failed = blocked = 0
-                    for recipient in recipients:
-                        telegram_id = recipient['telegram_id']
-                        lang = recipient['language'] or 'ru'
-                        text = broadcast.get_text(lang)
-                        if not text:
-                            failed += 1
-                            continue
-
-                        reply_markup = None
-                        if broadcast.button_text and broadcast.button_url:
-                            reply_markup = InlineKeyboardMarkup(inline_keyboard=[[
-                                InlineKeyboardButton(text=broadcast.button_text, url=broadcast.button_url)
-                            ]])
-                        try:
-                            if broadcast.image:
-                                await bot.send_photo(chat_id=telegram_id, photo=broadcast.image.url, caption=text, reply_markup=reply_markup)
-                            else:
-                                await bot.send_message(chat_id=telegram_id, text=text, reply_markup=reply_markup)
-                            sent += 1
-                        except TelegramForbiddenError:
-                            blocked += 1
-                            TelegramUser.objects.filter(telegram_id=telegram_id).update(is_blocked=True)
-                        except Exception as exc:
-                            logger.error('Broadcast error telegram_id=%s: %s', telegram_id, exc)
-                            failed += 1
-                        await asyncio.sleep(0.05)
-
-                    BotBroadcast.objects.filter(pk=broadcast.pk).update(
-                        status='done', sent_count=sent, failed_count=failed,
-                        blocked_count=blocked, sent_at=timezone.now(),
-                    )
+                    try:
+                        stats = await send_broadcast(bot, broadcast)
+                        results.append((broadcast, stats, None))
+                    except Exception as exc:
+                        results.append((broadcast, None, exc))
             finally:
                 await bot.session.close()
+            return results
 
         try:
-            asyncio.run(_run())
-            self.message_user(request, f'Рассылка завершена. Обработано: {len(broadcasts)}.')
+            results = asyncio.run(_run())
         except Exception as exc:
             logger.error('send_now admin action failed: %s', exc)
             self.message_user(request, f'Ошибка рассылки: {exc}', level='error')
+            return
+
+        for broadcast, stats, exc in results:
+            if exc is not None:
+                logger.error('Broadcast#%s failed: %s', broadcast.pk, exc)
+                self.message_user(
+                    request, f'«{broadcast.title}»: ошибка — {exc}', level='error',
+                )
+            else:
+                self.message_user(
+                    request,
+                    f'«{broadcast.title}»: получателей={stats["total"]} '
+                    f'отправлено={stats["sent"]} ошибок={stats["failed"]} '
+                    f'заблокировали={stats["blocked"]}',
+                )
+
+
+@admin.register(BotGroup)
+class BotGroupAdmin(admin.ModelAdmin):
+    """
+    Список ведётся автоматически по событию my_chat_member (см.
+    handlers/group_membership.py), когда бота добавляют/удаляют из
+    группы — руками добавлять не нужно. is_active можно снять вручную,
+    чтобы конкретную группу временно исключить из рассылок с
+    send_to_groups, не удаляя бота из неё физически.
+    """
+    list_display = ['title', 'chat_id', 'chat_type', 'is_active', 'added_at', 'removed_at']
+    list_filter = ['is_active', 'chat_type']
+    list_editable = ['is_active']
+    search_fields = ['title', 'chat_id']
+    ordering = ['-added_at']
+    readonly_fields = ['chat_id', 'chat_type', 'added_at', 'removed_at']
+
+    def has_add_permission(self, request):
+        return False
 
 
 @admin.register(BotContacts)

@@ -55,6 +55,7 @@ class ProductTranslationOptions(TranslationOptions):
     fields = (
         'title',
         'slider_price',
+        'slider_price_old',
         'slider_power',
         'slider_fuel_consumption',
     )

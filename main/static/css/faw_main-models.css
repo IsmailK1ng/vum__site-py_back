@@ -387,6 +387,20 @@
     line-height: 1;
 }
 
+/* Старая цена при акции — зачёркнутая, приглушённая */
+.truck-price .price-old {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: line-through;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.truck-price.has-discount {
+    flex-wrap: wrap;
+}
+
 .product-price-range {
     display: none !important;
 }

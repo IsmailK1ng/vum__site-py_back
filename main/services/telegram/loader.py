@@ -15,6 +15,8 @@ def _load_config():
 
 
 async def create_bot_and_dispatcher() -> tuple[Bot, Dispatcher]:
+    from main.services.telegram.middlewares.maintenance_middleware import MaintenanceMiddleware
+    from main.services.telegram.middlewares.private_chat_middleware import PrivateChatOnlyMiddleware
     from main.services.telegram.middlewares.user_middleware import UserMiddleware
     from main.services.telegram.fsm_storage import DatabaseStorage
 
@@ -40,6 +42,12 @@ async def create_bot_and_dispatcher() -> tuple[Bot, Dispatcher]:
     storage = DatabaseStorage()
     dp = Dispatcher(storage=storage)
 
+    dp.message.middleware(PrivateChatOnlyMiddleware())
+    dp.callback_query.middleware(PrivateChatOnlyMiddleware())
+
+    dp.message.middleware(MaintenanceMiddleware())
+    dp.callback_query.middleware(MaintenanceMiddleware())
+
     dp.message.middleware(UserMiddleware())
     dp.callback_query.middleware(UserMiddleware())
 
@@ -53,8 +61,10 @@ def _register_handlers(dp: Dispatcher) -> None:
     from main.services.telegram.handlers import (
         start, catalog, dealers, test_drive,
         lead, faq, profile, news, leasing, contacts, partner, common,
+        group_membership,
     )
 
+    dp.include_router(group_membership.router)
     dp.include_router(start.router)
     dp.include_router(catalog.router)
     dp.include_router(dealers.router)

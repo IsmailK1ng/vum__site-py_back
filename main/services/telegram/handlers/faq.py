@@ -53,7 +53,7 @@ def _build_faq_keyboard(items: list[dict], lang: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
-@router.message(StateFilter('*'), F.text.in_(FAQ_TRIGGERS))
+@router.message(StateFilter('*'), FAQ_TRIGGERS)
 async def handle_faq_enter(
     message: Message,
     state: FSMContext,

@@ -98,6 +98,8 @@ function initializeSlidesFromDjango() {
       year: slide.year || "2025",
       title: slide.title || "FAW Truck",
       price: slide.price || "Narx so'rang",
+      // Заполнено только при акции — тогда цена зачёркивается
+      priceOld: slide.price_old || "",
       power: slide.power || "—",
       mpg: slide.mpg || "—",
       image: slide.image || null,
@@ -339,12 +341,18 @@ function renderInfo(idx) {
     mpg: labelMpg
   };
 
+  // Старая цена показывается только если она задана в админке
+  const priceOldHTML = slide.priceOld
+    ? `<div class="faw-price-old">${slide.priceOld}</div>`
+    : '';
+
   document.getElementById('slider-info').innerHTML = `
     <div class="faw-year">${slide.year}</div>
     <div class="faw-title">${slide.title}</div>
     <div class="faw-info-row">
       <div class="faw-info-col">
         <span class="faw-price-label">${labels.price}</span>
+        ${priceOldHTML}
         <div class="faw-price-value">${slide.price}</div>
       </div>
       <div class="faw-info-col">

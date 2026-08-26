@@ -103,7 +103,7 @@ def _build_products_keyboard(products: list[dict], language: str) -> ReplyKeyboa
 # HANDLERS
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@router.message(F.text.in_(DEALERS_TRIGGERS))
+@router.message(DEALERS_TRIGGERS)
 async def handle_dealers_enter(
     message: Message,
     state: FSMContext,

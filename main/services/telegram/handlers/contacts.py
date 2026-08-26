@@ -95,7 +95,7 @@ def _build_contacts_text(contacts, texts: dict, lang: str) -> str:
     return '\n'.join(lines)
 
 
-@router.message(StateFilter('*'), F.text.in_(CONTACTS_TRIGGERS))
+@router.message(StateFilter('*'), CONTACTS_TRIGGERS)
 async def handle_contacts(
     message: Message,
     state: FSMContext,

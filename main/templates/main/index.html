@@ -71,6 +71,40 @@
     animation: none !important;
   }
 }
+
+/* Акция в слайдере: старая цена зачёркнута над актуальной.
+   Стили самого слайдера лежат в site_main.css (минифицирован), поэтому
+   дополнение держим здесь — как и остальные правки главной.
+   У .faw-slider-info светлый фон (#fff) на светлой теме и #161616 на тёмной
+   (см. site_main.css) — цвет старой цены должен читаться на обоих.
+   Линия — не text-decoration (её нельзя красить/наклонять кроссбраузерно
+   стабильно), а псевдоэлемент с наклоном. */
+.faw-price-old {
+  position: relative;
+  display: inline-block;
+  font-size: 2.1rem;
+  font-weight: 500;
+  color: #999;
+  line-height: 1.2;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+.faw-price-old::after {
+  content: '';
+  position: absolute;
+  left: -4%;
+  top: 50%;
+  width: 108%;
+  height: 2px;
+  background: #e53935;
+  transform: translateY(-50%) rotate(-6deg);
+  pointer-events: none;
+}
+
+body[data-theme="dark"] .faw-price-old {
+  color: rgba(255, 255, 255, 0.55);
+}
 </style>
 {% endblock %}
 

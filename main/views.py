@@ -92,13 +92,16 @@ def index(request):
         for product in featured_products:
             title = getattr(product, f'title_{current_lang}', None) or product.title
             price = getattr(product, f'slider_price_{current_lang}', None) or product.slider_price or 'Narx so\'rang'
+            price_old = getattr(product, f'slider_price_old_{current_lang}', None) or product.slider_price_old or ''
             power = getattr(product, f'slider_power_{current_lang}', None) or product.slider_power or '—'
             fuel = getattr(product, f'slider_fuel_consumption_{current_lang}', None) or product.slider_fuel_consumption or '—'
-            
+
             slider_item = {
                 'year': product.slider_year,
                 'title': title,
                 'price': price,
+                # Пустая строка = акции нет, в слайдере просто не будет зачёркнутой цены
+                'price_old': price_old,
                 'power': power,
                 'mpg': fuel,
                 'image': None,

@@ -390,7 +390,7 @@ async def show_profile(message: Message, user: TelegramUser, lang: str) -> None:
 # HANDLERS — профиль
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@router.message(StateFilter('*'), F.text.in_(PROFILE_TRIGGERS))
+@router.message(StateFilter('*'), PROFILE_TRIGGERS)
 async def handle_profile(
     message: Message,
     state: FSMContext,

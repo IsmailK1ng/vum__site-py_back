@@ -355,7 +355,7 @@ def _get_offer_label(key: str, lang: str) -> str:
 
 
 
-@router.message(F.text.in_(PARTNER_TRIGGERS))
+@router.message(PARTNER_TRIGGERS)
 async def handle_partner_enter(
     message: Message,
     state: FSMContext,

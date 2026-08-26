@@ -114,6 +114,20 @@
     color: #1a1a1a;
 }
 
+/* Цена при активной акции: зачёркнутая старая + актуальная рядом */
+.product-price-old {
+    font-size: 1.9rem;
+    font-weight: 400;
+    color: #8a8a8a;
+    text-decoration: line-through;
+    margin-right: 1rem;
+    white-space: nowrap;
+}
+
+.product-price-new {
+    white-space: nowrap;
+}
+
 body[data-theme="dark"] .product-price-wrapper {
     background: rgba(22, 22, 22, 0.95);
     border-color: rgb(60 60 60 / 80%);
@@ -126,6 +140,10 @@ body[data-theme="dark"] .product-price-label {
 
 body[data-theme="dark"] .product-price-value {
     color: #ffffff;
+}
+
+body[data-theme="dark"] .product-price-old {
+    color: #9a9a9a;
 }
 
 

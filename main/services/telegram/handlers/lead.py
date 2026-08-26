@@ -77,7 +77,7 @@ def _build_interest_keyboard(language: str) -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(keyboard=rows, resize_keyboard=True)
 
 
-@router.message(F.text.in_(LEAD_TRIGGERS))
+@router.message(LEAD_TRIGGERS)
 async def handle_lead_enter(
     message: Message,
     state: FSMContext,

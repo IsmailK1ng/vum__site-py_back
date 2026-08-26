@@ -195,7 +195,7 @@ async def _send_item(
 # НОВОСТИ
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@router.message(F.text.in_(NEWS_TRIGGERS))
+@router.message(NEWS_TRIGGERS)
 async def handle_news(
     message: Message,
     state: FSMContext,
@@ -260,7 +260,7 @@ async def handle_news_page(
 # АКЦИИ
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@router.message(F.text.in_(PROMOTIONS_TRIGGERS))
+@router.message(PROMOTIONS_TRIGGERS)
 async def handle_promotions(
     message: Message,
     state: FSMContext,

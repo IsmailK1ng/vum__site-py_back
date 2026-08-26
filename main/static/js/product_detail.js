@@ -289,17 +289,24 @@ class ProductDetail {
         if (!priceDisplay) return;
 
         if (this.product.price && this.product.price > 0) {
-            const formatted = new Intl.NumberFormat('uz-UZ', {
+            const formatPrice = (value) => new Intl.NumberFormat('uz-UZ', {
                 style: 'decimal',
                 maximumFractionDigits: 0,
-            }).format(this.product.price);
+            }).format(value);
 
             const fromLabel = { uz: "dan", ru: "от", en: "from" };
             const prefix = this.product.price_is_from
                 ? `${fromLabel[this.currentLanguage] || fromLabel['uz']} `
                 : '';
 
-            priceDisplay.textContent = `${prefix}${formatted} UZS`;
+            // При акции старая цена зачёркивается, рядом — цена со скидкой
+            if (this.product.has_discount && this.product.discount_price) {
+                priceDisplay.innerHTML =
+                    `${prefix}<span class="product-price-old">${formatPrice(this.product.price)}</span>` +
+                    `<span class="product-price-new">${formatPrice(this.product.discount_price)} UZS</span>`;
+            } else {
+                priceDisplay.textContent = `${prefix}${formatPrice(this.product.price)} UZS`;
+            }
         } else {
             const onRequest = { uz: "Narx so'rang", ru: 'Цена по запросу', en: 'Price on request' };
             priceDisplay.textContent = onRequest[this.currentLanguage] || onRequest['uz'];
@@ -430,12 +437,17 @@ class ProductDetail {
 
         // Offers — обязательно для Google Rich Results (Product schema).
         // Без offers/review/aggregateRating страница не попадает в карусели/расширенные результаты.
+        // Цена — фактическая: со скидкой, если акция активна.
+        const effectivePrice = (this.product.has_discount && this.product.discount_price)
+            ? this.product.discount_price
+            : this.product.price;
+
         productSchema.offers = {
             "@type": "Offer",
             "url": currentUrl,
             "priceCurrency": "UZS",
-            "price": (this.product.price && this.product.price > 0)
-                ? this.product.price.toString()
+            "price": (effectivePrice && effectivePrice > 0)
+                ? effectivePrice.toString()
                 : "0",
             "availability": "https://schema.org/InStock",
             "itemCondition": "https://schema.org/NewCondition",

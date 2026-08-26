@@ -1,4 +1,23 @@
 /* ==========================================
+   ТОКЕНЫ ТЕМЫ ДЛЯ ССЫЛОК В ТЕКСТЕ НОВОСТИ
+   Цвет текста берём из общих --t-bright, а ссылке нужен свой оттенок:
+   #0066cc на тёмном фоне нечитаем.
+   Механизм — только prefers-color-scheme, ровно как у --t-bright
+   в main_site.css, чтобы ссылка не разъехалась с цветом фона.
+   ========================================== */
+:root {
+  --news-link: #0066cc;
+  --news-link-hover: #004499;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --news-link: #6cb6ff;
+    --news-link-hover: #9ccfff;
+  }
+}
+
+/* ==========================================
    БАЗОВЫЕ СТИЛИ DIVIDER
    ========================================== */
 .mxd-divider {
@@ -68,7 +87,7 @@
 
 .faw-history-title h2 {
   font-size: 6rem;
-  color: #000;
+  color: var(--t-bright);
   display: inline-block;
   padding: 50px 60px 0 60px;
   line-height: 1.2;
@@ -77,7 +96,7 @@
 .faw-history-title h3 {
   font-size: 3.1rem;
   font-weight: 600;
-  color: #000;
+  color: var(--t-bright);
   display: block;
   letter-spacing: 0;
   margin: 0 180px -50px 180px;
@@ -107,7 +126,7 @@
   margin: 0px 180px 0px 180px;
   text-align: justify;
   line-height: 1.6;
-  color: #000;
+  color: var(--t-bright);
 }
 
 
@@ -116,7 +135,7 @@
   line-height: 1.6;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
-  color: #000;
+  color: var(--t-bright);
 }
 
 .hero-00-manifest .mxd-manifest p:last-child {
@@ -130,7 +149,8 @@
   text-align: left;
   margin: 0rem 0rem 1rem 3rem;
   list-style-position: outside !important;
-
+  /* маркеры списка рисуются цветом текста — без этого точки остаются чёрными */
+  color: var(--t-bright);
 }
 
 .hero-00-manifest .mxd-manifest ul {
@@ -145,14 +165,14 @@
   font-size: 3rem;
   line-height: 1.6;
   margin-bottom: 0.8em;
-  color: #000;
+  color: var(--t-bright);
   display: list-item !important;
 }
 
 .hero-00-manifest .mxd-manifest strong,
 .hero-00-manifest .mxd-manifest b {
   font-weight: 700;
-  color: #000;
+  color: var(--t-bright);
 }
 
 .hero-00-manifest .mxd-manifest em,
@@ -161,13 +181,13 @@
 }
 
 .hero-00-manifest .mxd-manifest a {
-  color: #0066cc;
+  color: var(--news-link);
   text-decoration: underline;
   transition: color 0.3s;
 }
 
 .hero-00-manifest .mxd-manifest a:hover {
-  color: #004499;
+  color: var(--news-link-hover);
 }
 
 /* ==========================================

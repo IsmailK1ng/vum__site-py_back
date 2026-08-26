@@ -14,6 +14,7 @@ from main.models import (
     BotBroadcast,
     BotConfig,
     BotContacts,
+    BotGroup,
     BotMessage,
     BotMenuItem,
     ContactForm,
@@ -249,6 +250,42 @@ class BotService:
             cache.set(cache_key, items, timeout=_MSG_CACHE_TTL)
 
         return items
+
+    @classmethod
+    def get_menu_item_labels(cls, key: str) -> frozenset:
+        """
+        Актуальные подписи кнопки меню (ru/uz/en) по стабильному key —
+        именно то, что реально написано на кнопке (см. get_label(), с эмодзи).
+        Используется MenuTrigger-фильтром вместо хардкода в triggers.py,
+        чтобы правка label_* в админке не ломала роутинг молча.
+        """
+        cache_key = f'bot_menu_labels_{key}'
+        labels = cache.get(cache_key)
+
+        if labels is None:
+            item = (
+                BotMenuItem.objects
+                .filter(key=key)
+                .only('label_ru', 'label_uz', 'label_en', 'emoji')
+                .first()
+            )
+            if item is None:
+                labels = frozenset()
+            else:
+                labels = frozenset({
+                    item.get_label('ru'),
+                    item.get_label('uz'),
+                    item.get_label('en'),
+                })
+            cache.set(cache_key, labels, timeout=_MSG_CACHE_TTL)
+
+        return labels
+
+    @classmethod
+    def invalidate_menu_cache(cls, key: str) -> None:
+        cache.delete(f'bot_menu_labels_{key}')
+        for lang in ('ru', 'uz', 'en'):
+            cache.delete(f'bot_menu_{lang}')
 
     # =========================================================================
     # ПОЛЬЗОВАТЕЛИ
@@ -945,6 +982,13 @@ class BotService:
         return qs
 
     @classmethod
+    def mark_broadcast_sending(cls, broadcast: BotBroadcast, total_recipients: int) -> None:
+        BotBroadcast.objects.filter(pk=broadcast.pk).update(
+            status='sending',
+            total_recipients=total_recipients,
+        )
+
+    @classmethod
     def mark_broadcast_done(cls, broadcast: BotBroadcast, stats: dict) -> None:
         BotBroadcast.objects.filter(pk=broadcast.pk).update(
             status='done',
@@ -953,6 +997,39 @@ class BotService:
             failed_count=stats.get('failed', 0),
             blocked_count=stats.get('blocked', 0),
             sent_at=timezone.now(),
+        )
+
+    @classmethod
+    def mark_broadcast_failed(cls, broadcast: BotBroadcast) -> None:
+        BotBroadcast.objects.filter(pk=broadcast.pk).update(status='failed')
+
+    # =========================================================================
+    # ГРУППЫ БОТА
+    # =========================================================================
+
+    @classmethod
+    def upsert_bot_group(cls, chat_id: int, title: str, chat_type: str) -> None:
+        BotGroup.objects.update_or_create(
+            chat_id=chat_id,
+            defaults={
+                'title': title or '',
+                'chat_type': chat_type,
+                'is_active': True,
+                'removed_at': None,
+            },
+        )
+
+    @classmethod
+    def deactivate_bot_group(cls, chat_id: int) -> None:
+        BotGroup.objects.filter(chat_id=chat_id).update(
+            is_active=False,
+            removed_at=timezone.now(),
+        )
+
+    @classmethod
+    def get_active_group_chat_ids(cls) -> list[int]:
+        return list(
+            BotGroup.objects.filter(is_active=True).values_list('chat_id', flat=True)
         )
 
     # =========================================================================

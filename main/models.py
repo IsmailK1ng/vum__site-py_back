@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from unidecode import unidecode
 from ckeditor.fields import RichTextField  
@@ -192,6 +193,15 @@ class Product(models.Model):
         default=False,
         help_text="Если включено, перед ценой будет отображаться слово 'от'"
     )
+    discount_price = models.DecimalField(
+        "Цена со скидкой (UZS)",
+        max_digits=15,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        help_text="Если заполнено, обычная цена зачёркивается, а рядом показывается эта. "
+                  "Должна быть меньше обычной цены. Чтобы убрать скидку — очистите поле"
+    )
     main_image = models.ImageField("Главное изображение", upload_to="products/main/", validators=[validate_image_size])
     card_image = models.ImageField(
         "Изображение для карточки",
@@ -222,6 +232,14 @@ class Product(models.Model):
         blank=True,
         null=True,
         help_text="Например: '434 000 000 sum'"
+    )
+    slider_price_old = models.CharField(
+        "Старая цена для слайдера",
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Заполняйте только при акции: эта цена будет зачёркнута рядом с ценой для слайдера. "
+                  "Например: '455 000 000 sum'"
     )
     slider_power = models.CharField(
         "Мощность для слайдера",
@@ -261,12 +279,38 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.get_category_display()} — {self.title}"
-    
+
+    @property
+    def has_discount(self):
+        """Скидка активна, только если новая цена заполнена и реально ниже обычной."""
+        return bool(self.price and self.discount_price and self.discount_price < self.price)
+
+    @property
+    def final_price(self):
+        """Цена, которую платит покупатель: со скидкой, если она есть."""
+        return self.discount_price if self.has_discount else self.price
+
+    def clean(self):
+        super().clean()
+        if self.discount_price is None:
+            return
+        if self.discount_price <= 0:
+            raise ValidationError({'discount_price': 'Цена со скидкой должна быть больше нуля.'})
+        if not self.price:
+            raise ValidationError({
+                'discount_price': 'Сначала укажите обычную цену — иначе скидку не от чего считать.'
+            })
+        if self.discount_price >= self.price:
+            raise ValidationError({
+                'discount_price': 'Цена со скидкой должна быть меньше обычной цены.'
+            })
+
     def get_slider_data(self):
         return {
             'year': self.slider_year,
             'title': self.title,
             'price': self.slider_price or 'Запросить цену',
+            'price_old': self.slider_price_old or '',
             'power': self.slider_power or '—',
             'mpg': self.slider_fuel_consumption or '—',
             'image': (self.slider_image or self.main_image).url if (self.slider_image or self.main_image) else None,
@@ -1590,6 +1634,13 @@ class BotBroadcast(models.Model):
         blank=True,
         null=True,
     )
+    send_to_groups = models.BooleanField(
+        "Также отправить во все группы бота",
+        default=False,
+        help_text="Помимо аудитории выше — продублировать в каждую активную "
+                   "группу/канал, куда добавлен бот (см. Бот — Группы). "
+                   "Текст берётся на русском.",
+    )
     scheduled_at = models.DateTimeField(
         "Запланировано на",
         blank=True,
@@ -1629,6 +1680,30 @@ class BotBroadcast(models.Model):
     def get_text(self, language: str) -> str:
         texts = {'ru': self.text_ru, 'uz': self.text_uz, 'en': self.text_en}
         return texts.get(language) or self.text_ru
+
+
+class BotGroup(models.Model):
+    """
+    Группа/супергруппа, куда добавлен бот. Регистрируется автоматически
+    по событию my_chat_member (см. handlers/group_membership.py) — руками
+    заполнять не нужно. is_active снимается сам, когда бота удаляют или
+    понижают до заблокированного статуса.
+    """
+    chat_id = models.BigIntegerField("Chat ID", unique=True)
+    title = models.CharField("Название группы", max_length=255, blank=True)
+    chat_type = models.CharField("Тип чата", max_length=20, blank=True)
+    is_active = models.BooleanField("Бот всё ещё в группе", default=True, db_index=True)
+    added_at = models.DateTimeField("Бот добавлен", auto_now_add=True)
+    removed_at = models.DateTimeField("Бот удалён", blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Бот — Группа"
+        verbose_name_plural = "Бот — Группы"
+        ordering = ['-added_at']
+
+    def __str__(self):
+        status = "✅" if self.is_active else "❌"
+        return f"{status} {self.title or self.chat_id}"
 
 
 class ProductWishlist(models.Model):
@@ -1698,6 +1773,21 @@ def clear_bot_config_cache(sender, instance, **kwargs):
 @receiver(post_save, sender=BotMessage)
 def clear_bot_message_cache(sender, instance, **kwargs):
     cache.delete(f'bot_msg_{instance.key}_{instance.language}')
+
+
+@receiver(post_save, sender=BotMenuItem)
+def clear_bot_menu_cache(sender, instance, **kwargs):
+    cache.delete(f'bot_menu_labels_{instance.key}')
+    for lang in ('ru', 'uz', 'en'):
+        cache.delete(f'bot_menu_{lang}')
+
+
+@receiver(post_delete, sender=BotMenuItem)
+def clear_bot_menu_cache_on_delete(sender, instance, **kwargs):
+    cache.delete(f'bot_menu_labels_{instance.key}')
+    for lang in ('ru', 'uz', 'en'):
+        cache.delete(f'bot_menu_{lang}')
+
 
 @receiver(post_save, sender=Dealer)
 def clear_dealer_cache(sender, instance, **kwargs):

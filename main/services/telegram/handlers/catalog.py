@@ -293,7 +293,7 @@ async def handle_download_catalog(
 # ВХОД В КАТАЛОГ
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@router.message(F.text.in_(CATALOG_TRIGGERS))
+@router.message(CATALOG_TRIGGERS)
 async def handle_catalog_enter(
     message: Message,
     state: FSMContext,
