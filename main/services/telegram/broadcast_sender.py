@@ -69,6 +69,24 @@ def _mark_group_removed(chat_id: int) -> None:
     BotService.deactivate_bot_group(chat_id)
 
 
+@sync_to_async
+def _record_delivery(broadcast, chat_id: int, message_id: int, is_group: bool) -> None:
+    BotService.record_broadcast_delivery(broadcast, chat_id, message_id, is_group)
+
+
+@sync_to_async
+def get_revocable_deliveries(broadcast) -> list[dict]:
+    """Публичная — переиспользуется admin-действием «Отозвать рассылку»."""
+    return list(
+        BotService.get_revocable_deliveries(broadcast).values('id', 'chat_id', 'message_id')
+    )
+
+
+@sync_to_async
+def _mark_delivery_revoked(delivery_id: int) -> None:
+    BotService.mark_delivery_revoked(delivery_id)
+
+
 async def send_broadcast(bot: Bot, broadcast) -> dict:
     """
     Отправляет одну рассылку — персональным получателям (по target)
@@ -131,12 +149,13 @@ async def send_broadcast(bot: Bot, broadcast) -> dict:
                     if isinstance(photo_source, FSInputFile):
                         photo_source = msg.photo[-1].file_id
                 else:
-                    await bot.send_message(
+                    msg = await bot.send_message(
                         chat_id=chat_id,
                         text=text,
                         reply_markup=reply_markup,
                     )
                 sent += 1
+                await _record_delivery(broadcast, chat_id, msg.message_id, is_group)
 
             except TelegramForbiddenError:
                 blocked += 1
@@ -166,3 +185,39 @@ async def send_broadcast(bot: Bot, broadcast) -> dict:
     stats = {'total': total, 'sent': sent, 'failed': failed, 'blocked': blocked}
     await _mark_done(broadcast, stats)
     return stats
+
+
+async def revoke_broadcast(bot: Bot, broadcast) -> dict:
+    """
+    Удаляет уже отправленные сообщения этой рассылки у всех получателей
+    (Telegram deleteMessage) — на случай, если ушла неверная информация.
+
+    Работает только по доставкам, записанным через BroadcastDelivery —
+    т.е. только для рассылок, отправленных ПОСЛЕ появления этого учёта.
+    Более старые рассылки отозвать нечем: message_id для них нигде не
+    сохранён.
+
+    Ограничение — не этого проекта, а самого Telegram Bot API: удалить
+    можно только сообщение, отправленное не позднее 48 часов назад.
+    Возвращает {'total', 'revoked', 'failed'}.
+    """
+    deliveries = await get_revocable_deliveries(broadcast)
+    total = len(deliveries)
+    revoked = failed = 0
+
+    for d in deliveries:
+        try:
+            await bot.delete_message(chat_id=d['chat_id'], message_id=d['message_id'])
+            await _mark_delivery_revoked(d['id'])
+            revoked += 1
+
+        except Exception as exc:
+            logger.warning(
+                'Revoke failed delivery#%s chat_id=%s message_id=%s: %s',
+                d['id'], d['chat_id'], d['message_id'], exc,
+            )
+            failed += 1
+
+        await asyncio.sleep(_SEND_DELAY)
+
+    return {'total': total, 'revoked': revoked, 'failed': failed}

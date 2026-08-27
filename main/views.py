@@ -259,6 +259,12 @@ def accountant_required(view_func):
     return _role_required(lambda p: p.is_accountant, view_func)
 
 
+def dealer_or_service_required(view_func):
+    """Дилер (покупатель) ИЛИ сервис — карточка запчасти нужна обоим:
+    дилеру для покупки, сервису — сверить отображение фото/описания."""
+    return _role_required(lambda p: p.is_dealer or p.is_service, view_func)
+
+
 @sensitive_post_parameters('password')
 @never_cache
 @require_http_methods(['GET', 'POST'])
@@ -375,7 +381,7 @@ def dealer_shop(request):
 
 
 @never_cache
-@dealer_required
+@dealer_or_service_required
 def dealer_part_detail(request, part_id):
     """Карточка конкретной запчасти + рекомендации.
     Приоритет рекомендаций: тот же тип ИЛИ тот же грузовик (без дублей).

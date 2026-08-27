@@ -5,9 +5,12 @@
 - amount_in_words_uzs(amount) → 'Один миллион двести тысяч сум 00 тийин'
 """
 
+import logging
 from decimal import Decimal, ROUND_HALF_UP
 
 from django.utils import timezone
+
+logger = logging.getLogger('django')
 
 # Месяцы РУ — для формата '15 июня 2026'.
 _RU_MONTHS = (
@@ -54,16 +57,22 @@ def amount_in_words_uzs(amount):
     Пример: Decimal('1200000.00') → 'Один миллион двести тысяч сум 00 тийин'.
     Целая часть — словами на русском (через num2words), тийины — двузначным числом.
     """
-    # Импорт здесь — чтоб модуль грузился даже если num2words ещё не установлен.
-    from num2words import num2words
-
     if amount is None:
         amount = 0
     d = Decimal(str(amount)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
     sum_part = int(d)
     tiyin_part = int((d - sum_part) * 100)
 
-    words = num2words(sum_part, lang='ru')
-    words = words[:1].upper() + words[1:]  # capitalize первую букву
+    # num2words — необязательная фишка (текст суммы прописью), не должна
+    # ронять всю страницу счёта, если пакет не установлен в окружении или
+    # упал на какой-то экзотической сумме. Раньше ImportError здесь долетал
+    # необработанным до view и превращался в 500 на всей странице счёта.
+    try:
+        from num2words import num2words
+        words = num2words(sum_part, lang='ru')
+        words = words[:1].upper() + words[1:]  # capitalize первую букву
+    except Exception:
+        logger.error('amount_in_words_uzs: num2words failed for sum_part=%s', sum_part, exc_info=True)
+        words = str(sum_part)
 
     return f'{words} сум {tiyin_part:02d} тийин'

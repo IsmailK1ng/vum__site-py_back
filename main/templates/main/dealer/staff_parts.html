@@ -44,6 +44,8 @@
     .parts-table thead th { background: #f8fafc; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: #7a8290; font-weight: 600; }
     .parts-table tbody tr:last-child td { border-bottom: 0; }
     .parts-table td.sku { font-weight: 600; color: #1f3a5f; }
+    .sku-link { color: inherit; text-decoration: none; }
+    .sku-link:hover { text-decoration: underline; }
     .parts-table td.qty-cell { width: 200px; }
     .parts-table tr.is-inactive { opacity: 0.5; }
     .inactive-badge { background: #c75050; color: #fff; padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-left: 6px; }
@@ -130,7 +132,9 @@
         <tbody>
           {% for p in parts %}
             <tr class="{% if not p.is_active %}is-inactive{% endif %}" data-id="{{ p.id }}">
-              <td class="sku">{{ p.part_number }}</td>
+              <td class="sku">
+                <a href="{% url 'dealer_part_detail' p.id %}" target="_blank" rel="noopener" class="sku-link">{{ p.part_number }}</a>
+              </td>
               <td>
                 {{ p.name }}
                 {% if not p.is_active %}<span class="inactive-badge">Снята</span>{% endif %}

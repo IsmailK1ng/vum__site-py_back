@@ -1682,6 +1682,37 @@ class BotBroadcast(models.Model):
         return texts.get(language) or self.text_ru
 
 
+class BroadcastDelivery(models.Model):
+    """
+    Учёт message_id каждой конкретной отправки рассылки — без этого
+    отозвать (удалить) уже разосланное сообщение нечем: Telegram
+    deleteMessage требует chat_id + message_id. Пишется автоматически
+    при каждой успешной отправке в send_broadcast() (broadcast_sender.py).
+    Отзыв доступен только в течение 48 часов — ограничение самого
+    Telegram Bot API, а не этого проекта.
+    """
+    broadcast = models.ForeignKey(
+        BotBroadcast,
+        on_delete=models.CASCADE,
+        related_name='deliveries',
+        verbose_name="Рассылка",
+    )
+    chat_id = models.BigIntegerField("Chat ID")
+    message_id = models.BigIntegerField("Message ID")
+    is_group = models.BooleanField("Это группа", default=False)
+    sent_at = models.DateTimeField("Отправлено", auto_now_add=True)
+    revoked = models.BooleanField("Отозвано", default=False, db_index=True)
+    revoked_at = models.DateTimeField("Отозвано в", blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Бот — Доставка рассылки"
+        verbose_name_plural = "Бот — Доставки рассылок"
+        indexes = [models.Index(fields=['broadcast', 'revoked'])]
+
+    def __str__(self):
+        return f"broadcast#{self.broadcast_id} -> chat={self.chat_id} msg={self.message_id}"
+
+
 class BotGroup(models.Model):
     """
     Группа/супергруппа, куда добавлен бот. Регистрируется автоматически

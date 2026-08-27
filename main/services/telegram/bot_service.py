@@ -16,6 +16,7 @@ from main.models import (
     BotContacts,
     BotGroup,
     BotMessage,
+    BroadcastDelivery,
     BotMenuItem,
     ContactForm,
     Dealer,
@@ -1030,6 +1031,32 @@ class BotService:
     def get_active_group_chat_ids(cls) -> list[int]:
         return list(
             BotGroup.objects.filter(is_active=True).values_list('chat_id', flat=True)
+        )
+
+    # =========================================================================
+    # ДОСТАВКИ РАССЫЛОК (для отзыва)
+    # =========================================================================
+
+    @classmethod
+    def record_broadcast_delivery(
+        cls, broadcast: BotBroadcast, chat_id: int, message_id: int, is_group: bool,
+    ) -> None:
+        BroadcastDelivery.objects.create(
+            broadcast=broadcast,
+            chat_id=chat_id,
+            message_id=message_id,
+            is_group=is_group,
+        )
+
+    @classmethod
+    def get_revocable_deliveries(cls, broadcast: BotBroadcast):
+        return BroadcastDelivery.objects.filter(broadcast=broadcast, revoked=False)
+
+    @classmethod
+    def mark_delivery_revoked(cls, delivery_id: int) -> None:
+        BroadcastDelivery.objects.filter(pk=delivery_id).update(
+            revoked=True,
+            revoked_at=timezone.now(),
         )
 
     # =========================================================================

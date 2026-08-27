@@ -1859,7 +1859,7 @@ class BotBroadcastAdmin(admin.ModelAdmin):
     list_filter = ['status', 'target']
     search_fields = ['title']
     ordering = ['-created_at']
-    actions = ['send_now']
+    actions = ['send_now', 'revoke_broadcast']
 
     fieldsets = (
         ('Контент', {'fields': ('title', 'text_ru', 'text_uz', 'text_en', 'image', 'button_text', 'button_url')}),
@@ -1926,6 +1926,69 @@ class BotBroadcastAdmin(admin.ModelAdmin):
                     f'«{broadcast.title}»: получателей={stats["total"]} '
                     f'отправлено={stats["sent"]} ошибок={stats["failed"]} '
                     f'заблокировали={stats["blocked"]}',
+                )
+
+    @admin.action(description='Отозвать рассылку (удалить у получателей)')
+    def revoke_broadcast(self, request, queryset):
+        """
+        Удаляет уже отправленные сообщения этой рассылки через Telegram
+        deleteMessage — на случай, если ушла неверная информация. Работает
+        только для рассылок, отправленных ПОСЛЕ появления BroadcastDelivery:
+        более старые message_id нигде не сохранены, отзывать нечем.
+        Ограничение Telegram — удалить можно только в течение 48 часов
+        после отправки.
+        """
+        broadcasts = list(queryset)
+        if not broadcasts:
+            self.message_user(request, 'Ничего не выбрано.', level='warning')
+            return
+
+        config = BotConfig.get_instance()
+        if not config or not config.bot_token:
+            self.message_user(request, 'BotConfig не настроен — токен отсутствует.', level='error')
+            return
+
+        from main.services.telegram.broadcast_sender import revoke_broadcast
+
+        async def _run():
+            bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+            results = []
+            try:
+                for broadcast in broadcasts:
+                    try:
+                        stats = await revoke_broadcast(bot, broadcast)
+                        results.append((broadcast, stats, None))
+                    except Exception as exc:
+                        results.append((broadcast, None, exc))
+            finally:
+                await bot.session.close()
+            return results
+
+        try:
+            results = asyncio.run(_run())
+        except Exception as exc:
+            logger.error('revoke_broadcast admin action failed: %s', exc)
+            self.message_user(request, f'Ошибка отзыва: {exc}', level='error')
+            return
+
+        for broadcast, stats, exc in results:
+            if exc is not None:
+                logger.error('Revoke broadcast#%s failed: %s', broadcast.pk, exc)
+                self.message_user(
+                    request, f'«{broadcast.title}»: ошибка — {exc}', level='error',
+                )
+            elif stats['total'] == 0:
+                self.message_user(
+                    request,
+                    f'«{broadcast.title}»: нечего отзывать — либо ещё не отправлялась, '
+                    f'либо отправлена до появления учёта доставок.',
+                    level='warning',
+                )
+            else:
+                self.message_user(
+                    request,
+                    f'«{broadcast.title}»: отозвано={stats["revoked"]} из {stats["total"]}, '
+                    f'не удалось={stats["failed"]} (обычно — прошло больше 48ч)',
                 )
 
 
