@@ -15,6 +15,7 @@ TelegramUser.notifications_enabled (админ выключает уведомл
 """
 import asyncio
 import logging
+import os
 
 from aiogram import Bot
 from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
@@ -74,6 +75,19 @@ def _record_delivery(broadcast, chat_id: int, message_id: int, is_group: bool) -
     BotService.record_broadcast_delivery(broadcast, chat_id, message_id, is_group)
 
 
+def _extract_file_id(msg):
+    """file_id из ответа Telegram — независимо от того, каким полем он
+    решил его вернуть (photo/animation/video/document, см. комментарий
+    в месте вызова)."""
+    if msg.photo:
+        return msg.photo[-1].file_id
+    for attr in ('animation', 'video', 'document'):
+        obj = getattr(msg, attr, None)
+        if obj is not None:
+            return obj.file_id
+    return None
+
+
 @sync_to_async
 def get_revocable_deliveries(broadcast) -> list[dict]:
     """Публичная — переиспользуется admin-действием «Отозвать рассылку»."""
@@ -121,12 +135,23 @@ async def send_broadcast(bot: Bot, broadcast) -> dict:
             InlineKeyboardButton(text=broadcast.button_text, url=broadcast.button_url)
         ]])
 
-    # broadcast.image.url — относительный путь (/media/...), Telegram по
-    # такому URL ничего скачать не может ("URL host is empty"). Первый раз
-    # шлём сам файл с диска (FSInputFile), а полученный от Telegram file_id
-    # переиспользуем для всех остальных получателей — иначе на каждую
-    # отправку файл заново читался бы и заливался с нуля.
-    photo_source = FSInputFile(broadcast.image.path) if broadcast.image else None
+    # broadcast.image.url / .video.url — относительный путь (/media/...),
+    # Telegram по такому URL ничего скачать не может ("URL host is empty").
+    # Первый раз шлём сам файл с диска (FSInputFile), а полученный от
+    # Telegram file_id переиспользуем для всех остальных получателей —
+    # иначе на каждую отправку файл заново читался бы и заливался с нуля.
+    # image/video — взаимоисключимы (BotBroadcast.clean()), .gif среди
+    # video уходит через send_animation, остальное — через send_video.
+    if broadcast.image:
+        media_kind = 'photo'
+        media_source = FSInputFile(broadcast.image.path)
+    elif broadcast.video:
+        ext = os.path.splitext(broadcast.video.name)[1].lower()
+        media_kind = 'animation' if ext == '.gif' else 'video'
+        media_source = FSInputFile(broadcast.video.path)
+    else:
+        media_kind = None
+        media_source = None
 
     sent = failed = blocked = 0
 
@@ -139,21 +164,45 @@ async def send_broadcast(bot: Bot, broadcast) -> dict:
                 continue
 
             try:
-                if photo_source is not None:
+                if media_kind == 'photo':
                     msg = await bot.send_photo(
                         chat_id=chat_id,
-                        photo=photo_source,
+                        photo=media_source,
                         caption=text,
                         reply_markup=reply_markup,
                     )
-                    if isinstance(photo_source, FSInputFile):
-                        photo_source = msg.photo[-1].file_id
+                elif media_kind == 'animation':
+                    msg = await bot.send_animation(
+                        chat_id=chat_id,
+                        animation=media_source,
+                        caption=text,
+                        reply_markup=reply_markup,
+                    )
+                elif media_kind == 'video':
+                    msg = await bot.send_video(
+                        chat_id=chat_id,
+                        video=media_source,
+                        caption=text,
+                        reply_markup=reply_markup,
+                    )
                 else:
                     msg = await bot.send_message(
                         chat_id=chat_id,
                         text=text,
                         reply_markup=reply_markup,
                     )
+
+                if isinstance(media_source, FSInputFile):
+                    # Telegram сам решает, как трактовать файл — sendAnimation
+                    # не гарантирует msg.animation: нестандартный/маленький
+                    # GIF может вернуться как msg.document. Проверяем все
+                    # варианты; если ни один не заполнен — просто продолжаем
+                    # заливать файл с диска на каждого получателя (медленнее,
+                    # но не падает).
+                    fid = _extract_file_id(msg)
+                    if fid:
+                        media_source = fid
+
                 sent += 1
                 await _record_delivery(broadcast, chat_id, msg.message_id, is_group)
 

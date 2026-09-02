@@ -10,7 +10,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save, post_delete
 from datetime import timedelta, time as datetime_time
 from django.core.cache import cache
-from .validators import validate_image_size
+from .validators import validate_image_size, validate_broadcast_video
 # ========== ОБЩИЕ CHOICES ==========
 
 REGION_CHOICES = [
@@ -1609,6 +1609,15 @@ class BotBroadcast(models.Model):
         help_text="Опционально — прикрепить фото к рассылке",
         validators=[validate_image_size],
     )
+    video = models.FileField(
+        "Видео/GIF",
+        upload_to="bot/broadcasts/video/",
+        blank=True,
+        null=True,
+        help_text="Опционально — mp4/mov/gif, не более 10 МБ. Взаимоисключимо "
+                   "с изображением выше: заполнено только одно из двух.",
+        validators=[validate_broadcast_video],
+    )
     button_text = models.CharField(
         "Текст кнопки",
         max_length=100,
@@ -1676,6 +1685,15 @@ class BotBroadcast(models.Model):
 
     def __str__(self):
         return f"{self.title} [{self.get_status_display()}]"
+
+    def clean(self):
+        # Telegram send_photo/send_video/send_animation — один вызов, одно
+        # вложение. Оба поля разом — путаница, что реально уйдёт получателю.
+        if self.image and self.video:
+            raise ValidationError(
+                'Нельзя одновременно прикрепить и изображение, и видео/GIF — '
+                'выберите что-то одно.'
+            )
 
     def get_text(self, language: str) -> str:
         texts = {'ru': self.text_ru, 'uz': self.text_uz, 'en': self.text_en}

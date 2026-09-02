@@ -1862,7 +1862,7 @@ class BotBroadcastAdmin(admin.ModelAdmin):
     actions = ['send_now', 'revoke_broadcast']
 
     fieldsets = (
-        ('Контент', {'fields': ('title', 'text_ru', 'text_uz', 'text_en', 'image', 'button_text', 'button_url')}),
+        ('Контент', {'fields': ('title', 'text_ru', 'text_uz', 'text_en', 'image', 'video', 'button_text', 'button_url')}),
         ('Аудитория', {'fields': ('target', 'target_region', 'send_to_groups', 'scheduled_at')}),
         ('Статус', {'fields': ('status',)}),
         ('Статистика', {
