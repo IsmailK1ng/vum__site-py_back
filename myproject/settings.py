@@ -108,6 +108,7 @@ JAZZMIN_SETTINGS = {
         "main": "fas fa-globe",
         "main.News": "fas fa-newspaper",
         "main.Product": "fas fa-truck",
+        "main.ParentModel": "fas fa-layer-group",
         "main.FeatureIcon": "fas fa-icons",
         "main.BecomeADealerPage": "fas fa-file-contract",
         "main.ContactForm": "fas fa-envelope",

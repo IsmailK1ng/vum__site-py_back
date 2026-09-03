@@ -55,7 +55,7 @@ from .models import (
     TeamDepartment, TeamMember, TeamMemberLink, NavItem, SocialLink,
     DealerProfile,
     SparePart, SparePartImage, SparePartType,
-    Invoice, InvoiceItem,
+    Invoice, InvoiceItem, ParentModel,
 )
 from .forms import PageMetaAdminForm, DealerProfileAdminForm, SparePartAdminForm
 from main.services.amocrm.token_manager import TokenManager
@@ -1151,11 +1151,11 @@ class InvoiceAdmin(admin.ModelAdmin):
 @admin.register(SparePart)
 class SparePartAdmin(TabbedTranslationAdmin):
     form            = SparePartAdminForm
-    list_display    = ('part_number', 'name', 'type', 'truck', 'quantity', 'price', 'is_active', 'updated_at')
-    list_filter     = ('is_active', 'type', 'truck')
+    list_display    = ('part_number', 'name', 'type', 'parent_model', 'quantity', 'price', 'is_active', 'updated_at')
+    list_filter     = ('is_active', 'type', 'parent_model')
     search_fields   = ('part_number', 'name', 'name_ru', 'name_uz', 'name_en')
     list_editable   = ('quantity', 'price', 'is_active')
-    autocomplete_fields = ('truck',)
+    autocomplete_fields = ('parent_model',)
     inlines         = [SparePartImageInline]
 
     fieldsets = (
@@ -1171,10 +1171,42 @@ class SparePartAdmin(TabbedTranslationAdmin):
             'fields': (('quantity', 'price'),),
         }),
         ('Привязка', {
-            'fields': ('truck',),
-            'description': 'Опционально. Можно привязать к конкретной модели грузовика.',
+            'fields': ('parent_model',),
+            'description': 'Опционально. Привязка к платформе/шасси — деталь '
+                            'считается подходящей всем кузовам на этой платформе.',
         }),
     )
+
+
+@admin.register(ParentModel)
+class ParentModelAdmin(admin.ModelAdmin):
+    """
+    Служебная сущность (платформа/шасси) — на сайте нигде не отображается.
+    Нужна для группировки: несколько Product (вариантов кузова) и
+    SparePart (запчастей) могут ссылаться на одну ParentModel.
+    """
+    list_display = ('name', 'products_count', 'spare_parts_count', 'updated_at')
+    search_fields = ('name', 'description')
+    ordering = ('name',)
+    readonly_fields = ('created_at', 'updated_at')
+
+    fieldsets = (
+        (None, {'fields': ('name', 'description')}),
+        ('Дополнительные данные', {
+            'fields': ('custom_fields',),
+            'description': 'Произвольный JSON — для данных, которым понадобится '
+                            'место позже, без правки кода/миграций.',
+        }),
+        ('Служебное', {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)}),
+    )
+
+    @admin.display(description='Моделей (кузовов)')
+    def products_count(self, obj):
+        return obj.products.count()
+
+    @admin.display(description='Запчастей')
+    def spare_parts_count(self, obj):
+        return obj.spare_parts.count()
 
 
 @admin.register(Product)
@@ -1190,11 +1222,14 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
     list_per_page = 15
     show_full_result_count = False
 
+    autocomplete_fields = ['parent']
+
     fieldsets = (
         ('Основная информация', {
             'fields': (
                 ('title', 'slug'),
                 'selected_categories',
+                'parent',
                 'price_combined',
                 'discount_price',
                 ('order', 'is_active', 'is_featured'),

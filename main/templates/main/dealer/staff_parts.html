@@ -124,7 +124,7 @@
             <th>Артикул</th>
             <th>Наименование</th>
             <th>Тип</th>
-            <th>Грузовик</th>
+            <th>Модель</th>
             <th>Цена</th>
             <th class="qty-cell">Остаток</th>
           </tr>
@@ -140,7 +140,7 @@
                 {% if not p.is_active %}<span class="inactive-badge">Снята</span>{% endif %}
               </td>
               <td>{{ p.type }}</td>
-              <td>{{ p.truck }}</td>
+              <td>{{ p.parent_model }}</td>
               <td>{{ p.price_formatted }} UZS</td>
               <td class="qty-cell">
                 <div class="qty-stepper" data-initial="{{ p.quantity }}">

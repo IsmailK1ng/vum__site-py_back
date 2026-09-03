@@ -159,6 +159,35 @@ class FeatureIcon(models.Model):
     def __str__(self):
         return self.name
 
+class ParentModel(models.Model):
+    """
+    Родительская модель (платформа/шасси) — служебная сущность для
+    группировки: несколько вариантов кузова (Product) физически строятся
+    на одном шасси, и запчасть, подходящая шасси, подходит им всем сразу.
+    На сайте нигде не отображается — только для админки и привязок.
+    custom_fields — открытое JSON-хранилище для данных, которым позже
+    понадобится место, без миграции под каждое новое поле.
+    """
+    name = models.CharField("Название", max_length=255)
+    description = models.TextField("Описание", blank=True)
+    custom_fields = models.JSONField(
+        "Дополнительные данные (JSON)",
+        default=dict,
+        blank=True,
+        help_text='Произвольные пары ключ-значение, например: {"wheelbase_mm": 3800}',
+    )
+    created_at = models.DateTimeField("Создано", auto_now_add=True)
+    updated_at = models.DateTimeField("Обновлено", auto_now=True)
+
+    class Meta:
+        verbose_name = "Родительская модель"
+        verbose_name_plural = "Родительские модели"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
     CATEGORY_CHOICES = [
         ('samosval', 'Samosvallar'),
@@ -179,6 +208,16 @@ class Product(models.Model):
         blank=True,
         null=True,
         help_text="Выберите категории через запятую. Например: samosval,maxsus"
+    )
+    parent = models.ForeignKey(
+        'ParentModel',
+        verbose_name="Родительская модель (опционально)",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='products',
+        help_text="Платформа/шасси, на которой построен этот вариант кузова. "
+                   "Пока не используется на сайте — задел на будущее.",
     )
     price = models.DecimalField(
         "Цена (UZS)",
@@ -2293,14 +2332,15 @@ class SparePart(models.Model):
         max_digits=12,
         decimal_places=2,
     )
-    truck = models.ForeignKey(
-        Product,
-        verbose_name='Грузовик (опционально)',
+    parent_model = models.ForeignKey(
+        ParentModel,
+        verbose_name='Родительская модель (опционально)',
         on_delete=models.SET_NULL,
         related_name='spare_parts',
         null=True,
         blank=True,
-        help_text='Привязка к модели грузовика. Можно оставить пустым.',
+        help_text='Привязка к платформе/шасси — деталь считается подходящей '
+                   'всем вариантам кузова на этой платформе. Можно оставить пустым.',
     )
     is_active = models.BooleanField('В продаже', default=True)
     created_at = models.DateTimeField('Создано', auto_now_add=True)

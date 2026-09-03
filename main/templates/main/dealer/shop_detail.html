@@ -351,8 +351,8 @@
 
         <div class="detail-info__meta">
           <span>Тип: <strong>{{ part.type.name_ru|default:part.type.name }}</strong></span>
-          {% if part.truck %}
-            <span>Грузовик: <strong>{{ part.truck.title }}</strong></span>
+          {% if part.parent_model %}
+            <span>Модель: <strong>{{ part.parent_model.name }}</strong></span>
           {% endif %}
         </div>
 

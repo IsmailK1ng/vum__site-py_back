@@ -47,7 +47,7 @@ from .models import (
     TeamDepartment,
     TeamMember,
     DealerProfile,
-    SparePart, SparePartType,
+    SparePart, SparePartType, ParentModel,
     Invoice, InvoiceItem,
 )
 from django.db import transaction, IntegrityError
@@ -329,13 +329,13 @@ def dealer_shop(request):
 
     # Параметры фильтрации
     q          = (request.GET.get('q') or '').strip()
-    truck_id   = (request.GET.get('truck') or '').strip()
+    parent_id  = (request.GET.get('parent') or '').strip()
     type_id    = (request.GET.get('type') or '').strip()
 
     parts = (
         SparePart.objects
         .filter(is_active=True)
-        .select_related('truck', 'type')
+        .select_related('parent_model', 'type')
         .prefetch_related('images')
     )
 
@@ -348,19 +348,19 @@ def dealer_shop(request):
         )
 
     # Фильтры по селектам — только если значение валидное число
-    if truck_id.isdigit():
-        parts = parts.filter(truck_id=int(truck_id))
+    if parent_id.isdigit():
+        parts = parts.filter(parent_model_id=int(parent_id))
     if type_id.isdigit():
         parts = parts.filter(type_id=int(type_id))
 
     parts = parts.order_by('-updated_at')
 
     # Списки для селектов в фильтр-баре — только сущности, у которых есть запчасти
-    trucks_with_parts = (
-        Product.objects
+    parents_with_parts = (
+        ParentModel.objects
         .filter(spare_parts__is_active=True)
         .distinct()
-        .order_by('title')
+        .order_by('name')
     )
     types_with_parts = (
         SparePartType.objects
@@ -372,9 +372,9 @@ def dealer_shop(request):
     return render(request, 'main/dealer/shop.html', {
         'profile': profile,
         'parts': parts,
-        'trucks_with_parts': trucks_with_parts,
+        'parents_with_parts': parents_with_parts,
         'types_with_parts': types_with_parts,
-        'selected_truck': truck_id,
+        'selected_parent': parent_id,
         'selected_type': type_id,
         'search_query': q,
     })
@@ -384,14 +384,14 @@ def dealer_shop(request):
 @dealer_or_service_required
 def dealer_part_detail(request, part_id):
     """Карточка конкретной запчасти + рекомендации.
-    Приоритет рекомендаций: тот же тип ИЛИ тот же грузовик (без дублей).
+    Приоритет рекомендаций: тот же тип ИЛИ та же родительская модель (без дублей).
     Если таких нет — fallback на 4 свежих активных запчасти.
     """
     profile = request.dealer_profile
 
     part = (
         SparePart.objects
-        .select_related('truck', 'type')
+        .select_related('parent_model', 'type')
         .prefetch_related('images')
         .filter(is_active=True)
         .filter(pk=part_id)
@@ -401,20 +401,20 @@ def dealer_part_detail(request, part_id):
         messages.warning(request, 'Запчасть не найдена или снята с продажи.')
         return redirect('dealer_shop')
 
-    # Рекомендации: тот же тип ИЛИ тот же грузовик, исключая саму запчасть
+    # Рекомендации: тот же тип ИЛИ та же родительская модель, исключая саму запчасть
     rec_qs = (
         SparePart.objects
         .filter(is_active=True)
         .exclude(pk=part.pk)
-        .select_related('truck', 'type')
+        .select_related('parent_model', 'type')
         .prefetch_related('images')
     )
     rec_filter = Q(type=part.type)
-    if part.truck_id:
-        rec_filter |= Q(truck=part.truck)
+    if part.parent_model_id:
+        rec_filter |= Q(parent_model=part.parent_model)
     recommendations = list(rec_qs.filter(rec_filter).order_by('-updated_at')[:4])
 
-    # Fallback — берём свежие активные запчасти если по типу/грузовику ничего
+    # Fallback — берём свежие активные запчасти если по типу/модели ничего
     if not recommendations:
         recommendations = list(rec_qs.order_by('-updated_at')[:4])
 
@@ -1073,7 +1073,7 @@ def staff_parts_list(request):
     profile = request.dealer_profile
     q = (request.GET.get('q') or '').strip()
 
-    parts = SparePart.objects.select_related('type', 'truck').order_by('part_number')
+    parts = SparePart.objects.select_related('type', 'parent_model').order_by('part_number')
     if q:
         parts = parts.filter(
             Q(part_number__icontains=q)
@@ -1087,7 +1087,7 @@ def staff_parts_list(request):
             'part_number': p.part_number,
             'name': p.name_ru or p.name,
             'type': (p.type.name_ru or p.type.name) if p.type_id else '—',
-            'truck': p.truck.title if p.truck_id else '—',
+            'parent_model': p.parent_model.name if p.parent_model_id else '—',
             'quantity': p.quantity,
             'price_formatted': format_uzs(p.price),
             'is_active': p.is_active,

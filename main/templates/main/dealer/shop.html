@@ -345,16 +345,16 @@
         placeholder="Поиск по артикулу или названию"
         value="{{ search_query }}"
       >
-      <select name="truck" class="shop-filters__select">
-        <option value="">Все грузовики</option>
-        {% for t in trucks_with_parts %}<option value="{{ t.id }}"{% if selected_truck == t.id|stringformat:"s" %} selected{% endif %}>{{ t.title }}</option>{% endfor %}
+      <select name="parent" class="shop-filters__select">
+        <option value="">Все модели</option>
+        {% for pm in parents_with_parts %}<option value="{{ pm.id }}"{% if selected_parent == pm.id|stringformat:"s" %} selected{% endif %}>{{ pm.name }}</option>{% endfor %}
       </select>
       <select name="type" class="shop-filters__select">
         <option value="">Все типы</option>
         {% for pt in types_with_parts %}<option value="{{ pt.id }}"{% if selected_type == pt.id|stringformat:"s" %} selected{% endif %}>{{ pt.name_ru|default:pt.name }}</option>{% endfor %}
       </select>
       <button type="submit" class="shop-filters__submit">Применить</button>
-      {% if search_query or selected_truck or selected_type %}
+      {% if search_query or selected_parent or selected_type %}
         <a href="{% url 'dealer_shop' %}" class="shop-filters__reset">Сбросить</a>
       {% endif %}
     </form>
