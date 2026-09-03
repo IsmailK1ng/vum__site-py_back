@@ -351,9 +351,13 @@
 
         <div class="detail-info__meta">
           <span>Тип: <strong>{{ part.type.name_ru|default:part.type.name }}</strong></span>
-          {% if part.parent_model %}
-            <span>Модель: <strong>{{ part.parent_model.name }}</strong></span>
+          {% with parents=part.parent_models.all %}
+          {% if parents %}
+            <span>Модель:
+              <strong>{% for pm in parents %}{{ pm.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</strong>
+            </span>
           {% endif %}
+          {% endwith %}
         </div>
 
         <div class="detail-info__description {% if not part.description_ru and not part.description %}detail-info__description--empty{% endif %}">

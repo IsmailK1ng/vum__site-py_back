@@ -2332,15 +2332,14 @@ class SparePart(models.Model):
         max_digits=12,
         decimal_places=2,
     )
-    parent_model = models.ForeignKey(
+    parent_models = models.ManyToManyField(
         ParentModel,
-        verbose_name='Родительская модель (опционально)',
-        on_delete=models.SET_NULL,
+        verbose_name='Родительские модели (опционально)',
         related_name='spare_parts',
-        null=True,
         blank=True,
-        help_text='Привязка к платформе/шасси — деталь считается подходящей '
-                   'всем вариантам кузова на этой платформе. Можно оставить пустым.',
+        help_text='Привязка к одной или нескольким платформам/шасси — деталь '
+                   'считается подходящей всем вариантам кузова на каждой из них. '
+                   'Можно оставить пустым.',
     )
     is_active = models.BooleanField('В продаже', default=True)
     created_at = models.DateTimeField('Создано', auto_now_add=True)

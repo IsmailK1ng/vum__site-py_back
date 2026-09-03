@@ -335,8 +335,8 @@ def dealer_shop(request):
     parts = (
         SparePart.objects
         .filter(is_active=True)
-        .select_related('parent_model', 'type')
-        .prefetch_related('images')
+        .select_related('type')
+        .prefetch_related('images', 'parent_models')
     )
 
     # Поиск по артикулу ИЛИ названию (RU и base). icontains — case-insensitive.
@@ -347,9 +347,10 @@ def dealer_shop(request):
             | Q(name_ru__icontains=q)
         )
 
-    # Фильтры по селектам — только если значение валидное число
+    # Фильтры по селектам — только если значение валидное число.
+    # parent_models — M2M, фильтр по одному id может задвоить строки join'ом.
     if parent_id.isdigit():
-        parts = parts.filter(parent_model_id=int(parent_id))
+        parts = parts.filter(parent_models__id=int(parent_id)).distinct()
     if type_id.isdigit():
         parts = parts.filter(type_id=int(type_id))
 
@@ -391,8 +392,8 @@ def dealer_part_detail(request, part_id):
 
     part = (
         SparePart.objects
-        .select_related('parent_model', 'type')
-        .prefetch_related('images')
+        .select_related('type')
+        .prefetch_related('images', 'parent_models')
         .filter(is_active=True)
         .filter(pk=part_id)
         .first()
@@ -401,18 +402,19 @@ def dealer_part_detail(request, part_id):
         messages.warning(request, 'Запчасть не найдена или снята с продажи.')
         return redirect('dealer_shop')
 
-    # Рекомендации: тот же тип ИЛИ та же родительская модель, исключая саму запчасть
+    # Рекомендации: тот же тип ИЛИ хотя бы одна общая родительская модель
     rec_qs = (
         SparePart.objects
         .filter(is_active=True)
         .exclude(pk=part.pk)
-        .select_related('parent_model', 'type')
-        .prefetch_related('images')
+        .select_related('type')
+        .prefetch_related('images', 'parent_models')
     )
     rec_filter = Q(type=part.type)
-    if part.parent_model_id:
-        rec_filter |= Q(parent_model=part.parent_model)
-    recommendations = list(rec_qs.filter(rec_filter).order_by('-updated_at')[:4])
+    parent_ids = list(part.parent_models.values_list('id', flat=True))
+    if parent_ids:
+        rec_filter |= Q(parent_models__id__in=parent_ids)
+    recommendations = list(rec_qs.filter(rec_filter).distinct().order_by('-updated_at')[:4])
 
     # Fallback — берём свежие активные запчасти если по типу/модели ничего
     if not recommendations:
@@ -1073,7 +1075,7 @@ def staff_parts_list(request):
     profile = request.dealer_profile
     q = (request.GET.get('q') or '').strip()
 
-    parts = SparePart.objects.select_related('type', 'parent_model').order_by('part_number')
+    parts = SparePart.objects.select_related('type').prefetch_related('parent_models').order_by('part_number')
     if q:
         parts = parts.filter(
             Q(part_number__icontains=q)
@@ -1087,7 +1089,7 @@ def staff_parts_list(request):
             'part_number': p.part_number,
             'name': p.name_ru or p.name,
             'type': (p.type.name_ru or p.type.name) if p.type_id else '—',
-            'parent_model': p.parent_model.name if p.parent_model_id else '—',
+            'parent_models': ', '.join(pm.name for pm in p.parent_models.all()) or '—',
             'quantity': p.quantity,
             'price_formatted': format_uzs(p.price),
             'is_active': p.is_active,

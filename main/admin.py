@@ -1151,11 +1151,15 @@ class InvoiceAdmin(admin.ModelAdmin):
 @admin.register(SparePart)
 class SparePartAdmin(TabbedTranslationAdmin):
     form            = SparePartAdminForm
-    list_display    = ('part_number', 'name', 'type', 'parent_model', 'quantity', 'price', 'is_active', 'updated_at')
-    list_filter     = ('is_active', 'type', 'parent_model')
+    list_display    = ('part_number', 'name', 'type', 'parent_models_display', 'quantity', 'price', 'is_active', 'updated_at')
+    list_filter     = ('is_active', 'type', 'parent_models')
     search_fields   = ('part_number', 'name', 'name_ru', 'name_uz', 'name_en')
     list_editable   = ('quantity', 'price', 'is_active')
-    autocomplete_fields = ('parent_model',)
+    # autocomplete_fields (select2) на M2M в этом проекте нигде раньше не
+    # применялось — Jazzmin-тема не докрашивает мульти-select2, поле выходит
+    # прозрачным. filter_horizontal — родной двухколоночный виджет Django,
+    # Jazzmin его поддерживает штатно.
+    filter_horizontal = ('parent_models',)
     inlines         = [SparePartImageInline]
 
     fieldsets = (
@@ -1171,11 +1175,15 @@ class SparePartAdmin(TabbedTranslationAdmin):
             'fields': (('quantity', 'price'),),
         }),
         ('Привязка', {
-            'fields': ('parent_model',),
-            'description': 'Опционально. Привязка к платформе/шасси — деталь '
-                            'считается подходящей всем кузовам на этой платформе.',
+            'fields': ('parent_models',),
+            'description': 'Опционально. Привязка к одной или нескольким платформам/шасси — '
+                            'деталь считается подходящей всем кузовам на каждой из них.',
         }),
     )
+
+    @admin.display(description='Родительские модели')
+    def parent_models_display(self, obj):
+        return ', '.join(pm.name for pm in obj.parent_models.all()) or '—'
 
 
 @admin.register(ParentModel)
