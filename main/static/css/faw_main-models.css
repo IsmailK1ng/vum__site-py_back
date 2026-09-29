@@ -48,9 +48,20 @@
     height: auto;
 }
 
+/* Было height:65vh (и свои vh-значения на каждом брейкпоинте ниже по
+   файлу — 55/50/70/60/55/22vh). На этой странице в баннере только
+   заголовок + подпись + небольшая PNG-картинка машины, без фонового
+   видео/изображения, которое было бы под что заполнять фиксированную
+   высоту — отсюда и пустота. auto — высота по содержимому, без единого
+   магического числа на брейкпоинт. */
 .mxd-hero-06__content {
-    margin: 4rem 0 0;
-    height: 65vh;
+    /* Фиксированный отступ 4rem был жёстко задан числом. Картинка машины
+       растёт вместе с шириной колонки (45% от .mxd-container), а отступ
+       сверху — нет, поэтому на широких/выкрученных экранах картинка
+       визуально "съедала" верхний отступ и прижималась к шапке. clamp()
+       вместо фиксированного числа — отступ растёт вместе с картинкой. */
+    margin: clamp(2rem, 1rem + 3vw, 5rem) 0 0;
+    height: auto;
 }
 
 .mxd-hero-06__top {
@@ -110,9 +121,18 @@
     padding: 10px;
 }
 
+/* max-width + auto — тот же потолок, что у .mxd-container/
+   .faw-truck-card-container/.mxd-card-grid у остального сайта. У этой
+   секции своего container не было: ряд текст+картинка растягивался на
+   всю ширину экрана без потолка, и на широких/выкрученных экранах
+   картинка (flex:45% от всей ширины) уезжала не туда, а текст
+   (маленький, не растягивается) визуально оставался на месте — между
+   ними рос неравномерный разрыв. Теперь весь ряд — единый центрированный
+   блок, как и остальной контент сайта. */
 .hero-06-headline__descr {
-    margin-bottom: 2.4rem;
-    padding: 10px;
+    max-width: 1920px;
+    margin: 0 auto 2.4rem;
+    padding: 10px 50px;
     color: white;
     z-index: 2;
 }
@@ -277,10 +297,25 @@
    ================================= */
 .faw-truck-card-container {
     width: 100%;
+    /* Как и .mxd-card-grid на новостях — без потолка ширины контейнер
+       рос бесконечно на очень широком эффективном viewport (сверхширокий
+       монитор, сильный зум-аут браузера): auto-fill находил место для
+       большего числа колонок по 420px, и все карточки утрамбовывались
+       в один ряд без переноса. max-width ограничивает именно это. */
+    max-width: 1920px;
+    margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(425px, 1fr));
+    /* auto-fill вместо auto-fit, фиксированный диапазон вместо 1fr:
+       auto-fit схлопывает пустые колонки и отдаёт их ширину занятым
+       (1fr), поэтому при малом числе карточек каждая раздувалась под
+       свою колонку и центрировалась в ней — отсюда огромный зазор
+       между двумя карточками. auto-fill колонки не схлопывает, они
+       остаются пустыми и невидимыми — карточки не растягиваются. */
+    grid-template-columns: repeat(auto-fill, minmax(350px, 420px));
     gap: 20px;
-    justify-content: center;
+    /* start вместо center — карточки прижаты к левому краю ряда, а не
+       раскиданы по центру с пустыми невидимыми колонками между ними. */
+    justify-content: start;
     padding: 0 4.6rem;
 }
 
@@ -290,6 +325,11 @@
     min-width: 350px;
     width: 100%;
     height: 100%;
+    /* flex-колонка: картинка фиксированной высоты + .truck-info занимает
+       весь остаток, чтобы кнопка внизу всегда была на одном уровне между
+       карточками — доп. страховка сверх фикса высоты заголовка/подписей ниже. */
+    display: flex;
+    flex-direction: column;
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -309,6 +349,7 @@
     justify-content: center;
     width: 100%;
     height: 400px;
+    flex-shrink: 0;
     /* Сначала solid-white background чтобы тёмный фон карточки точно не просвечивал,
        а сверху lin-gradient для визуального эффекта */
     background-color: #ffffff;
@@ -343,13 +384,14 @@
 .truck-info {
     row-gap: 10px;
     min-height: 265px;
-    /* height: 100%; */
+    /* flex:1 вместо height:100% — заполняет весь остаток .faw-truck-card
+       после картинки фиксированной высоты, независимо от объёма контента. */
+    flex: 1;
     color: #fff;
     padding: 15px;
     position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
 }
 
 .truck-title {
@@ -358,6 +400,15 @@
     /* margin-bottom: 25px; */
     text-align: center;
     color: #fff;
+    /* Резерв под 3 строки (em — от собственного font-size, масштабируется
+       вместе с ним в адаптивных медиа-запросах ниже). Проверил реальные
+       названия в базе — у "Refrijerator..." доходит до 86 символов = 3
+       строки. Без резерва под самый длинный случай всё содержимое ниже
+       (цена/иконки/кнопка) съезжало по разным уровням между карточками. */
+    min-height: 3.9em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .truck-price {
@@ -442,6 +493,13 @@
     word-break: break-all;
     hyphens: auto;
     overflow-wrap: break-word;
+    /* Резерв под 2 строки — короткие подписи ("Dizel") и длинные
+       ("Konditsioner", переносится в узкой колонке 100px) должны занимать
+       одинаковую высоту, иначе ряд иконок съезжает между карточками. */
+    min-height: 2.4em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .spec-label {
@@ -452,6 +510,10 @@
 
 .truck-cta {
     text-align: center;
+    /* Страховка сверх фиксов заголовка/подписей выше: если что-то всё же
+       переносится нестандартно (например 5 иконок вместо 4), кнопка всё
+       равно прижата к низу карточки, а не «подвисает» посередине. */
+    margin-top: auto;
 }
 
 .btn-details {
@@ -579,10 +641,6 @@ body[data-theme="dark"] .hero-05-title__item {
     .mxd-hero-06 {
         height: auto;
     }
-
-    .mxd-hero-06__content {
-        height: 55vh;
-    }
 }
 
 /* Desktop Small */
@@ -597,10 +655,6 @@ body[data-theme="dark"] .hero-05-title__item {
 
     .truck-title {
         font-size: 20px;
-    }
-
-    .mxd-hero-06__content {
-        height: 50vh;
     }
 }
 
@@ -671,10 +725,6 @@ body[data-theme="dark"] .hero-05-title__item {
 }
 
 @media (max-width: 992px) {
-    .mxd-hero-06__content {
-        height: 70vh;
-    }
-
     .models_title {
         font-size: 5rem;
     }
@@ -702,10 +752,6 @@ body[data-theme="dark"] .hero-05-title__item {
 }
 
 @media (max-width: 882px) {
-    .mxd-hero-06__content {
-        height: 60vh;
-    }
-
     .hero-05-title__item.title-item-image svg {
         width: 3.1rem;
         height: 3.1rem;
@@ -722,10 +768,6 @@ body[data-theme="dark"] .hero-05-title__item {
 
 /* Tablet Portrait */
 @media (max-width: 768px) {
-    .mxd-hero-06__content {
-        height: 55vh;
-    }
-
     .stack-item {
         height: 70%;
         min-height: 300px;
@@ -758,10 +800,6 @@ body[data-theme="dark"] .hero-05-title__item {
 
 /* Mobile Landscape */
 @media (max-width: 576px) {
-    .mxd-hero-06__content {
-        height: 22vh;
-    }
-
     .mxd-hero-06__img img {
         display: none;
     }
@@ -773,11 +811,17 @@ body[data-theme="dark"] .hero-05-title__item {
     }
 }
 
-/* Fix overflow длинных слов (типа "Kombinatsiyalangan") в названиях */
-.faw-truck-card,
+/* Fix overflow длинных слов (типа "Kombinatsiyalangan") в названиях.
+   .faw-truck-card и .faw-truck-card-container сюда не входят намеренно:
+   у обоих свой max-width (420px и 1920px, строки ~279 и ~287), а это
+   правило шло позже по каскаду и сводило его на нет — сбрасывало
+   обратно в 100%. Именно поэтому фикс с 1920px "не работал" —
+   он реально применялся, но тут же перезаписывался этим же правилом
+   чуть ниже по файлу. Реальная защита от переполнения длинных слов —
+   ниже, overflow-wrap на .truck-title, к размеру контейнера/карточки
+   не относится. */
 .truck-info,
-.truck-image-container,
-.faw-truck-card-container {
+.truck-image-container {
     box-sizing: border-box;
     max-width: 100%;
 }
@@ -806,7 +850,9 @@ body[data-theme="dark"] .hero-05-title__item {
 
     .truck-info {
         max-height: none;
-        height: 100%;
+        /* height:100% убрал — конфликтовал с flex:1 из базового правила
+           (карточка теперь flex-колонка), на мобиле карточки и так в один
+           столбец, растягивать по соседям не нужно. */
     }
 
     .mxd-grid-item {
@@ -1053,8 +1099,12 @@ body[data-theme="dark"] .hero-05-title__item {
 
     .faw-truck-card {
         min-width: 0;
-        max-width: 100%;
-        margin: 0;
+        /* Было max-width:100% — карточка тянулась на всю ширину своей
+           1fr-колонки. С 1-2 товарами на странице (1 строка, пустых рядов
+           ниже нет) это давало гигантские карточки во весь экран. Разумный
+           потолок вместо 100% — размер стабильный независимо от количества. */
+        max-width: 480px;
+        margin: 0 auto;
     }
 
     .truck-image-container {

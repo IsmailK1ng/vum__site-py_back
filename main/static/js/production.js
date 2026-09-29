@@ -129,7 +129,7 @@ class ProductsManager {
         uz: {
           title: 'Tiger V',
           breadcrumb: 'Tiger V',
-          slogan: 'Kuchli va zamonaviy pikap',
+          slogan: 'Kuchli va zamonaviy texnika',
           buttonText: 'Batafsil o\'qish'
         },
         ru: {

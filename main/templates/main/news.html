@@ -185,7 +185,12 @@
     function createPageButton(pageNumber) {
       const button = document.createElement('a');
       button.href = 'javascript:void(0);';
-      button.className = `mxd-blog-pagination__item blog-pagination-number btn btn-anim`;
+      /* Без btn-anim: та hover-анимация рвёт текст на буквы и прячет
+         их через overflow:hidden (рассчитана на два дублированных блока
+         текста для слайд-эффекта, тут дублирования нет) — на двузначных
+         номерах страниц (10, 11...) это обрезало вторую цифру. Цифрам
+         эта анимация и не нужна — у номеров свой hover (scale 1.1). */
+      button.className = `mxd-blog-pagination__item blog-pagination-number btn`;
       button.dataset.page = pageNumber;
       button.innerHTML = `<span class="btn-caption">${pageNumber}</span>`;
       button.setAttribute('role', 'button');

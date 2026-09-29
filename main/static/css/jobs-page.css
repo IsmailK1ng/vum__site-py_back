@@ -11,22 +11,93 @@
     overflow: visible;
 }
 
-.breadcrumb-ol {
-    display: flex;
-    padding: 0 9rem;
-    gap: 10px;
+/* ============================================================
+   Hero (jobs.html) — без картинки/объектов, только текст, поэтому
+   исходные значения из main_site.css (рассчитанные под секции с
+   фото/иллюстрацией) тут всегда давали лишнюю пустоту. clamp() вместо
+   фиксированных значений на каждый брейкпоинт — размер и отступы
+   плавно меняются с шириной экрана, а не скачут между двумя цифрами.
+   ============================================================ */
+.mxd-hero-09 {
+    padding-top: clamp(2rem, 5vw, 5rem);
 }
 
-@media only screen and (min-width: 1200px) {
-    .breadcrumb-ol {
-        padding: 0 6rem;
-    }
+.mxd-hero-09__wrap {
+    /* auto, а не 100vh/50vh/80vh — этим значениям неоткуда взяться:
+       заполнять высоту тут нечем, кроме текста. */
+    height: auto;
+    padding-top: clamp(1.5rem, 4vw, 4rem);
+    overflow: visible;
+}
+
+/* На ≥1200px main_site.css делает .mxd-hero-09__headline
+   position:absolute — рассчитано на герои с картинкой/объектами сзади,
+   текст ставится поверх них через bottom:4rem. На jobs.html картинки
+   нет: с height:auto у обёртки не остаётся содержимого "в потоке",
+   она схлопывается в 0, а overflow:hidden обрезает абсолютно
+   спозиционированный текст, торчащий выше этого нулевого блока —
+   с виду будто текст просто пропал. Держим его в потоке всегда. */
+.mxd-hero-09__headline {
+    position: relative !important;
+    bottom: auto !important;
+}
+
+/* Раньше был инлайн-стилем в шаблоне (style="font-size: 4rem") — из-за
+   этого медиа-запросы не могли его переопределить без !important.
+   Перенесено в класс + сам размер теперь плавающий. */
+.hero-09-headline__caption-text {
+    font-size: clamp(1.6rem, 1rem + 1.5vw, 3.2rem);
+}
+
+.hero-09-headline__title h1 {
+    font-size: clamp(3.5rem, 2rem + 5vw, 9rem);
+    text-align: center;
+}
+
+/* Брейдкрамбс — под заголовком на любой ширине экрана, не только на
+   мобилке. main становится flex-колонкой, у крошек order больше, чем
+   у секции-героя, но меньше, чем у секций ниже. */
+.mxd-page-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.mxd-section:not(.padding-blog):not(.overflow-hidden) {
+    order: 1;
+}
+
+div[aria-label="breadcrumb"] {
+    order: 2;
+    margin-top: 2rem;
+}
+
+/* .mxd-section.padding-blog — реальный прямой потомок main (форма и
+   список вакансий), #projects внутри него — вложенный div, order на
+   нём не подействовал бы на порядок среди детей main. */
+.mxd-section.padding-blog {
+    order: 3;
+}
+
+/* CTA-секция с фоновой картинкой (.mxd-promo__bg) — была последней по
+   документу, явный order возвращает её на то же место. Без order у
+   ВСЕХ прямых детей main тот, кого забыли, получает тот же приоритет,
+   что и герой (order:0 по умолчанию) и вылезает не на своё место —
+   так уже случилось один раз с этим самым CTA-баннером. */
+.mxd-section.overflow-hidden {
+    order: 4;
+}
+
+.breadcrumb-ol {
+    display: flex;
+    padding: 0 clamp(1.5rem, 5vw, 6rem);
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .breadcrumb-ol a {
     list-style: none;
     color: black;
-    font-size: 2rem;
+    font-size: clamp(1.3rem, 0.9rem + 0.6vw, 2rem);
 }
 
 .breadcrumb-ol li::after {
@@ -290,20 +361,18 @@ body[data-theme="dark"] .job-details-block.vacancy-details .vacancy-description 
         max-width: 550px;
     }
 
-    .hero-09-headline__title h1 {
-        font-size: 15vh;
-        text-align: center;
-    }
-
-    .mxd-hero-09__wrap {
-        padding-top: 0;
-        height: 50vh;
-    }
+    /* Размер заголовка/подписи и высота хиро — теперь clamp() в общих
+       правилах выше, отдельные фиксированные значения тут не нужны
+       (раньше height:50vh давало пустой блок на широких экранах). */
 }
 
 @media only screen and (max-width: 1200px) {
     .mxd-page-content {
-        padding: 0;
+        /* Было padding:0 — сбрасывало и padding-top:100px из базового
+           правила (main_site.css), который компенсирует фиксированную
+           шапку (#header.faw-header{position:fixed}). Без него хлебные
+           крошки в начале страницы залезали под шапку. */
+        padding: 100px 0 0;
     }
 }
 
@@ -340,13 +409,8 @@ body[data-theme="dark"] .job-details-block.vacancy-details .vacancy-description 
         min-width: unset;
     }
 
-    .hero-09-headline__title h1 {
-        font-size: 8vh;
-    }
-
-    .mxd-hero-09__wrap {
-        height: 80vh;
-    }
+    /* Заголовок/подпись/отступы хиро и брейдкрамбс — теперь clamp() в
+       общих правилах выше, для мобилки отдельных значений не нужно. */
 }
 
 li b {

@@ -1419,30 +1419,36 @@ window.addEventListener('DOMContentLoaded', () => {
 // --------------------------------------------- //
 const toTop = document.querySelector(".btn-to-top");
 
-$(".btn-to-top").each(function() {
+if (toTop) {
   toTop.addEventListener("click", function(event){
     event.preventDefault()
   });
 
-  toTop.addEventListener("click", () => gsap.to(window, { 
-    scrollTo: 0, 
+  toTop.addEventListener("click", () => gsap.to(window, {
+    scrollTo: 0,
     ease: 'power4.inOut',
     duration: 1.3,
   }));
 
-  gsap.set(toTop, { opacity: 0 });
+  gsap.set(toTop, { opacity: 0, autoAlpha: 0 });
 
-  gsap.to(toTop, {
-    opacity: 1,
-    autoAlpha: 1,
-    scrollTrigger: {
-      trigger: "body",
-      start: "top -20%",
-      end: "top -20%",
-      toggleActions: "play none reverse none"
-    }
-  });
-});
+  // Показываем по факту прокрутки в пикселях, а не по проценту высоты body
+  // через ScrollTrigger ("top -20%") — на коротких страницах (мало карточек,
+  // мало высоты) этот процент срабатывал сразу при загрузке без реальной
+  // прокрутки, кнопка перекрывала контент внизу первого экрана.
+  const TO_TOP_SHOW_AFTER_PX = 400;
+  let toTopVisible = false;
+
+  function updateToTopVisibility() {
+    const shouldShow = window.scrollY > TO_TOP_SHOW_AFTER_PX;
+    if (shouldShow === toTopVisible) return;
+    toTopVisible = shouldShow;
+    gsap.to(toTop, { opacity: shouldShow ? 1 : 0, autoAlpha: shouldShow ? 1 : 0, duration: 0.3 });
+  }
+
+  window.addEventListener('scroll', updateToTopVisibility, { passive: true });
+  updateToTopVisibility();
+}
 // --------------------------------------------- //
 // Scroll to Top Button End
 // --------------------------------------------- //

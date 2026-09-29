@@ -96,8 +96,16 @@ body[data-theme="dark"] {
     padding-top: 0;
 }
 
+/* max-width 1920 + auto — тот же потолок, что у остальных уже
+   поправленных секций сайта (модели, новости, форма дилера): без него
+   герой растягивался на всю ширину экрана без ограничения, а
+   декоративные объекты (position:absolute, right:14% и т.п.) на широких/
+   выкрученных мониторах уезжали не на то место, т.к. считали % от всей
+   ширины экрана, а не от разумного контейнера. */
 .mxd-hero-09__wrap {
     padding-top: 0;
+    max-width: 1920px;
+    margin: 0 auto;
 }
 
 @media only screen and (min-width: 768px) {
@@ -107,9 +115,14 @@ body[data-theme="dark"] {
     }
 }
 
+/* max-width 1920 + auto — тот же потолок, что у остальных уже
+   поправленных секций сайта: без него калькулятор растягивался на всю
+   ширину экрана без ограничения на широких/выкрученных мониторах. */
 .lizing-calc-container {
     display: flex;
     gap: 40px;
+    max-width: 1920px;
+    margin: 0 auto;
     background: #fbfbfb;
     border-radius: var(--_radius-m, 24px);
     padding: 40px 32px;
@@ -374,28 +387,22 @@ body[data-theme="dark"] {
     padding: 0 6rem;
 }
 
+/* Было height:60vh (и 75vh/70vh по брейкпоинтам ниже) — vh считается от
+   эффективной высоты вьюпорта, которая так же раздувается при уменьшении
+   зума браузера, как и ширина (см. фикс max-width выше). clamp() с
+   потолком в px — высота больше не может улететь в огромную пустоту
+   независимо от зума, но на обычных экранах выглядит так же, как раньше. */
 .mxd-hero-09__wrap {
-    height: 60vh;
+    height: clamp(380px, 55vh, 560px);
 }
 
 h1 {
     font-size: 7rem;
 }
 
-@media (max-width: 1200px) {
-    .mxd-hero-09__wrap {
-        height: 75vh;
-    }
-
-}
-
 @media (max-width: 768px) {
     .hero-09-objects__item {
         display: none;
-    }
-
-    .mxd-hero-09__wrap {
-        height: 70vh;
     }
 
     .lizing-calc__title {

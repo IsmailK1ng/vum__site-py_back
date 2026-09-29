@@ -7,7 +7,7 @@
     --icon-size: 14px;
     --header-height: 110px;
     --text-height: 120px;
-    --image-height: 55%;
+    --image-height: 60%;
     --card-bg: #faf8f6;
     --card-border-color: white;
     --text-primary: #333;
@@ -126,6 +126,13 @@
     grid-template-columns: repeat(3, 1fr);
     gap: var(--card-gap);
     width: 100%;
+    /* Не было max-width — в отличие от .mxd-container (max-width:1920px),
+       который используется по всему сайту как общий потолок ширины.
+       Сетка тянулась бесконечно на очень широком экране/при уменьшении
+       масштаба браузера, а фиксированный боковой padding на этом фоне
+       визуально почти исчезал — как будто страница совсем без контейнера. */
+    max-width: 1920px;
+    margin: 0 auto;
     padding: 0rem 10rem;
     align-items: stretch;
 }
@@ -216,7 +223,18 @@
 }
 
 .slide-header__title {
-    display: contents;
+    /* Было display:contents — оно полностью убирает собственный блок
+       элемента, из-за чего height:61px ниже был мёртвым кодом и никогда
+       не применялся (и -webkit-line-clamp в медиа-запросах ниже — тоже,
+       ему нужен именно display:-webkit-box). Заголовок в 2 и в 3 строки
+       занимал разную высоту, и в flex-колонке карточки (.slide-content)
+       картинка с высотой в процентах (var(--image-height)) получала
+       разное пространство под себя — отсюда разные по размеру картинки
+       в одном ряду. */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
     text-wrap: auto;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -382,12 +400,16 @@
     transform: translateX(4px);
 }
 
+/* min-width вместо width + padding: двузначные номера страниц (10, 11...)
+   не помещались в фикс 44px, особенно у .active ниже (шрифт там 4rem) —
+   обрезались и показывали только первую цифру. */
 .blog-pagination-number {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
+    min-width: 44px;
     height: 44px;
+    padding: 0 6px;
     font: normal var(--fw-regular) 2rem/3.3rem var(--_font-accent);
     color: #000000;
     background: var(--bg-card);
@@ -561,8 +583,9 @@ body[data-theme="dark"] .slide-text__content {
     }
 
     .blog-pagination-number {
-        width: 38px;
+        min-width: 38px;
         height: 38px;
+        padding: 0 5px;
         font-size: 1.8rem;
     }
 
@@ -696,8 +719,9 @@ body[data-theme="dark"] .slide-text__content {
     }
 
     .blog-pagination-number {
-        width: 34px;
+        min-width: 34px;
         height: 34px;
+        padding: 0 4px;
         font-size: 1.6rem;
         border-radius: 8px;
     }
