@@ -1024,10 +1024,15 @@ class ProductCategoriesForm(forms.ModelForm):
             if not isinstance(items, list):
                 raise forms.ValidationError(f'Значение категории "{category}" должно быть списком')
             for item in items:
-                if not isinstance(item, (str, dict)):
-                    raise forms.ValidationError(
-                        f'Элемент в категории "{category}" должен быть строкой или объектом {{"ru":.., "uz":.., "en":..}}'
-                    )
+                if isinstance(item, str):
+                    continue
+                if isinstance(item, dict) and any(k in item for k in ('ru', 'uz', 'en')):
+                    continue
+                raise forms.ValidationError(
+                    f'Элемент в категории "{category}" должен быть строкой или объектом с ключами '
+                    f'"ru"/"uz"/"en" — например {{"ru": "текст", "uz": "matn", "en": "text"}}. '
+                    f'Получено: {item!r}'
+                )
         return data
 
     def save(self, commit=True):
