@@ -964,10 +964,29 @@ class ProductCategoriesForm(forms.ModelForm):
         required=False,
         help_text='Перед ценой будет отображаться "от"',
     )
+    parameters_json = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 8, 'placeholder': '{"engine": ["Дизель, 130 л.с."], "weight": ["Полная масса: 8000 кг"]}'}),
+        required=False,
+        label='Импорт параметров (JSON)',
+        help_text=(
+            'Вставьте JSON вида {"категория": ["текст", ...]}, чтобы быстро заполнить параметры, '
+            'не добавляя строки вручную ниже. Элемент списка — строка (пишется только на узбекский, '
+            'остальные языки останутся пустыми) или объект {"ru":.., "uz":.., "en":..} для перевода '
+            'сразу на все языки — рекомендуется всегда указывать все три. '
+            'Заменяются только категории, присутствующие в JSON (остальные не трогаются), но внутри '
+            'такой категории все старые строки удаляются и создаются заново из JSON — язык, который '
+            'не указан в элементе, будет пустым, а не как было раньше. '
+            'Допустимые категории: main, engine, weight, transmission, brakes, comfort, superstructure, cabin, additional.'
+        ),
+    )
 
     class Meta:
         model = Product
         exclude = ['category', 'categories']
+
+    class Media:
+        js = ('js/admin/parameters_json_example.js',)
+        css = {'all': ('css/admin/parameters_json_example.css',)}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -985,6 +1004,31 @@ class ProductCategoriesForm(forms.ModelForm):
         if not categories:
             raise forms.ValidationError('Выберите хотя бы одну категорию')
         return categories
+
+    def clean_parameters_json(self):
+        raw = self.cleaned_data.get('parameters_json', '').strip()
+        if not raw:
+            return {}
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError as e:
+            raise forms.ValidationError(f'Некорректный JSON: {e}')
+        if not isinstance(data, dict):
+            raise forms.ValidationError('JSON должен быть объектом вида {"категория": ["текст", ...]}')
+        valid_categories = {code for code, _ in ProductParameter.CATEGORY_CHOICES}
+        for category, items in data.items():
+            if category not in valid_categories:
+                raise forms.ValidationError(
+                    f'Неизвестная категория "{category}". Допустимые: {", ".join(sorted(valid_categories))}'
+                )
+            if not isinstance(items, list):
+                raise forms.ValidationError(f'Значение категории "{category}" должно быть списком')
+            for item in items:
+                if not isinstance(item, (str, dict)):
+                    raise forms.ValidationError(
+                        f'Элемент в категории "{category}" должен быть строкой или объектом {{"ru":.., "uz":.., "en":..}}'
+                    )
+        return data
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -1252,8 +1296,33 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
                 ('slider_power', 'slider_fuel_consumption'),
             ),
         }),
+        ('Импорт параметров (JSON)', {
+            'classes': ('collapse',),
+            'fields': ('parameters_json',),
+        }),
     )
     inlines = [ProductParameterInline, ProductFeatureInline, ProductCardSpecInline, ProductGalleryInline]
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        data = form.cleaned_data.get('parameters_json')
+        if not data:
+            return
+        product = form.instance
+        for category, items in data.items():
+            ProductParameter.objects.filter(product=product, category=category).delete()
+            rows = []
+            for order, item in enumerate(items):
+                row = ProductParameter(product=product, category=category, order=order)
+                if isinstance(item, str):
+                    row.text_uz = item
+                else:
+                    for lang in ('ru', 'uz', 'en'):
+                        value = item.get(lang)
+                        if value:
+                            setattr(row, f'text_{lang}', value)
+                rows.append(row)
+            ProductParameter.objects.bulk_create(rows)
 
     def thumbnail(self, obj):
         img = obj.card_image or obj.main_image
@@ -1318,6 +1387,54 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
         extra_context['show_slider_info'] = True
         return super().changelist_view(request, extra_context)
 
+    # Примеры для категорий, которые есть в ProductParameter.CATEGORY_CHOICES
+    # на момент написания. Категория, которую сюда не добавили (например,
+    # появившаяся позже новая), не ломает пример — parameters_example_api
+    # ниже подставит для неё generic-заглушку по названию категории, так что
+    # руками менять этот словарь при добавлении категории не обязательно.
+    # Все строки — полный объект {ru, uz, en}. Специально не мешаем сюда
+    # "просто строку": в реальном импорте это создаёт НОВУЮ запись с пустыми
+    # остальными языками (категория полностью пересоздаётся, не патчится),
+    # так что в примере-шаблоне это только вводит в заблуждение.
+    PARAMETER_EXAMPLE_TEXTS = {
+        'main': [
+            {"ru": "Колёсная формула: 4x2", "uz": "G'ildirak formulasi: 4x2", "en": "Wheel formula: 4x2"},
+            {"ru": "Год выпуска: 2024", "uz": "Ishlab chiqarilgan yili: 2024", "en": "Year: 2024"},
+        ],
+        'engine': [
+            {"ru": "Дизель, 4 цилиндра, 130 л.с.", "uz": "Dizel, 4 silindrli, 130 o.k.", "en": "Diesel, 4-cylinder, 130 hp"},
+            {"ru": "Объём двигателя: 3.8 л", "uz": "Dvigatel hajmi: 3.8 l", "en": "Engine volume: 3.8 L"},
+        ],
+        'weight': [
+            {"ru": "Полная масса: 8000 кг", "uz": "To'liq massa: 8000 kg", "en": "Gross weight: 8000 kg"},
+            {"ru": "Грузоподъёмность: 5000 кг", "uz": "Yuk ko'tarish qobiliyati: 5000 kg", "en": "Payload capacity: 5000 kg"},
+        ],
+        'transmission': [
+            {"ru": "КПП: механическая, 6 передач", "uz": "Uzatmalar qutisi: mexanik, 6 ta uzatma", "en": "Transmission: manual, 6-speed"},
+            {"ru": "Сцепление: однодисковое, сухое", "uz": "Mufta: bir diskli, quruq", "en": "Clutch: single-plate, dry"},
+        ],
+        'brakes': [
+            {"ru": "Тормоза: дисковые, ABS", "uz": "Tormozlar: diskli, ABS", "en": "Brakes: disc, ABS"},
+            {"ru": "Шины: 7.00R16", "uz": "Shinalar: 7.00R16", "en": "Tires: 7.00R16"},
+        ],
+        'comfort': [
+            {"ru": "Кондиционер", "uz": "Konditsioner", "en": "Air conditioner"},
+            {"ru": "Электростеклоподъёмники", "uz": "Elektr oyna ko'taruvchi", "en": "Electric window lifters"},
+        ],
+        'superstructure': [
+            {"ru": "Изотермический фургон, 14.8 м³", "uz": "Izotermik furgon, 14.8 m³", "en": "Insulated van, 14.8 m³"},
+            {"ru": "Материал кузова: сэндвич-панель 50 мм", "uz": "Kuzov materiali: sendvich panel 50 mm", "en": "Body material: 50 mm sandwich panel"},
+        ],
+        'cabin': [
+            {"ru": "Кабина: однорядная, 3 места", "uz": "Kabina: bir qatorli, 3 o'rindiq", "en": "Cabin: single-row, 3 seats"},
+            {"ru": "Аудиосистема, Bluetooth", "uz": "Audio tizim, Bluetooth", "en": "Audio system, Bluetooth"},
+        ],
+        'additional': [
+            {"ru": "Гарантия: 2 года или 100 000 км", "uz": "Kafolat: 2 yil yoki 100 000 km", "en": "Warranty: 2 years or 100,000 km"},
+            {"ru": "Комплектация: домкрат, знак аварийной остановки, огнетушитель", "uz": "Jihozlar: domkrat, ogohlantiruvchi uchburchak, o't o'chirgich", "en": "Equipment: jack, warning triangle, fire extinguisher"},
+        ],
+    }
+
     def get_urls(self):
         return [
             path(
@@ -1325,7 +1442,29 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
                 self.admin_site.admin_view(self.parameter_suggestions_api),
                 name='parameter_suggestions_api',
             ),
+            path(
+                'api/parameters-example/',
+                self.admin_site.admin_view(self.parameters_example_api),
+                name='parameters_example_api',
+            ),
         ] + super().get_urls()
+
+    def parameters_example_api(self, request):
+        """
+        Собирает пример JSON прямо из ProductParameter.CATEGORY_CHOICES —
+        если появится новая категория, она автоматически попадёт в пример
+        (с заглушкой по названию, если для неё нет готового текста в
+        PARAMETER_EXAMPLE_TEXTS выше) без правки кода.
+        """
+        example = {}
+        for code, label in ProductParameter.CATEGORY_CHOICES:
+            example[code] = self.PARAMETER_EXAMPLE_TEXTS.get(
+                code, [
+                    {"ru": f'Пример параметра 1 для категории «{label}»', "uz": f'«{label}» toifasi uchun 1-parametr namunasi', "en": f'Example parameter 1 for category "{label}"'},
+                    {"ru": f'Пример параметра 2 для категории «{label}»', "uz": f'«{label}» toifasi uchun 2-parametr namunasi', "en": f'Example parameter 2 for category "{label}"'},
+                ]
+            )
+        return JsonResponse(example)
 
     def parameter_suggestions_api(self, request):
         category = request.GET.get('category', '')
