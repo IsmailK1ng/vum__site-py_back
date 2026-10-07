@@ -40,8 +40,6 @@ from aiogram.enums import ParseMode
 # ========== ЛОКАЛЬНЫЕ ИМПОРТЫ ==========
 from .models import (
     News, NewsBlock, ContactForm, Vacancy,
-    VacancyResponsibility, VacancyRequirement,
-    VacancyCondition, VacancyIdealCandidate,
     JobApplication, FeatureIcon, Product,
     ProductParameter, ProductFeature, ProductCardSpec,
     ProductGallery, DealerService, Dealer,
@@ -597,43 +595,57 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
 
 
 
-class VacancyResponsibilityInline(TranslationStackedInline):
-    model = VacancyResponsibility
-    extra = 2
-    fields = (('title', 'order'), 'text')
+# Подставляется в поле "Описание вакансии", когда оно ещё пустое (новая
+# вакансия или старая, которую переносят вручную со старых 4 списков) —
+# готовый каркас с подсказкой по размерам шрифта, чтобы не гадать.
+VACANCY_CONTENT_PLACEHOLDER = (
+    '<p><em>Подсказка (удалите этот абзац): заголовки разделов делайте через '
+    'Format → Heading 2 (как "Обязанности" ниже, ≈20px) или Heading 3 для '
+    'подпунктов (≈16px), обычный текст — Normal (14px). Так все вакансии '
+    'на сайте будут выглядеть одинаково, даже если менять шрифт вручную через '
+    'FontSize не хочется.</em></p>'
+    '<h2>Обязанности</h2>'
+    '<ul><li>Пункт обязанности</li><li>Ещё один пункт</li></ul>'
+    '<h2>Требования</h2>'
+    '<ul><li>Требование к кандидату</li></ul>'
+    '<h2>Условия</h2>'
+    '<ul><li>Условие работы</li></ul>'
+    '<h2>Портрет идеального кандидата</h2>'
+    '<ul><li>Качество кандидата</li></ul>'
+    '<h2>Как подать заявку</h2>'
+    '<p>Присылайте резюме на info@faw.uz</p>'
+)
 
 
-class VacancyRequirementInline(TranslationTabularInline):
-    model = VacancyRequirement
-    extra = 3
-    fields = ('text', 'order')
+class VacancyAdminForm(forms.ModelForm):
+    class Meta:
+        model = Vacancy
+        fields = '__all__'
 
-
-class VacancyConditionInline(TranslationTabularInline):
-    model = VacancyCondition
-    extra = 3
-    fields = ('text', 'order')
-
-
-class VacancyIdealCandidateInline(TranslationTabularInline):
-    model = VacancyIdealCandidate
-    extra = 3
-    fields = ('text', 'order')
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for lang_code, _label in settings.LANGUAGES:
+            field_name = f'content_{lang_code}'
+            if field_name in self.fields and not self.initial.get(field_name):
+                # BoundField.value() берёт self.initial[name], а не field.initial,
+                # если ключ вообще присутствует в словаре — а modeltranslation уже
+                # кладёт туда '' для пустого перевода. Поэтому меняем именно словарь.
+                self.initial[field_name] = VACANCY_CONTENT_PLACEHOLDER
 
 
 @admin.register(Vacancy)
 class VacancyAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
+    form = VacancyAdminForm
     list_display = ['title', 'is_active', 'applications_count', 'order', 'created_at']
     list_filter = ['is_active', 'created_at']
     search_fields = ['title', 'short_description']
     prepopulated_fields = {'slug': ('title',)}
     readonly_fields = ['created_at', 'updated_at', 'applications_count']
-    inlines = [VacancyResponsibilityInline, VacancyRequirementInline, VacancyIdealCandidateInline, VacancyConditionInline]
     history_latest_first = True
 
     fieldsets = (
         ('Основная информация', {'fields': ('title', 'slug', 'short_description', 'is_active', 'order')}),
-        ('Контакты', {'fields': ('contact_info',)}),
+        ('Описание вакансии', {'fields': ('content',)}),
         ('Статистика', {'fields': ('applications_count', 'created_at', 'updated_at'), 'classes': ('collapse',)}),
     )
 

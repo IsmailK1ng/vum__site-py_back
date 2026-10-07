@@ -10,7 +10,7 @@ from .models import (
     News, NewsBlock, ContactForm, JobApplication, 
     Product, FeatureIcon, ProductCardSpec, ProductParameter, ProductFeature, ProductGallery,  
     DealerService, Dealer, BecomeADealerPage, BecomeADealerApplication,
-    Vacancy, Promotion, VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate
+    Vacancy, Promotion
 )
 
 
@@ -487,76 +487,26 @@ class BecomeADealerApplicationSerializer(serializers.ModelSerializer):
 class VacancySerializer(LanguageSerializerMixin, serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
     short_description = serializers.SerializerMethodField()
-    contact_info = serializers.SerializerMethodField()
-    responsibilities = serializers.SerializerMethodField()
-    requirements = serializers.SerializerMethodField()
-    conditions = serializers.SerializerMethodField()
-    ideal_candidates = serializers.SerializerMethodField()
-    
+    content = serializers.SerializerMethodField()
+
     class Meta:
         model = Vacancy
         fields = [
-            'id', 'title', 'short_description', 'contact_info',
-            'responsibilities', 'requirements', 'conditions', 'ideal_candidates',
+            'id', 'title', 'short_description', 'content',
             'is_active', 'created_at'
         ]
-    
+
     def get_title(self, obj):
-        lang = self.get_current_language()  
+        lang = self.get_current_language()
         return getattr(obj, f'title_{lang}', None) or obj.title
-    
+
     def get_short_description(self, obj):
-        lang = self.get_current_language()  
+        lang = self.get_current_language()
         return getattr(obj, f'short_description_{lang}', None) or obj.short_description or ''
-    
-    def get_contact_info(self, obj):
-        lang = self.get_current_language()  
-        return getattr(obj, f'contact_info_{lang}', None) or obj.contact_info or ''
-    
-    def get_responsibilities(self, obj):
-        lang = self.get_current_language()  
-        responsibilities = obj.responsibilities.all().order_by('order')
-        return [
-            {
-                'id': item.id, 
-                'title': getattr(item, f'title_{lang}', None) or item.title or '', 
-                'text': getattr(item, f'text_{lang}', None) or item.text or ''
-            } 
-            for item in responsibilities
-        ]
-    
-    def get_requirements(self, obj):
-        lang = self.get_current_language()  
-        requirements = obj.requirements.all().order_by('order')
-        return [
-            {
-                'id': item.id, 
-                'text': getattr(item, f'text_{lang}', None) or item.text or ''
-            } 
-            for item in requirements
-        ]
-    
-    def get_conditions(self, obj):
-        lang = self.get_current_language()  
-        conditions = obj.conditions.all().order_by('order')
-        return [
-            {
-                'id': item.id, 
-                'text': getattr(item, f'text_{lang}', None) or item.text or ''
-            } 
-            for item in conditions
-        ]
-    
-    def get_ideal_candidates(self, obj):
-        lang = self.get_current_language()  
-        candidates = obj.ideal_candidates.all().order_by('order')
-        return [
-            {
-                'id': item.id, 
-                'text': getattr(item, f'text_{lang}', None) or item.text or ''
-            } 
-            for item in candidates
-        ]
+
+    def get_content(self, obj):
+        lang = self.get_current_language()
+        return getattr(obj, f'content_{lang}', None) or obj.content or ''
 
 from .models import Promotion
 from main.serializers_base import LanguageSerializerMixin

@@ -150,6 +150,34 @@ div[aria-label="breadcrumb"] {
     color: #333a4d;
 }
 
+/* Стили для содержимого из CKEditor (поле Vacancy.content) — раньше тут
+   были отдельные блоки с инлайн font-size:1.3em;font-weight:700 на каждый
+   заголовок раздела, теперь один HTML-блок, но внешний вид сохраняем тем
+   же через h2/h3/ul, которые реально доступны в тулбаре CKEditor. */
+.vacancy-description h2,
+.vacancy-description h3 {
+    margin: 1.1em 0 0.6em;
+    font-weight: 700;
+}
+
+.vacancy-description h2 {
+    font-size: 1.3em;
+}
+
+.vacancy-description h3 {
+    font-size: 1.1em;
+}
+
+.vacancy-description p {
+    margin-bottom: 1em;
+}
+
+.vacancy-description ul,
+.vacancy-description ol {
+    margin-bottom: 1.1em;
+    padding-left: 1.2em;
+}
+
 @keyframes fadeInVacancy {
     from {
         opacity: 0;

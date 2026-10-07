@@ -1208,12 +1208,7 @@ def jobs(request):
     try:
         from .serializers import VacancySerializer
         
-        vacancies = Vacancy.objects.filter(is_active=True).prefetch_related(
-            'responsibilities', 
-            'requirements', 
-            'ideal_candidates',
-            'conditions'
-        ).order_by('order', '-created_at')
+        vacancies = Vacancy.objects.filter(is_active=True).order_by('order', '-created_at')
         
         serializer = VacancySerializer(vacancies, many=True, context={'request': request})
         vacancies_data = serializer.data

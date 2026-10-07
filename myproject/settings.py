@@ -398,6 +398,29 @@ CKEDITOR_CONFIGS = {
         'resize_enabled': True,
         'forcePasteAsPlainText': True,
     },
+    # Профиль для вакансий: один большой блок текста вместо 4 отдельных
+    # списков (обязанности/требования/условия/портрет кандидата). Format —
+    # заголовки разделов через Heading 2/3 (единый размер по всему сайту,
+    # не "на глаз" через FontSize), FontSize — на случай точечной правки.
+    # БЕЗ Image/Iframe/Table.
+    'vacancy': {
+        'toolbar': 'Vacancy',
+        'toolbar_Vacancy': [
+            ['Undo', 'Redo'],
+            ['Format', 'FontSize'],
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],
+            ['Link', 'Unlink'],
+            ['RemoveFormat'],
+            ['Source'],
+        ],
+        'format_tags': 'p;h2;h3',
+        'height': 500,
+        'width': '100%',
+        'removePlugins': 'elementspath,exportpdf,image,iframe,table,tabletools,tableselection,tableresize',
+        'resize_enabled': True,
+        'forcePasteAsPlainText': True,
+    },
 }
 
 CKEDITOR_UPLOAD_PATH = "uploads/"

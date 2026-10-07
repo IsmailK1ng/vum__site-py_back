@@ -697,7 +697,12 @@ class Vacancy(models.Model):
     title = models.CharField("Название", max_length=255)
     slug = models.SlugField("URL", max_length=255, unique=True)
     short_description = models.TextField("Описание", max_length=500, blank=True)
-    contact_info = models.TextField("Контакты", default='Присылайте резюме на info@faw.uz')
+    content = RichTextField(
+        "Описание вакансии",
+        blank=True,
+        config_name='vacancy',
+        help_text='Обязанности, требования, условия, контакты для отклика и т.д. — одним полем. Без изображений.',
+    )
     is_active = models.BooleanField("Активна", default=True)
     order = models.PositiveIntegerField("Порядок", default=0)
     created_at = models.DateTimeField("Дата создания", auto_now_add=True)
@@ -711,62 +716,9 @@ class Vacancy(models.Model):
     def __str__(self):
         status = "✅ Активна" if self.is_active else "❌ Неактивна"
         return f"{self.title} — {status}"
-    
+
     def get_applications_count(self):
         return self.applications.count()
-
-class VacancyResponsibility(models.Model):
-    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='responsibilities')
-    title = models.CharField("Заголовок", max_length=255, blank=True)
-    text = models.TextField("Описание")
-    order = models.PositiveIntegerField("Порядок", default=0)
-
-    class Meta:
-        verbose_name = "Обязанность"
-        verbose_name_plural = "Обязанности"
-        ordering = ['order']
-
-    def __str__(self):
-        return self.title or self.text[:50]
-
-class VacancyRequirement(models.Model):
-    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='requirements')
-    text = models.CharField("Требование", max_length=500)
-    order = models.PositiveIntegerField("Порядок", default=0)
-
-    class Meta:
-        verbose_name = "Требование"
-        verbose_name_plural = "Требования"
-        ordering = ['order']
-
-    def __str__(self):
-        return self.text[:50]
-
-class VacancyCondition(models.Model):
-    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='conditions')
-    text = models.CharField("Условие", max_length=500)
-    order = models.PositiveIntegerField("Порядок", default=0)
-
-    class Meta:
-        verbose_name = "Условие"
-        verbose_name_plural = "Условия"
-        ordering = ['order']
-
-    def __str__(self):
-        return self.text[:50]
-
-class VacancyIdealCandidate(models.Model):
-    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='ideal_candidates')
-    text = models.CharField("Качество", max_length=500)
-    order = models.PositiveIntegerField("Порядок", default=0)
-
-    class Meta:
-        verbose_name = "Портрет кандидата"
-        verbose_name_plural = "Портрет кандидата"
-        ordering = ['order']
-
-    def __str__(self):
-        return self.text[:50]
 
 class JobApplication(models.Model):
     vacancy = models.ForeignKey(

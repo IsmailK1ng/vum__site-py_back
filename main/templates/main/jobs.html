@@ -298,73 +298,8 @@
                                                     <div class="job-details-block vacancy-details"
                                                         style="display:none;">
 
-                                                        {% if vacancy.responsibilities %}
-                                                        <div
-                                                            style="margin-bottom:1.1em; font-size:1.3em; font-weight:700;">
-                                                            {% if LANGUAGE_CODE == 'ru' %}Обязанности:
-                                                            {% elif LANGUAGE_CODE == 'en' %}Responsibilities:
-                                                            {% else %}Majburiyatlar:{% endif %}
-                                                        </div>
-                                                        <ul style="margin-bottom:1.1em;padding-left:1.2em;">
-                                                            {% for item in vacancy.responsibilities %}
-                                                            <li>
-                                                                {% if item.title %}<b>{{ item.title }}</b><br>{% endif %}
-                                                                {{ item.text }}
-                                                            </li>
-                                                            {% endfor %}
-                                                        </ul>
-                                                        {% endif %}
-
-                                                        {% if vacancy.requirements %}
-                                                        <div
-                                                            style="margin-bottom:1.1em; font-size:1.3em; font-weight:700;">
-                                                            {% if LANGUAGE_CODE == 'ru' %}Требования:
-                                                            {% elif LANGUAGE_CODE == 'en' %}Requirements:
-                                                            {% else %}Talablar:{% endif %}
-                                                        </div>
-                                                        <ul style="margin-bottom:1.1em;padding-left:1.2em;">
-                                                            {% for item in vacancy.requirements %}
-                                                            <li>{{ item.text }}</li>
-                                                            {% endfor %}
-                                                        </ul>
-                                                        {% endif %}
-
-                                                        {% if vacancy.ideal_candidates %}
-                                                        <div
-                                                            style="margin-bottom:1.1em; font-size:1.3em; font-weight:700;">
-                                                            {% if LANGUAGE_CODE == 'ru' %}Портрет идеального кандидата:
-                                                            {% elif LANGUAGE_CODE == 'en' %}Ideal Candidate:
-                                                            {% else %}Ideal nomzod:{% endif %}
-                                                        </div>
-                                                        <ul style="margin-bottom:1.1em;padding-left:1.2em;">
-                                                            {% for item in vacancy.ideal_candidates %}
-                                                            <li>{{ item.text }}</li>
-                                                            {% endfor %}
-                                                        </ul>
-                                                        {% endif %}
-
-                                                        {% if vacancy.conditions %}
-                                                        <div
-                                                            style="margin-bottom:1.1em; font-size:1.3em; font-weight:700;">
-                                                            {% if LANGUAGE_CODE == 'ru' %}Условия работы:
-                                                            {% elif LANGUAGE_CODE == 'en' %}Working Conditions:
-                                                            {% else %}Ish sharoitlari:{% endif %}
-                                                        </div>
-                                                        <ul style="margin-bottom:1.1em;padding-left:1.2em;">
-                                                            {% for item in vacancy.conditions %}
-                                                            <li>{{ item.text }}</li>
-                                                            {% endfor %}
-                                                        </ul>
-                                                        {% endif %}
-
-                                                        {% if vacancy.contact_info %}
-                                                        <div
-                                                            style="margin-bottom:1.1em; font-size:1.3em; font-weight:700;">
-                                                            {% if LANGUAGE_CODE == 'ru' %}Как подать заявку:
-                                                            {% elif LANGUAGE_CODE == 'en' %}How to Apply:
-                                                            {% else %}Qanday ariza topshirish:{% endif %}
-                                                        </div>
-                                                        {{ vacancy.contact_info|safe }}
+                                                        {% if vacancy.content %}
+                                                        <div class="vacancy-description">{{ vacancy.content|safe }}</div>
                                                         {% endif %}
 
                                                     </div> <!-- Закрываем vacancy-details -->

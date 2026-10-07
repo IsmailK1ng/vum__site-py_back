@@ -3,7 +3,6 @@
 from modeltranslation.translator import register, TranslationOptions
 from .models import (
     News, NewsBlock, Vacancy,
-    VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
     Product, ProductFeature, ProductCardSpec, ProductParameter,
     DealerService, Dealer, BecomeADealerPage, DealerRequirement, Promotion, PageMeta,
     FAQItem,
@@ -26,27 +25,7 @@ class NewsBlockTranslationOptions(TranslationOptions):
 # ========== ВАКАНСИИ ==========
 @register(Vacancy)
 class VacancyTranslationOptions(TranslationOptions):
-    fields = ('title', 'short_description', 'contact_info')
-
-
-@register(VacancyResponsibility)
-class VacancyResponsibilityTranslationOptions(TranslationOptions):
-    fields = ('title', 'text')
-
-
-@register(VacancyRequirement)
-class VacancyRequirementTranslationOptions(TranslationOptions):
-    fields = ('text',)
-
-
-@register(VacancyCondition)
-class VacancyConditionTranslationOptions(TranslationOptions):
-    fields = ('text',)
-
-
-@register(VacancyIdealCandidate)
-class VacancyIdealCandidateTranslationOptions(TranslationOptions):
-    fields = ('text',)
+    fields = ('title', 'short_description', 'content')
 
 
 # ========== ПРОДУКТЫ ==========
