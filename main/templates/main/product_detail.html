@@ -413,7 +413,7 @@
                         {% if LANGUAGE_CODE == 'ru' %}Я согласен с обработкой данных
                         {% elif LANGUAGE_CODE == 'en' %}I agree with data processing
                         {% else %}Men ma'lumotlarni qayta ishlashga roziman{% endif %}.
-                        <a href="#" class="consent-agree-link">
+                        <a href="javascript:void(0)" class="consent-agree-link" data-privacy-modal-trigger>
                             {% if LANGUAGE_CODE == 'ru' %}Политика{% elif LANGUAGE_CODE == 'en' %}Policy{% else %}Siyosat{% endif %}
                         </a>
                     </span>

@@ -1,0 +1,495 @@
+<!-- templates/includes/privacy_policy_modal.html -->
+<!-- Общая модалка политики конфиденциальности — подключается один раз через
+     footer.html (он грузится на всех страницах), открывается по клику на
+     любой элемент с [data-privacy-modal-trigger] (ссылки "Политика" в чекбоксах
+     согласия на формах, ссылка "Политика конфиденциальности" в футере). -->
+<div id="privacyPolicyModal" class="privacy-modal" data-lenis-prevent>
+    <div class="privacy-modal-content">
+        <span class="privacy-close">&times;</span>
+        <div class="privacy-modal-body">
+            {% if LANGUAGE_CODE == 'ru' %}
+            <h2>ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ</h2>
+            <p class="privacy-subtitle">Порядок обработки персональных данных пользователей веб-сайта faw.uz</p>
+
+            <h3>1. Общие положения</h3>
+            <p>1.1. Настоящая Политика конфиденциальности (далее — «Политика») определяет порядок сбора, хранения, использования и защиты персональных данных, получаемых «VAN Universal Motors» (далее — «VUM» или «Компания») через веб-сайт faw.uz (далее — «Сайт»).</p>
+            <p>1.2. VUM является официальным производителем коммерческой техники FAW в Узбекистане. Компания выступает в качестве владельца и оператора персональных данных.</p>
+            <p>1.3. Политика разработана в соответствии с Законом Республики Узбекистан от 2 июля 2019 года № ЗРУ-547 «О персональных данных», а также иными действующими нормативно-правовыми актами.</p>
+            <p>1.4. Используя Сайт или заполняя форму на Сайте, пользователь подтверждает, что ознакомился с настоящей Политикой и даёт согласие на обработку своих данных в порядке, указанном в ней. Если вы не согласны с условиями Политики, прекратите использование Сайта.</p>
+
+            <h3>2. Основные понятия</h3>
+            <ul>
+                <li><strong>Персональные данные</strong> — любая информация, относящаяся к определённому физическому лицу или позволяющая его идентифицировать.</li>
+                <li><strong>Субъект</strong> — физическое лицо, персональные данные которого обрабатываются (пользователь Сайта).</li>
+                <li><strong>Обработка</strong> — любое действие с данными: сбор, систематизация, хранение, изменение, использование, передача, обезличивание и уничтожение.</li>
+                <li><strong>Cookie-файлы</strong> — небольшие текстовые файлы, сохраняемые Сайтом на устройстве пользователя.</li>
+            </ul>
+
+            <h3>3. Какие данные мы собираем</h3>
+            <p>3.1. Данные, предоставляемые пользователем самостоятельно:</p>
+            <ul>
+                <li>Формы «Свяжитесь с нами» и «Жду звонка»: имя, номер телефона, область, интересующая модель или услуга.</li>
+                <li>Форма «Стать дилером»: Ф.И.О., название компании, должность, телефон, электронная почта, регион и краткая информация о бизнесе.</li>
+                <li>Запросы по лизингу и сервису: имя, телефон, модель техники, содержание запроса.</li>
+                <li>Раздел «Вакансии»: Ф.И.О., контактные данные, резюме и указанные в нём сведения об образовании и опыте работы.</li>
+            </ul>
+            <p>3.2. Данные, собираемые автоматически: IP-адрес, тип браузера и устройства, операционная система, дата и время посещения, просмотренные страницы, источник перехода на Сайт (реклама, поисковая система, социальная сеть), идентификаторы cookie.</p>
+            <p>3.3. VUM не собирает через Сайт данные особых категорий (расовая или национальная принадлежность, политические взгляды, религиозные убеждения, состояние здоровья). Просим пользователей не указывать такие данные в формах.</p>
+
+            <h3>4. Цели использования данных</h3>
+            <ul>
+                <li>Ответ на обращения, организация обратного звонка и консультации.</li>
+                <li>Подготовка цены техники, условий лизинга и коммерческого предложения.</li>
+                <li>Направление клиента к ближайшему официальному дилеру или сервисному центру.</li>
+                <li>Рассмотрение заявок на получение статуса дилера и ведение переговоров о сотрудничестве.</li>
+                <li>Отбор кандидатов по вакансиям.</li>
+                <li>Рассылка информации о новых моделях, акциях и мероприятиях — только при отдельном согласии пользователя.</li>
+                <li>Анализ работы Сайта, повышение удобства и эффективности рекламы.</li>
+                <li>Исполнение обязанностей, установленных законодательством.</li>
+            </ul>
+
+            <h3>5. Правовые основания обработки</h3>
+            <p>5.1. VUM обрабатывает персональные данные на следующих основаниях: согласие субъекта; заключение или исполнение договора, стороной которого является субъект; обязанности, предусмотренные законодательством.</p>
+            <p>5.2. Согласие предоставляется путём установки отметки «Я согласен на обработку своих данных» перед отправкой формы на Сайте. Согласие может быть отозвано в любое время в порядке, указанном в разделе 10 настоящей Политики.</p>
+
+            <h3>6. Cookie-файлы и аналитические сервисы</h3>
+            <p>6.1. Для работы Сайта и анализа используются cookie-файлы, а также следующие сторонние сервисы:</p>
+            <ul>
+                <li>Google Tag Manager и Google Analytics — статистика посещений и анализ поведения пользователей.</li>
+                <li>Яндекс.Метрика — статистика посещений, анализ действий на странице.</li>
+                <li>Meta Pixel — измерение эффективности рекламы в Facebook и Instagram, настройка аудитории.</li>
+            </ul>
+            <p>6.2. Эти сервисы обрабатывают данные в соответствии со своими политиками конфиденциальности и предоставляют VUM преимущественно обезличенную, обобщённую статистику.</p>
+            <p>6.3. Пользователь может удалить или заблокировать cookie-файлы через настройки браузера. При этом отдельные функции Сайта могут работать некорректно.</p>
+
+            <h3>7. Передача данных третьим лицам</h3>
+            <p>7.1. VUM не продаёт и не сдаёт персональные данные в аренду. Данные передаются только в следующих случаях и в объёме, необходимом для целей, указанных в разделе 4:</p>
+            <ul>
+                <li>Официальным дилерам и сервисным центрам VUM — для обслуживания клиента.</li>
+                <li>Партнёрским лизинговым компаниям и банкам — если клиент обратился по вопросу лизинга или кредита.</li>
+                <li>Техническим подрядчикам (хостинг, CRM, услуги связи) — которые обрабатывают данные исключительно по поручению VUM и на основании обязательств о конфиденциальности.</li>
+                <li>Уполномоченным государственным органам — в случаях и порядке, установленных законодательством.</li>
+            </ul>
+            <p>7.2. Трансграничная передача данных за пределы страны осуществляется только с соблюдением требований законодательства.</p>
+
+            <h3>8. Место и сроки хранения</h3>
+            <p>8.1. Персональные данные граждан Республики Узбекистан хранятся на технических средствах, расположенных на территории Узбекистана и зарегистрированных в Государственном реестре баз персональных данных, в соответствии с требованиями закона.</p>
+            <p>8.2. Данные хранятся до достижения цели обработки или до отзыва согласия субъекта, если законодательством не установлен более длительный срок. По истечении срока данные уничтожаются или обезличиваются.</p>
+            <p>8.3. Ориентировочные сроки: данные по обращениям — 3 года с момента последнего обращения; резюме кандидатов — 1 год; данные аналитики — срок, установленный настройками соответствующего сервиса.</p>
+
+            <h3>9. Защита данных</h3>
+            <p>9.1. VUM принимает правовые, организационные и технические меры для защиты данных от несанкционированного доступа, изменения, распространения и утраты, в том числе:</p>
+            <ul>
+                <li>использование на Сайте защищённого соединения HTTPS (SSL);</li>
+                <li>ограничение доступа к данным только теми сотрудниками, которым это необходимо по роду деятельности;</li>
+                <li>получение от сотрудников и партнёров обязательств о соблюдении конфиденциальности;</li>
+                <li>регулярное обновление систем и ведение резервного копирования.</li>
+            </ul>
+            <p>9.2. Ни один способ передачи данных через интернет не гарантирует стопроцентной безопасности. В случае утечки данных VUM принимает меры, предусмотренные законодательством.</p>
+
+            <h3>10. Права субъекта</h3>
+            <p>Пользователь имеет право:</p>
+            <ul>
+                <li>получать информацию о том, обрабатываются ли его данные, и об их составе;</li>
+                <li>требовать исправления неточных или устаревших данных;</li>
+                <li>требовать уничтожения данных или прекращения их обработки;</li>
+                <li>отозвать ранее данное согласие на обработку в любое время;</li>
+                <li>отказаться от получения рекламных сообщений;</li>
+                <li>обжаловать действия VUM в уполномоченный государственный орган или в суд.</li>
+            </ul>
+            <p>Запрос направляется на адрес info@faw.uz. VUM рассматривает запрос в срок, установленный законодательством, как правило в течение 10 рабочих дней.</p>
+
+            <h3>11. Несовершеннолетние</h3>
+            <p>Сайт предназначен для юридических лиц, предпринимателей и совершеннолетних лиц. VUM сознательно не собирает данные лиц младше 18 лет. Если выяснится, что такие данные были получены, они будут удалены.</p>
+
+            <h3>12. Ссылки на сторонние сайты</h3>
+            <p>На Сайте размещены ссылки на социальные сети (Instagram, Facebook, Telegram, YouTube, LinkedIn), Яндекс.Карты и другие ресурсы. Эти ресурсы имеют собственные политики конфиденциальности, и VUM не несёт ответственности за обработку данных на них.</p>
+
+            <h3>13. Внесение изменений в Политику</h3>
+            <p>VUM вправе вносить изменения в настоящую Политику. Новая редакция вступает в силу со дня её публикации на Сайте. Действующая редакция Политики постоянно доступна на сайте faw.uz.</p>
+
+            <h3>14. Контактные данные</h3>
+            <p>Оператор: «VAN Universal Motors»<br>
+            Адрес: г. Ташкент, Яккасарайский район, улица Абдуллы Каххара, 2Б<br>
+            Телефон: +998 55 508 60 60<br>
+            Электронная почта: info@faw.uz</p>
+
+            {% elif LANGUAGE_CODE == 'en' %}
+            <h2>PRIVACY POLICY</h2>
+            <p class="privacy-subtitle">How faw.uz website collects and processes personal data of its users</p>
+            <p class="privacy-date">Effective date: 13.10.2026</p>
+
+            <h3>1. General Provisions</h3>
+            <p>1.1. This Privacy Policy (the "Policy") sets out how "VAN Universal Motors" (the "Company" or "VUM") collects, stores, uses and protects personal data obtained through the faw.uz website (the "Site").</p>
+            <p>1.2. VUM is the official manufacturer of FAW commercial vehicles in Uzbekistan. The Company acts as the owner and operator of personal data.</p>
+            <p>1.3. This Policy has been developed in accordance with the Law of the Republic of Uzbekistan No. ZRU-547 "On Personal Data" dated July 2, 2019, and other applicable legislation.</p>
+            <p>1.4. By using the Site or submitting a form on the Site, the user confirms that they have read this Policy and consent to the processing of their data as described herein. If you do not agree with the terms of this Policy, please stop using the Site.</p>
+
+            <h3>2. Key Definitions</h3>
+            <ul>
+                <li><strong>Personal data</strong> — any information relating to an identified or identifiable individual.</li>
+                <li><strong>Data subject</strong> — the individual whose personal data is processed (a Site user).</li>
+                <li><strong>Processing</strong> — any action performed with data, including collection, organization, storage, modification, use, transfer, anonymization and destruction.</li>
+                <li><strong>Cookies</strong> — small text files stored by the Site on the user's device.</li>
+            </ul>
+
+            <h3>3. What Data We Collect</h3>
+            <p>3.1. Data provided by the user directly:</p>
+            <ul>
+                <li>"Contact Us" and "Request a Call" forms: name, phone number, region, model or service of interest.</li>
+                <li>"Become a Dealer" form: full name, company name, position, phone, email, region and a brief description of the business.</li>
+                <li>Leasing and service inquiries: name, phone, vehicle model, inquiry details.</li>
+                <li>"Vacancies" section: full name, contact details, resume and the education/work experience stated in it.</li>
+            </ul>
+            <p>3.2. Data collected automatically: IP address, browser and device type, operating system, visit date and time, pages viewed, referral source (ads, search engine, social network), cookie identifiers.</p>
+            <p>3.3. VUM does not collect special categories of data (racial or ethnic origin, political views, religious beliefs, health status) through the Site. Users are asked not to enter such data in the forms.</p>
+
+            <h3>4. Purposes of Data Use</h3>
+            <ul>
+                <li>Responding to inquiries, arranging callbacks and providing consultations.</li>
+                <li>Preparing vehicle pricing, leasing terms and commercial offers.</li>
+                <li>Directing the customer to the nearest official dealer or service center.</li>
+                <li>Reviewing dealer applications and negotiating cooperation.</li>
+                <li>Selecting candidates for job vacancies.</li>
+                <li>Sending information about new models, promotions and events — only with the user's separate consent.</li>
+                <li>Analyzing Site performance and improving usability and advertising effectiveness.</li>
+                <li>Fulfilling obligations established by law.</li>
+            </ul>
+
+            <h3>5. Legal Basis for Processing</h3>
+            <p>5.1. VUM processes personal data on the following grounds: the data subject's consent; the conclusion or performance of a contract to which the subject is a party; obligations established by law.</p>
+            <p>5.2. Consent is given by checking the box "I consent to the processing of my data" before submitting a form on the Site. Consent may be withdrawn at any time in the manner described in Section 10 of this Policy.</p>
+
+            <h3>6. Cookies and Analytics Services</h3>
+            <p>6.1. Cookies and the following third-party services are used for the operation and analysis of the Site:</p>
+            <ul>
+                <li>Google Tag Manager and Google Analytics — visit statistics and user behavior analysis.</li>
+                <li>Yandex Metrica — visit statistics, on-page activity analysis.</li>
+                <li>Meta Pixel — measuring advertising effectiveness on Facebook and Instagram, audience targeting.</li>
+            </ul>
+            <p>6.2. These services process data in accordance with their own privacy policies and mainly provide VUM with anonymized, aggregated statistics.</p>
+            <p>6.3. Users may delete or block cookies through their browser settings. This may affect the correct operation of certain Site features.</p>
+
+            <h3>7. Disclosure of Data to Third Parties</h3>
+            <p>7.1. VUM does not sell or lease personal data. Data is disclosed only in the following cases and only to the extent necessary for the purposes set out in Section 4:</p>
+            <ul>
+                <li>To VUM's official dealers and service centers — to serve the customer.</li>
+                <li>To partner leasing companies and banks — if the customer has applied for leasing or credit.</li>
+                <li>To technical service providers (hosting, CRM, communication services) — who process data solely on VUM's instructions and under confidentiality obligations.</li>
+                <li>To authorized government bodies — in cases and in the manner established by law.</li>
+            </ul>
+            <p>7.2. Cross-border transfer of data is carried out only in compliance with applicable legal requirements.</p>
+
+            <h3>8. Storage Location and Retention Period</h3>
+            <p>8.1. Personal data of citizens of the Republic of Uzbekistan is stored on technical facilities located in Uzbekistan and registered in the State Register of Personal Data Databases, as required by law.</p>
+            <p>8.2. Data is retained until the purpose of processing is achieved or consent is withdrawn, unless a longer period is required by law. After this period, the data is destroyed or anonymized.</p>
+            <p>8.3. Approximate retention periods: inquiry data — 3 years from the last inquiry; candidate resumes — 1 year; analytics data — the period set by the respective service's settings.</p>
+
+            <h3>9. Data Protection</h3>
+            <p>9.1. VUM takes legal, organizational and technical measures to protect data from unauthorized access, alteration, disclosure and loss, including:</p>
+            <ul>
+                <li>using an encrypted HTTPS (SSL) connection on the Site;</li>
+                <li>restricting data access to employees who need it for their job duties;</li>
+                <li>obtaining confidentiality commitments from employees and partners;</li>
+                <li>regularly updating systems and maintaining backups.</li>
+            </ul>
+            <p>9.2. No method of data transmission over the internet guarantees 100% security. In the event of a data breach, VUM takes the measures required by law.</p>
+
+            <h3>10. Rights of the Data Subject</h3>
+            <p>Users have the right to:</p>
+            <ul>
+                <li>receive information on whether their data is being processed and about its content;</li>
+                <li>request correction of inaccurate or outdated data;</li>
+                <li>request destruction of their data or cessation of its processing;</li>
+                <li>withdraw previously given consent to processing at any time;</li>
+                <li>opt out of receiving promotional messages;</li>
+                <li>file a complaint about VUM's actions with an authorized government body or court.</li>
+            </ul>
+            <p>Requests should be sent to info@faw.uz. VUM reviews requests within the period established by law, typically within 10 business days.</p>
+
+            <h3>11. Minors</h3>
+            <p>The Site is intended for legal entities, entrepreneurs and adults. VUM does not knowingly collect data from individuals under 18 years of age. If we discover that such data has been obtained, it will be deleted.</p>
+
+            <h3>12. Links to Third-Party Sites</h3>
+            <p>The Site contains links to social networks (Instagram, Facebook, Telegram, YouTube, LinkedIn), Yandex Maps and other resources. These resources have their own privacy policies, and VUM is not responsible for how they handle data.</p>
+
+            <h3>13. Amendments to the Policy</h3>
+            <p>VUM reserves the right to amend this Policy. The new version takes effect on the day it is published on the Site. The current version of the Policy is always available at faw.uz.</p>
+
+            <h3>14. Contact Information</h3>
+            <p>Operator: "VAN Universal Motors"<br>
+            Address: 2B Abdulla Qahhor Street, Yakkasaray district, Tashkent<br>
+            Phone: +998 55 508 60 60<br>
+            Email: info@faw.uz</p>
+
+            {% else %}
+            <h2>MAXFIYLIK SIYOSATI</h2>
+            <p class="privacy-subtitle">faw.uz veb-sayti foydalanuvchilarining shaxsga doir ma&rsquo;lumotlarini qayta ishlash tartibi</p>
+            <p class="privacy-date">Kuchga kirgan sana: 13.10.2026</p>
+
+            <h3>1. Umumiy qoidalar</h3>
+            <p>1.1. Ushbu Maxfiylik siyosati (keyingi o&rsquo;rinlarda &ldquo;Siyosat&rdquo;) &ldquo;VAN Universal Motors&rdquo; (keyingi o&rsquo;rinlarda &ldquo;VUM&rdquo; yoki &ldquo;Kompaniya&rdquo;) tomonidan faw.uz veb-sayti (keyingi o&rsquo;rinlarda &ldquo;Sayt&rdquo;) orqali olinadigan shaxsga doir ma&rsquo;lumotlarni yig&rsquo;ish, saqlash, foydalanish va himoya qilish tartibini belgilaydi.</p>
+            <p>1.2. VUM O&rsquo;zbekistonda FAW tijorat texnikasining rasmiy ishlab chiqaruvchisi hisoblanadi. Kompaniya shaxsga doir ma&rsquo;lumotlar egasi va operatori sifatida ish yuritadi.</p>
+            <p>1.3. Siyosat O&rsquo;zbekiston Respublikasining 2019-yil 2-iyuldagi O&rsquo;RQ-547-son &ldquo;Shaxsga doir ma&rsquo;lumotlar to&rsquo;g&rsquo;risida&rdquo;gi Qonuni hamda boshqa amaldagi qonun hujjatlariga muvofiq ishlab chiqilgan.</p>
+            <p>1.4. Saytdan foydalanish yoki Saytdagi shaklni to&rsquo;ldirish orqali foydalanuvchi ushbu Siyosat bilan tanishganini va o&rsquo;z ma&rsquo;lumotlarini shu yerda ko&rsquo;rsatilgan tartibda qayta ishlashga rozilik berganini tasdiqlaydi. Siyosat shartlariga rozi bo&rsquo;lmasangiz, Saytdan foydalanishni to&rsquo;xtating.</p>
+
+            <h3>2. Asosiy tushunchalar</h3>
+            <ul>
+                <li><strong>Shaxsga doir ma&rsquo;lumotlar</strong> &ndash; muayyan jismoniy shaxsga taalluqli yoki uni identifikatsiya qilish imkonini beradigan har qanday axborot.</li>
+                <li><strong>Sub&rsquo;ekt</strong> &ndash; shaxsga doir ma&rsquo;lumotlari qayta ishlanadigan jismoniy shaxs (Sayt foydalanuvchisi).</li>
+                <li><strong>Qayta ishlash</strong> &ndash; ma&rsquo;lumotlarni yig&rsquo;ish, tizimlashtirish, saqlash, o&rsquo;zgartirish, foydalanish, uzatish, egasizlantirish va yo&rsquo;q qilish bo&rsquo;yicha har qanday harakat.</li>
+                <li><strong>Cookie fayllar</strong> &ndash; Sayt foydalanuvchi qurilmasiga saqlaydigan kichik matnli fayllar.</li>
+            </ul>
+
+            <h3>3. Qanday ma&rsquo;lumotlarni yig&rsquo;amiz</h3>
+            <p>3.1. Foydalanuvchi o&rsquo;zi taqdim etadigan ma&rsquo;lumotlar:</p>
+            <ul>
+                <li>&ldquo;Biz bilan bog&rsquo;laning&rdquo; va &ldquo;Qo&rsquo;ng&rsquo;iroq kutaman&rdquo; shakllari: ism, telefon raqami, viloyat, qiziqtirgan model yoki xizmat.</li>
+                <li>&ldquo;Diler bo&rsquo;lish&rdquo; shakli: F.I.Sh., kompaniya nomi, lavozim, telefon, elektron pochta, hudud va biznes haqida qisqa ma&rsquo;lumot.</li>
+                <li>Lizing va servis bo&rsquo;yicha so&rsquo;rovlar: ism, telefon, texnika modeli, so&rsquo;rov mazmuni.</li>
+                <li>&ldquo;Vakansiya&rdquo; bo&rsquo;limi: F.I.Sh., aloqa ma&rsquo;lumotlari, rezyume va unda ko&rsquo;rsatilgan ta&rsquo;lim hamda ish tajribasi.</li>
+            </ul>
+            <p>3.2. Avtomatik yig&rsquo;iladigan ma&rsquo;lumotlar: IP-manzil, brauzer va qurilma turi, operatsion tizim, tashrif sanasi va vaqti, ko&rsquo;rilgan sahifalar, Saytga o&rsquo;tilgan manba (reklama, qidiruv tizimi, ijtimoiy tarmoq), cookie identifikatorlari.</p>
+            <p>3.3. VUM maxsus toifadagi ma&rsquo;lumotlarni (irqiy yoki milliy mansublik, siyosiy qarashlar, diniy e&rsquo;tiqod, sog&rsquo;liq holati) Sayt orqali yig&rsquo;maydi. Foydalanuvchidan bunday ma&rsquo;lumotlarni shakllarga kiritmaslik so&rsquo;raladi.</p>
+
+            <h3>4. Ma&rsquo;lumotlardan foydalanish maqsadlari</h3>
+            <ul>
+                <li>Murojaatlarga javob berish, qayta qo&rsquo;ng&rsquo;iroq qilish va maslahat berish.</li>
+                <li>Texnika narxi, lizing shartlari va tijorat taklifini tayyorlash.</li>
+                <li>Mijozni eng yaqin rasmiy dilerga yoki servis markaziga yo&rsquo;naltirish.</li>
+                <li>Diler bo&rsquo;lish arizalarini ko&rsquo;rib chiqish va hamkorlik bo&rsquo;yicha muzokaralar olib borish.</li>
+                <li>Vakansiyalar bo&rsquo;yicha nomzodlarni tanlash.</li>
+                <li>Foydalanuvchi alohida rozilik bergan holda yangi modellar, aksiyalar va tadbirlar haqida xabar yuborish.</li>
+                <li>Sayt ishini tahlil qilish, qulayligini va reklama samaradorligini oshirish.</li>
+                <li>Qonun hujjatlarida belgilangan majburiyatlarni bajarish.</li>
+            </ul>
+
+            <h3>5. Qayta ishlashning huquqiy asoslari</h3>
+            <p>5.1. VUM shaxsga doir ma&rsquo;lumotlarni quyidagi asoslarda qayta ishlaydi: sub&rsquo;ektning roziligi; sub&rsquo;ekt tomon bo&rsquo;lgan shartnomani tuzish yoki bajarish; qonun hujjatlarida nazarda tutilgan majburiyatlar.</p>
+            <p>5.2. Rozilik Saytdagi shaklni yuborishdan oldin &ldquo;Men o&rsquo;z ma&rsquo;lumotlarimning qayta ishlanishiga rozilik beraman&rdquo; belgisini qo&rsquo;yish orqali beriladi. Rozilik ushbu Siyosatning 10-bo&rsquo;limida ko&rsquo;rsatilgan tartibda istalgan vaqtda qaytarib olinishi mumkin.</p>
+
+            <h3>6. Cookie fayllar va analitika xizmatlari</h3>
+            <p>6.1. Sayt ishlashi va tahlil uchun cookie fayllar hamda quyidagi uchinchi tomon xizmatlaridan foydalaniladi:</p>
+            <ul>
+                <li>Google Tag Manager va Google Analytics &ndash; tashriflar statistikasi va foydalanuvchi xatti-harakatini tahlil qilish.</li>
+                <li>Yandex Metrika &ndash; tashriflar statistikasi, sahifadagi harakatlar tahlili.</li>
+                <li>Meta Pixel &ndash; Facebook va Instagram&rsquo;dagi reklama samaradorligini o&rsquo;lchash va auditoriyani sozlash.</li>
+            </ul>
+            <p>6.2. Bu xizmatlar ma&rsquo;lumotlarni o&rsquo;z maxfiylik siyosatlariga muvofiq qayta ishlaydi. Ular VUM&rsquo;ga asosan egasizlantirilgan, umumlashtirilgan statistikani taqdim etadi.</p>
+            <p>6.3. Foydalanuvchi brauzer sozlamalari orqali cookie fayllarni o&rsquo;chirishi yoki bloklashi mumkin. Bunda Saytning ayrim funksiyalari to&rsquo;g&rsquo;ri ishlamasligi mumkin.</p>
+
+            <h3>7. Ma&rsquo;lumotlarni uchinchi shaxslarga berish</h3>
+            <p>7.1. VUM shaxsga doir ma&rsquo;lumotlarni sotmaydi va ijaraga bermaydi. Ma&rsquo;lumotlar faqat quyidagi hollarda va 4-bo&rsquo;limdagi maqsadlar uchun zarur hajmda beriladi:</p>
+            <ul>
+                <li>VUM&rsquo;ning rasmiy dilerlari va servis markazlariga: mijozga xizmat ko&rsquo;rsatish uchun.</li>
+                <li>Hamkor lizing kompaniyalari va banklarga: mijoz lizing yoki kredit bo&rsquo;yicha murojaat qilgan holda.</li>
+                <li>Texnik xizmat ko&rsquo;rsatuvchilarga (hosting, CRM, aloqa xizmatlari): ular ma&rsquo;lumotlarni faqat VUM topshirig&rsquo;i bilan va maxfiylik majburiyati asosida qayta ishlaydi.</li>
+                <li>Vakolatli davlat organlariga: qonun hujjatlarida belgilangan hollarda va tartibda.</li>
+            </ul>
+            <p>7.2. Ma&rsquo;lumotlarni chet elga transchegaraviy uzatish faqat qonun hujjatlari talablariga rioya qilingan holda amalga oshiriladi.</p>
+
+            <h3>8. Saqlash joyi va muddati</h3>
+            <p>8.1. O&rsquo;zbekiston Respublikasi fuqarolarining shaxsga doir ma&rsquo;lumotlari qonun talabiga muvofiq O&rsquo;zbekiston hududida joylashgan va Shaxsga doir ma&rsquo;lumotlar bazalari davlat reyestrida ro&rsquo;yxatdan o&rsquo;tgan texnik vositalarda saqlanadi.</p>
+            <p>8.2. Ma&rsquo;lumotlar qayta ishlash maqsadiga erishilguncha yoki sub&rsquo;ekt roziligini qaytarib olguncha saqlanadi, agar qonun hujjatlarida uzoqroq muddat belgilanmagan bo&rsquo;lsa. Muddat tugagach, ma&rsquo;lumotlar yo&rsquo;q qilinadi yoki egasizlantiriladi.</p>
+            <p>8.3. Taxminiy muddatlar: murojaatlar bo&rsquo;yicha ma&rsquo;lumotlar &ndash; oxirgi murojaatdan 3 yil; nomzodlar rezyumelari &ndash; 1 yil; analitika ma&rsquo;lumotlari &ndash; tegishli xizmat sozlamalarida belgilangan muddat.</p>
+
+            <h3>9. Ma&rsquo;lumotlarni himoya qilish</h3>
+            <p>9.1. VUM ma&rsquo;lumotlarni ruxsatsiz kirish, o&rsquo;zgartirish, tarqatish va yo&rsquo;qotishdan himoya qilish uchun huquqiy, tashkiliy va texnik choralarni ko&rsquo;radi, jumladan:</p>
+            <ul>
+                <li>Saytda HTTPS (SSL) shifrlangan ulanishdan foydalanish.</li>
+                <li>Ma&rsquo;lumotlarga kirishni faqat vazifasi taqozo etadigan xodimlar bilan cheklash.</li>
+                <li>Xodimlar va hamkorlardan maxfiylik majburiyatini olish.</li>
+                <li>Tizimlarni muntazam yangilash va zaxira nusxalarini yuritish.</li>
+            </ul>
+            <p>9.2. Internet orqali ma&rsquo;lumot uzatishning hech bir usuli 100% xavfsizlikni kafolatlamaydi. Ma&rsquo;lumotlar sizib chiqqan holda VUM qonunda belgilangan choralarni ko&rsquo;radi.</p>
+
+            <h3>10. Sub&rsquo;ektning huquqlari</h3>
+            <p>Foydalanuvchi quyidagi huquqlarga ega:</p>
+            <ul>
+                <li>O&rsquo;z ma&rsquo;lumotlari qayta ishlanayotgani haqida va ularning tarkibi haqida axborot olish.</li>
+                <li>Noto&rsquo;g&rsquo;ri yoki eskirgan ma&rsquo;lumotlarni tuzatishni talab qilish.</li>
+                <li>Ma&rsquo;lumotlarni yo&rsquo;q qilish yoki qayta ishlashni to&rsquo;xtatishni talab qilish.</li>
+                <li>Qayta ishlashga berilgan rozilikni istalgan vaqtda qaytarib olish.</li>
+                <li>Reklama xabarlaridan voz kechish.</li>
+                <li>VUM harakatlari ustidan vakolatli davlat organiga yoki sudga shikoyat qilish.</li>
+            </ul>
+            <p>So&rsquo;rov info@faw.uz manziliga yoziladi. VUM so&rsquo;rovni qonunda belgilangan muddatda, odatda 10 ish kuni ichida ko&rsquo;rib chiqadi.</p>
+
+            <h3>11. Voyaga yetmaganlar</h3>
+            <p>Sayt yuridik shaxslar, tadbirkorlar va voyaga yetgan shaxslar uchun mo&rsquo;ljallangan. VUM 18 yoshga to&rsquo;lmagan shaxslarning ma&rsquo;lumotlarini ataylab yig&rsquo;maydi. Agar bunday ma&rsquo;lumot olinganini aniqlasak, uni o&rsquo;chiramiz.</p>
+
+            <h3>12. Uchinchi tomon saytlariga havolalar</h3>
+            <p>Saytda ijtimoiy tarmoqlar (Instagram, Facebook, Telegram, YouTube, LinkedIn), Yandex Xaritalar va boshqa resurslarga havolalar mavjud. Bu resurslar o&rsquo;z maxfiylik siyosatiga ega va VUM ularning ma&rsquo;lumotlar bilan ishlashi uchun javobgar emas.</p>
+
+            <h3>13. Siyosatga o&rsquo;zgartirish kiritish</h3>
+            <p>VUM ushbu Siyosatga o&rsquo;zgartirish kiritish huquqiga ega. Yangi tahrir Saytda e&rsquo;lon qilingan kundan kuchga kiradi. Siyosatning amaldagi tahriri doimo faw.uz saytida ochiq joylashtiriladi.</p>
+
+            <h3>14. Aloqa ma&rsquo;lumotlari</h3>
+            <p>Operator: &ldquo;VAN Universal Motors&rdquo;<br>
+            Manzil: Toshkent shahri, Yakkasaroy tumani, Abdulla Qahhor ko&rsquo;chasi, 2B<br>
+            Telefon: +998 55 508 60 60<br>
+            Elektron pochta: info@faw.uz</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.privacy-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 5vh 0;
+}
+
+.privacy-modal.privacy-modal-open {
+    display: block;
+}
+
+.privacy-modal-content {
+    position: relative;
+    background-color: #fff;
+    margin: 0 auto;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 820px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.privacy-close {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #fff;
+    z-index: 10;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.5);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.privacy-close:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: rotate(90deg);
+}
+
+.privacy-modal-body {
+    padding: 40px 36px;
+    color: #333;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.privacy-modal-body h2 {
+    margin: 0 0 8px;
+    font-size: 22px;
+}
+
+.privacy-modal-body .privacy-subtitle {
+    color: #666;
+    font-size: 14px;
+    margin: 0 0 4px;
+}
+
+.privacy-modal-body .privacy-date {
+    color: #999;
+    font-size: 12px;
+    margin: 0 0 24px;
+}
+
+.privacy-modal-body h3 {
+    font-size: 16px;
+    margin: 24px 0 8px;
+}
+
+.privacy-modal-body p {
+    margin: 0 0 10px;
+}
+
+.privacy-modal-body ul {
+    margin: 0 0 10px;
+    padding-left: 1.2em;
+}
+
+.privacy-modal-body li {
+    margin-bottom: 6px;
+}
+
+@media (max-width: 768px) {
+    .privacy-modal {
+        padding: 3vh 0;
+    }
+
+    .privacy-modal-content {
+        width: 95%;
+    }
+
+    .privacy-modal-body {
+        padding: 30px 20px;
+    }
+}
+
+body[data-theme="dark"] .privacy-modal-content {
+    background-color: #161616;
+}
+
+body[data-theme="dark"] .privacy-modal-body {
+    color: #e0e0e0;
+}
+
+body[data-theme="dark"] .privacy-modal-body .privacy-subtitle {
+    color: #aaa;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('privacyPolicyModal');
+    if (!modal) return;
+    const closeBtn = modal.querySelector('.privacy-close');
+
+    function openModal(e) {
+        if (e) e.preventDefault();
+        modal.classList.add('privacy-modal-open');
+        document.body.style.overflow = 'hidden';
+        if (window.lenis) window.lenis.stop();
+    }
+
+    function closeModal() {
+        modal.classList.remove('privacy-modal-open');
+        document.body.style.overflow = 'auto';
+        if (window.lenis) window.lenis.start();
+    }
+
+    document.querySelectorAll('[data-privacy-modal-trigger]').forEach(function (el) {
+        el.addEventListener('click', openModal);
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+
+    window.addEventListener('click', function (event) {
+        if (event.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && modal.classList.contains('privacy-modal-open')) {
+            closeModal();
+        }
+    });
+});
+</script>

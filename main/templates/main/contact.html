@@ -204,11 +204,11 @@
                                                                 <input type="checkbox" name="consent_agree" id="consent-agree-checkbox-contact" class="consent-agree-input" required>
                                                                 <span class="consent-agree-text">
                                                                     {% if LANGUAGE_CODE == 'uz' %}
-                                                                    Men o'z ma'lumotlarning qayta ishlashiga rozilik beraman. <a href="#" class="consent-agree-link">Siyosat</a>
+                                                                    Men o'z ma'lumotlarning qayta ishlashiga rozilik beraman. <a href="javascript:void(0)" class="consent-agree-link" data-privacy-modal-trigger>Siyosat</a>
                                                                     {% elif LANGUAGE_CODE == 'ru' %}
-                                                                    Я согласен с обработкой данных. <a href="#" class="consent-agree-link">Политика</a>
+                                                                    Я согласен с обработкой данных. <a href="javascript:void(0)" class="consent-agree-link" data-privacy-modal-trigger>Политика</a>
                                                                     {% else %}
-                                                                    I agree with data processing. <a href="#" class="consent-agree-link">Policy</a>
+                                                                    I agree with data processing. <a href="javascript:void(0)" class="consent-agree-link" data-privacy-modal-trigger>Policy</a>
                                                                     {% endif %}
                                                                 </span>
                                                             </label>

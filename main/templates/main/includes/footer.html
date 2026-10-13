@@ -29,7 +29,7 @@
                         </ul>
                     </div>
                     <div class="footer-blocks__links">
-                        <a class="btn btn-line-xsmall btn-muted slide-right anim-no-delay" href="#">
+                        <a class="btn btn-line-xsmall btn-muted slide-right anim-no-delay" href="javascript:void(0)" data-privacy-modal-trigger>
                             <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Maxfiylik siyosati{% elif LANGUAGE_CODE == 'ru' %}Политика конфиденциальности{% else %}Privacy policy{% endif %}</span>
                         </a>
                         <a class="btn btn-line-xsmall btn-muted slide-right anim-no-delay" href="#">
@@ -116,3 +116,5 @@
             </div>
         </div>
     </footer>
+
+    {% include 'main/includes/privacy_policy_modal.html' %}
