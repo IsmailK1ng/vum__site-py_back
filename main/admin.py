@@ -1223,6 +1223,10 @@ class SparePartAdmin(TabbedTranslationAdmin):
     filter_horizontal = ('parent_models',)
     inlines         = [SparePartImageInline]
 
+    class Media:
+        js = ('js/admin/spare_part_images.js',)
+        css = {'all': ('css/admin/spare_part_images.css',)}
+
     fieldsets = (
         ('Основное', {
             'fields': (

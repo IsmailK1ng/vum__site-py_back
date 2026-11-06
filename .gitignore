@@ -44,3 +44,6 @@ Desktop.ini
 *.dump
 main/static/css/*.orig
 main/static/css/*purged.css
+
+# === Внутренняя документация (не для репозитория) ===
+/docs/
