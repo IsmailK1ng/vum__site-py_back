@@ -275,6 +275,9 @@
     .invoice-success-banner--draft .invoice-success-banner__icon { background: #e08b00; }
     .invoice-success-banner--transit { background: #e6f1fb; border-color: #bcd9f4; color: #1f4f7e; }
     .invoice-success-banner--transit .invoice-success-banner__icon { background: #1f7ec7; }
+    .invoice-success-banner--cancelled { background: #fdecea; border-color: #f5c2bd; color: #7d1f16; }
+    .invoice-success-banner--cancelled .invoice-success-banner__icon { background: #c0392b; }
+    .invoice-print-bar #invoice-cancel-order-btn { color: #c0392b !important; border-color: #e6b0aa !important; }
 
     /* Бейдж статуса в тулбаре (рядом с навигацией) */
     .status-badge {
@@ -289,6 +292,7 @@
     .status-badge--paid            { background: #2c9f4e; }
     .status-badge--in_transit      { background: #1f7ec7; }
     .status-badge--delivered       { background: #5a6470; }
+    .status-badge--cancelled       { background: #c0392b; }
 
     /* Кнопка "Я получил" — ярко-зелёная, заметная */
     .invoice-print-bar #invoice-received-btn {
@@ -343,6 +347,13 @@
         <strong>Заказ в пути.</strong> Когда получите груз — нажмите «Я получил» чтобы подтвердить доставку.
       </div>
     </div>
+  {% elif invoice.status == 'cancelled' %}
+    <div class="invoice-success-banner invoice-success-banner--cancelled">
+      <div class="invoice-success-banner__icon">✕</div>
+      <div class="invoice-success-banner__text">
+        <strong>Заказ отменён.</strong>{% if invoice.cancel_reason %} Причина: {{ invoice.cancel_reason }}{% endif %}
+      </div>
+    </div>
   {% endif %}
 
   <div class="invoice-print-bar">
@@ -367,6 +378,9 @@
       <div class="invoice-print-bar__group">
         {% if invoice.can_mark_received %}
           <button type="button" id="invoice-received-btn">✓ Я получил</button>
+        {% endif %}
+        {% if invoice.can_cancel_order %}
+          <button type="button" id="invoice-cancel-order-btn">✕ Отменить заказ</button>
         {% endif %}
         <button type="button" onclick="window.print()" class="is-primary">🖨 Распечатать</button>
       </div>
@@ -449,11 +463,11 @@
 
   </article>
 
-  {% if invoice.is_draft or invoice.can_mark_received %}
+  {% if invoice.is_draft or invoice.can_mark_received or invoice.can_cancel_order %}
     {# CSRF-токен для AJAX (страница загружена GET-ом, поэтому нужен явно) #}
     <form id="invoice-csrf-form" style="display:none">{% csrf_token %}</form>
 
-    <script src="{% static 'js/dealer-cart.js' %}"></script>
+    <script src="{% static 'js/dealer-cart.js' %}" data-owner="{{ profile.id }}"></script>
     <script>
       (function(){
         function getCSRFToken(){
@@ -467,25 +481,46 @@
           return input ? input.value : '';
         }
 
-        function postJson(url, onOk, onErr){
+        function postJson(url, onOk, onErr, body){
           return fetch(url, {
             method: 'POST',
             credentials: 'same-origin',
-            headers: { 'X-CSRFToken': getCSRFToken() }
+            headers: { 'X-CSRFToken': getCSRFToken() },
+            body: body
           })
             .then(function(r){
               return r.json().then(function(json){ return { status: r.status, body: json }; });
             })
             .then(function(res){
               if (res.body && res.body.ok) onOk(res.body);
-              else onErr(res.body && res.body.error ? res.body.error : 'Ошибка');
+              else onErr(res.body && res.body.error ? res.body.error : 'Ошибка', res.body || {});
             })
-            .catch(function(){ onErr('Ошибка сети. Попробуйте ещё раз.'); });
+            .catch(function(){ onErr('Ошибка сети. Попробуйте ещё раз.', {}); });
         }
 
-        var confirmBtn  = document.getElementById('invoice-confirm-btn');
-        var cancelBtn   = document.getElementById('invoice-cancel-btn');
-        var receivedBtn = document.getElementById('invoice-received-btn');
+        var confirmBtn     = document.getElementById('invoice-confirm-btn');
+        var cancelBtn      = document.getElementById('invoice-cancel-btn');
+        var receivedBtn    = document.getElementById('invoice-received-btn');
+        var cancelOrderBtn = document.getElementById('invoice-cancel-order-btn');
+
+        if (cancelOrderBtn) {
+          cancelOrderBtn.addEventListener('click', function(){
+            var reason = prompt('Отменить заказ? Укажите причину (необязательно):', '');
+            if (reason === null) return;
+            cancelOrderBtn.disabled = true;
+            var fd = new FormData();
+            fd.append('reason', reason);
+            postJson(
+              '{% url "dealer_invoice_cancel_order" invoice.id %}',
+              function(){ window.location.reload(); },
+              function(msg){
+                cancelOrderBtn.disabled = false;
+                alert(msg);
+              },
+              fd
+            );
+          });
+        }
 
         if (confirmBtn) {
           confirmBtn.addEventListener('click', function(){
@@ -497,10 +532,12 @@
                 if (window.DealerCart) DealerCart.clear();
                 window.location.href = body.redirect_url;
               },
-              function(msg){
+              function(msg, body){
+                alert(msg);
+                // Сервер пересчитал черновик (изменилась цена) — показываем новый документ
+                if (body.reload) { window.location.reload(); return; }
                 confirmBtn.disabled = false;
                 confirmBtn.textContent = '✓ Подтвердить заказ';
-                alert(msg);
               }
             );
           });

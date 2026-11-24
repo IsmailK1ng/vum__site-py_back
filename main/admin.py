@@ -12,10 +12,13 @@ from django import forms
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.db import transaction
 from django.db.models import Q, Max, Count, Case, When, IntegerField
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import path
+from django.core.exceptions import PermissionDenied
+from main.utils.java_parts import parse_java_parts
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.html import format_html
@@ -54,6 +57,7 @@ from .models import (
     DealerProfile,
     SparePart, SparePartImage, SparePartType,
     Invoice, InvoiceItem, ParentModel,
+    StockMovement, record_stock_change, VAT_RATE, DealerContract,
 )
 from .forms import PageMetaAdminForm, DealerProfileAdminForm, SparePartAdminForm
 from main.services.amocrm.token_manager import TokenManager
@@ -1111,6 +1115,25 @@ class SparePartImageInline(admin.TabularInline):
     verbose_name_plural = 'Фото запчасти'
 
 
+class StockMovementInline(admin.TabularInline):
+    """Движения склада в карточке запчасти (только просмотр)."""
+    model = StockMovement
+    extra = 0
+    can_delete = False
+    max_num = 0
+    fields = ('created_at', 'delta_display', 'quantity_after', 'reason', 'invoice', 'changed_by', 'comment')
+    readonly_fields = fields
+    ordering = ('-created_at', '-id')
+    verbose_name_plural = 'Движение склада'
+    classes = ('collapse',)
+
+    @admin.display(description='Изменение')
+    def delta_display(self, obj):
+        if obj.delta is None:       # пустая шаблонная строка инлайна
+            return '—'
+        return f'+{obj.delta}' if obj.delta > 0 else str(obj.delta)
+
+
 @admin.register(SparePartType)
 class SparePartTypeAdmin(TabbedTranslationAdmin):
     """Тип — переводимое поле name. RU обязателен, UZ/EN опционально."""
@@ -1132,15 +1155,38 @@ class InvoiceItemInline(admin.TabularInline):
     model = InvoiceItem
     extra = 0
     can_delete = False
-    fields = ('name', 'quantity', 'unit', 'price', 'sum')
+    fields = ('name', 'part_number', 'quantity', 'unit', 'price_without_vat', 'vat_rate', 'price', 'sum')
     readonly_fields = fields
 
     def has_add_permission(self, request, obj=None):
         return False
 
 
+class InvoiceStatusForm(forms.ModelForm):
+    """Проверка при возврате отменённого заказа в работу — позиции надо списать
+    со склада заново, и их может уже не хватать. Используется и в карточке счёта,
+    и в list_editable списка."""
+
+    class Meta:
+        model = Invoice
+        fields = ('status',)
+
+    def clean_status(self):
+        new_status = self.cleaned_data['status']
+        instance = self.instance
+        if (instance.pk and instance.status == Invoice.STATUS_CANCELLED
+                and new_status != Invoice.STATUS_CANCELLED):
+            shortages = instance.stock_shortage_for_uncancel()
+            if shortages:
+                raise forms.ValidationError(
+                    'Нельзя вернуть заказ в работу — не хватает на складе: ' + '; '.join(shortages)
+                )
+        return new_status
+
+
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
+    form            = InvoiceStatusForm
     list_display    = ('display_number', 'dealer', 'status', 'status_badge', 'buyer_company_name', 'total_amount', 'confirmed_at')
     list_filter     = ('status', 'year', 'dealer')
     search_fields   = ('number', 'buyer_company_name', 'buyer_inn', 'buyer_contract_number', 'dealer__name', 'dealer__user__username')
@@ -1148,19 +1194,25 @@ class InvoiceAdmin(admin.ModelAdmin):
     date_hierarchy  = 'confirmed_at'
     readonly_fields = (
         'dealer', 'year', 'number',
-        'buyer_company_name', 'buyer_inn', 'buyer_contract_number',
+        'buyer_company_name', 'buyer_inn', 'buyer_contract_number', 'buyer_contract_date', 'contract',
         'total_amount', 'created_at', 'confirmed_at',
+        'cancelled_at', 'cancelled_by', 'cancel_reason',
     )
     inlines         = [InvoiceItemInline]
-    ordering        = ('-year', '-number')
+    ordering        = ('-confirmed_at', '-id')
 
     fieldsets = (
         ('Заказ', {
             'fields': (('year', 'number'), 'dealer', 'status'),
-            'description': 'Статус — единственное поле которое можно менять. Остальное — снапшот на момент подтверждения.',
+            'description': 'Статус — единственное поле которое можно менять. Остальное — снапшот на момент подтверждения. '
+                            '«Отменён» возвращает позиции на склад, возврат из «Отменён» — списывает заново.',
+        }),
+        ('Отмена', {
+            'fields': ('cancelled_at', 'cancelled_by', 'cancel_reason'),
+            'classes': ('collapse',),
         }),
         ('Реквизиты покупателя (снапшот)', {
-            'fields': ('buyer_company_name', 'buyer_inn', 'buyer_contract_number'),
+            'fields': ('buyer_company_name', 'buyer_inn', ('buyer_contract_number', 'buyer_contract_date'), 'contract'),
         }),
         ('Сумма и даты', {
             'fields': ('total_amount', 'created_at', 'confirmed_at'),
@@ -1179,6 +1231,7 @@ class InvoiceAdmin(admin.ModelAdmin):
             Invoice.STATUS_PAID:            '#2c9f4e',  # зелёный
             Invoice.STATUS_IN_TRANSIT:      '#1f7ec7',  # синий
             Invoice.STATUS_DELIVERED:       '#5a6470',  # серый (завершено)
+            Invoice.STATUS_CANCELLED:       '#c0392b',  # красный
         }
         color = colors.get(obj.status, '#888')
         return format_html(
@@ -1187,6 +1240,28 @@ class InvoiceAdmin(admin.ModelAdmin):
             color, obj.get_status_display()
         )
     status_badge.short_description = ' '
+
+    def get_changelist_form(self, request, **kwargs):
+        kwargs.setdefault('form', InvoiceStatusForm)
+        return super().get_changelist_form(request, **kwargs)
+
+    def save_model(self, request, obj, form, change):
+        """Переходы в/из «Отменён» двигают склад. Админ может всё — матрица ролей
+        здесь не действует, но остатки должны сходиться."""
+        if change and 'status' in form.changed_data:
+            with transaction.atomic():
+                old_status = (
+                    Invoice.objects.select_for_update()
+                    .values_list('status', flat=True).get(pk=obj.pk)
+                )
+                new_status = obj.status
+                if new_status == Invoice.STATUS_CANCELLED and old_status != Invoice.STATUS_CANCELLED:
+                    obj.set_cancelled(changed_by=request.user.username, reason='Отменён в админке')
+                elif old_status == Invoice.STATUS_CANCELLED and new_status != Invoice.STATUS_CANCELLED:
+                    obj.set_uncancelled(new_status, changed_by=request.user.username)
+                super().save_model(request, obj, form, change)
+            return
+        super().save_model(request, obj, form, change)
 
     def has_add_permission(self, request):
         return False
@@ -1212,7 +1287,7 @@ class InvoiceAdmin(admin.ModelAdmin):
 @admin.register(SparePart)
 class SparePartAdmin(TabbedTranslationAdmin):
     form            = SparePartAdminForm
-    list_display    = ('part_number', 'name', 'type', 'parent_models_display', 'quantity', 'price', 'is_active', 'updated_at')
+    list_display    = ('part_number', 'name', 'type', 'parent_models_display', 'quantity', 'price', 'price_with_vat_display', 'is_active', 'updated_at')
     list_filter     = ('is_active', 'type', 'parent_models')
     search_fields   = ('part_number', 'name', 'name_ru', 'name_uz', 'name_en')
     list_editable   = ('quantity', 'price', 'is_active')
@@ -1221,7 +1296,9 @@ class SparePartAdmin(TabbedTranslationAdmin):
     # прозрачным. filter_horizontal — родной двухколоночный виджет Django,
     # Jazzmin его поддерживает штатно.
     filter_horizontal = ('parent_models',)
-    inlines         = [SparePartImageInline]
+    readonly_fields = ('price_with_vat_display',)
+    change_list_template = 'admin/main/sparepart/change_list.html'
+    inlines         = [SparePartImageInline, StockMovementInline]
 
     class Media:
         js = ('js/admin/spare_part_images.js',)
@@ -1231,13 +1308,13 @@ class SparePartAdmin(TabbedTranslationAdmin):
         ('Основное', {
             'fields': (
                 ('part_number', 'is_active'),
-                'type',
+                'type_name',
                 'name',
                 'description',
             ),
         }),
         ('Цена и склад', {
-            'fields': (('quantity', 'price'),),
+            'fields': (('quantity', 'price', 'price_with_vat_display'),),
         }),
         ('Привязка', {
             'fields': ('parent_models',),
@@ -1246,9 +1323,175 @@ class SparePartAdmin(TabbedTranslationAdmin):
         }),
     )
 
+    # ---------- Импорт из Java-файла (код + наименование) ----------
+    JAVA_IMPORT_MAX_BYTES = 2 * 1024 * 1024
+    JAVA_IMPORT_DEFAULT_TYPE = 'Без категории'
+
+    def get_urls(self):
+        return [
+            path(
+                'import-java/',
+                self.admin_site.admin_view(self.import_java_view),
+                name='main_sparepart_import_java',
+            ),
+        ] + super().get_urls()
+
+    def import_java_view(self, request):
+        """Загрузка SpareParts.java → новые запчасти (код + наименование).
+
+        Новые позиции создаются СНЯТЫМИ с продажи, с ценой 0 и остатком 0 —
+        дилеры их не увидят, пока сотрудник не проставит цену и не включит «В продаже».
+        Уже существующие артикулы не трогаются (или только переименовываются — по галке).
+        """
+        if not self.has_add_permission(request):
+            raise PermissionDenied
+
+        context = {
+            **self.admin_site.each_context(request),
+            'opts': self.model._meta,
+            'title': 'Импорт запчастей из Java',
+            'type_names': list(SparePartType.objects.order_by('name').values_list('name', flat=True)),
+            'type_value': self.JAVA_IMPORT_DEFAULT_TYPE,
+            'update_names': False,
+        }
+
+        if request.method == 'POST':
+            upload = request.FILES.get('java_file')
+            type_value = (request.POST.get('type_name') or '').strip() or self.JAVA_IMPORT_DEFAULT_TYPE
+            update_names = bool(request.POST.get('update_names'))
+            context.update(type_value=type_value, update_names=update_names)
+
+            error = None
+            parsed = []
+            if not upload:
+                error = 'Выберите файл .java.'
+            elif upload.size > self.JAVA_IMPORT_MAX_BYTES:
+                error = 'Файл больше 2 МБ — это точно список запчастей?'
+            else:
+                try:
+                    text = upload.read().decode('utf-8-sig')
+                except UnicodeDecodeError:
+                    error = 'Файл не в кодировке UTF-8.'
+                else:
+                    parsed = parse_java_parts(text)
+                    if not parsed:
+                        error = ('В файле не найдено ни одной строки вида '
+                                 'new SparePart(1, "код", "наименование").')
+            if error:
+                context['error'] = error
+                return render(request, 'admin/main/sparepart/import_java.html', context)
+
+            context['result'] = self._import_java_parts(request, parsed, type_value, update_names)
+
+        return render(request, 'admin/main/sparepart/import_java.html', context)
+
+    def _import_java_parts(self, request, parsed, type_value, update_names):
+        seen = set()
+        unique, duplicates, no_name = [], [], []
+        for part_number, name in parsed:
+            if part_number in seen:
+                duplicates.append(part_number)
+                continue
+            seen.add(part_number)
+            if not name:
+                no_name.append(part_number)
+                continue
+            unique.append((part_number, name))
+
+        existing = {
+            p.part_number: p
+            for p in SparePart.objects.filter(part_number__in=[pn for pn, _ in unique])
+        }
+        created, renamed, skipped = [], [], []
+
+        with transaction.atomic():
+            part_type = SparePartType.get_or_create_normalized(type_value)
+            for part_number, name in unique:
+                part = existing.get(part_number)
+                if part is None:
+                    SparePart.objects.create(
+                        part_number=part_number[:100],
+                        name=name[:255], name_ru=name[:255],
+                        type=part_type,
+                        price=0, quantity=0, is_active=False,
+                    )
+                    created.append(f'{part_number} — {name}')
+                elif update_names and (part.name_ru or '') != name:
+                    old = part.name_ru or part.name
+                    part.name_ru = name[:255]
+                    part.save(update_fields=['name_ru', 'updated_at'])
+                    renamed.append(f'{part_number}: «{old}» → «{name}»')
+                else:
+                    skipped.append(f'{part_number} — {part.name_ru or part.name}')
+
+        if created or renamed:
+            logger.info('Spare parts imported from Java by %s: created=%d renamed=%d',
+                        request.user.username, len(created), len(renamed))
+        return {
+            'total': len(parsed),
+            'created': created,
+            'renamed': renamed,
+            'skipped': skipped,
+            'duplicates': duplicates,
+            'no_name': no_name,
+            'type_name': part_type.name,
+        }
+
     @admin.display(description='Родительские модели')
     def parent_models_display(self, obj):
         return ', '.join(pm.name for pm in obj.parent_models.all()) or '—'
+
+    @admin.display(description=f'Цена с НДС {VAT_RATE:g}%')
+    def price_with_vat_display(self, obj):
+        if obj is None or obj.price is None:
+            return '—'
+        return f'{obj.price_with_vat:,.0f}'.replace(',', ' ')
+
+    def save_model(self, request, obj, form, change):
+        """Правка остатка в админке (в карточке или прямо в списке) — пишем в журнал склада."""
+        if 'quantity' not in form.changed_data:
+            super().save_model(request, obj, form, change)
+            return
+        with transaction.atomic():
+            old_quantity = 0
+            if change:
+                old_quantity = (
+                    SparePart.objects.select_for_update()
+                    .values_list('quantity', flat=True).get(pk=obj.pk)
+                )
+            super().save_model(request, obj, form, change)
+            record_stock_change(
+                obj.pk, obj.quantity - old_quantity, obj.quantity,
+                StockMovement.REASON_ADMIN, changed_by=request.user.username,
+            )
+
+
+
+@admin.register(StockMovement)
+class StockMovementAdmin(admin.ModelAdmin):
+    """Журнал склада — только чтение. Пишется автоматически при заказах,
+    отменах и правках остатка сотрудниками/админами."""
+    list_display  = ('created_at', 'part', 'delta_display', 'quantity_after', 'reason', 'invoice', 'changed_by', 'comment')
+    list_filter   = ('reason', 'created_at')
+    search_fields = ('part__part_number', 'part__name_ru', 'changed_by', 'comment')
+    date_hierarchy = 'created_at'
+    list_select_related = ('part', 'invoice', 'invoice__dealer')
+    list_per_page = 50
+
+    @admin.display(description='Изменение', ordering='delta')
+    def delta_display(self, obj):
+        color = '#2c9f4e' if obj.delta > 0 else '#c0392b'
+        sign = '+' if obj.delta > 0 else ''
+        return format_html('<b style="color:{}">{}{}</b>', color, sign, obj.delta)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(ParentModel)
@@ -2504,8 +2747,11 @@ class DealerProfileAdmin(admin.ModelAdmin):
             'description': 'Дилер — покупатель. Сервис — заказы и склад. Бухгалтер — оплата.',
         }),
         ('Юридические данные', {
-            'fields': ('company_name', 'inn', 'contract_number'),
-            'description': 'Обязательно только для роли «Дилер» (для счетов на оплату).',
+            'fields': ('company_name', 'inn', ('contract_number', 'contract_date')),
+            'description': 'Обязательно только для роли «Дилер» (для счетов на оплату). '
+                            'Правка номера/даты здесь — исправление текущего договора, нумерация '
+                            'счетов НЕ сбрасывается. Новый договор с нумерацией с №1 заводит '
+                            'сервис в разделе «Договоры».',
         }),
         ('Служебное', {
             'fields': ('created_at', 'updated_at'),
@@ -2535,6 +2781,20 @@ class DealerProfileAdmin(admin.ModelAdmin):
             obj.user.save()
         super().save_model(request, obj, form, change)
 
+        # Номер/дата договора в профиле = текущий договор. Правка в админке —
+        # исправление текущего договора (без сброса нумерации).
+        if obj.is_dealer and obj.contract_number:
+            contract = DealerContract.objects.filter(dealer=obj).order_by('-created_at', '-id').first()
+            if contract is None:
+                DealerContract.objects.create(
+                    dealer=obj, number=obj.contract_number, date=obj.contract_date,
+                    created_by=request.user.username,
+                )
+            elif (contract.number, contract.date) != (obj.contract_number, obj.contract_date):
+                contract.number = obj.contract_number
+                contract.date = obj.contract_date
+                contract.save(update_fields=['number', 'date'])
+
     def delete_model(self, request, obj):
         user = obj.user
         super().delete_model(request, obj)
@@ -2558,3 +2818,18 @@ class DealerProfileAdmin(admin.ModelAdmin):
     def username_display(self, obj):
         return obj.user.username
     username_display.short_description = 'Логин'
+
+@admin.register(DealerContract)
+class DealerContractAdmin(admin.ModelAdmin):
+    """История договоров дилеров. Новый договор заводит сервис («Договоры»)."""
+    list_display  = ('dealer', 'number', 'date', 'last_number', 'created_by', 'created_at')
+    list_filter   = ('dealer',)
+    search_fields = ('number', 'dealer__name', 'dealer__company_name')
+    readonly_fields = ('dealer', 'last_number', 'created_by', 'created_at')
+    fields = ('dealer', 'number', 'date', 'last_number', 'created_by', 'created_at')
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False

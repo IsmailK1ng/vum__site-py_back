@@ -265,6 +265,8 @@
       justify-content: space-between;
       gap: 10px;
     }
+    .part-card__price-block { display: flex; flex-direction: column; }
+    .part-card__price-novat { font-size: 11px; color: #8a929b; white-space: nowrap; }
     .part-card__price {
       font-size: 17px;
       font-weight: 700;
@@ -290,6 +292,19 @@
       color: #3a4452;
     }
     .shop-empty__text { margin: 0; font-size: 14px; }
+
+    .shop-pagination {
+      display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+      gap: 6px; margin: 28px 0 8px;
+    }
+    .shop-pagination__link {
+      min-width: 38px; padding: 8px 12px; border-radius: 8px;
+      background: #fff; border: 1px solid #dde3ea; color: #1f3a5f;
+      font-size: 14px; font-weight: 600; text-align: center; text-decoration: none;
+    }
+    .shop-pagination__link:hover { border-color: #1f3a5f; }
+    .shop-pagination__link.is-current { background: #1f3a5f; border-color: #1f3a5f; color: #fff; }
+    .shop-pagination__gap { color: #8a94a3; padding: 0 4px; }
 
     /* ===== MOBILE ===== */
     @media (max-width: 600px) {
@@ -376,7 +391,10 @@
               <span class="part-card__sku">{{ part.part_number }}</span>
               <h2 class="part-card__name">{{ part.name_ru|default:part.name }}</h2>
               <div class="part-card__bottom">
-                <span class="part-card__price">{{ part.price|floatformat:0 }} UZS</span>
+                <span class="part-card__price-block">
+                  <span class="part-card__price">{{ part.price_with_vat|floatformat:0 }} UZS</span>
+                  <span class="part-card__price-novat">без НДС: {{ part.price|floatformat:0 }}</span>
+                </span>
                 {% if part.quantity %}
                   <span class="part-card__stock">В наличии: {{ part.quantity }}</span>
                 {% else %}
@@ -387,6 +405,27 @@
           </a>
         {% endfor %}
       </div>
+
+      {% if page_obj.has_other_pages %}
+        {# filter_query — текущие фильтры без page, чтоб они не терялись при листании #}
+        <nav class="shop-pagination" aria-label="Страницы каталога">
+          {% if page_obj.has_previous %}
+            <a href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}" class="shop-pagination__link">← Назад</a>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+              <span class="shop-pagination__link is-current">{{ num }}</span>
+            {% elif num == 1 or num == page_obj.paginator.num_pages or num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+              <a href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}page={{ num }}" class="shop-pagination__link">{{ num }}</a>
+            {% elif num == page_obj.number|add:"-3" or num == page_obj.number|add:"3" %}
+              <span class="shop-pagination__gap">…</span>
+            {% endif %}
+          {% endfor %}
+          {% if page_obj.has_next %}
+            <a href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}" class="shop-pagination__link">Вперёд →</a>
+          {% endif %}
+        </nav>
+      {% endif %}
     {% else %}
       <div class="shop-empty">
         <p class="shop-empty__title">Каталог пуст</p>
@@ -397,7 +436,7 @@
 
   {% include 'main/dealer/_profile_modal.html' %}
 
-  <script src="{% static 'js/dealer-cart.js' %}"></script>
+  <script src="{% static 'js/dealer-cart.js' %}" data-owner="{{ profile.id }}"></script>
   <script>
     DealerCart.bindBadge(document.getElementById('cart-badge'));
   </script>

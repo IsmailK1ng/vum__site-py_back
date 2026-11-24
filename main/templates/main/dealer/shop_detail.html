@@ -180,6 +180,7 @@
       display: flex; flex-wrap: wrap; align-items: center; gap: 18px;
     }
     .detail-footer__price { font-size: 24px; font-weight: 700; color: #1f3a5f; white-space: nowrap; }
+    .detail-footer__price-novat { margin-top: 2px; font-size: 12px; color: #8a929b; white-space: nowrap; }
     .detail-footer__stock { font-size: 13px; color: #5a6470; }
     .detail-footer__stock--zero { color: #c75050; font-weight: 600; }
     .detail-footer__stepper {
@@ -268,6 +269,7 @@
       margin-top: 4px;
       font-size: 14px; font-weight: 700; color: #1f3a5f;
     }
+    .rec-card__price-novat { font-size: 11px; color: #8a929b; }
 
     /* ===== TOAST ===== */
     .toast {
@@ -296,10 +298,12 @@
 </head>
 <body>
   <header class="dealer-header">
+    {# Карточку открывает и сервис (сверить фото/описание) — ему корзина и счета не нужны #}
     <div class="dealer-header__logo">
-      <a href="{% url 'dealer_shop' %}"><img src="{% static 'images/LOGO-VUM.png' %}" alt="VUM"></a>
+      <a href="{% if profile.is_dealer %}{% url 'dealer_shop' %}{% else %}{% url 'staff_parts_list' %}{% endif %}"><img src="{% static 'images/LOGO-VUM.png' %}" alt="VUM"></a>
     </div>
     <div class="dealer-header__user">
+      {% if profile.is_dealer %}
       <a href="{% url 'dealer_invoices_list' %}" class="cart-icon-link" aria-label="История счетов">
         <svg fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
       </a>
@@ -307,6 +311,7 @@
         <svg fill="currentColor" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
         <span class="cart-icon-link__badge" id="cart-badge" style="display:none"></span>
       </a>
+      {% endif %}
       <button type="button" class="profile-trigger" aria-label="Профиль">
         {% if profile.avatar %}
           <img class="dealer-header__avatar" src="{{ profile.avatar.url }}" alt="{{ profile.name }}">
@@ -319,7 +324,11 @@
   </header>
 
   <main class="dealer-main">
-    <a href="{% url 'dealer_shop' %}" class="back-link">← Назад к каталогу</a>
+    {% if profile.is_dealer %}
+      <a href="{% url 'dealer_shop' %}" class="back-link">← Назад к каталогу</a>
+    {% else %}
+      <a href="{% url 'staff_parts_list' %}" class="back-link">← К списку запчастей</a>
+    {% endif %}
 
     <section class="detail-card">
       {# ===== Галерея ===== #}
@@ -365,22 +374,27 @@
         </div>
 
         <div class="detail-footer">
-          <div class="detail-footer__price">{{ part.price|floatformat:0 }} UZS</div>
+          <div class="detail-footer__price-block">
+            <div class="detail-footer__price">{{ part.price_with_vat|floatformat:0 }} UZS</div>
+            <div class="detail-footer__price-novat">без НДС: {{ part.price|floatformat:0 }} UZS · НДС 12% включён</div>
+          </div>
           {% if part.quantity %}
             <div class="detail-footer__stock">Кол-во: <strong>{{ part.quantity }}</strong></div>
           {% else %}
             <div class="detail-footer__stock detail-footer__stock--zero">Нет в наличии</div>
           {% endif %}
 
-          <div class="detail-footer__stepper" data-max="{{ part.quantity }}">
-            <button type="button" data-action="dec" aria-label="Уменьшить">−</button>
-            <input type="number" id="qty-input" value="{% if part.quantity %}1{% else %}0{% endif %}" min="0" max="{{ part.quantity }}">
-            <button type="button" data-action="inc" aria-label="Увеличить">+</button>
-          </div>
+          {% if profile.is_dealer %}
+            <div class="detail-footer__stepper" data-max="{{ part.quantity }}">
+              <button type="button" data-action="dec" aria-label="Уменьшить">−</button>
+              <input type="number" id="qty-input" value="{% if part.quantity %}1{% else %}0{% endif %}" min="0" max="{{ part.quantity }}">
+              <button type="button" data-action="inc" aria-label="Увеличить">+</button>
+            </div>
 
-          <button type="button" class="detail-footer__add" id="add-to-cart-btn" {% if not part.quantity %}disabled{% endif %}>
-            Добавить в корзину
-          </button>
+            <button type="button" class="detail-footer__add" id="add-to-cart-btn" {% if not part.quantity %}disabled{% endif %}>
+              Добавить в корзину
+            </button>
+          {% endif %}
         </div>
       </div>
     </section>
@@ -400,7 +414,8 @@
               <div class="rec-card__body">
                 <span class="rec-card__sku">{{ r.part_number }}</span>
                 <h3 class="rec-card__name">{{ r.name_ru|default:r.name }}</h3>
-                <span class="rec-card__price">{{ r.price|floatformat:0 }} UZS</span>
+                <span class="rec-card__price">{{ r.price_with_vat|floatformat:0 }} UZS</span>
+                <span class="rec-card__price-novat">без НДС: {{ r.price|floatformat:0 }}</span>
               </div>
             </a>
           {% endfor %}
@@ -413,10 +428,11 @@
 
   {% include 'main/dealer/_profile_modal.html' %}
 
-  <script src="{% static 'js/dealer-cart.js' %}"></script>
+  {% if profile.is_dealer %}
+    <script src="{% static 'js/dealer-cart.js' %}" data-owner="{{ profile.id }}"></script>
+    <script>DealerCart.bindBadge(document.getElementById('cart-badge'));</script>
+  {% endif %}
   <script>
-    DealerCart.bindBadge(document.getElementById('cart-badge'));
-
     (function(){
       // ===== Галерея =====
       var mainImg = document.getElementById('gallery-main-img');

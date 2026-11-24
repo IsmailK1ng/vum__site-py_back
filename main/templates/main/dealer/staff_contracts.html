@@ -1,0 +1,178 @@
+{% load static %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="same-origin">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Договоры — VUM</title>
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f5f7fa; color: #1a1a1a; }
+
+    .dealer-header { background: #fff; border-bottom: 1px solid #e3e8ef; padding: 0 28px; display: flex; align-items: stretch; justify-content: space-between; position: sticky; top: 0; z-index: 10; gap: 24px; }
+    .dealer-header__logo { display: flex; align-items: center; }
+    .dealer-header__logo img { height: 30px; width: auto; }
+    .staff-tabs { display: flex; align-items: stretch; gap: 0; flex: 1; }
+    .staff-tabs__link { display: inline-flex; align-items: center; padding: 18px 18px; color: #5a6470; text-decoration: none; font-size: 14px; font-weight: 600; border-bottom: 3px solid transparent; transition: color 0.15s, border-color 0.15s, background 0.15s; }
+    .staff-tabs__link:hover { color: #1f3a5f; background: #f8fafc; }
+    .staff-tabs__link.is-current { color: #1f3a5f; border-bottom-color: #1f3a5f; }
+    .dealer-header__user { display: flex; align-items: center; gap: 14px; }
+    .dealer-header__avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 1.5px solid #e3e8ef; }
+    .dealer-header__avatar--placeholder { background: #1f3a5f; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; }
+    .dealer-header__name { font-size: 14px; font-weight: 600; }
+    .staff-role-badge { font-size: 10px; color: #fff; background: #1f3a5f; padding: 2px 8px; border-radius: 8px; margin-left: 8px; text-transform: uppercase; font-weight: 700; }
+
+    .dealer-main { max-width: 1280px; margin: 0 auto; padding: 24px 28px 64px; }
+    .page-title { margin: 0 0 8px; font-size: 24px; font-weight: 700; color: #0f1419; }
+    .page-hint { margin: 0 0 20px; color: #5a6470; font-size: 14px; max-width: 760px; }
+
+    .filters { background: #fff; border: 1px solid #e3e8ef; border-radius: 12px; padding: 14px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; }
+    .filters__input { width: 100%; padding: 10px 12px; border: 1.5px solid #d6dce5; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; }
+    .filters__input:focus { border-color: #1f3a5f; }
+    .filters__submit { padding: 10px 18px; background: #1f3a5f; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .filters__reset { padding: 10px 14px; color: #7a8290; text-decoration: none; font-size: 13px; font-weight: 600; }
+
+    .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 14px; font-weight: 600; }
+    .alert--ok { background: #e7f6ec; color: #1e6b37; border: 1px solid #bfe5cb; }
+    .alert--error { background: #fdecec; color: #a12d2d; border: 1px solid #f3c2c2; }
+
+    .contract-list { display: flex; flex-direction: column; gap: 14px; }
+    .contract-card { background: #fff; border: 1px solid #e3e8ef; border-radius: 14px; padding: 18px 20px; display: grid; grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr) auto; gap: 18px 24px; align-items: center; }
+    .contract-card.is-done { border-color: #2c9f4e; box-shadow: 0 0 0 2px rgba(44, 159, 78, 0.15); }
+    .contract-card.is-inactive { opacity: 0.55; }
+    .contract-card__dealer-name { font-size: 15px; font-weight: 700; color: #0f1419; }
+    .contract-card__dealer-meta { font-size: 13px; color: #7a8290; margin-top: 2px; }
+    .contract-card__current-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: #7a8290; font-weight: 600; }
+    .contract-card__current { font-size: 15px; font-weight: 700; color: #1f3a5f; margin-top: 2px; }
+    .contract-card__counter { font-size: 13px; color: #5a6470; margin-top: 2px; }
+
+    .contract-form { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
+    .contract-form label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #7a8290; font-weight: 600; }
+    .contract-form input { padding: 9px 10px; border: 1.5px solid #d6dce5; border-radius: 8px; font-size: 14px; font-family: inherit; outline: none; }
+    .contract-form input:focus { border-color: #1f3a5f; }
+    .contract-form input[name="contract_number"] { width: 150px; }
+    .contract-form button { padding: 10px 14px; background: #c0392b; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .contract-form button:hover { background: #a93226; }
+
+    .empty-state { background: #fff; border: 1px solid #e3e8ef; border-radius: 14px; padding: 60px 20px; text-align: center; color: #7a8290; }
+
+    @media (max-width: 900px) {
+      .contract-card { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .dealer-header { padding: 0 16px; }
+      .dealer-header__name { display: none; }
+      .dealer-main { padding: 16px; }
+      .filters { grid-template-columns: 1fr; }
+      .contract-form input[name="contract_number"] { width: 100%; }
+      .contract-form label { flex: 1 1 140px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="dealer-header">
+    <div class="dealer-header__logo">
+      <a href="{% url 'staff_orders_list' %}"><img src="{% static 'images/LOGO-VUM.png' %}" alt="VUM"></a>
+    </div>
+    <nav class="staff-tabs">
+      <a href="{% url 'staff_orders_list' %}" class="staff-tabs__link">Заказы</a>
+      <a href="{% url 'staff_parts_list' %}" class="staff-tabs__link">Запчасти</a>
+      <a href="{% url 'staff_contracts' %}" class="staff-tabs__link is-current">Договоры</a>
+    </nav>
+    <div class="dealer-header__user">
+      <button type="button" class="profile-trigger" aria-label="Профиль" style="display:inline-flex;align-items:center;gap:10px;background:transparent;border:none;padding:4px 8px;border-radius:24px;cursor:pointer;font:inherit;color:inherit;">
+        {% if profile.avatar %}
+          <img class="dealer-header__avatar" src="{{ profile.avatar.url }}" alt="{{ profile.name }}">
+        {% else %}
+          <div class="dealer-header__avatar dealer-header__avatar--placeholder">{{ profile.name|slice:":1"|upper }}</div>
+        {% endif %}
+        <span class="dealer-header__name">{{ profile.name }}<span class="staff-role-badge">{{ profile.get_role_display }}</span></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="dealer-main">
+    <h1 class="page-title">Договоры дилеров</h1>
+    <p class="page-hint">
+      Когда с дилером подписан новый договор — введите его номер и дату и нажмите
+      «Новый договор». Счета и спецификации этого дилера начнут нумероваться заново с №1.
+      Уже выданные документы не меняются.
+    </p>
+
+    {% for m in messages %}
+      <div class="alert alert--error">{{ m }}</div>
+    {% endfor %}
+
+    <form class="filters" method="get" action="">
+      <input type="search" name="q" class="filters__input" placeholder="Поиск: дилер, юр. название, ИНН, № договора" value="{{ q }}">
+      <button type="submit" class="filters__submit">Найти</button>
+      {% if q %}<a href="{% url 'staff_contracts' %}" class="filters__reset">Сбросить</a>{% endif %}
+    </form>
+
+    {% if rows %}
+      <div class="contract-list">
+        {% for r in rows %}
+          {% with is_done=r.id|stringformat:"s" %}
+          <div class="contract-card{% if is_done == done_id %} is-done{% endif %}{% if not r.is_active %} is-inactive{% endif %}" id="dealer-{{ r.id }}">
+            <div>
+              <div class="contract-card__dealer-name">{{ r.company_name|default:r.name }}</div>
+              <div class="contract-card__dealer-meta">{{ r.name }}{% if r.inn %} · ИНН {{ r.inn }}{% endif %}{% if not r.is_active %} · заблокирован{% endif %}</div>
+            </div>
+            <div>
+              <div class="contract-card__current-label">Текущий договор</div>
+              <div class="contract-card__current">
+                {% if r.contract_number %}№ {{ r.contract_number }}{% if r.contract_date %} от {{ r.contract_date }}{% endif %}{% else %}не указан{% endif %}
+              </div>
+              <div class="contract-card__counter">
+                Выдано счетов по договору: {{ r.last_number }}
+                {% if r.started_by %}· заведён {{ r.started_at }} ({{ r.started_by }}){% endif %}
+              </div>
+              {% if is_done == done_id %}
+                <div class="alert alert--ok" style="margin:10px 0 0;padding:8px 12px;">Новый договор заведён — следующий счёт будет №1.</div>
+              {% endif %}
+            </div>
+            <form class="contract-form" method="post" action="{% url 'staff_contract_new' r.id %}"
+                  data-dealer="{{ r.company_name|default:r.name }}">
+              {% csrf_token %}
+              <label>№ договора
+                <input type="text" name="contract_number" maxlength="100" required placeholder="AVN-24">
+              </label>
+              <label>Дата договора
+                <input type="date" name="contract_date" required>
+              </label>
+              <button type="submit">↺ Новый договор</button>
+            </form>
+          </div>
+          {% endwith %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">Дилеры не найдены.</div>
+    {% endif %}
+  </main>
+
+  {% include 'main/dealer/_profile_modal.html' %}
+
+  <script>
+    (function(){
+      document.querySelectorAll('.contract-form').forEach(function(form){
+        form.addEventListener('submit', function(e){
+          var number = form.querySelector('[name=contract_number]').value.trim();
+          var ok = confirm(
+            'Завести новый договор № ' + number + ' для «' + form.dataset.dealer + '»?\n\n'
+            + 'Нумерация счетов и спецификаций этого дилера начнётся заново с №1.'
+          );
+          if (!ok) e.preventDefault();
+        });
+      });
+      var done = document.querySelector('.contract-card.is-done');
+      if (done) done.scrollIntoView({ block: 'center' });
+    })();
+  </script>
+</body>
+</html>

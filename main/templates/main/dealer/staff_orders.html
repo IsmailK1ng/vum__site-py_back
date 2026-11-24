@@ -112,6 +112,7 @@
     .status-badge--paid            { background: #2c9f4e; }
     .status-badge--in_transit      { background: #1f7ec7; }
     .status-badge--delivered       { background: #5a6470; }
+    .status-badge--cancelled       { background: #c0392b; }
 
     .empty-state {
       background: #fff; border: 1px solid #e3e8ef; border-radius: 14px;
@@ -138,6 +139,7 @@
       <a href="{% url 'staff_orders_list' %}" class="staff-tabs__link is-current">Заказы</a>
       {% if profile.is_service %}
         <a href="{% url 'staff_parts_list' %}" class="staff-tabs__link">Запчасти</a>
+        <a href="{% url 'staff_contracts' %}" class="staff-tabs__link">Договоры</a>
       {% endif %}
     </nav>
     <div class="dealer-header__user">

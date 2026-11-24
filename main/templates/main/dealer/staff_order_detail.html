@@ -64,6 +64,7 @@
     .status-badge--paid            { background: #2c9f4e; }
     .status-badge--in_transit      { background: #1f7ec7; }
     .status-badge--delivered       { background: #5a6470; }
+    .status-badge--cancelled       { background: #c0392b; }
 
     .status-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
     .status-btn {
@@ -73,6 +74,9 @@
     }
     .status-btn:hover { background: #2a4d7a; }
     .status-btn:disabled { background: #b6bfcc; cursor: not-allowed; }
+    .status-btn--danger { background: #c0392b; }
+    .status-btn--danger:hover { background: #a93226; }
+    .status-cancelled-info { color: #7d1f16; background: #fdecea; border-radius: 8px; padding: 10px 14px; font-size: 14px; line-height: 1.5; }
 
     .status-locked-hint { color: #888; font-size: 13px; font-style: italic; margin-top: 10px; }
 
@@ -104,6 +108,7 @@
       <a href="{% url 'staff_orders_list' %}" class="staff-tabs__link is-current">Заказы</a>
       {% if profile.is_service %}
         <a href="{% url 'staff_parts_list' %}" class="staff-tabs__link">Запчасти</a>
+        <a href="{% url 'staff_contracts' %}" class="staff-tabs__link">Договоры</a>
       {% endif %}
     </nav>
     <div class="dealer-header__user">
@@ -135,15 +140,28 @@
       {% if next_options %}
         <div class="status-actions" id="status-actions">
           {% for opt in next_options %}
-            <button type="button" class="status-btn" data-new-status="{{ opt.value }}">→ {{ opt.label }}</button>
+            {% if opt.value == 'cancelled' %}
+              <button type="button" class="status-btn status-btn--danger" data-new-status="{{ opt.value }}">✕ Отменить заказ</button>
+            {% else %}
+              <button type="button" class="status-btn" data-new-status="{{ opt.value }}">→ {{ opt.label }}</button>
+            {% endif %}
           {% endfor %}
         </div>
+        {% if invoice.status != 'cancelled' %}
+          <div class="status-locked-hint">При отмене позиции заказа вернутся на склад.</div>
+        {% endif %}
       {% elif profile.is_service and invoice.status == 'pending_payment' %}
         <div class="status-locked-hint">⏳ Сначала бухгалтер должен подтвердить оплату.</div>
       {% elif profile.is_service and invoice.status == 'in_transit' %}
         <div class="status-locked-hint">Заказ в пути. Дилер сам подтвердит получение — статус сменится на «Доставлено» автоматически.</div>
       {% elif invoice.status == 'delivered' %}
         <div class="status-locked-hint">✓ Заказ доставлен и закрыт.</div>
+      {% elif invoice.status == 'cancelled' %}
+        <div class="status-cancelled-info">
+          Заказ отменён{% if invoice.cancelled_at %} {{ invoice.cancelled_at }}{% endif %}{% if invoice.cancelled_by %} — {{ invoice.cancelled_by }}{% endif %}.
+          Позиции возвращены на склад.
+          {% if invoice.cancel_reason %}<br>Причина: {{ invoice.cancel_reason }}{% endif %}
+        </div>
       {% else %}
         <div class="status-locked-hint">Доступных переходов для вашей роли нет.</div>
       {% endif %}
@@ -167,8 +185,9 @@
             <th>Наименование</th>
             <th class="qty">Кол-во</th>
             <th>Ед.</th>
-            <th class="price">Цена</th>
-            <th class="sum">Сумма</th>
+            {% if totals.has_vat %}<th class="price">Цена без НДС</th>{% endif %}
+            <th class="price">Цена{% if totals.has_vat %} с НДС{% endif %}</th>
+            <th class="sum">Сумма{% if totals.has_vat %} с НДС{% endif %}</th>
           </tr>
         </thead>
         <tbody>
@@ -178,6 +197,7 @@
               <td>{{ item.name }}</td>
               <td class="qty">{{ item.quantity }}</td>
               <td>{{ item.unit }}</td>
+              {% if totals.has_vat %}<td class="price">{{ item.price_without_vat_formatted }}</td>{% endif %}
               <td class="price">{{ item.price_formatted }}</td>
               <td class="sum">{{ item.sum_formatted }}</td>
             </tr>
@@ -188,17 +208,27 @@
         <span>Итого:</span>
         <span class="items-total__sum">{{ totals.amount_formatted }} {{ totals.currency }}</span>
       </div>
+      {% if totals.has_vat %}
+      <div style="text-align:right;color:#5a6470;font-size:13px;">
+        в т.ч. НДС{% if totals.vat_rate %} {{ totals.vat_rate }}%{% endif %}: {{ totals.vat_formatted }} {{ totals.currency }}
+      </div>
+      {% endif %}
       <div style="margin-top:6px;color:#5a6470;font-size:13px;">{{ totals.amount_in_words }}</div>
     </div>
 
     {# ===== Открыть полный документ ===== #}
     <div class="card" style="text-align:center;">
       <p style="margin:0 0 14px;color:#5a6470;font-size:14px;">
-        Тут — сводка по заказу. Полный счёт-фактуру с подписями можно открыть отдельно (печатается на A4).
+        Тут — сводка по заказу. Документы можно открыть отдельно (печатаются на A4).
       </p>
-      <a href="{% url 'staff_invoice_view' invoice.id %}" class="open-doc-btn">
-        📄 Открыть документ
-      </a>
+      <div class="open-doc-btns">
+        <a href="{% url 'staff_invoice_view' invoice.id %}" class="open-doc-btn">
+          📄 Счёт на оплату
+        </a>
+        <a href="{% url 'staff_specification_view' invoice.id %}" class="open-doc-btn">
+          📋 Спецификация
+        </a>
+      </div>
     </div>
   </main>
 
@@ -213,6 +243,7 @@
       transition: background 0.15s;
     }
     .open-doc-btn:hover { background: #2a4d7a; color: #fff; }
+    .open-doc-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
   </style>
 
   <div class="toast" id="toast"></div>
@@ -247,11 +278,18 @@
         var btn = e.target.closest('button[data-new-status]');
         if (!btn) return;
         var newStatus = btn.dataset.newStatus;
-        if (!confirm('Перевести заказ в статус «' + btn.textContent.replace('→ ', '').trim() + '»?')) return;
+        var reason = '';
+        if (newStatus === 'cancelled') {
+          reason = prompt('Отменить заказ? Позиции вернутся на склад.\nПричина (необязательно):', '');
+          if (reason === null) return;
+        } else if (!confirm('Перевести заказ в статус «' + btn.textContent.replace('→ ', '').trim() + '»?')) {
+          return;
+        }
 
         btn.disabled = true;
         var fd = new FormData();
         fd.append('status', newStatus);
+        fd.append('reason', reason);
         fetch('{% url "staff_change_status" invoice.id %}', {
           method: 'POST',
           credentials: 'same-origin',

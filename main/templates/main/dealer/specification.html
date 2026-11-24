@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Спецификация № {{ spec.number }}</title>
+  <style>
+    /* Вёрстка под A4 (210 × 297 mm), по образцу бумажной спецификации */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 14px;
+      color: #000;
+      background: #f5f5f5;
+      line-height: 1.35;
+    }
+
+    .spec-page {
+      max-width: 820px;
+      margin: 24px auto;
+      padding: 48px 40px 60px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      min-height: 1000px;
+    }
+
+    .spec-title {
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 14px;
+    }
+
+    .spec-subtitle {
+      text-align: center;
+      margin: 0 0 44px;
+    }
+
+    .spec-place-date {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 40px;
+      margin-bottom: 18px;
+    }
+
+    .spec-intro {
+      text-align: center;
+      margin: 0 0 18px;
+    }
+
+    table.spec-items {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    table.spec-items th,
+    table.spec-items td {
+      border: 1px solid #000;
+      padding: 8px 6px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    table.spec-items thead th {
+      font-weight: 700;
+      font-size: 13px;
+      height: 92px;
+      vertical-align: top;
+      padding-top: 10px;
+    }
+
+    table.spec-items tbody td { height: 54px; }
+    table.spec-items td.num { width: 42px; }
+    table.spec-items td.qty { width: 50px; }
+    table.spec-items td.money { white-space: nowrap; }
+
+    /* Внешняя рамка таблицы толще — как в образце */
+    table.spec-items { border: 2px solid #000; }
+
+    .spec-signatures {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 22px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    /* ===== Тулбар (не печатается) ===== */
+    .spec-print-bar {
+      max-width: 820px;
+      margin: 24px auto 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    .spec-print-bar__group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .spec-print-bar a,
+    .spec-print-bar button {
+      padding: 8px 16px;
+      border: 1.5px solid #d6dce5;
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: #3a4452;
+      font-family: inherit;
+      text-decoration: none;
+    }
+    .spec-print-bar a:hover,
+    .spec-print-bar button:hover { border-color: #1f3a5f; color: #1f3a5f; }
+    .spec-print-bar .is-primary { background: #1f3a5f; border-color: #1f3a5f; color: #fff; }
+    .spec-print-bar .is-primary:hover { background: #2a4d7a; color: #fff; }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .status-badge--pending_payment { background: #e08b00; }
+    .status-badge--paid { background: #2c9f4e; }
+    .status-badge--in_transit { background: #1f7ec7; }
+    .status-badge--delivered { background: #5a6470; }
+    .status-badge--cancelled { background: #c0392b; }
+
+    @media (max-width: 700px) {
+      .spec-page { padding: 24px 12px; margin: 12px 0; }
+      .spec-place-date { padding: 0; }
+      table.spec-items { font-size: 12px; }
+      .spec-print-bar { padding: 0 12px; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .spec-page {
+        margin: 0;
+        box-shadow: none;
+        padding: 15mm 15mm;
+        max-width: none;
+        min-height: auto;
+      }
+      .spec-print-bar { display: none; }
+      @page { size: A4; margin: 0; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="spec-print-bar">
+    <div class="spec-print-bar__group">
+      <a href="{{ spec.back_url }}">← К управлению заказом</a>
+      <span class="status-badge status-badge--{{ spec.status }}">{{ spec.status_label }}</span>
+    </div>
+    <div class="spec-print-bar__group">
+      <button type="button" onclick="window.print()" class="is-primary">🖨 Распечатать</button>
+    </div>
+  </div>
+
+  <article class="spec-page">
+
+    <h1 class="spec-title">СПЕЦИФИКАЦИЯ №{{ spec.number }}</h1>
+    <p class="spec-subtitle">
+      к Договору № {{ spec.contract_number }}{% if spec.contract_date %} от {{ spec.contract_date }} г.{% endif %}
+    </p>
+
+    <div class="spec-place-date">
+      <span>г. Ташкент</span>
+      <span>«{{ spec.day }}» {{ spec.month }} {{ spec.year }} г.</span>
+    </div>
+
+    <p class="spec-intro">
+      ООО «VAN UNIVERSAL MOTORS», именуемое «Продавец», и {{ spec.buyer_name }},
+      именуемое «Покупатель», составили настоящую спецификацию о нижеследующем.
+    </p>
+
+    <table class="spec-items">
+      <thead>
+        <tr>
+          <th>№</th>
+          <th>Наименование материальных ценностей</th>
+          <th>Код детали</th>
+          <th>Кол-во</th>
+          <th>Цена без НДС</th>
+          <th>Стоимость сум с НДС</th>
+          <th>Общая цена с НДС</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td class="num">{{ forloop.counter }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.part_number|default:"—" }}</td>
+          <td class="qty">{{ item.quantity }}</td>
+          <td class="money">{{ item.price_without_vat }}</td>
+          <td class="money">{{ item.price }}</td>
+          <td class="money">{{ item.sum }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+          <td></td>
+          <td>Итого:</td>
+          <td></td>
+          <td class="qty">{{ total_quantity }}</td>
+          <td></td>
+          <td></td>
+          <td class="money">{{ total_amount }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="spec-signatures">
+      <div>Продавец:<br>ООО «VAN UNIVERSAL MOTORS»</div>
+      <div>Покупатель:<br>{{ spec.buyer_name }}</div>
+    </div>
+
+  </article>
+
+</body>
+
+</html>

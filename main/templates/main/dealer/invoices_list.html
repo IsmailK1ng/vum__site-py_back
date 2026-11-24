@@ -103,6 +103,7 @@
     .status-badge--paid            { background: #2c9f4e; }
     .status-badge--in_transit      { background: #1f7ec7; }
     .status-badge--delivered       { background: #5a6470; }
+    .status-badge--cancelled       { background: #c0392b; }
 
     /* ===== Empty ===== */
     .empty-state {
@@ -199,7 +200,7 @@
 
   {% include 'main/dealer/_profile_modal.html' %}
 
-  <script src="{% static 'js/dealer-cart.js' %}"></script>
+  <script src="{% static 'js/dealer-cart.js' %}" data-owner="{{ profile.id }}"></script>
   <script>
     DealerCart.bindBadge(document.getElementById('cart-badge'));
   </script>

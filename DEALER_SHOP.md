@@ -107,18 +107,21 @@ POST `/dealer/change-password/` через модалку в кабинете:
 
 `GET /dealer/` — `dealer_shop`. Показывает активные `SparePart` с фильтрами:
 - `?q=` — поиск по артикулу/имени/`name_ru`
-- `?truck=ID` — фильтр по грузовику (только если `isdigit()` — защита от мусора в querystring)
+- `?parent=ID` — фильтр по родительской модели (платформе/шасси, M2M `SparePart.parent_models`; только если `isdigit()` — защита от мусора в querystring)
 - `?type=ID` — фильтр по типу запчасти
+- `?page=N` — пагинация по `SHOP_PAGE_SIZE = 24`; ссылки страниц сохраняют текущие фильтры
 
-Селекты «грузовик» и «тип» — показывают только сущности, у которых **есть** активные запчасти (через `parts__is_active=True`).
+Селекты «модель» и «тип» — показывают только сущности, у которых **есть** активные запчасти.
 
 ### Карточка детали
 
-`GET /dealer/part/<id>/` — `dealer_part_detail`. Полная инфа + блок «Похожие запчасти» (тот же тип ИЛИ тот же грузовик, fallback на 4 свежих).
+`GET /dealer/part/<id>/` — `dealer_part_detail`. Полная инфа + блок «Похожие запчасти» (тот же тип ИЛИ общая родительская модель, fallback на 4 свежих).
+
+Карточку может открыть и **сервис** (сверить фото/описание из `/staff/parts/`) — для него скрыты корзина, история счетов и кнопка «В корзину», а «назад» ведёт в список запчастей staff.
 
 ### Корзина
 
-**Хранилище — localStorage** (`dealer_cart_v1`). Структура: `[{id, qty}, ...]`. Никакого серверного состояния, чтобы:
+**Хранилище — localStorage**, ключ `dealer_cart_v1_<profile_id>` — своя корзина у каждого дилера (иначе два дилера за одним компьютером видели бы корзину друг друга). id профиля приходит из `<script src="dealer-cart.js" data-owner="{{ profile.id }}">`. Старая общая корзина `dealer_cart_v1` один раз переносится первому зашедшему дилеру и удаляется. Структура: `[{id, qty}, ...]`. Никакого серверного состояния, чтобы:
 - Дешёвая запись/чтение
 - Не зависит от cookie-сессии
 
@@ -184,13 +187,17 @@ with transaction.atomic():
     for it in items:
         if part.quantity < it.quantity: return 400 "Недостаточно X"
 
-    # 4. Списание через F() — атомарный SQL UPDATE quantity = quantity - N
-    for it in items:
-        SparePart.objects.filter(id=it.part_id).update(
-            quantity=F('quantity') - it.quantity
-        )
+    # 4. Цена изменилась с момента черновика? → пересчитываем черновик,
+    #    отвечаем 409 {reload: true}, склад не трогаем. Дилер видит новую сумму
+    #    и подтверждает ещё раз. По старой цене подтвердить нельзя.
 
-    # 5. Lock последнего счёта этого года → присвоение номера
+    # 5. Списание через change_stock() — атомарный UPDATE quantity = quantity - N
+    #    + запись в журнал склада StockMovement (reason='order')
+    for it in items:
+        change_stock(it.part_id, -it.quantity, StockMovement.REASON_ORDER, invoice=invoice, ...)
+
+    # 6. Lock последнего счёта этого года → присвоение номера
+    year = timezone.localdate().year     # год по Ташкенту, не по UTC
     last = Invoice.objects.select_for_update().filter(
         year=year, number__isnull=False
     ).order_by('-number').first()
@@ -254,36 +261,56 @@ class Invoice(Meta):
 - Поддерживает 2 формата: `{quantity: N}` (установить) или `{delta: ±N}` (прирост/убыль)
 - Запрещает уход в минус: `new_val < 0` → 400
 
+### Журнал склада `StockMovement`
+
+Каждое изменение остатка пишется в журнал: запчасть, `delta` (±N), остаток после, причина, счёт (если есть), кто и когда.
+
+| Причина | Когда пишется |
+|---------|---------------|
+| `order` | Подтверждение заказа дилером; возврат отменённого заказа в работу из админки |
+| `order_cancel` | Отмена заказа — позиции возвращаются на склад |
+| `staff` | Сервис меняет остаток на `/staff/parts/` |
+| `admin` | Остаток изменён в админке (в карточке, в списке через `list_editable`, или при создании запчасти) |
+
+Код — `change_stock()` (меняет остаток через `F()` + пишет журнал) и `record_stock_change()` (только журнал, если остаток уже сохранён) в `main/models.py`. Смотреть — раздел админки «Магазин — Движение склада» (только чтение) и свёрнутый блок «Движение склада» в карточке запчасти.
+
 ---
 
-## 7. Нумерация счетов (сквозная по году)
+## 7. Нумерация счетов (по договору дилера)
 
-**Бизнес-правило**: каждый год нумерация начинается с 1. Дилер A заказал первым → №1, дилер B следующим → №2, и т.д.
+**Бизнес-правило**: у каждого дилера своя нумерация внутри текущего договора: 1, 2, 3… Номер спецификации = номер счёта (внутри договора, см. раздел 7). Когда подписан новый договор, сервис заводит его в разделе «Договоры» (`/staff/contracts/`): вводит номер и дату, нажимает «↺ Новый договор», и нумерация этого дилера начинается заново с №1, не дожидаясь нового года.
 
-### Реализация
+### Модель `DealerContract`
+
+`dealer`, `number`, `date`, `last_number` (последний выданный номер), `created_by`, `created_at`. Текущий договор — самый свежий. Номер/дата текущего договора дублируются в `DealerProfile.contract_number/contract_date`.
+
+- Первый договор заводится автоматически из реквизитов профиля при первом подтверждении (`current_contract()`, `created_by='auto'`).
+- Правка номера/даты в админке (учётка дилера) — исправление текущего договора, нумерация **не** сбрасывается.
+- В админке «Договоры дилеров» — история, только чтение (номер/дату можно поправить).
+
+### Реализация (в `dealer_invoice_confirm`)
 
 ```python
-year = timezone.now().year
-last = Invoice.objects.select_for_update().filter(
-    year=year, number__isnull=False
-).order_by('-number').first()
-next_number = (last.number + 1) if last else 1
+DealerProfile.objects.select_for_update().filter(pk=profile.pk).first()  # сериализует заказы дилера и сброс
+contract = current_contract(profile)
+contract.last_number += 1
+invoice.number = contract.last_number
+invoice.contract = contract
+invoice.buyer_contract_number/date = contract.number/date   # на момент подтверждения
+invoice.year = timezone.localdate().year                    # год остаётся — для фильтров и «№N/2026»
 ```
 
-- Фильтр `year=year` — берём только этот год
-- `number__isnull=False` — игнорируем черновики (у них номера нет)
-- `select_for_update()` — блокируем строку, чтобы параллельные транзакции получили разные номера
-- Если ни одного счёта в этом году нет — `next_number = 1`
+Черновик, созданный до нового договора, при подтверждении получит номер и реквизиты нового договора.
 
-### Сброс по году
+### Старые счета
 
-В январе 2027:
-- Первый confirm → `last = None` (для 2027 пусто) → `next_number = 1` → счёт `№1/2027`
-- Старые счета 2026 продолжают существовать со своими номерами `№N/2026`
+Счета до введения договоров (`contract = NULL`) сохраняют свои номера (сквозные по году).
 
-### Защита от теоретической гонки
+### Защита от гонки
 
-`UniqueConstraint(year, number)` на уровне БД. Даже если 2 транзакции каким-то чудом пройдут lock одновременно — вторая упадёт с `IntegrityError`. Клиент получит 409 и повторит.
+- `UniqueConstraint(contract, number)` — для новых счетов.
+- `UniqueConstraint(year, number) WHERE contract IS NULL` — для старых.
+- При `IntegrityError` клиент получает 409 и повторяет.
 
 ---
 
@@ -309,9 +336,19 @@ part      = FK SET_NULL    # ссылка для аналитики
 name      = CharField      # снапшот name_ru или name
 quantity  = PositiveIntField
 unit      = CharField (default 'шт')
-price     = Decimal        # снапшот SparePart.price
-sum       = Decimal        # quantity × price (зафиксировано)
+price     = Decimal        # цена С НДС = add_vat(SparePart.price)
+sum       = Decimal        # quantity × price, с НДС (зафиксировано)
+price_without_vat = Decimal null  # снапшот SparePart.price (без НДС)
+vat_rate  = Decimal null   # ставка на момент заказа (12)
 ```
+
+### НДС
+
+- `SparePart.price` в админке вводится **без НДС**. Дилер в каталоге, корзине и счёте видит цену **с НДС**: `models.add_vat(price)` = price × (100 + `VAT_RATE`) / 100, округлено до целого сума (`ROUND_HALF_UP`). Ставка — константа `VAT_RATE = 12` в `main/models.py`.
+- `Invoice.total_amount`, `InvoiceItem.price/sum` — всегда с НДС (то, что дилер платит).
+- Счёт на оплату (`invoice.html`) не меняется: те же колонки «Цена»/«Сумма», просто суммы уже с НДС. Разбивка «без НДС / в т.ч. НДС 12%» есть только в карточке заказа у сотрудников (`staff_order_detail`), и только у счетов, созданных после введения НДС.
+- Миграция `0038_spare_part_vat` только добавляет поля, цены **не пересчитывает**. Старые цены (введённые с НДС) сотрудники перебивают вручную на цены без НДС. До этого к ним тоже прибавится 12%. Черновики, созданные до перехода, при подтверждении получат «изменилась цена» и пересчитаются.
+- Проверка «цена изменилась» при подтверждении сравнивает и цену с НДС, и цену без НДС.
 
 Если запчасть подорожает или переименуется — старый счёт продолжит показывать исходные значения. `part_id` остаётся (для аналитики — какая модель), но **не используется** при рендере счёта.
 
@@ -321,7 +358,7 @@ sum       = Decimal        # quantity × price (зафиксировано)
 
 ## 9. Жизненный цикл заказа (статусы)
 
-### 4 статуса
+### 5 статусов
 
 | Код | Лейбл | Цвет |
 |-----|-------|------|
@@ -329,16 +366,31 @@ sum       = Decimal        # quantity × price (зафиксировано)
 | `paid` | Оплачено | 🟢 зелёный |
 | `in_transit` | В пути | 🔵 синий |
 | `delivered` | Доставлено | ⚫ серый |
+| `cancelled` | Отменён | 🔴 красный |
 
 ### Матрица переходов
 
 ```python
 ALLOWED_STATUS_TRANSITIONS = {
-    'accountant': { 'pending_payment': ['paid'] },
-    'service':    { 'paid':            ['in_transit'] },
-    'dealer':     { 'in_transit':      ['delivered'] },
+    'accountant': { 'pending_payment': ['paid', 'cancelled'],
+                    'paid':            ['cancelled'] },
+    'service':    { 'pending_payment': ['cancelled'],
+                    'paid':            ['in_transit', 'cancelled'] },
+    'dealer':     { 'pending_payment': ['cancelled'],
+                    'in_transit':      ['delivered'] },
 }
 ```
+
+### Отмена заказа
+
+- **Дилер** — свой заказ, пока он в «Ожидании оплаты»: кнопка «✕ Отменить заказ» в счёте → `POST /dealer/invoice/<id>/cancel-order/`.
+- **Бухгалтер / сервис** — до отгрузки (`pending_payment` или `paid`): красная кнопка в карточке заказа → `POST /staff/orders/<id>/status/` со `status=cancelled`.
+- После «В пути» отменить может только **админ** в админке.
+- Причина отмены необязательна (спрашивается через prompt).
+
+При отмене (`Invoice.set_cancelled`) все позиции **возвращаются на склад** (журнал: `order_cancel`), сохраняются `cancelled_at`, `cancelled_by`, `cancel_reason`. Номер счёта остаётся — дыр в нумерации нет. Из «Отменён» по матрице никуда не перейти.
+
+**Админ может всё**: в админке статус меняется без матрицы ролей, но склад всё равно сходится — уход в «Отменён» возвращает остатки, возврат из «Отменён» списывает их заново (`Invoice.set_uncancelled`). Если остатков уже не хватает — форма (`InvoiceStatusForm`, и в карточке, и в `list_editable`) покажет ошибку и статус не сменится.
 
 **Цепочка прохождения**:
 
@@ -417,7 +469,9 @@ Invoice.objects.filter(id=invoice_id, dealer=profile)
 1. Управление статусом — кнопки доступных переходов или подсказка («Сначала бухгалтер должен подтвердить оплату», «Заказ в пути — дилер сам подтвердит», «Заказ завершён»).
 2. Покупатель (снапшот)
 3. Позиции + итого + сумма прописью
-4. **«📄 Открыть документ»** → полный счёт-фактура (тот же что у дилера, но без кнопки «Я получил», с навигацией «← К управлению заказом»)
+4. Документы:
+   - **«📄 Счёт на оплату»** → полный счёт (тот же что у дилера, но без кнопки «Я получил», с навигацией «← К управлению заказом»)
+   - **«📋 Спецификация»** → `/staff/orders/<id>/specification/` — спецификация к договору по образцу бумажной: «Спецификация №N к Договору № … от …», г. Ташкент + дата подтверждения, таблица (№, наименование, код детали, кол-во, цена без НДС, цена с НДС, общая с НДС), итого, подписи сторон. Номер спецификации = номер счёта. Дата договора — `DealerProfile.contract_date` (снапшот в `Invoice.buyer_contract_date`; если пусто — «от …» не печатается). Код детали — снапшот `InvoiceItem.part_number`, у старых позиций берётся из живой запчасти. У заказов до введения НДС цена без НДС = «—».
 
 ### Список запчастей `/staff/parts/` (только сервис)
 
@@ -435,6 +489,7 @@ Stepper на каждой запчасти. После изменения чис
 - ✅ `Secure` в проде — только HTTPS
 - ✅ Cookie живёт 8 часов (встроено в подпись через `max_age`)
 - ✅ Live-проверка `is_active` на каждом запросе — деактивация в админке = немедленный logout
+- ✅ `?next=` после логина проверяется `url_has_allowed_host_and_scheme` — ссылка вида `/dealer/login/?next=https://evil.com` не уведёт на чужой сайт (open redirect), вместо неё — свой кабинет роли
 
 ### Авторизация
 
@@ -484,7 +539,8 @@ Stepper на каждой запчасти. После изменения чис
 Каждое важное действие логируется через `logger.info`:
 - Создание черновика (`Invoice draft created: id=N`)
 - Подтверждение (`Invoice confirmed: №N/Y`)
-- Отмена (`Invoice draft cancelled: id=N`)
+- Отмена черновика (`Invoice draft cancelled: id=N`)
+- Отмена заказа (`Invoice cancelled: №N/Y by=<user> (<role>) reason=...`)
 - Смена статуса (`Status changed: invoice=№N/Y by=<user> (<role>) → <new>`)
 - Получение дилером (`Invoice received by dealer: №N/Y`)
 - Логин/logout, смена пароля
@@ -510,6 +566,7 @@ Stepper на каждой запчасти. После изменения чис
 | `/dealer/invoice/<id>/confirm/` | POST | `dealer_invoice_confirm` | Подтверждение черновика |
 | `/dealer/invoice/<id>/cancel/` | POST | `dealer_invoice_cancel` | Удаление черновика |
 | `/dealer/invoice/<id>/received/` | POST | `dealer_invoice_mark_received` | Я получил → delivered |
+| `/dealer/invoice/<id>/cancel-order/` | POST | `dealer_invoice_cancel_order` | Отмена неоплаченного заказа + возврат на склад |
 | `/dealer/invoices/` | GET | `dealer_invoices_list` | История счетов |
 
 ### Сотрудники
@@ -520,6 +577,9 @@ Stepper на каждой запчасти. После изменения чис
 | `/staff/orders/<id>/` | service+accountant | `staff_order_detail` | Управление статусом |
 | `/staff/orders/<id>/status/` | POST | `staff_change_status` | Смена статуса (с ролью) |
 | `/staff/orders/<id>/document/` | service+accountant | `staff_invoice_view` | Полный документ |
+| `/staff/orders/<id>/specification/` | service+accountant | `staff_specification_view` | Спецификация к договору |
+| `/staff/contracts/` | service | `staff_contracts` | Договоры дилеров |
+| `/staff/contracts/<dealer_id>/new/` | service (POST) | `staff_contract_new` | Новый договор, нумерация с №1 |
 | `/staff/parts/` | service | `staff_parts_list` | Все запчасти |
 | `/staff/parts/<id>/quantity/` | POST (service) | `staff_part_update_quantity` | Изменить остаток |
 
@@ -550,7 +610,7 @@ description        = RichTextField (CKEditor text_only, перевод)
 type               = FK SparePartType (PROTECT)
 quantity           = PositiveInt   ← вот это списывается на confirm
 price              = Decimal(12,2)
-truck              = FK Product (SET_NULL, optional) — для фильтра
+parent_models      = M2M ParentModel (optional) — платформы/шасси, для фильтра
 is_active          = Boolean
 created_at, updated_at
 ```
@@ -562,7 +622,7 @@ name               = CharField (модельтрансляция: name_ru/uz/en,
 created_at
 ```
 
-Хитрый автокомплит в admin-форме: вводишь "Двигатель" → ищем `name_ru__iexact='двигатель'` → если есть, переиспользуем, если нет — создаём.
+Хитрый автокомплит в admin-форме: вводишь "Двигатель" → ищем `name_ru__iexact='двигатель'` → если есть, переиспользуем, если нет — создаём. В форме это текстовое поле `type_name` (FK `type` из формы исключён); тип ищется/создаётся только в `SparePartAdminForm.save()` — если форма или фото не прошли валидацию, лишний тип в БД не появится.
 
 ### `Invoice`
 
@@ -577,7 +637,11 @@ buyer_inn                 = CharField
 buyer_contract_number     = CharField
 
 total_amount              = Decimal(14,2)
-status                    = CharField(choices=4 values, default='pending_payment')
+status                    = CharField(choices=5 values, default='pending_payment')
+
+cancelled_at              = DateTime (NULL пока не отменён)
+cancelled_by              = CharField  # username того, кто отменил
+cancel_reason             = CharField
 
 created_at
 
@@ -596,6 +660,19 @@ quantity   = PositiveInt
 unit       = CharField (default 'шт')
 price      = Decimal     # снапшот
 sum        = Decimal     # qty × price
+```
+
+### `StockMovement`
+
+```python
+part            = FK SparePart (CASCADE)
+delta           = Integer          # +N приход / −N расход
+quantity_after  = PositiveInt      # остаток после изменения
+reason          = CharField(choices: order / order_cancel / staff / admin)
+invoice         = FK Invoice (SET_NULL, optional)
+changed_by      = CharField        # username
+comment         = CharField
+created_at
 ```
 
 ---
@@ -618,6 +695,10 @@ sum        = Decimal     # qty × price
 - Возвращаем 400 с понятным текстом: «Недостаточно X. Доступно: 2, требуется: 5»
 - `transaction.atomic()` откатывает, ничего не списано
 - Черновик дилера A остаётся — он может отменить и пересобрать корзину
+
+### Цена изменилась между checkout и confirm
+
+Админ поменял цену, пока дилер смотрел черновик. При confirm позиции черновика пересчитываются по новой цене, сумма обновляется, ответ 409 `{reload: true}` с перечнем изменившихся позиций. Страница перезагружается, дилер видит новую сумму и подтверждает снова. Склад и номер не тронуты, пока он не подтвердит.
 
 ### Запчасть удалили из админки между checkout и confirm
 
@@ -673,7 +754,11 @@ sum        = Decimal     # qty × price
 
 Через админку — запрещено (`has_delete_permission` возвращает True только для черновиков). Если суперюзер удалит через shell — `on_delete=PROTECT` на `Invoice.dealer` сработает только если хотим удалить дилера; для самого Invoice — каскадно удалит `InvoiceItem`, но **склад НЕ восстановит** (намеренно — это документ, его не отменить).
 
-Если нужно «откатить» — это бизнес-процесс, делается отдельным заказом-возвратом (пока не реализован).
+Если нужно «откатить» заказ — его **отменяют** (статус «Отменён», см. раздел 9): позиции возвращаются на склад, документ и номер остаются в истории.
+
+### Заказ 1 января ночью
+
+`USE_TZ=True`, `timezone.now()` — в UTC. Заказ 1 января в 02:00 по Ташкенту — это ещё 31 декабря по UTC. Поэтому год берётся через `timezone.localdate().year` — счёт получит номер нового года.
 
 ### `USE_THOUSAND_SEPARATOR=True` и год счёта
 
@@ -693,14 +778,15 @@ Django по умолчанию рендерит integer в шаблоне с п�
 
 | Слой | Файл |
 |------|------|
-| Модели магазина | [main/models.py](main/models.py) — `DealerProfile`, `SparePart`, `SparePartType`, `SparePartImage`, `Invoice`, `InvoiceItem` |
+| Модели магазина | [main/models.py](main/models.py) — `DealerProfile`, `SparePart`, `SparePartType`, `SparePartImage`, `Invoice`, `InvoiceItem`, `StockMovement` + `change_stock()` / `record_stock_change()` |
+| Тесты | [main/tests/test_dealer_shop.py](main/tests/test_dealer_shop.py) — `python manage.py test main.tests.test_dealer_shop` |
 | Утилиты форматирования | [main/utils/invoice_format.py](main/utils/invoice_format.py) — `format_uzs`, `format_date_ru`, `amount_in_words_uzs` |
 | Валидаторы | [main/validators.py](main/validators.py) — `validate_image_size` |
 | Очистка orphan-файлов | [main/signals_cleanup.py](main/signals_cleanup.py) |
 | Views (магазин + staff + auth) | [main/views.py](main/views.py) |
 | URL-карта | [main/urls.py](main/urls.py) |
 | Формы | [main/forms.py](main/forms.py) — `DealerLoginForm`, `DealerProfileAdminForm`, `DealerPasswordChangeForm`, `SparePartAdminForm` |
-| Админка | [main/admin.py](main/admin.py) — `DealerProfileAdmin`, `SparePartAdmin`, `SparePartTypeAdmin`, `InvoiceAdmin` |
+| Админка | [main/admin.py](main/admin.py) — `DealerProfileAdmin`, `SparePartAdmin`, `SparePartTypeAdmin`, `InvoiceAdmin` (+ `InvoiceStatusForm`), `StockMovementAdmin` |
 | Шаблоны дилера | `main/templates/main/dealer/`: `login.html`, `shop.html`, `shop_detail.html`, `cart.html`, `invoice.html`, `invoices_list.html`, `_profile_modal.html` |
 | Шаблоны staff | `main/templates/main/dealer/`: `staff_orders.html`, `staff_order_detail.html`, `staff_parts.html` |
 | JS-корзина | [main/static/js/dealer-cart.js](main/static/js/dealer-cart.js) |

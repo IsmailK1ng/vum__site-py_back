@@ -12,6 +12,8 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate
 from django.core import signing
+from django.core.paginator import Paginator
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.db.models import Count, Q, Avg, F
 from django.db.models.functions import TruncHour, TruncDate
 from django.http import HttpResponseRedirect, HttpResponseForbidden, JsonResponse
@@ -49,10 +51,15 @@ from .models import (
     DealerProfile,
     SparePart, SparePartType, ParentModel,
     Invoice, InvoiceItem,
+    StockMovement, change_stock, record_stock_change, VAT_RATE,
+    DealerContract, current_contract,
 )
 from django.db import transaction, IntegrityError
 from decimal import Decimal
-from main.utils.invoice_format import format_uzs, format_date_ru, amount_in_words_uzs
+from main.utils.invoice_format import (
+    format_uzs, format_date_ru, amount_in_words_uzs,
+    _RU_MONTHS as MONTHS_RU_GENITIVE,
+)
 from .forms import DealerLoginForm, DealerPasswordChangeForm
 from .serializers import (
     NewsSerializer, 
@@ -300,8 +307,16 @@ def dealer_login(request):
                 logger.warning('Dealer login blocked (no/inactive profile): username=%s', username)
             else:
                 logger.info('Dealer login: username=%s ip=%s', username, request.META.get('REMOTE_ADDR'))
-                # Куда уводим зависит от роли. ?next= уважаем только если он есть.
-                next_url = request.GET.get('next') or _landing_url_for(profile)
+                # Куда уводим зависит от роли. ?next= уважаем только если он ведёт
+                # на наш же сайт — иначе ссылка /dealer/login/?next=https://evil.com
+                # после входа увела бы дилера на чужой сайт (open redirect).
+                next_url = request.GET.get('next') or ''
+                if not url_has_allowed_host_and_scheme(
+                    next_url,
+                    allowed_hosts={request.get_host()},
+                    require_https=request.is_secure(),
+                ):
+                    next_url = _landing_url_for(profile)
                 response = redirect(next_url)
                 _set_dealer_cookie(response, profile.id)
                 return response
@@ -317,6 +332,9 @@ def dealer_logout(request):
     response = redirect('dealer_login')
     _clear_dealer_cookie(response)
     return response
+
+
+SHOP_PAGE_SIZE = 24  # кратно 2/3/4 колонкам сетки каталога
 
 
 @never_cache
@@ -355,6 +373,11 @@ def dealer_shop(request):
         parts = parts.filter(type_id=int(type_id))
 
     parts = parts.order_by('-updated_at')
+    page_obj = Paginator(parts, SHOP_PAGE_SIZE).get_page(request.GET.get('page'))
+
+    # Текущие фильтры без page — для ссылок пагинации
+    filter_params = request.GET.copy()
+    filter_params.pop('page', None)
 
     # Списки для селектов в фильтр-баре — только сущности, у которых есть запчасти
     parents_with_parts = (
@@ -372,7 +395,9 @@ def dealer_shop(request):
 
     return render(request, 'main/dealer/shop.html', {
         'profile': profile,
-        'parts': parts,
+        'parts': page_obj.object_list,
+        'page_obj': page_obj,
+        'filter_query': filter_params.urlencode(),
         'parents_with_parts': parents_with_parts,
         'types_with_parts': types_with_parts,
         'selected_parent': parent_id,
@@ -485,7 +510,8 @@ def dealer_cart_api(request):
             'part_number': p.part_number,
             'name': p.name_ru or p.name,
             'type': (p.type.name_ru or p.type.name) if p.type_id else None,
-            'price': float(p.price),
+            'price': float(p.price_with_vat),   # дилер видит цену с НДС
+            'price_without_vat': float(p.price),
             'quantity_available': p.quantity,
             'image_url': first_image.image.url if first_image else None,
         })
@@ -554,6 +580,7 @@ def dealer_cart_checkout(request):
                 buyer_company_name=profile.company_name,
                 buyer_inn=profile.inn,
                 buyer_contract_number=profile.contract_number,
+                buyer_contract_date=profile.contract_date,
                 total_amount=Decimal('0'),
             )
 
@@ -565,15 +592,19 @@ def dealer_cart_checkout(request):
                 actual_qty = min(qty, part.quantity)
                 if actual_qty < 1:
                     continue
-                line_sum = (part.price * actual_qty).quantize(Decimal('0.01'))
+                price = part.price_with_vat
+                line_sum = (price * actual_qty).quantize(Decimal('0.01'))
                 InvoiceItem.objects.create(
                     invoice=invoice,
                     part=part,
                     name=part.name_ru or part.name,
+                    part_number=part.part_number,
                     quantity=actual_qty,
                     unit='шт',
-                    price=part.price,
+                    price=price,
                     sum=line_sum,
+                    price_without_vat=part.price,
+                    vat_rate=VAT_RATE,
                 )
                 total += line_sum
 
@@ -646,29 +677,60 @@ def dealer_invoice_confirm(request, invoice_id):
                         'error': f'Недостаточно «{it.name}» на складе. Доступно: {part.quantity}, требуется: {it.quantity}',
                     }, status=400)
 
-            # Списываем со склада через F() — атомарно
+            # Цена могла поменяться, пока дилер смотрел черновик. Подтверждать
+            # по старой цене нельзя — обновляем черновик и просим проверить заново.
+            # Return внутри atomic без исключения → обновлённый черновик коммитится.
+            changed_names = []
             for it in items:
-                SparePart.objects.filter(id=it.part_id).update(
-                    quantity=F('quantity') - it.quantity
+                part = parts_locked[it.part_id]
+                new_price = part.price_with_vat
+                if new_price != it.price or part.price != it.price_without_vat:
+                    it.price = new_price
+                    it.sum = (new_price * it.quantity).quantize(Decimal('0.01'))
+                    it.price_without_vat = part.price
+                    it.vat_rate = VAT_RATE
+                    it.save(update_fields=['price', 'sum', 'price_without_vat', 'vat_rate'])
+                    changed_names.append(it.name)
+            if changed_names:
+                invoice.total_amount = sum((it.sum for it in items), Decimal('0'))
+                invoice.save(update_fields=['total_amount'])
+                return JsonResponse({
+                    'ok': False,
+                    'reload': True,
+                    'error': 'Изменилась цена: ' + ', '.join(f'«{n}»' for n in changed_names)
+                             + '. Счёт пересчитан — проверьте сумму и подтвердите ещё раз.',
+                }, status=409)
+
+            # Списываем со склада через F() — атомарно, с записью в журнал склада
+            for it in items:
+                change_stock(
+                    it.part_id, -it.quantity, StockMovement.REASON_ORDER,
+                    invoice=invoice, changed_by=profile.user.username,
                 )
 
-            # Присваиваем номер: блокируем последнюю строку года
-            year = timezone.now().year
-            last = (
-                Invoice.objects
-                .select_for_update()
-                .filter(year=year, number__isnull=False)
-                .order_by('-number')
-                .first()
-            )
-            next_number = (last.number + 1) if last else 1
+            # Номер — следующий внутри текущего договора дилера (1, 2, 3…).
+            # Блокируем профиль дилера: сериализует параллельные подтверждения
+            # и сброс договора сервисом.
+            DealerProfile.objects.select_for_update().filter(pk=profile.pk).first()
+            contract = current_contract(profile)
+            contract.last_number += 1
+            contract.save(update_fields=['last_number'])
 
-            invoice.year = year
-            invoice.number = next_number
+            # localdate — год по TIME_ZONE (Ташкент): при USE_TZ=True timezone.now()
+            # в UTC, и заказ 1 января до 05:00 получил бы год прошлого.
+            invoice.year = timezone.localdate().year
+            invoice.number = contract.last_number
+            invoice.contract = contract
+            # Реквизиты договора — на момент подтверждения (договор мог смениться после черновика)
+            invoice.buyer_contract_number = contract.number
+            invoice.buyer_contract_date = contract.date
             invoice.confirmed_at = timezone.now()
-            invoice.save(update_fields=['year', 'number', 'confirmed_at'])
+            invoice.save(update_fields=[
+                'year', 'number', 'contract', 'buyer_contract_number',
+                'buyer_contract_date', 'confirmed_at',
+            ])
     except IntegrityError:
-        # Гонка на UniqueConstraint(year, number) — крайне маловероятна,
+        # Гонка на UniqueConstraint номера — крайне маловероятна,
         # но если случится — клиент перезагрузит и повторит
         return JsonResponse({'ok': False, 'error': 'Попробуйте ещё раз'}, status=409)
 
@@ -722,6 +784,48 @@ def dealer_invoice_mark_received(request, invoice_id):
     })
 
 
+def _cancel_order(invoice, profile, reason):
+    """Отмена подтверждённого заказа с возвратом на склад. Вызывать в atomic под lock'ом."""
+    invoice.set_cancelled(changed_by=profile.user.username, reason=reason)
+    invoice.save(update_fields=['status', 'cancelled_at', 'cancelled_by', 'cancel_reason'])
+    logger.info(
+        'Invoice cancelled: №%d/%d by=%s (%s) reason=%s',
+        invoice.number, invoice.year, profile.user.username, profile.role, reason,
+    )
+
+
+@never_cache
+@dealer_required
+@require_http_methods(['POST'])
+def dealer_invoice_cancel_order(request, invoice_id):
+    """Дилер отменяет СВОЙ подтверждённый заказ — только пока он не оплачен.
+    Остатки возвращаются на склад, номер счёта остаётся (дыр в нумерации нет).
+    """
+    profile = request.dealer_profile
+    reason = (request.POST.get('reason') or '').strip()
+
+    with transaction.atomic():
+        invoice = (
+            Invoice.objects
+            .select_for_update()
+            .filter(
+                id=invoice_id,
+                dealer=profile,
+                number__isnull=False,
+                status=Invoice.STATUS_PENDING_PAYMENT,
+            )
+            .first()
+        )
+        if not invoice:
+            return JsonResponse({
+                'ok': False,
+                'error': 'Заказ не найден или уже оплачен — отменить может только бухгалтерия',
+            }, status=404)
+        _cancel_order(invoice, profile, reason)
+
+    return JsonResponse({'ok': True})
+
+
 @never_cache
 @dealer_required
 @require_http_methods(['POST'])
@@ -737,6 +841,43 @@ def dealer_invoice_cancel(request, invoice_id):
     return JsonResponse({'ok': True})
 
 
+def _invoice_items_and_totals(invoice):
+    """Позиции и итоги счёта для шаблонов (дилерский счёт, карточка заказа, документ).
+
+    price/sum позиций — с НДС. Цена без НДС и сумма НДС есть только у счетов,
+    созданных после введения НДС (у старых price_without_vat пустой → has_vat=False).
+    """
+    items = list(invoice.items.all())
+    has_vat = bool(items) and all(it.price_without_vat is not None for it in items)
+    items_ctx = []
+    vat_total = Decimal('0')
+    for it in items:
+        row = {
+            'name': it.name,
+            'quantity': it.quantity,
+            'unit': it.unit,
+            'price_formatted': format_uzs(it.price),
+            'sum_formatted': format_uzs(it.sum),
+            'price_without_vat_formatted': '',
+        }
+        if has_vat:
+            row['price_without_vat_formatted'] = format_uzs(it.price_without_vat)
+            vat_total += it.sum - it.price_without_vat * it.quantity
+        items_ctx.append(row)
+
+    vat_rates = {it.vat_rate for it in items if it.vat_rate is not None}
+    totals = {
+        'amount_formatted': format_uzs(invoice.total_amount),
+        'currency': 'UZS',
+        'amount_in_words': amount_in_words_uzs(invoice.total_amount),
+        'has_vat': has_vat,
+        'vat_formatted': format_uzs(vat_total) if has_vat else '',
+        # '12' вместо '12.00'
+        'vat_rate': (f'{vat_rates.pop().normalize():f}' if len(vat_rates) == 1 else '') if has_vat else '',
+    }
+    return items_ctx, totals
+
+
 @never_cache
 @dealer_required
 def dealer_invoices_list(request):
@@ -745,7 +886,7 @@ def dealer_invoices_list(request):
     invoices = (
         Invoice.objects
         .filter(dealer=profile, number__isnull=False)   # черновики скрываем
-        .order_by('-year', '-number')
+        .order_by('-confirmed_at', '-id')
     )
 
     # year/number → строка чтоб Django не вставлял пробел-разделитель тысяч (USE_THOUSAND_SEPARATOR=True)
@@ -785,16 +926,7 @@ def dealer_invoice(request, invoice_id):
         messages.warning(request, 'Счёт не найден.')
         return redirect('dealer_shop')
 
-    items_ctx = [
-        {
-            'name': it.name,
-            'quantity': it.quantity,
-            'unit': it.unit,
-            'price_formatted': format_uzs(it.price),
-            'sum_formatted': format_uzs(it.sum),
-        }
-        for it in invoice.items.all()
-    ]
+    items_ctx, totals = _invoice_items_and_totals(invoice)
 
     is_draft = invoice.is_draft
     # Для черновика дата = момент создания; для подтверждённого = confirmed_at
@@ -802,8 +934,11 @@ def dealer_invoice(request, invoice_id):
 
     # Дилер может подтвердить получение только если счёт «В пути»
     can_mark_received = (not is_draft) and invoice.status == Invoice.STATUS_IN_TRANSIT
+    # Отменить сам — только пока не оплачен
+    can_cancel_order = (not is_draft) and invoice.status == Invoice.STATUS_PENDING_PAYMENT
 
     return render(request, 'main/dealer/invoice.html', {
+        'profile': profile,
         'invoice': {
             'id': invoice.id,
             'is_draft': is_draft,
@@ -814,6 +949,8 @@ def dealer_invoice(request, invoice_id):
             'status': invoice.status,
             'status_label': invoice.get_status_display(),
             'can_mark_received': can_mark_received,
+            'can_cancel_order': can_cancel_order,
+            'cancel_reason': invoice.cancel_reason,
         },
         'buyer': {
             'name': invoice.buyer_company_name,
@@ -821,11 +958,7 @@ def dealer_invoice(request, invoice_id):
             'contract_number': invoice.buyer_contract_number,
         },
         'items': items_ctx,
-        'totals': {
-            'amount_formatted': format_uzs(invoice.total_amount),
-            'currency': 'UZS',
-            'amount_in_words': amount_in_words_uzs(invoice.total_amount),
-        },
+        'totals': totals,
     })
 
 
@@ -834,15 +967,20 @@ def dealer_invoice(request, invoice_id):
 # Правила переходов статусов по ролям.
 # Бухгалтер ставит "оплачено", сервис двигает дальше до "в пути",
 # финальный шаг "доставлено" подтверждает САМ ДИЛЕР у себя в счёте.
+# Отмена (с возвратом на склад) — сотрудникам до отгрузки, дилеру — пока не оплачено.
+# После "в пути" отменить может только админ (в админке).
 ALLOWED_STATUS_TRANSITIONS = {
     DealerProfile.ROLE_ACCOUNTANT: {
-        Invoice.STATUS_PENDING_PAYMENT: [Invoice.STATUS_PAID],
+        Invoice.STATUS_PENDING_PAYMENT: [Invoice.STATUS_PAID, Invoice.STATUS_CANCELLED],
+        Invoice.STATUS_PAID:            [Invoice.STATUS_CANCELLED],
     },
     DealerProfile.ROLE_SERVICE: {
-        Invoice.STATUS_PAID: [Invoice.STATUS_IN_TRANSIT],
+        Invoice.STATUS_PENDING_PAYMENT: [Invoice.STATUS_CANCELLED],
+        Invoice.STATUS_PAID:            [Invoice.STATUS_IN_TRANSIT, Invoice.STATUS_CANCELLED],
     },
     DealerProfile.ROLE_DEALER: {
-        Invoice.STATUS_IN_TRANSIT: [Invoice.STATUS_DELIVERED],
+        Invoice.STATUS_PENDING_PAYMENT: [Invoice.STATUS_CANCELLED],
+        Invoice.STATUS_IN_TRANSIT:      [Invoice.STATUS_DELIVERED],
     },
 }
 
@@ -923,16 +1061,7 @@ def staff_order_detail(request, invoice_id):
         messages.warning(request, 'Заказ не найден.')
         return redirect('staff_orders_list')
 
-    items_ctx = [
-        {
-            'name': it.name,
-            'quantity': it.quantity,
-            'unit': it.unit,
-            'price_formatted': format_uzs(it.price),
-            'sum_formatted': format_uzs(it.sum),
-        }
-        for it in invoice.items.all()
-    ]
+    items_ctx, totals = _invoice_items_and_totals(invoice)
 
     # Какие переходы доступны этой роли с текущего статуса
     next_options = [
@@ -950,6 +1079,9 @@ def staff_order_detail(request, invoice_id):
             'dealer_name': invoice.dealer.name,
             'status': invoice.status,
             'status_label': invoice.get_status_display(),
+            'cancelled_by': invoice.cancelled_by,
+            'cancelled_at': format_date_ru(invoice.cancelled_at) if invoice.cancelled_at else '',
+            'cancel_reason': invoice.cancel_reason,
         },
         'buyer': {
             'name': invoice.buyer_company_name,
@@ -957,11 +1089,7 @@ def staff_order_detail(request, invoice_id):
             'contract_number': invoice.buyer_contract_number,
         },
         'items': items_ctx,
-        'totals': {
-            'amount_formatted': format_uzs(invoice.total_amount),
-            'currency': 'UZS',
-            'amount_in_words': amount_in_words_uzs(invoice.total_amount),
-        },
+        'totals': totals,
         'next_options': next_options,
     })
 
@@ -971,11 +1099,13 @@ def staff_order_detail(request, invoice_id):
 @require_http_methods(['POST'])
 def staff_change_status(request, invoice_id):
     """Смена статуса заказа.
-    Бухгалтер: pending → paid. Сервис: paid → in_transit → delivered.
+    Бухгалтер: pending → paid. Сервис: paid → in_transit (delivered ставит дилер).
+    Отмена — по матрице ALLOWED_STATUS_TRANSITIONS, с возвратом остатков на склад.
     Любой другой переход — 403.
     """
     profile = request.dealer_profile
     new_status = (request.POST.get('status') or '').strip()
+    reason = (request.POST.get('reason') or '').strip()
 
     if new_status not in dict(Invoice.STATUS_CHOICES):
         return JsonResponse({'ok': False, 'error': 'Неизвестный статус'}, status=400)
@@ -996,6 +1126,14 @@ def staff_change_status(request, invoice_id):
                 'ok': False,
                 'error': 'У вашей роли нет права на этот переход',
             }, status=403)
+
+        if new_status == Invoice.STATUS_CANCELLED:
+            _cancel_order(invoice, profile, reason)
+            return JsonResponse({
+                'ok': True,
+                'new_status': new_status,
+                'new_status_label': invoice.get_status_display(),
+            })
 
         invoice.status = new_status
         invoice.save(update_fields=['status'])
@@ -1028,16 +1166,7 @@ def staff_invoice_view(request, invoice_id):
         messages.warning(request, 'Счёт не найден.')
         return redirect('staff_orders_list')
 
-    items_ctx = [
-        {
-            'name': it.name,
-            'quantity': it.quantity,
-            'unit': it.unit,
-            'price_formatted': format_uzs(it.price),
-            'sum_formatted': format_uzs(it.sum),
-        }
-        for it in invoice.items.all()
-    ]
+    items_ctx, totals = _invoice_items_and_totals(invoice)
     invoice_date = invoice.confirmed_at or invoice.created_at
 
     return render(request, 'main/dealer/invoice.html', {
@@ -1051,6 +1180,7 @@ def staff_invoice_view(request, invoice_id):
             'status': invoice.status,
             'status_label': invoice.get_status_display(),
             'can_mark_received': False,         # сотрудник не дилер
+            'cancel_reason': invoice.cancel_reason,
             'back_url': reverse('staff_order_detail', args=[invoice.id]),
             'back_label': '← К управлению заказом',
         },
@@ -1060,12 +1190,153 @@ def staff_invoice_view(request, invoice_id):
             'contract_number': invoice.buyer_contract_number,
         },
         'items': items_ctx,
-        'totals': {
-            'amount_formatted': format_uzs(invoice.total_amount),
-            'currency': 'UZS',
-            'amount_in_words': amount_in_words_uzs(invoice.total_amount),
-        },
+        'totals': totals,
     })
+
+
+def _spec_amount(amount):
+    """Сумма для спецификации: '370 720' (без копеек, если их нет), иначе '246 400,50'."""
+    if amount is None:
+        return '—'
+    s = format_uzs(amount)
+    return s[:-3] if s.endswith(',00') else s
+
+
+@never_cache
+@staff_required
+def staff_specification_view(request, invoice_id):
+    """Спецификация к договору по заказу — для печати (A4). Только просмотр.
+
+    Номер спецификации = номер счёта, дата = дата подтверждения заказа.
+    Цена без НДС берётся из снапшота позиции; у заказов до введения НДС её нет → «—».
+    """
+    invoice = (
+        Invoice.objects
+        .filter(id=invoice_id, number__isnull=False)
+        .prefetch_related('items__part')
+        .first()
+    )
+    if not invoice:
+        messages.warning(request, 'Заказ не найден.')
+        return redirect('staff_orders_list')
+
+    items = list(invoice.items.all())
+    items_ctx = [
+        {
+            'name': it.name,
+            # У позиций до появления снапшота кода — берём из самой запчасти, если она жива
+            'part_number': it.part_number or (it.part.part_number if it.part else ''),
+            'quantity': it.quantity,
+            'price_without_vat': _spec_amount(it.price_without_vat),
+            'price': _spec_amount(it.price),
+            'sum': _spec_amount(it.sum),
+        }
+        for it in items
+    ]
+
+    spec_date = timezone.localtime(invoice.confirmed_at or invoice.created_at)
+    contract_date = invoice.buyer_contract_date
+    return render(request, 'main/dealer/specification.html', {
+        'spec': {
+            'number': str(invoice.number),
+            'day': f'{spec_date.day:02d}',
+            'month': MONTHS_RU_GENITIVE[spec_date.month - 1].capitalize(),
+            'year': str(spec_date.year),
+            'contract_number': invoice.buyer_contract_number,
+            'contract_date': contract_date.strftime('%d.%m.%Y') if contract_date else '',
+            'buyer_name': invoice.buyer_company_name,
+            'status': invoice.status,
+            'status_label': invoice.get_status_display(),
+            'back_url': reverse('staff_order_detail', args=[invoice.id]),
+        },
+        'items': items_ctx,
+        'total_quantity': str(sum(it.quantity for it in items)),
+        'total_amount': _spec_amount(invoice.total_amount),
+    })
+
+
+@never_cache
+@service_required
+def staff_contracts(request):
+    """Договоры дилеров — только сервис. Здесь заводится новый договор:
+    номер + дата → нумерация счетов и спецификаций дилера начинается с №1.
+    """
+    profile = request.dealer_profile
+    q = (request.GET.get('q') or '').strip()
+
+    dealers = DealerProfile.objects.filter(role=DealerProfile.ROLE_DEALER).order_by('name')
+    if q:
+        dealers = dealers.filter(
+            Q(name__icontains=q) | Q(company_name__icontains=q)
+            | Q(inn__icontains=q) | Q(contract_number__icontains=q)
+        )
+    dealers = list(dealers[:300])
+
+    latest = {}
+    for c in DealerContract.objects.filter(dealer__in=dealers).order_by('dealer_id', '-created_at', '-id'):
+        latest.setdefault(c.dealer_id, c)
+
+    rows = []
+    for d in dealers:
+        c = latest.get(d.id)
+        rows.append({
+            'id': d.id,
+            'name': d.name,
+            'company_name': d.company_name,
+            'inn': d.inn,
+            'is_active': d.is_active,
+            'contract_number': c.number if c else d.contract_number,
+            'contract_date': format_date_ru(c.date if c else d.contract_date),
+            'last_number': str(c.last_number) if c else '0',
+            'started_at': format_date_ru(c.created_at) if c and c.created_by != 'auto' else '',
+            'started_by': c.created_by if c and c.created_by != 'auto' else '',
+        })
+
+    return render(request, 'main/dealer/staff_contracts.html', {
+        'profile': profile,
+        'rows': rows,
+        'q': q,
+        'done_id': request.GET.get('done', ''),
+    })
+
+
+@never_cache
+@service_required
+@require_http_methods(['POST'])
+def staff_contract_new(request, dealer_id):
+    """Новый договор дилера: номер + дата, нумерация счетов/спецификаций — с №1."""
+    profile = request.dealer_profile
+    number = (request.POST.get('contract_number') or '').strip()[:100]
+    raw_date = (request.POST.get('contract_date') or '').strip()
+
+    try:
+        contract_date = datetime.strptime(raw_date, '%Y-%m-%d').date() if raw_date else None
+    except ValueError:
+        contract_date = None
+    if not number or not contract_date:
+        messages.error(request, 'Укажите номер и дату договора.')
+        return redirect('staff_contracts')
+
+    with transaction.atomic():
+        dealer = (
+            DealerProfile.objects.select_for_update()
+            .filter(pk=dealer_id, role=DealerProfile.ROLE_DEALER)
+            .first()
+        )
+        if not dealer:
+            messages.error(request, 'Дилер не найден.')
+            return redirect('staff_contracts')
+        DealerContract.objects.create(
+            dealer=dealer, number=number, date=contract_date,
+            created_by=profile.user.username,
+        )
+        dealer.contract_number = number
+        dealer.contract_date = contract_date
+        dealer.save(update_fields=['contract_number', 'contract_date', 'updated_at'])
+
+    logger.info('New dealer contract: dealer=%s number=%s date=%s by=%s',
+                dealer.user.username, number, contract_date, profile.user.username)
+    return redirect(f"{reverse('staff_contracts')}?done={dealer.id}")
 
 
 @never_cache
@@ -1091,7 +1362,8 @@ def staff_parts_list(request):
             'type': (p.type.name_ru or p.type.name) if p.type_id else '—',
             'parent_models': ', '.join(pm.name for pm in p.parent_models.all()) or '—',
             'quantity': p.quantity,
-            'price_formatted': format_uzs(p.price),
+            'price_formatted': format_uzs(p.price_with_vat),
+            'price_without_vat_formatted': format_uzs(p.price),
             'is_active': p.is_active,
         }
         for p in parts[:500]
@@ -1125,6 +1397,7 @@ def staff_part_update_quantity(request, part_id):
         part = SparePart.objects.select_for_update().filter(id=part_id).first()
         if not part:
             return JsonResponse({'ok': False, 'error': 'Запчасть не найдена'}, status=404)
+        old_quantity = part.quantity
 
         if new_quantity is not None:
             try:
@@ -1150,6 +1423,10 @@ def staff_part_update_quantity(request, part_id):
             return JsonResponse({'ok': False, 'error': 'Нужен quantity или delta'}, status=400)
 
         part.save(update_fields=['quantity'])
+        record_stock_change(
+            part.id, part.quantity - old_quantity, part.quantity,
+            StockMovement.REASON_STAFF, changed_by=request.dealer_profile.user.username,
+        )
 
     logger.info('Stock updated: part=%s qty=%d by=%s',
                 part.part_number, part.quantity, request.dealer_profile.user.username)

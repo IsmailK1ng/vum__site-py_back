@@ -1,0 +1,142 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">Главная</a>
+  &rsaquo; <a href="{% url 'admin:main_sparepart_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; Импорт из Java
+</div>
+{% endblock %}
+
+{% block content %}
+<style>
+  .java-import { max-width: 860px; }
+  .java-import__hint { color: #5a6470; margin: 0 0 18px; line-height: 1.5; }
+  .java-import__hint code { background: #f1f3f6; padding: 1px 5px; border-radius: 4px; }
+  .java-import__card { background: #fff; border: 1px solid #e3e8ef; border-radius: 12px; padding: 20px; margin-bottom: 18px; }
+  .java-drop {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    border: 2px dashed #b9c3d0; border-radius: 12px; padding: 28px 16px; text-align: center;
+    color: #5a6470; cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .java-drop:hover, .java-drop.is-over { border-color: #1f3a5f; background: #f5f8fc; }
+  .java-drop__title { font-size: 15px; font-weight: 600; color: #1f3a5f; }
+  .java-drop__file { font-weight: 600; color: #2c9f4e; }
+  .java-drop input[type=file] { display: none; }
+  .java-import__row { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+  .java-import__row label { font-weight: 600; }
+  .java-import__row input[type=text] { max-width: 360px; padding: 7px 10px; }
+  .java-import__check { margin-top: 14px; display: flex; gap: 8px; align-items: flex-start; }
+  .java-import__submit { margin-top: 18px; }
+  .java-import__error { background: #fdecec; border: 1px solid #f3c2c2; color: #a12d2d; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; font-weight: 600; }
+  .java-result__stats { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .java-result__stat { background: #f5f7fa; border-radius: 8px; padding: 8px 12px; }
+  .java-result__stat b { font-size: 18px; }
+  .java-result__stat--ok b { color: #2c9f4e; }
+  .java-result details { margin-top: 8px; }
+  .java-result summary { cursor: pointer; font-weight: 600; }
+  .java-result ul { max-height: 320px; overflow: auto; margin: 6px 0 0; padding-left: 20px; font-family: monospace; font-size: 12px; }
+</style>
+
+<div class="java-import">
+  <p class="java-import__hint">
+    Загрузите файл <code>SpareParts.java</code> — из строк вида
+    <code>new SparePart(1, "E05QA-1115340", "Отсекатель масла в цилиндре")</code>
+    будут взяты код детали и наименование (английское название в старом формате файла пропускается).<br>
+    Новые запчасти создаются <b>снятыми с продажи</b>, с ценой 0 и остатком 0 — дилеры их не увидят,
+    пока вы не проставите цену без НДС и не включите «В продаже».
+    Запчасти с уже существующим кодом не создаются повторно.
+  </p>
+
+  {% if error %}<div class="java-import__error">{{ error }}</div>{% endif %}
+
+  {% if result %}
+    <div class="java-import__card java-result">
+      <div class="java-result__stats">
+        <div class="java-result__stat">В файле: <b>{{ result.total }}</b></div>
+        <div class="java-result__stat java-result__stat--ok">Создано: <b>{{ result.created|length }}</b></div>
+        {% if result.renamed %}<div class="java-result__stat java-result__stat--ok">Переименовано: <b>{{ result.renamed|length }}</b></div>{% endif %}
+        <div class="java-result__stat">Уже были: <b>{{ result.skipped|length }}</b></div>
+        {% if result.duplicates %}<div class="java-result__stat">Повторы в файле: <b>{{ result.duplicates|length }}</b></div>{% endif %}
+        {% if result.no_name %}<div class="java-result__stat">Без названия: <b>{{ result.no_name|length }}</b></div>{% endif %}
+      </div>
+      {% if result.created %}<p>Новые запчасти записаны в тип «{{ result.type_name }}».</p>{% endif %}
+
+      {% if result.created %}
+        <details><summary>Создано ({{ result.created|length }})</summary>
+          <ul>{% for x in result.created %}<li>{{ x }}</li>{% endfor %}</ul></details>
+      {% endif %}
+      {% if result.renamed %}
+        <details><summary>Переименовано ({{ result.renamed|length }})</summary>
+          <ul>{% for x in result.renamed %}<li>{{ x }}</li>{% endfor %}</ul></details>
+      {% endif %}
+      {% if result.skipped %}
+        <details><summary>Уже были в базе — не тронуты ({{ result.skipped|length }})</summary>
+          <ul>{% for x in result.skipped %}<li>{{ x }}</li>{% endfor %}</ul></details>
+      {% endif %}
+      {% if result.duplicates %}
+        <details><summary>Повторяются в файле — взята первая строка ({{ result.duplicates|length }})</summary>
+          <ul>{% for x in result.duplicates %}<li>{{ x }}</li>{% endfor %}</ul></details>
+      {% endif %}
+      {% if result.no_name %}
+        <details><summary>Пропущены — пустое наименование ({{ result.no_name|length }})</summary>
+          <ul>{% for x in result.no_name %}<li>{{ x }}</li>{% endfor %}</ul></details>
+      {% endif %}
+
+      <p style="margin-top:14px;">
+        <a href="{% url 'admin:main_sparepart_changelist' %}?is_active__exact=0">→ Открыть снятые с продажи (проставить цены)</a>
+      </p>
+    </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" class="java-import__card" id="java-import-form">
+    {% csrf_token %}
+    <label class="java-drop" id="java-drop">
+      <span class="java-drop__title">Перетащите сюда SpareParts.java</span>
+      <span>или нажмите, чтобы выбрать файл</span>
+      <span class="java-drop__file" id="java-drop-file"></span>
+      <input type="file" name="java_file" id="java-file" accept=".java,.txt,text/plain" required>
+    </label>
+
+    <div class="java-import__row">
+      <label for="java-type">Тип для новых запчастей</label>
+      <input type="text" name="type_name" id="java-type" value="{{ type_value }}" list="java-type-list" maxlength="100">
+      <datalist id="java-type-list">{% for t in type_names %}<option value="{{ t }}">{% endfor %}</datalist>
+      <span class="help">Можно выбрать существующий или ввести новый. Потом тип можно поменять у каждой запчасти.</span>
+    </div>
+
+    <label class="java-import__check">
+      <input type="checkbox" name="update_names" value="1" {% if update_names %}checked{% endif %}>
+      <span>Обновить наименование (RU) у запчастей, которые уже есть в базе — цены, остатки и фото не трогаются</span>
+    </label>
+
+    <div class="java-import__submit">
+      <button type="submit" class="btn btn-primary">📥 Импортировать</button>
+      <a href="{% url 'admin:main_sparepart_changelist' %}" class="btn btn-default">Отмена</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  (function(){
+    var drop = document.getElementById('java-drop');
+    var input = document.getElementById('java-file');
+    var label = document.getElementById('java-drop-file');
+    function show(){ label.textContent = input.files.length ? '✓ ' + input.files[0].name : ''; }
+    input.addEventListener('change', show);
+    ['dragenter', 'dragover'].forEach(function(ev){
+      drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.add('is-over'); });
+    });
+    ['dragleave', 'drop'].forEach(function(ev){
+      drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.remove('is-over'); });
+    });
+    drop.addEventListener('drop', function(e){
+      if (!e.dataTransfer.files.length) return;
+      var dt = new DataTransfer();
+      dt.items.add(e.dataTransfer.files[0]);
+      input.files = dt.files;
+      show();
+    });
+  })();
+</script>
+{% endblock %}

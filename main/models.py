@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
 from django.db.models.signals import post_save, post_delete
 from datetime import timedelta, time as datetime_time
+from decimal import Decimal, ROUND_HALF_UP
 from django.core.cache import cache
 from .validators import validate_image_size, validate_broadcast_video
 # ========== ОБЩИЕ CHOICES ==========
@@ -2153,6 +2154,12 @@ class DealerProfile(models.Model):
         blank=True,
         help_text='Например: 12345/2026',
     )
+    contract_date = models.DateField(
+        'Дата договора',
+        null=True,
+        blank=True,
+        help_text='Печатается в спецификации: «к Договору № … от …».',
+    )
     is_active = models.BooleanField(
         'Активен',
         default=True,
@@ -2243,6 +2250,21 @@ class SparePartType(models.Model):
         return cls.objects.create(name=name, name_ru=name)
 
 
+# ========== НДС ==========
+# В админке цена запчасти вводится БЕЗ НДС. Дилеру (магазин, корзина, счёт)
+# показывается и выставляется цена С НДС — считается по формуле ниже.
+VAT_RATE = Decimal('12')   # ставка НДС, %
+
+
+def add_vat(amount, rate=VAT_RATE):
+    """Цена без НДС → цена с НДС, округлённая до целого сума."""
+    if amount is None:
+        return None
+    return (Decimal(amount) * (Decimal('100') + Decimal(rate)) / Decimal('100')).quantize(
+        Decimal('1'), rounding=ROUND_HALF_UP,
+    )
+
+
 class SparePart(models.Model):
     """Запчасть/деталь для магазина. Артикул уникален, имя переводится (RU обязателен)."""
 
@@ -2280,9 +2302,10 @@ class SparePart(models.Model):
         default=0,
     )
     price = models.DecimalField(
-        'Цена (UZS)',
+        'Цена без НДС (UZS)',
         max_digits=12,
         decimal_places=2,
+        help_text='Вводится без НДС. Дилерам показывается цена с НДС (+12%).',
     )
     parent_models = models.ManyToManyField(
         ParentModel,
@@ -2304,6 +2327,11 @@ class SparePart(models.Model):
 
     def __str__(self):
         return f'{self.part_number} — {self.name}'
+
+    @property
+    def price_with_vat(self):
+        """Цена для дилера: цена без НДС + НДС, округлено до сума."""
+        return add_vat(self.price)
 
 
 class SparePartImage(models.Model):
@@ -2332,6 +2360,54 @@ class SparePartImage(models.Model):
 
 
 # ========== СЧЕТА ДИЛЕРАМ ==========
+
+class DealerContract(models.Model):
+    """Договор с дилером. Счета (и спецификации) дилера нумеруются ВНУТРИ договора: 1, 2, 3…
+
+    Новый договор заводит сервис кнопкой в разделе «Договоры» → нумерация
+    начинается заново с №1, не дожидаясь нового года. Текущий договор дилера —
+    самый свежий. Номер/дата текущего договора дублируются в DealerProfile
+    (contract_number/contract_date) — их видно в админке и профиле.
+    """
+
+    dealer = models.ForeignKey(
+        'DealerProfile',
+        verbose_name='Дилер',
+        on_delete=models.CASCADE,
+        related_name='contracts',
+    )
+    number = models.CharField('Номер договора', max_length=100)
+    date = models.DateField('Дата договора', null=True, blank=True)
+    # Последний выданный номер счёта/спецификации по этому договору
+    last_number = models.PositiveIntegerField('Последний № счёта', default=0)
+    created_by = models.CharField('Кто завёл', max_length=150, blank=True)
+    created_at = models.DateTimeField('Заведён', auto_now_add=True)
+
+    class Meta:
+        verbose_name        = 'Магазин — Договор дилера'
+        verbose_name_plural = 'Магазин — Договоры дилеров'
+        ordering            = ['-created_at', '-id']
+
+    def __str__(self):
+        date = f' от {self.date:%d.%m.%Y}' if self.date else ''
+        return f'№ {self.number}{date}'
+
+
+def current_contract(profile):
+    """Текущий (последний) договор дилера. Если договоров ещё нет — заводит
+    первый из реквизитов профиля. Вызывать под блокировкой профиля дилера
+    (select_for_update), чтобы два параллельных заказа не завели два договора.
+    """
+    contract = DealerContract.objects.filter(dealer=profile).order_by('-created_at', '-id').first()
+    if contract is None:
+        contract = DealerContract.objects.create(
+            dealer=profile,
+            number=profile.contract_number,
+            date=profile.contract_date,
+            created_by='auto',
+        )
+    return contract
+
 
 class Invoice(models.Model):
     """Счёт на оплату для дилера.
@@ -2371,11 +2447,13 @@ class Invoice(models.Model):
     STATUS_PAID            = 'paid'
     STATUS_IN_TRANSIT      = 'in_transit'
     STATUS_DELIVERED       = 'delivered'
+    STATUS_CANCELLED       = 'cancelled'
     STATUS_CHOICES = [
         (STATUS_PENDING_PAYMENT, 'Ожидание оплаты'),
         (STATUS_PAID,            'Оплачено'),
         (STATUS_IN_TRANSIT,      'В пути'),
         (STATUS_DELIVERED,       'Доставлено'),
+        (STATUS_CANCELLED,       'Отменён'),
     ]
     status = models.CharField(
         'Статус',
@@ -2390,6 +2468,16 @@ class Invoice(models.Model):
     buyer_company_name   = models.CharField('Покупатель — юр. название', max_length=255, blank=True)
     buyer_inn            = models.CharField('Покупатель — ИНН',          max_length=20,  blank=True)
     buyer_contract_number = models.CharField('Покупатель — № договора',   max_length=100, blank=True)
+    buyer_contract_date   = models.DateField('Покупатель — дата договора', null=True, blank=True)
+    # Договор, в рамках которого выдан номер. NULL — счета до нумерации по договорам
+    # (у них номер сквозной по году).
+    contract = models.ForeignKey(
+        DealerContract,
+        verbose_name='Договор',
+        on_delete=models.PROTECT,
+        related_name='invoices',
+        null=True, blank=True,
+    )
 
     total_amount = models.DecimalField(
         'Итоговая сумма (UZS)',
@@ -2397,16 +2485,27 @@ class Invoice(models.Model):
         default=0,
     )
 
+    # Отмена подтверждённого заказа — остатки возвращаются на склад (см. set_cancelled)
+    cancelled_at  = models.DateTimeField('Отменён', null=True, blank=True)
+    cancelled_by  = models.CharField('Кем отменён', max_length=150, blank=True)
+    cancel_reason = models.CharField('Причина отмены', max_length=255, blank=True)
+
     created_at = models.DateTimeField('Создан', auto_now_add=True)
 
     class Meta:
         verbose_name        = 'Магазин — Счёт'
         verbose_name_plural = 'Магазин — Счета'
-        ordering            = ['-year', '-number']
-        # Гарантия что (год, номер) уникальны — на уровне БД, а не только в коде.
-        # При гонке вторая параллельная вставка с тем же номером упадёт с IntegrityError.
+        ordering            = ['-confirmed_at', '-id']
+        # Уникальность номера на уровне БД, а не только в коде.
+        # Новые счета: номер уникален внутри договора дилера.
+        # Старые (contract=NULL): номер был сквозной по году.
         constraints = [
-            models.UniqueConstraint(fields=['year', 'number'], name='invoice_year_number_unique'),
+            models.UniqueConstraint(
+                fields=['year', 'number'],
+                condition=models.Q(contract__isnull=True),
+                name='invoice_year_number_unique',
+            ),
+            models.UniqueConstraint(fields=['contract', 'number'], name='invoice_contract_number_unique'),
         ]
 
     def __str__(self):
@@ -2418,6 +2517,46 @@ class Invoice(models.Model):
     def is_draft(self):
         """True если счёт ещё не подтверждён (нет номера)."""
         return self.number is None
+
+    def set_cancelled(self, changed_by, reason=''):
+        """Отмена подтверждённого заказа: возвращаем позиции на склад.
+        Вызывать внутри transaction.atomic(). Сам статус не сохраняет —
+        это делает вызывающий (вьюха или админка) вместе с остальными полями.
+        """
+        for item in self.items.all():
+            if item.part_id:
+                change_stock(
+                    item.part_id, item.quantity, StockMovement.REASON_ORDER_CANCEL,
+                    invoice=self, changed_by=changed_by,
+                )
+        self.status = self.STATUS_CANCELLED
+        self.cancelled_at = timezone.now()
+        self.cancelled_by = changed_by
+        self.cancel_reason = (reason or '')[:255]
+
+    def stock_shortage_for_uncancel(self):
+        """Список «нехваток» если вернуть отменённый заказ в работу —
+        позиции снова надо списать со склада. Пустой список = можно."""
+        shortages = []
+        for item in self.items.select_related('part'):
+            if item.part and item.part.quantity < item.quantity:
+                shortages.append(
+                    f'«{item.name}»: на складе {item.part.quantity}, нужно {item.quantity}'
+                )
+        return shortages
+
+    def set_uncancelled(self, new_status, changed_by):
+        """Возврат отменённого заказа в работу (только из админки) — списываем заново."""
+        for item in self.items.all():
+            if item.part_id:
+                change_stock(
+                    item.part_id, -item.quantity, StockMovement.REASON_ORDER,
+                    invoice=self, changed_by=changed_by, comment='Возврат отменённого заказа',
+                )
+        self.status = new_status
+        self.cancelled_at = None
+        self.cancelled_by = ''
+        self.cancel_reason = ''
 
 
 class InvoiceItem(models.Model):
@@ -2433,10 +2572,17 @@ class InvoiceItem(models.Model):
     )
 
     name     = models.CharField('Наименование', max_length=255)
+    part_number = models.CharField('Код детали', max_length=100, blank=True)   # снапшот SparePart.part_number
     quantity = models.PositiveIntegerField('Количество', default=1)
     unit     = models.CharField('Единица', max_length=20, default='шт')
-    price    = models.DecimalField('Цена',  max_digits=14, decimal_places=2)
-    sum      = models.DecimalField('Сумма', max_digits=14, decimal_places=2)
+    # price/sum — то, что платит дилер, т.е. С НДС (как и Invoice.total_amount).
+    price    = models.DecimalField('Цена с НДС',  max_digits=14, decimal_places=2)
+    sum      = models.DecimalField('Сумма с НДС', max_digits=14, decimal_places=2)
+    # Снапшот цены без НДС и ставки. Пусто у счетов, созданных до введения НДС.
+    price_without_vat = models.DecimalField('Цена без НДС', max_digits=14, decimal_places=2,
+                                            null=True, blank=True)
+    vat_rate = models.DecimalField('Ставка НДС, %', max_digits=5, decimal_places=2,
+                                   null=True, blank=True)
 
     class Meta:
         verbose_name        = 'Позиция счёта'
@@ -2445,3 +2591,77 @@ class InvoiceItem(models.Model):
 
     def __str__(self):
         return f'{self.name} × {self.quantity}'
+
+
+# ========== ДВИЖЕНИЕ СКЛАДА ==========
+
+class StockMovement(models.Model):
+    """Журнал изменений остатка запчасти: кто, когда, на сколько и почему.
+    Пишется только через change_stock() / record_stock_change() — руками не создаётся.
+    """
+
+    REASON_ORDER        = 'order'
+    REASON_ORDER_CANCEL = 'order_cancel'
+    REASON_STAFF        = 'staff'
+    REASON_ADMIN        = 'admin'
+    REASON_CHOICES = [
+        (REASON_ORDER,        'Заказ дилера'),
+        (REASON_ORDER_CANCEL, 'Отмена заказа'),
+        (REASON_STAFF,        'Сотрудник сервиса'),
+        (REASON_ADMIN,        'Админка'),
+    ]
+
+    part = models.ForeignKey(
+        SparePart,
+        on_delete=models.CASCADE,
+        related_name='stock_movements',
+        verbose_name='Запчасть',
+    )
+    delta          = models.IntegerField('Изменение')
+    quantity_after = models.PositiveIntegerField('Остаток после')
+    reason         = models.CharField('Причина', max_length=20, choices=REASON_CHOICES, db_index=True)
+    invoice = models.ForeignKey(
+        Invoice,
+        on_delete=models.SET_NULL,
+        related_name='stock_movements',
+        null=True, blank=True,
+        verbose_name='Счёт',
+    )
+    changed_by = models.CharField('Кто', max_length=150, blank=True)
+    comment    = models.CharField('Комментарий', max_length=255, blank=True)
+    created_at = models.DateTimeField('Когда', auto_now_add=True, db_index=True)
+
+    class Meta:
+        verbose_name        = 'Магазин — Движение склада'
+        verbose_name_plural = 'Магазин — Движение склада'
+        ordering            = ['-created_at', '-id']
+
+    def __str__(self):
+        sign = '+' if self.delta > 0 else ''
+        return f'{self.part.part_number}: {sign}{self.delta} → {self.quantity_after}'
+
+
+def record_stock_change(part_id, delta, quantity_after, reason, invoice=None, changed_by='', comment=''):
+    """Запись в журнал, когда остаток уже изменён вызывающим кодом."""
+    if not delta:
+        return None
+    return StockMovement.objects.create(
+        part_id=part_id,
+        delta=delta,
+        quantity_after=quantity_after,
+        reason=reason,
+        invoice=invoice,
+        changed_by=changed_by or '',
+        comment=comment or '',
+    )
+
+
+def change_stock(part_id, delta, reason, invoice=None, changed_by='', comment=''):
+    """Атомарно меняет остаток (UPDATE ... SET quantity = quantity + delta) и пишет журнал.
+    Вызывать внутри transaction.atomic(); проверку «не уйти в минус» делает вызывающий
+    под select_for_update. Возвращает новый остаток.
+    """
+    SparePart.objects.filter(id=part_id).update(quantity=models.F('quantity') + delta)
+    quantity_after = SparePart.objects.values_list('quantity', flat=True).get(id=part_id)
+    record_stock_change(part_id, delta, quantity_after, reason, invoice, changed_by, comment)
+    return quantity_after

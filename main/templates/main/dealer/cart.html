@@ -195,6 +195,12 @@
       font-size: 15px;
     }
     .cart-total__label { color: #5a6470; font-weight: 600; }
+    .cart-vat-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 13px; color: #7a8290; margin-bottom: 6px;
+    }
+    .cart-vat-row span:last-child { color: #3a4452; font-weight: 600; }
+    .cart-item__price-novat { color: #8a929b; }
     .cart-total__sum { font-size: 22px; font-weight: 700; color: #1f3a5f; }
 
     .cart-pay-btn {
@@ -272,7 +278,7 @@
 
   {% include 'main/dealer/_profile_modal.html' %}
 
-  <script src="{% static 'js/dealer-cart.js' %}"></script>
+  <script src="{% static 'js/dealer-cart.js' %}" data-owner="{{ profile.id }}"></script>
   <script>
     (function(){
       DealerCart.bindBadge(document.getElementById('cart-badge'));
@@ -303,7 +309,9 @@
           + '  <div class="cart-item__info">'
           + '    <div class="cart-item__sku">' + escapeHtml(item.part_number) + '</div>'
           + '    <h3 class="cart-item__name">' + escapeHtml(item.name) + '</h3>'
-          + '    <div class="cart-item__price-line">Цена: <strong>' + fmt(item.price) + ' UZS</strong> · в наличии: ' + item.quantity_available + '</div>'
+          + '    <div class="cart-item__price-line">Цена с НДС: <strong>' + fmt(item.price) + ' UZS</strong>'
+          + ' <span class="cart-item__price-novat">(без НДС: ' + fmt(item.price_without_vat) + ')</span>'
+          + ' · в наличии: ' + item.quantity_available + '</div>'
           + '  </div>'
           + '  <div class="cart-item__actions">'
           + '    <div class="cart-item__stepper" data-max="' + item.quantity_available + '">'
@@ -392,6 +400,7 @@
         }).join('');
 
         var total = items.reduce(function(s, it){ return s + it.price * it.qty; }, 0);
+        var totalNoVat = items.reduce(function(s, it){ return s + it.price_without_vat * it.qty; }, 0);
 
         var sidebar = ''
           + '<aside class="cart-sidebar">'
@@ -399,6 +408,8 @@
           + '    <h2 class="cart-sidebar__title">Сумма</h2>'
           + '    <ul class="cart-breakdown" id="cart-breakdown">' + breakdownLines + '</ul>'
           + '    <hr class="cart-breakdown__divider">'
+          + '    <div class="cart-vat-row"><span>Сумма без НДС:</span><span id="cart-total-novat">' + fmt(totalNoVat) + ' UZS</span></div>'
+          + '    <div class="cart-vat-row"><span>НДС 12%:</span><span id="cart-total-vat">' + fmt(total - totalNoVat) + ' UZS</span></div>'
           + '    <div class="cart-total">'
           + '      <span class="cart-total__label">Итого:</span>'
           + '      <span class="cart-total__sum" id="cart-total">' + fmt(total) + ' UZS</span>'
@@ -422,6 +433,7 @@
 
         function recomputeSidebar(){
           var total = 0;
+          var totalNoVat = 0;
           var breakdown = document.getElementById('cart-breakdown');
           if (!breakdown) return;
           Object.values(byId).forEach(function(it){
@@ -429,10 +441,13 @@
             if (!line) return;
             var sub = it.price * it.qty;
             total += sub;
+            totalNoVat += it.price_without_vat * it.qty;
             line.querySelector('[data-role="sub"]').textContent = fmt(sub);
             line.querySelector('.cart-breakdown__formula').innerHTML = '<b>' + it.qty + '</b> × ' + fmt(it.price);
           });
           document.getElementById('cart-total').textContent = fmt(total) + ' UZS';
+          document.getElementById('cart-total-novat').textContent = fmt(totalNoVat) + ' UZS';
+          document.getElementById('cart-total-vat').textContent = fmt(total - totalNoVat) + ' UZS';
         }
 
         document.querySelectorAll('.cart-item').forEach(function(card){

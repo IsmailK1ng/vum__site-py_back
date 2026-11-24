@@ -87,6 +87,7 @@
     <nav class="staff-tabs">
       <a href="{% url 'staff_orders_list' %}" class="staff-tabs__link">Заказы</a>
       <a href="{% url 'staff_parts_list' %}" class="staff-tabs__link is-current">Запчасти</a>
+      <a href="{% url 'staff_contracts' %}" class="staff-tabs__link">Договоры</a>
     </nav>
     <div class="dealer-header__user">
       <button type="button" class="profile-trigger" aria-label="Профиль" style="display:inline-flex;align-items:center;gap:10px;background:transparent;border:none;padding:4px 8px;border-radius:24px;cursor:pointer;font:inherit;color:inherit;">
@@ -125,7 +126,7 @@
             <th>Наименование</th>
             <th>Тип</th>
             <th>Модель</th>
-            <th>Цена</th>
+            <th>Цена с НДС</th>
             <th class="qty-cell">Остаток</th>
           </tr>
         </thead>
@@ -141,7 +142,7 @@
               </td>
               <td>{{ p.type }}</td>
               <td>{{ p.parent_models }}</td>
-              <td>{{ p.price_formatted }} UZS</td>
+              <td>{{ p.price_formatted }} UZS<br><small style="color:#8a929b;">без НДС: {{ p.price_without_vat_formatted }}</small></td>
               <td class="qty-cell">
                 <div class="qty-stepper" data-initial="{{ p.quantity }}">
                   <button type="button" data-action="dec" aria-label="Уменьшить">−</button>

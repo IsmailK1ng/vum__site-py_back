@@ -33,14 +33,18 @@ urlpatterns = [
     path('dealer/invoice/<int:invoice_id>/confirm/', views.dealer_invoice_confirm, name='dealer_invoice_confirm'),
     path('dealer/invoice/<int:invoice_id>/cancel/', views.dealer_invoice_cancel, name='dealer_invoice_cancel'),
     path('dealer/invoice/<int:invoice_id>/received/', views.dealer_invoice_mark_received, name='dealer_invoice_mark_received'),
+    path('dealer/invoice/<int:invoice_id>/cancel-order/', views.dealer_invoice_cancel_order, name='dealer_invoice_cancel_order'),
     path('dealer/change-password/', views.dealer_change_password, name='dealer_change_password'),
 
     # ========== STAFF (СЕРВИС + БУХГАЛТЕР) ==========
     path('staff/orders/', views.staff_orders_list, name='staff_orders_list'),
     path('staff/orders/<int:invoice_id>/', views.staff_order_detail, name='staff_order_detail'),
     path('staff/orders/<int:invoice_id>/document/', views.staff_invoice_view, name='staff_invoice_view'),
+    path('staff/orders/<int:invoice_id>/specification/', views.staff_specification_view, name='staff_specification_view'),
     path('staff/orders/<int:invoice_id>/status/', views.staff_change_status, name='staff_change_status'),
     path('staff/parts/', views.staff_parts_list, name='staff_parts_list'),
+    path('staff/contracts/', views.staff_contracts, name='staff_contracts'),
+    path('staff/contracts/<int:dealer_id>/new/', views.staff_contract_new, name='staff_contract_new'),
     path('staff/parts/<int:part_id>/quantity/', views.staff_part_update_quantity, name='staff_part_update_quantity'),
 
     # ========== DASHBOARD ==========

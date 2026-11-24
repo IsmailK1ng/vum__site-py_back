@@ -4,12 +4,30 @@
  * Структура: [{ id: <part_id>, qty: <int> }, ...]
  * При любом изменении бросаем window event 'dealer-cart-change' —
  * хедер/бейджи подписываются на него и обновляют счётчик.
+ *
+ * Корзина своя у каждого дилера: ключ включает id профиля из
+ * <script src="dealer-cart.js" data-owner="{{ profile.id }}">. Иначе два дилера
+ * за одним компьютером видели бы корзину друг друга.
  */
 (function(){
   if (window.DealerCart) return;
 
-  var KEY = 'dealer_cart_v1';
+  var LEGACY_KEY = 'dealer_cart_v1';
+  var script = document.currentScript;
+  var owner = script && script.dataset.owner;
+  var KEY = owner ? LEGACY_KEY + '_' + owner : LEGACY_KEY;
   var EVENT = 'dealer-cart-change';
+
+  // Старая общая корзина (до разделения по дилерам) — переносим первому,
+  // кто зайдёт, и удаляем, чтоб она не всплыла у другого дилера.
+  try {
+    if (owner && localStorage.getItem(LEGACY_KEY) !== null) {
+      if (localStorage.getItem(KEY) === null) {
+        localStorage.setItem(KEY, localStorage.getItem(LEGACY_KEY));
+      }
+      localStorage.removeItem(LEGACY_KEY);
+    }
+  } catch (e) {}
 
   function readRaw(){
     try {

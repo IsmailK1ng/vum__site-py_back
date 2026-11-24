@@ -219,7 +219,7 @@ class DealerProfileAdminForm(forms.ModelForm):
 
     class Meta:
         model = DealerProfile
-        fields = ['role', 'name', 'avatar', 'company_name', 'inn', 'contract_number', 'is_active']
+        fields = ['role', 'name', 'avatar', 'company_name', 'inn', 'contract_number', 'contract_date', 'is_active']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -511,10 +511,14 @@ class SparePartAdminForm(forms.ModelForm):
     - Пользователь либо выбирает существующий тип из datalist,
     - либо вводит новое название (case-insensitive дедуп через get_or_create_normalized).
     Поле обязательное. Перевод типа (UZ/EN) редактируется отдельно в админке типов.
+
+    FK 'type' исключён из формы, вместо него текстовое 'type_name'. Тип ищется/создаётся
+    только в save() — если форма или инлайны с фото не прошли валидацию, в БД не
+    остаётся «осиротевших» типов.
     """
 
-    # Подмена FK на CharField — у пользователя одно текстовое поле с автодополнением
-    type = forms.CharField(
+    # Вместо FK — одно текстовое поле с автодополнением
+    type_name = forms.CharField(
         label='Тип запчасти',
         max_length=100,
         required=True,
@@ -526,26 +530,22 @@ class SparePartAdminForm(forms.ModelForm):
 
     class Meta:
         model = SparePart
-        fields = '__all__'
+        exclude = ['type']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # При редактировании Django через model_to_dict кладёт в self.initial['type']
-        # ID грузовика (число), а у нас CharField — нужно подменить на текстовое имя.
-        # Перезаписываем именно self.initial, а не self.fields['type'].initial —
-        # второе игнорируется когда ключ уже есть в self.initial.
         if self.instance and self.instance.pk and self.instance.type_id:
-            self.initial['type'] = (
+            self.initial['type_name'] = (
                 self.instance.type.name_ru or self.instance.type.name
             )
 
-    def clean_type(self):
-        """Возвращает уже готовый SparePartType instance.
-        Делаем дедуп+создание прямо здесь, чтоб construct_instance() получил FK-объект,
-        а не строку (иначе ValueError на присвоение строки в FK).
-        """
-        raw = self.cleaned_data.get('type', '')
-        normalized = normalize_type_name(raw)
+    def clean_type_name(self):
+        normalized = normalize_type_name(self.cleaned_data.get('type_name', ''))
         if not normalized:
             raise forms.ValidationError('Тип запчасти обязателен.')
-        return SparePartType.get_or_create_normalized(normalized)
+        return normalized
+
+    def save(self, commit=True):
+        # Админка зовёт save(commit=False) уже после валидации формы и всех инлайнов
+        self.instance.type = SparePartType.get_or_create_normalized(self.cleaned_data['type_name'])
+        return super().save(commit=commit)
