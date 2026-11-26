@@ -725,9 +725,11 @@ def dealer_invoice_confirm(request, invoice_id):
             invoice.buyer_contract_number = contract.number
             invoice.buyer_contract_date = contract.date
             invoice.confirmed_at = timezone.now()
+            # Дальше заказ сначала проверяет сервис, бухгалтерия его пока не видит
+            invoice.status = Invoice.STATUS_PENDING_APPROVAL
             invoice.save(update_fields=[
                 'year', 'number', 'contract', 'buyer_contract_number',
-                'buyer_contract_date', 'confirmed_at',
+                'buyer_contract_date', 'confirmed_at', 'status',
             ])
     except IntegrityError:
         # Гонка на UniqueConstraint номера — крайне маловероятна,
@@ -784,6 +786,10 @@ def dealer_invoice_mark_received(request, invoice_id):
     })
 
 
+# Свой заказ дилер может отменить, пока он не оплачен
+DEALER_CANCELLABLE_STATUSES = (Invoice.STATUS_PENDING_APPROVAL, Invoice.STATUS_APPROVED)
+
+
 def _cancel_order(invoice, profile, reason):
     """Отмена подтверждённого заказа с возвратом на склад. Вызывать в atomic под lock'ом."""
     invoice.set_cancelled(changed_by=profile.user.username, reason=reason)
@@ -798,7 +804,8 @@ def _cancel_order(invoice, profile, reason):
 @dealer_required
 @require_http_methods(['POST'])
 def dealer_invoice_cancel_order(request, invoice_id):
-    """Дилер отменяет СВОЙ подтверждённый заказ — только пока он не оплачен.
+    """Дилер отменяет СВОЙ подтверждённый заказ — пока он на подтверждении у сервиса
+    или уже подтверждён, но ещё не отправлен.
     Остатки возвращаются на склад, номер счёта остаётся (дыр в нумерации нет).
     """
     profile = request.dealer_profile
@@ -812,14 +819,14 @@ def dealer_invoice_cancel_order(request, invoice_id):
                 id=invoice_id,
                 dealer=profile,
                 number__isnull=False,
-                status=Invoice.STATUS_PENDING_PAYMENT,
+                status__in=DEALER_CANCELLABLE_STATUSES,
             )
             .first()
         )
         if not invoice:
             return JsonResponse({
                 'ok': False,
-                'error': 'Заказ не найден или уже оплачен — отменить может только бухгалтерия',
+                'error': 'Заказ не найден или уже отправлен — отменить его может только поставщик',
             }, status=404)
         _cancel_order(invoice, profile, reason)
 
@@ -841,18 +848,24 @@ def dealer_invoice_cancel(request, invoice_id):
     return JsonResponse({'ok': True})
 
 
-def _invoice_items_and_totals(invoice):
+def _invoice_items_and_totals(invoice, include_removed=False):
     """Позиции и итоги счёта для шаблонов (дилерский счёт, карточка заказа, документ).
 
     price/sum позиций — с НДС. Цена без НДС и сумма НДС есть только у счетов,
     созданных после введения НДС (у старых price_without_vat пустой → has_vat=False).
+    Позиции, убранные сервисом (quantity=0), в документы не попадают —
+    их видно только в карточке заказа у сервиса (include_removed=True).
     """
-    items = list(invoice.items.all())
+    items = [it for it in invoice.items.all() if include_removed or it.quantity > 0]
     has_vat = bool(items) and all(it.price_without_vat is not None for it in items)
     items_ctx = []
     vat_total = Decimal('0')
     for it in items:
         row = {
+            'id': it.id,
+            'part_id': it.part_id,
+            'original_quantity': it.original_quantity,
+            'is_changed': it.is_changed_by_supplier,
             'name': it.name,
             'quantity': it.quantity,
             'unit': it.unit,
@@ -935,7 +948,13 @@ def dealer_invoice(request, invoice_id):
     # Дилер может подтвердить получение только если счёт «В пути»
     can_mark_received = (not is_draft) and invoice.status == Invoice.STATUS_IN_TRANSIT
     # Отменить сам — только пока не оплачен
-    can_cancel_order = (not is_draft) and invoice.status == Invoice.STATUS_PENDING_PAYMENT
+    can_cancel_order = (not is_draft) and invoice.status in DEALER_CANCELLABLE_STATUSES
+
+    # Что поменял сервис: было → стало (в т.ч. убранные позиции)
+    supplier_changes = [
+        {'name': it.name, 'was': it.original_quantity, 'now': it.quantity}
+        for it in invoice.items.all() if it.is_changed_by_supplier
+    ]
 
     return render(request, 'main/dealer/invoice.html', {
         'profile': profile,
@@ -951,7 +970,9 @@ def dealer_invoice(request, invoice_id):
             'can_mark_received': can_mark_received,
             'can_cancel_order': can_cancel_order,
             'cancel_reason': invoice.cancel_reason,
+            'is_awaiting_approval': invoice.is_awaiting_approval,
         },
+        'supplier_changes': supplier_changes,
         'buyer': {
             'name': invoice.buyer_company_name,
             'inn': invoice.buyer_inn,
@@ -965,21 +986,22 @@ def dealer_invoice(request, invoice_id):
 # ========== STAFF (СОТРУДНИКИ СЕРВИСА + БУХГАЛТЕР) ==========
 
 # Правила переходов статусов по ролям.
-# Бухгалтер ставит "оплачено", сервис двигает дальше до "в пути",
+# Сервис подтверждает заказ и двигает его до "в пути", бухгалтер только смотрит,
 # финальный шаг "доставлено" подтверждает САМ ДИЛЕР у себя в счёте.
-# Отмена (с возвратом на склад) — сотрудникам до отгрузки, дилеру — пока не оплачено.
+# Отмена (с возвратом на склад) — сервису и дилеру до отгрузки.
 # После "в пути" отменить может только админ (в админке).
 ALLOWED_STATUS_TRANSITIONS = {
-    DealerProfile.ROLE_ACCOUNTANT: {
-        Invoice.STATUS_PENDING_PAYMENT: [Invoice.STATUS_PAID, Invoice.STATUS_CANCELLED],
-        Invoice.STATUS_PAID:            [Invoice.STATUS_CANCELLED],
-    },
+    # Бухгалтер статусы не меняет — только смотрит счёт и спецификацию
+    # (а «На подтверждении» вообще не видит).
+    DealerProfile.ROLE_ACCOUNTANT: {},
     DealerProfile.ROLE_SERVICE: {
-        Invoice.STATUS_PENDING_PAYMENT: [Invoice.STATUS_CANCELLED],
-        Invoice.STATUS_PAID:            [Invoice.STATUS_IN_TRANSIT, Invoice.STATUS_CANCELLED],
+        # подтвердить заказ (→ бухгалтерии) или отменить
+        Invoice.STATUS_PENDING_APPROVAL: [Invoice.STATUS_APPROVED, Invoice.STATUS_CANCELLED],
+        Invoice.STATUS_APPROVED: [Invoice.STATUS_IN_TRANSIT, Invoice.STATUS_CANCELLED],
     },
     DealerProfile.ROLE_DEALER: {
-        Invoice.STATUS_PENDING_PAYMENT: [Invoice.STATUS_CANCELLED],
+        Invoice.STATUS_PENDING_APPROVAL: [Invoice.STATUS_CANCELLED],
+        Invoice.STATUS_APPROVED: [Invoice.STATUS_CANCELLED],
         Invoice.STATUS_IN_TRANSIT:      [Invoice.STATUS_DELIVERED],
     },
 }
@@ -990,6 +1012,15 @@ def _allowed_next_statuses(profile, current_status):
     return ALLOWED_STATUS_TRANSITIONS.get(profile.role, {}).get(current_status, [])
 
 
+def _staff_invoices(profile):
+    """Подтверждённые дилерами заказы, которые видит сотрудник.
+    Бухгалтер не видит заказы, которые ещё не подтвердил сервис."""
+    qs = Invoice.objects.filter(number__isnull=False)
+    if not profile.is_service:
+        qs = qs.exclude(status=Invoice.STATUS_PENDING_APPROVAL)
+    return qs
+
+
 @never_cache
 @staff_required
 def staff_orders_list(request):
@@ -998,16 +1029,23 @@ def staff_orders_list(request):
     """
     profile = request.dealer_profile
     qs = (
-        Invoice.objects
-        .filter(number__isnull=False)
+        _staff_invoices(profile)
         .select_related('dealer')
-        .order_by('-confirmed_at')
+        .order_by('-confirmed_at', '-id')
     )
 
     status_filter = (request.GET.get('status') or '').strip()
     q = (request.GET.get('q') or '').strip()
 
-    if status_filter and status_filter in dict(Invoice.STATUS_CHOICES):
+    status_choices = [
+        (value, label) for value, label in Invoice.STATUS_CHOICES
+        if profile.is_service or value != Invoice.STATUS_PENDING_APPROVAL
+    ]
+    awaiting_count = (
+        qs.filter(status=Invoice.STATUS_PENDING_APPROVAL).count() if profile.is_service else 0
+    )
+
+    if status_filter and status_filter in dict(status_choices):
         qs = qs.filter(status=status_filter)
 
     if q:
@@ -1041,7 +1079,9 @@ def staff_orders_list(request):
         'invoices': items_ctx,
         'status_filter': status_filter,
         'search_query': q,
-        'status_choices': Invoice.STATUS_CHOICES,
+        'status_choices': status_choices,
+        'awaiting_count': awaiting_count,
+        'awaiting_status': Invoice.STATUS_PENDING_APPROVAL,
     })
 
 
@@ -1051,8 +1091,8 @@ def staff_order_detail(request, invoice_id):
     """Просмотр конкретного заказа сотрудником + доступные действия по статусу."""
     profile = request.dealer_profile
     invoice = (
-        Invoice.objects
-        .filter(id=invoice_id, number__isnull=False)
+        _staff_invoices(profile)
+        .filter(id=invoice_id)
         .select_related('dealer')
         .prefetch_related('items')
         .first()
@@ -1061,7 +1101,18 @@ def staff_order_detail(request, invoice_id):
         messages.warning(request, 'Заказ не найден.')
         return redirect('staff_orders_list')
 
-    items_ctx, totals = _invoice_items_and_totals(invoice)
+    # Количество правит только сервис и только до своего подтверждения
+    can_edit_items = profile.is_service and invoice.is_awaiting_approval
+    items_ctx, totals = _invoice_items_and_totals(invoice, include_removed=can_edit_items)
+    if can_edit_items:
+        # Максимум = уже заказано (списано) + свободный остаток на складе
+        stock = dict(
+            SparePart.objects.filter(id__in=[r['part_id'] for r in items_ctx if r['part_id']])
+            .values_list('id', 'quantity')
+        )
+        for row in items_ctx:
+            row['stock'] = stock.get(row['part_id'])
+            row['max_quantity'] = row['quantity'] + (row['stock'] or 0)
 
     # Какие переходы доступны этой роли с текущего статуса
     next_options = [
@@ -1082,6 +1133,8 @@ def staff_order_detail(request, invoice_id):
             'cancelled_by': invoice.cancelled_by,
             'cancelled_at': format_date_ru(invoice.cancelled_at) if invoice.cancelled_at else '',
             'cancel_reason': invoice.cancel_reason,
+            'approved_by': invoice.approved_by,
+            'approved_at': format_date_ru(invoice.approved_at) if invoice.approved_at else '',
         },
         'buyer': {
             'name': invoice.buyer_company_name,
@@ -1091,7 +1144,104 @@ def staff_order_detail(request, invoice_id):
         'items': items_ctx,
         'totals': totals,
         'next_options': next_options,
+        'can_edit_items': can_edit_items,
+        'has_supplier_changes': any(r['is_changed'] for r in items_ctx),
     })
+
+
+@never_cache
+@service_required
+@require_http_methods(['POST'])
+def staff_order_update_items(request, invoice_id):
+    """Сервис меняет количество позиций заказа, пока не подтвердил его.
+
+    JSON {"items": [{"id": <InvoiceItem.id>, "quantity": N}, ...]}.
+    Разница сразу двигает склад (журнал: «Правка заказа сервисом»): уменьшили — вернули
+    на склад, увеличили — списали (не больше свободного остатка). 0 — позиция убрана.
+    Цена остаётся та, по которой заказывал дилер.
+    """
+    profile = request.dealer_profile
+    try:
+        payload = json.loads(request.body or b'{}')
+        requested = {}
+        for row in payload.get('items', [])[:200]:
+            qty = int(row['quantity'])
+            if qty < 0 or qty > 100000:
+                raise ValueError
+            requested[int(row['id'])] = qty
+    except (ValueError, TypeError, KeyError, AttributeError, json.JSONDecodeError):
+        return JsonResponse({'ok': False, 'error': 'Неверные данные'}, status=400)
+
+    username = profile.user.username
+    changed = []
+    with transaction.atomic():
+        invoice = (
+            Invoice.objects.select_for_update()
+            .filter(id=invoice_id, number__isnull=False, status=Invoice.STATUS_PENDING_APPROVAL)
+            .first()
+        )
+        if not invoice:
+            return JsonResponse({
+                'ok': False, 'error': 'Заказ не найден или уже подтверждён — количество менять нельзя',
+            }, status=404)
+
+        items = {it.id: it for it in invoice.items.all()}
+        if set(requested) - set(items):
+            return JsonResponse({'ok': False, 'error': 'Позиция не из этого заказа'}, status=400)
+
+        to_change = {iid: q for iid, q in requested.items() if items[iid].quantity != q}
+        if to_change and all(to_change.get(iid, it.quantity) == 0 for iid, it in items.items()):
+            return JsonResponse({
+                'ok': False,
+                'error': 'Нельзя убрать все позиции. Если заказ не нужен — отмените его.',
+            }, status=400)
+
+        parts = {
+            p.id: p for p in SparePart.objects.select_for_update()
+            .filter(id__in=[items[i].part_id for i in to_change if items[i].part_id])
+        }
+        # Сначала проверяем всё, потом двигаем склад
+        for iid, new_qty in to_change.items():
+            it = items[iid]
+            delta = new_qty - it.quantity
+            if delta > 0:
+                part = parts.get(it.part_id)
+                if not part:
+                    return JsonResponse({
+                        'ok': False, 'error': f'«{it.name}» удалена из каталога — увеличить нельзя',
+                    }, status=400)
+                if part.quantity < delta:
+                    return JsonResponse({
+                        'ok': False,
+                        'error': f'«{it.name}»: на складе свободно {part.quantity}, '
+                                 f'можно максимум {it.quantity + part.quantity}',
+                    }, status=400)
+
+        for iid, new_qty in to_change.items():
+            it = items[iid]
+            old_qty = it.quantity
+            if it.part_id in parts:
+                # уменьшили → вернули на склад (+), увеличили → списали (−)
+                change_stock(
+                    it.part_id, old_qty - new_qty, StockMovement.REASON_ORDER_EDIT,
+                    invoice=invoice, changed_by=username,
+                    comment=f'Заказ №{invoice.number}/{invoice.year}: {old_qty} → {new_qty}',
+                )
+            if it.original_quantity is None:
+                it.original_quantity = old_qty
+            it.quantity = new_qty
+            it.sum = (it.price * new_qty).quantize(Decimal('0.01'))
+            it.save(update_fields=['quantity', 'original_quantity', 'sum'])
+            changed.append(f'{it.part_number or it.name}: {old_qty}→{new_qty}')
+
+        if changed:
+            invoice.total_amount = sum((it.sum for it in items.values()), Decimal('0'))
+            invoice.save(update_fields=['total_amount'])
+
+    if changed:
+        logger.info('Order items edited: invoice=№%d/%d by=%s %s',
+                    invoice.number, invoice.year, username, ', '.join(changed))
+    return JsonResponse({'ok': True, 'changed': len(changed)})
 
 
 @never_cache
@@ -1099,7 +1249,8 @@ def staff_order_detail(request, invoice_id):
 @require_http_methods(['POST'])
 def staff_change_status(request, invoice_id):
     """Смена статуса заказа.
-    Бухгалтер: pending → paid. Сервис: paid → in_transit (delivered ставит дилер).
+    Сервис: на подтверждении → подтверждён → в пути (delivered ставит дилер).
+    Бухгалтер статусы не меняет.
     Отмена — по матрице ALLOWED_STATUS_TRANSITIONS, с возвратом остатков на склад.
     Любой другой переход — 403.
     """
@@ -1112,9 +1263,9 @@ def staff_change_status(request, invoice_id):
 
     with transaction.atomic():
         invoice = (
-            Invoice.objects
+            _staff_invoices(profile)
             .select_for_update()
-            .filter(id=invoice_id, number__isnull=False)
+            .filter(id=invoice_id)
             .first()
         )
         if not invoice:
@@ -1135,8 +1286,18 @@ def staff_change_status(request, invoice_id):
                 'new_status_label': invoice.get_status_display(),
             })
 
+        update_fields = ['status']
+        if invoice.status == Invoice.STATUS_PENDING_APPROVAL:
+            # Сервис подтверждает заказ → его видит бухгалтерия, дилеру выдаётся счёт
+            if not invoice.items.filter(quantity__gt=0).exists():
+                return JsonResponse({
+                    'ok': False, 'error': 'В заказе не осталось позиций — отмените его',
+                }, status=400)
+            invoice.approved_at = timezone.now()
+            invoice.approved_by = profile.user.username
+            update_fields += ['approved_at', 'approved_by']
         invoice.status = new_status
-        invoice.save(update_fields=['status'])
+        invoice.save(update_fields=update_fields)
 
     logger.info(
         'Status changed: invoice=№%d/%d by=%s (%s) → %s',
@@ -1157,8 +1318,8 @@ def staff_invoice_view(request, invoice_id):
     """
     profile = request.dealer_profile
     invoice = (
-        Invoice.objects
-        .filter(id=invoice_id, number__isnull=False)
+        _staff_invoices(profile)
+        .filter(id=invoice_id)
         .prefetch_related('items')
         .first()
     )
@@ -1211,8 +1372,8 @@ def staff_specification_view(request, invoice_id):
     Цена без НДС берётся из снапшота позиции; у заказов до введения НДС её нет → «—».
     """
     invoice = (
-        Invoice.objects
-        .filter(id=invoice_id, number__isnull=False)
+        _staff_invoices(request.dealer_profile)
+        .filter(id=invoice_id)
         .prefetch_related('items__part')
         .first()
     )
@@ -1220,7 +1381,7 @@ def staff_specification_view(request, invoice_id):
         messages.warning(request, 'Заказ не найден.')
         return redirect('staff_orders_list')
 
-    items = list(invoice.items.all())
+    items = [it for it in invoice.items.all() if it.quantity > 0]   # убранные сервисом не печатаем
     items_ctx = [
         {
             'name': it.name,

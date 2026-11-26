@@ -108,8 +108,8 @@
       font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
       text-transform: uppercase; white-space: nowrap; color: #fff;
     }
-    .status-badge--pending_payment { background: #e08b00; }
-    .status-badge--paid            { background: #2c9f4e; }
+    .status-badge--pending_approval { background: #8e44ad; }
+    .status-badge--approved { background: #2c9f4e; }
     .status-badge--in_transit      { background: #1f7ec7; }
     .status-badge--delivered       { background: #5a6470; }
     .status-badge--cancelled       { background: #c0392b; }
@@ -118,6 +118,9 @@
       background: #fff; border: 1px solid #e3e8ef; border-radius: 14px;
       padding: 60px 20px; text-align: center;
     }
+    .awaiting-banner { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; background: #f4ecf8; border: 1px solid #dcc6e8; color: #5e2d79; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; text-decoration: none; font-size: 15px; }
+    .awaiting-banner:hover, .awaiting-banner.is-current { background: #ead9f3; }
+    .awaiting-banner__hint { font-size: 13px; color: #7d5a91; }
     .empty-state__title { font-size: 18px; font-weight: 600; color: #3a4452; margin: 0 0 8px; }
     .empty-state__text { color: #7a8290; font-size: 14px; margin: 0; }
 
@@ -156,6 +159,13 @@
 
   <main class="dealer-main">
     <h1 class="page-title">Все заказы</h1>
+
+    {% if awaiting_count %}
+      <a href="?status={{ awaiting_status }}" class="awaiting-banner{% if status_filter == awaiting_status %} is-current{% endif %}">
+        ⏳ Ждут вашего подтверждения: <b>{{ awaiting_count }}</b>
+        <span class="awaiting-banner__hint">Проверьте количество и подтвердите — до этого бухгалтерия заказ не видит, а дилер не получает счёт</span>
+      </a>
+    {% endif %}
 
     <form class="filters" method="get" action="">
       <input

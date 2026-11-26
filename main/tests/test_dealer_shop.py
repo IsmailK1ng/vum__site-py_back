@@ -63,6 +63,22 @@ class ShopTestBase(TestCase):
         invoice.refresh_from_db()
         return invoice
 
+    def approved_order(self, qty=3):
+        """Заказ, подтверждённый дилером и сервисом → «Подтверждён», виден бухгалтеру."""
+        invoice = self.confirmed_order(qty)
+        self.login_as(self.service)
+        resp = self.client.post(reverse('staff_change_status', args=[invoice.id]),
+                                {'status': Invoice.STATUS_APPROVED})
+        self.assertEqual(resp.status_code, 200, resp.content)
+        invoice.refresh_from_db()
+        return invoice
+
+    def edit_items(self, invoice, items):
+        return self.client.post(
+            reverse('staff_order_update_items', args=[invoice.id]),
+            data=json.dumps({'items': items}), content_type='application/json',
+        )
+
 
 class ConfirmTests(ShopTestBase):
 
@@ -148,7 +164,7 @@ class SpecificationTests(ShopTestBase):
         from datetime import date
         self.dealer.contract_date = date(2026, 8, 20)
         self.dealer.save()
-        invoice = self.confirmed_order(qty=2)
+        invoice = self.approved_order(qty=2)
         self.assertEqual(invoice.items.get().part_number, 'F-001')
 
         self.login_as(self.accountant)
@@ -268,9 +284,9 @@ class CancelTests(ShopTestBase):
             invoice=invoice, reason=StockMovement.REASON_ORDER_CANCEL, delta=4,
         ).exists())
 
-    def test_dealer_cannot_cancel_paid_order(self):
+    def test_dealer_cannot_cancel_shipped_order(self):
         invoice = self.confirmed_order()
-        Invoice.objects.filter(id=invoice.id).update(status=Invoice.STATUS_PAID)
+        Invoice.objects.filter(id=invoice.id).update(status=Invoice.STATUS_IN_TRANSIT)
         resp = self.client.post(reverse('dealer_invoice_cancel_order', args=[invoice.id]))
         self.assertEqual(resp.status_code, 404)
         self.part.refresh_from_db()
@@ -283,17 +299,30 @@ class CancelTests(ShopTestBase):
         resp = self.client.post(reverse('dealer_invoice_cancel_order', args=[invoice.id]))
         self.assertEqual(resp.status_code, 404)
 
-    def test_accountant_cancels_paid_order(self):
-        invoice = self.confirmed_order(qty=2)
-        Invoice.objects.filter(id=invoice.id).update(status=Invoice.STATUS_PAID)
-        self.login_as(self.accountant)
+    def test_service_cancels_approved_order(self):
+        invoice = self.approved_order(qty=2)
         resp = self.client.post(
             reverse('staff_change_status', args=[invoice.id]),
-            {'status': Invoice.STATUS_CANCELLED, 'reason': 'Возврат денег'},
+            {'status': Invoice.STATUS_CANCELLED, 'reason': 'Нет в наличии'},
         )
         self.assertEqual(resp.status_code, 200, resp.content)
         self.part.refresh_from_db()
         self.assertEqual(self.part.quantity, 10)
+
+    def test_accountant_cannot_change_status(self):
+        invoice = self.approved_order(qty=2)
+        self.login_as(self.accountant)
+        for status in (Invoice.STATUS_CANCELLED, Invoice.STATUS_IN_TRANSIT):
+            resp = self.client.post(reverse('staff_change_status', args=[invoice.id]), {'status': status})
+            self.assertEqual(resp.status_code, 403, status)
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, Invoice.STATUS_APPROVED)
+
+    def test_service_ships_after_approval(self):
+        invoice = self.approved_order()
+        resp = self.client.post(reverse('staff_change_status', args=[invoice.id]),
+                                {'status': Invoice.STATUS_IN_TRANSIT})
+        self.assertEqual(resp.status_code, 200, resp.content)
 
     def test_service_cannot_cancel_in_transit(self):
         invoice = self.confirmed_order()
@@ -307,9 +336,9 @@ class CancelTests(ShopTestBase):
     def test_cancelled_order_cannot_move_further(self):
         invoice = self.confirmed_order()
         self.client.post(reverse('dealer_invoice_cancel_order', args=[invoice.id]))
-        self.login_as(self.accountant)
+        self.login_as(self.service)
         resp = self.client.post(
-            reverse('staff_change_status', args=[invoice.id]), {'status': Invoice.STATUS_PAID},
+            reverse('staff_change_status', args=[invoice.id]), {'status': Invoice.STATUS_IN_TRANSIT},
         )
         self.assertEqual(resp.status_code, 403)
 
@@ -340,12 +369,12 @@ class AdminInvoiceTests(ShopTestBase):
         self.part.refresh_from_db()
         self.assertEqual(self.part.quantity, 10)
 
-        resp = self.admin_set_status(invoice, Invoice.STATUS_PAID)
+        resp = self.admin_set_status(invoice, Invoice.STATUS_APPROVED)
         self.assertEqual(resp.status_code, 302)
         self.part.refresh_from_db()
         self.assertEqual(self.part.quantity, 7)
         invoice.refresh_from_db()
-        self.assertEqual(invoice.status, Invoice.STATUS_PAID)
+        self.assertEqual(invoice.status, Invoice.STATUS_APPROVED)
         self.assertEqual(invoice.cancelled_by, '')
 
     def test_admin_uncancel_blocked_when_stock_short(self):
@@ -353,7 +382,7 @@ class AdminInvoiceTests(ShopTestBase):
         self.admin_set_status(invoice, Invoice.STATUS_CANCELLED)
         SparePart.objects.filter(id=self.part.id).update(quantity=1)
 
-        resp = self.admin_set_status(invoice, Invoice.STATUS_PAID)
+        resp = self.admin_set_status(invoice, Invoice.STATUS_APPROVED)
         self.assertEqual(resp.status_code, 200)                 # форма с ошибкой
         self.assertContains(resp, 'не хватает на складе')
         invoice.refresh_from_db()
@@ -415,11 +444,19 @@ class PagesRenderTests(ShopTestBase):
             self.assertEqual(self.client.get(url).status_code, 200, url)
 
     def test_staff_sees_cancel_button(self):
-        invoice = self.confirmed_order()
-        self.login_as(self.accountant)
+        invoice = self.approved_order()
         resp = self.client.get(reverse('staff_order_detail', args=[invoice.id]))
         self.assertContains(resp, 'data-new-status="cancelled"')
-        self.assertContains(resp, 'data-new-status="paid"')
+        self.assertContains(resp, 'data-new-status="in_transit"')
+
+    def test_accountant_only_views_documents(self):
+        invoice = self.approved_order()
+        self.login_as(self.accountant)
+        resp = self.client.get(reverse('staff_order_detail', args=[invoice.id]))
+        self.assertNotContains(resp, 'data-new-status=')
+        self.assertContains(resp, 'Статусом управляет сервис')
+        for name in ('staff_invoice_view', 'staff_specification_view'):
+            self.assertEqual(self.client.get(reverse(name, args=[invoice.id])).status_code, 200, name)
 
 
 class StaffStockTests(ShopTestBase):
@@ -582,3 +619,169 @@ class JavaImportTests(ShopTestBase):
         self.assertTrue(all(name for _, name in parsed))
         resp = self.upload(text)
         self.assertEqual(SparePart.objects.count() - 1, len(resp.context['result']['created']))
+
+
+class SupplierApprovalTests(ShopTestBase):
+    """Сначала заказ подтверждает сервис (может поправить количество), потом — бухгалтерия."""
+
+    def setUp(self):
+        super().setUp()
+        self.part2 = SparePart.objects.create(
+            part_number='B-002', name='Колодка', name_ru='Колодка',
+            type=self.ptype, quantity=5, price=Decimal('50000'),
+        )
+
+    def two_item_order(self):
+        self.login_as(self.dealer)
+        resp = self.client.post(
+            reverse('dealer_cart_checkout'),
+            data=json.dumps({'items': [{'id': self.part.id, 'qty': 3}, {'id': self.part2.id, 'qty': 2}]}),
+            content_type='application/json',
+        )
+        invoice = Invoice.objects.get(id=resp.json()['invoice_id'])
+        self.client.post(reverse('dealer_invoice_confirm', args=[invoice.id]))
+        invoice.refresh_from_db()
+        return invoice
+
+    def test_dealer_confirm_goes_to_supplier_first(self):
+        invoice = self.confirmed_order(qty=3)
+        self.assertEqual(invoice.status, Invoice.STATUS_PENDING_APPROVAL)
+        self.part.refresh_from_db()
+        self.assertEqual(self.part.quantity, 7)            # товар уже зарезервирован
+        resp = self.client.get(reverse('dealer_invoice', args=[invoice.id]))
+        self.assertContains(resp, 'Ожидание подтверждения поставщиком')
+        self.assertNotContains(resp, 'window.print()')     # счёт на оплату ещё не выдан
+        self.assertContains(resp, 'invoice-cancel-order-btn')
+
+    def test_accountant_does_not_see_unapproved_order(self):
+        invoice = self.confirmed_order()
+        self.login_as(self.accountant)
+        resp = self.client.get(reverse('staff_orders_list'))
+        self.assertNotContains(resp, f'/staff/orders/{invoice.id}/')
+        self.assertNotContains(resp, 'На подтверждении')
+        for name in ('staff_order_detail', 'staff_invoice_view', 'staff_specification_view'):
+            self.assertEqual(self.client.get(reverse(name, args=[invoice.id])).status_code, 302, name)
+        resp = self.client.post(reverse('staff_change_status', args=[invoice.id]),
+                                {'status': Invoice.STATUS_CANCELLED})
+        self.assertEqual(resp.status_code, 404)
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, Invoice.STATUS_PENDING_APPROVAL)
+
+    def test_service_sees_awaiting_order_and_can_edit(self):
+        invoice = self.confirmed_order()
+        self.login_as(self.service)
+        resp = self.client.get(reverse('staff_orders_list'))
+        self.assertContains(resp, 'Ждут вашего подтверждения')
+        resp = self.client.get(reverse('staff_order_detail', args=[invoice.id]))
+        self.assertContains(resp, 'qty-edit__input')
+        self.assertContains(resp, 'data-approve="1"')
+        self.assertContains(resp, 'max="10"')               # 3 в заказе + 7 на складе
+        self.assertEqual(self.client.get(reverse('staff_specification_view', args=[invoice.id])).status_code, 200)
+
+    def test_service_decreases_quantity(self):
+        invoice = self.confirmed_order(qty=3)
+        item = invoice.items.get()
+        self.login_as(self.service)
+        resp = self.edit_items(invoice, [{'id': item.id, 'quantity': 1}])
+        self.assertEqual(resp.status_code, 200, resp.content)
+        item.refresh_from_db()
+        invoice.refresh_from_db()
+        self.part.refresh_from_db()
+        self.assertEqual((item.quantity, item.original_quantity), (1, 3))
+        self.assertEqual(item.sum, Decimal('112000'))
+        self.assertEqual(invoice.total_amount, Decimal('112000'))
+        self.assertEqual(self.part.quantity, 9)
+        mv = StockMovement.objects.get(invoice=invoice, reason=StockMovement.REASON_ORDER_EDIT)
+        self.assertEqual((mv.delta, mv.quantity_after, mv.changed_by), (2, 9, 'service1'))
+
+        self.login_as(self.dealer)
+        resp = self.client.get(reverse('dealer_invoice', args=[invoice.id]))
+        self.assertContains(resp, 'Поставщик изменил количество')
+        self.assertContains(resp, 'было 3 → стало 1')
+
+    def test_service_increases_within_stock_only(self):
+        invoice = self.confirmed_order(qty=3)       # на складе осталось 7
+        item = invoice.items.get()
+        self.login_as(self.service)
+        resp = self.edit_items(invoice, [{'id': item.id, 'quantity': 11}])
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn('максимум 10', resp.json()['error'])
+        resp = self.edit_items(invoice, [{'id': item.id, 'quantity': 10}])
+        self.assertEqual(resp.status_code, 200)
+        self.part.refresh_from_db()
+        item.refresh_from_db()
+        self.assertEqual((self.part.quantity, item.quantity, item.original_quantity), (0, 10, 3))
+
+        # Вернули как заказал дилер — пометки «изменено» нет
+        self.edit_items(invoice, [{'id': item.id, 'quantity': 3}])
+        item.refresh_from_db()
+        self.assertFalse(item.is_changed_by_supplier)
+
+    def test_remove_one_position_and_not_all(self):
+        invoice = self.two_item_order()
+        it1, it2 = invoice.items.order_by('id')
+        self.login_as(self.service)
+        resp = self.edit_items(invoice, [{'id': it1.id, 'quantity': 0}, {'id': it2.id, 'quantity': 0}])
+        self.assertEqual(resp.status_code, 400)
+        resp = self.edit_items(invoice, [{'id': it2.id, 'quantity': 0}])
+        self.assertEqual(resp.status_code, 200)
+        self.part2.refresh_from_db()
+        self.assertEqual(self.part2.quantity, 5)
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.total_amount, Decimal('336000'))
+        resp = self.client.get(reverse('staff_specification_view', args=[invoice.id]))
+        self.assertNotContains(resp, 'B-002')
+
+        # Отмена после правки возвращает на склад ровно то, что осталось в заказе
+        self.client.post(reverse('staff_change_status', args=[invoice.id]), {'status': Invoice.STATUS_CANCELLED})
+        self.part.refresh_from_db()
+        self.part2.refresh_from_db()
+        self.assertEqual((self.part.quantity, self.part2.quantity), (10, 5))
+
+    def test_foreign_item_rejected(self):
+        a = self.confirmed_order(qty=1)
+        b = self.two_item_order()
+        self.login_as(self.service)
+        resp = self.edit_items(a, [{'id': b.items.first().id, 'quantity': 1}])
+        self.assertEqual(resp.status_code, 400)
+
+    def test_only_service_edits(self):
+        invoice = self.confirmed_order()
+        item = invoice.items.get()
+        for who in (self.dealer, self.accountant):
+            self.login_as(who)
+            self.assertEqual(self.edit_items(invoice, [{'id': item.id, 'quantity': 1}]).status_code, 302)
+        item.refresh_from_db()
+        self.assertEqual(item.quantity, 3)
+
+    def test_approve_sends_to_accountant(self):
+        invoice = self.approved_order(qty=2)
+        self.assertEqual(invoice.status, Invoice.STATUS_APPROVED)
+        self.assertEqual(invoice.approved_by, 'service1')
+        self.assertIsNotNone(invoice.approved_at)
+
+        # После подтверждения количество менять нельзя
+        resp = self.edit_items(invoice, [{'id': invoice.items.get().id, 'quantity': 1}])
+        self.assertEqual(resp.status_code, 404)
+
+        self.login_as(self.accountant)
+        resp = self.client.get(reverse('staff_orders_list'))
+        self.assertContains(resp, f'/staff/orders/{invoice.id}/')
+
+        self.login_as(self.dealer)
+        resp = self.client.get(reverse('dealer_invoice', args=[invoice.id]))
+        self.assertContains(resp, 'window.print()')
+
+    def test_accountant_cannot_approve(self):
+        invoice = self.confirmed_order()
+        self.login_as(self.accountant)
+        resp = self.client.post(reverse('staff_change_status', args=[invoice.id]),
+                                {'status': Invoice.STATUS_APPROVED})
+        self.assertEqual(resp.status_code, 404)
+
+    def test_dealer_cancels_while_awaiting(self):
+        invoice = self.confirmed_order(qty=4)
+        resp = self.client.post(reverse('dealer_invoice_cancel_order', args=[invoice.id]))
+        self.assertEqual(resp.status_code, 200)
+        self.part.refresh_from_db()
+        self.assertEqual(self.part.quantity, 10)

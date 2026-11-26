@@ -48,3 +48,5 @@ main/static/css/*purged.css
 # === Внутренняя документация (не для репозитория) ===
 /docs/
 /data/
+/logs/
+*.log.*

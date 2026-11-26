@@ -42,6 +42,7 @@ urlpatterns = [
     path('staff/orders/<int:invoice_id>/document/', views.staff_invoice_view, name='staff_invoice_view'),
     path('staff/orders/<int:invoice_id>/specification/', views.staff_specification_view, name='staff_specification_view'),
     path('staff/orders/<int:invoice_id>/status/', views.staff_change_status, name='staff_change_status'),
+    path('staff/orders/<int:invoice_id>/items/', views.staff_order_update_items, name='staff_order_update_items'),
     path('staff/parts/', views.staff_parts_list, name='staff_parts_list'),
     path('staff/contracts/', views.staff_contracts, name='staff_contracts'),
     path('staff/contracts/<int:dealer_id>/new/', views.staff_contract_new, name='staff_contract_new'),

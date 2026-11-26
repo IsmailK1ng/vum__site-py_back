@@ -277,6 +277,11 @@
     .invoice-success-banner--transit .invoice-success-banner__icon { background: #1f7ec7; }
     .invoice-success-banner--cancelled { background: #fdecea; border-color: #f5c2bd; color: #7d1f16; }
     .invoice-success-banner--cancelled .invoice-success-banner__icon { background: #c0392b; }
+    .invoice-success-banner--approval { background: #f4ecf8; border-color: #dcc6e8; color: #5e2d79; }
+    .invoice-success-banner--approval .invoice-success-banner__icon { background: #8e44ad; }
+    .invoice-success-banner--changes { background: #fff8e6; border-color: #f2dca0; color: #6b4e00; }
+    .invoice-success-banner--changes .invoice-success-banner__icon { background: #c79100; }
+    .supplier-changes { margin: 6px 0 0; padding-left: 18px; }
     .invoice-print-bar #invoice-cancel-order-btn { color: #c0392b !important; border-color: #e6b0aa !important; }
 
     /* Бейдж статуса в тулбаре (рядом с навигацией) */
@@ -288,8 +293,8 @@
       letter-spacing: 0.3px; text-transform: uppercase;
       color: #fff; white-space: nowrap;
     }
-    .status-badge--pending_payment { background: #e08b00; }
-    .status-badge--paid            { background: #2c9f4e; }
+    .status-badge--pending_approval { background: #8e44ad; }
+    .status-badge--approved { background: #2c9f4e; }
     .status-badge--in_transit      { background: #1f7ec7; }
     .status-badge--delivered       { background: #5a6470; }
     .status-badge--cancelled       { background: #c0392b; }
@@ -326,6 +331,18 @@
         Проверьте позиции и нажмите «Подтвердить заказ» — после этого счёт получит номер и попадёт в историю.
       </div>
     </div>
+  {% elif invoice.is_awaiting_approval %}
+    <div class="invoice-success-banner invoice-success-banner--approval">
+      <div class="invoice-success-banner__icon">⏳</div>
+      <div class="invoice-success-banner__text">
+        {% if request.GET.from == 'confirm' %}
+          Заказ <strong>№{{ invoice.number }}/{{ invoice.year }}</strong> отправлен поставщику.
+        {% else %}
+          <strong>Ожидание подтверждения поставщиком.</strong>
+        {% endif %}
+        Поставщик проверит наличие и подтвердит заказ — после этого здесь появится счёт на оплату.
+      </div>
+    </div>
   {% elif request.GET.from == 'confirm' %}
     <div class="invoice-success-banner">
       <div class="invoice-success-banner__icon">✓</div>
@@ -356,6 +373,20 @@
     </div>
   {% endif %}
 
+  {% if supplier_changes %}
+    <div class="invoice-success-banner invoice-success-banner--changes">
+      <div class="invoice-success-banner__icon">✎</div>
+      <div class="invoice-success-banner__text">
+        <strong>Поставщик изменил количество:</strong>
+        <ul class="supplier-changes">
+          {% for ch in supplier_changes %}
+            <li>{{ ch.name }}: было {{ ch.was }} → {% if ch.now %}стало {{ ch.now }}{% else %}<b>убрано из заказа</b>{% endif %}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% endif %}
+
   <div class="invoice-print-bar">
     {% if invoice.is_draft %}
       <div class="invoice-print-bar__group">
@@ -382,7 +413,9 @@
         {% if invoice.can_cancel_order %}
           <button type="button" id="invoice-cancel-order-btn">✕ Отменить заказ</button>
         {% endif %}
-        <button type="button" onclick="window.print()" class="is-primary">🖨 Распечатать</button>
+        {% if not invoice.is_awaiting_approval %}
+          <button type="button" onclick="window.print()" class="is-primary">🖨 Распечатать</button>
+        {% endif %}
       </div>
     {% endif %}
   </div>
@@ -393,6 +426,8 @@
     <h1 class="invoice-title">
       {% if invoice.is_draft %}
         Счет на оплату поставщика (предварительный просмотр) от {{ invoice.date }}
+      {% elif invoice.is_awaiting_approval %}
+        Заказ № {{ invoice.number }} от {{ invoice.date }} (ожидает подтверждения поставщиком)
       {% else %}
         Счет на оплату поставщика № {{ invoice.number }} от {{ invoice.date }}
       {% endif %}
@@ -448,7 +483,7 @@
     </p>
     <p class="invoice-summary__words">{{ totals.amount_in_words }}</p>
 
-    <div class="invoice-signatures">
+    <div class="invoice-signatures"{% if invoice.is_awaiting_approval %} hidden{% endif %}>
       <div class="invoice-signature">
         <span class="invoice-signature__label">Руководитель</span>
         <span class="invoice-signature__line"></span>

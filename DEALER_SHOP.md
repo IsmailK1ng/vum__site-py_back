@@ -31,8 +31,8 @@
 | Роль | Значение в БД | Что может |
 |------|---------------|-----------|
 | Дилер | `dealer` | Покупает: каталог → корзина → черновик → подтверждение. Подтверждает получение. |
-| Сотрудник сервиса | `service` | Видит все заказы. Меняет статус `Оплачено → В пути`. Управляет остатками запчастей. |
-| Бухгалтер | `accountant` | Видит все заказы. Только подтверждает оплату: `Ожидание → Оплачено`. |
+| Сотрудник сервиса | `service` | Видит все заказы. Подтверждает заказы (правит количество), отправляет `Подтверждён → В пути`, отменяет до отгрузки. Управляет остатками и договорами. |
+| Бухгалтер | `accountant` | Только просмотр: заказы, подтверждённые сервисом, их счёт на оплату и спецификация. Статусы не меняет. |
 
 Дефолт при создании учётки — `dealer`. Управление ролями — через админ-форму `DealerProfileAdminForm`.
 
@@ -362,8 +362,8 @@ vat_rate  = Decimal null   # ставка на момент заказа (12)
 
 | Код | Лейбл | Цвет |
 |-----|-------|------|
-| `pending_payment` | Ожидание оплаты | 🟠 оранжевый |
-| `paid` | Оплачено | 🟢 зелёный |
+| `pending_approval` | На подтверждении | 🟣 фиолетовый |
+| `approved` | Подтверждён | 🟢 зелёный |
 | `in_transit` | В пути | 🔵 синий |
 | `delivered` | Доставлено | ⚫ серый |
 | `cancelled` | Отменён | 🔴 красный |
@@ -372,19 +372,34 @@ vat_rate  = Decimal null   # ставка на момент заказа (12)
 
 ```python
 ALLOWED_STATUS_TRANSITIONS = {
-    'accountant': { 'pending_payment': ['paid', 'cancelled'],
-                    'paid':            ['cancelled'] },
-    'service':    { 'pending_payment': ['cancelled'],
-                    'paid':            ['in_transit', 'cancelled'] },
-    'dealer':     { 'pending_payment': ['cancelled'],
-                    'in_transit':      ['delivered'] },
+    'accountant': {},                                                  # только просмотр
+    'service':    { 'pending_approval': ['approved', 'cancelled'],   # «✓ Подтвердить заказ»
+                    'approved':  ['in_transit', 'cancelled'] },
+    'dealer':     { 'pending_approval': ['cancelled'],
+                    'approved':  ['cancelled'],
+                    'in_transit':       ['delivered'] },
 }
 ```
 
+Статусов «Ожидание оплаты» и «Оплачено» нет (убраны в `0038_order_supplier_approval`, старые `pending_payment` и `paid` → `approved`). Оплату бухгалтерия отслеживает сама, в системе она не отмечается.
+
+### Подтверждение поставщиком (сервис)
+
+После подтверждения дилером заказ получает номер и статус `pending_approval`. Его видит только сервис (в списке — плашка «Ждут вашего подтверждения: N»).
+
+- **Бухгалтер** такие заказы не видит нигде: список, карточка, счёт, спецификация, смена статуса — всё через `_staff_invoices(profile)`, который исключает `pending_approval` для не-сервиса.
+- **Дилер** видит заказ со статусом «На подтверждении», без кнопки печати и подписей — счёт на оплату появляется после подтверждения. Отменить заказ может.
+- **Сервис** в карточке заказа меняет количество (± / ввод, 0 — убрать позицию) → `POST /staff/orders/<id>/items/` (`staff_order_update_items`):
+  - разница сразу двигает склад через `change_stock` с причиной `order_edit` («Правка заказа сервисом»), комментарий «Заказ №N/Y: 3 → 1»;
+  - увеличить можно не больше свободного остатка; убрать все позиции нельзя (для этого — отмена);
+  - цена — снапшот на момент заказа, пересчитываются `sum` позиции и `total_amount`;
+  - `InvoiceItem.original_quantity` хранит, сколько заказал дилер; дилер видит «было → стало». Позиции с `quantity=0` в счёт и спецификацию не попадают.
+- «✓ Подтвердить заказ» = переход в `approved`, пишутся `Invoice.approved_at/approved_by`. После этого количество менять нельзя.
+
 ### Отмена заказа
 
-- **Дилер** — свой заказ, пока он в «Ожидании оплаты»: кнопка «✕ Отменить заказ» в счёте → `POST /dealer/invoice/<id>/cancel-order/`.
-- **Бухгалтер / сервис** — до отгрузки (`pending_payment` или `paid`): красная кнопка в карточке заказа → `POST /staff/orders/<id>/status/` со `status=cancelled`.
+- **Дилер** — свой заказ, пока он «На подтверждении» или в «статусе «Подтверждён»»: кнопка «✕ Отменить заказ» в счёте → `POST /dealer/invoice/<id>/cancel-order/`.
+- **Сервис** — до отгрузки (`pending_approval` или `approved`): красная кнопка в карточке заказа → `POST /staff/orders/<id>/status/` со `status=cancelled`. Бухгалтер отменять не может.
 - После «В пути» отменить может только **админ** в админке.
 - Причина отмены необязательна (спрашивается через prompt).
 
@@ -395,11 +410,11 @@ ALLOWED_STATUS_TRANSITIONS = {
 **Цепочка прохождения**:
 
 ```
-[Дилер создаёт + подтверждает]
+[Дилер создаёт + подтверждает]  — товар уже списан (резерв)
          ↓
-   pending_payment
-         ↓  ← Бухгалтер (POST /staff/orders/<id>/status/)
-       paid
+   pending_approval   ← бухгалтер заказ НЕ видит
+         ↓  ← Сервис: правит количество, «✓ Подтвердить заказ»
+   approved          ← видит бухгалтерия (счёт, спецификация), дилер получает счёт
          ↓  ← Сервис (POST /staff/orders/<id>/status/)
    in_transit
          ↓  ← Дилер у себя в счёте (POST /dealer/invoice/<id>/received/)
@@ -413,7 +428,7 @@ ALLOWED_STATUS_TRANSITIONS = {
 - Подходит ли текущий статус
 - Подходит ли роль для этого перехода
 
-Любая попытка перепрыгнуть (например сервис в pending_payment → paid) → 403.
+Любая попытка перепрыгнуть (например сервис из pending_approval сразу в in_transit, или любой переход бухгалтера) → 403.
 
 ### Ключевой момент: дилер сам подтверждает доставку
 
@@ -466,7 +481,7 @@ Invoice.objects.filter(id=invoice_id, dealer=profile)
 ### Детальный просмотр заказа `/staff/orders/<id>/`
 
 Карточки:
-1. Управление статусом — кнопки доступных переходов или подсказка («Сначала бухгалтер должен подтвердить оплату», «Заказ в пути — дилер сам подтвердит», «Заказ завершён»).
+1. Управление статусом — кнопки доступных переходов или подсказка («Статусом управляет сервис» — для бухгалтера, «Заказ в пути — дилер сам подтвердит», «Заказ завершён»).
 2. Покупатель (снапшот)
 3. Позиции + итого + сумма прописью
 4. Документы:
@@ -576,6 +591,7 @@ Stepper на каждой запчасти. После изменения чис
 | `/staff/orders/` | service+accountant | `staff_orders_list` | Все заказы |
 | `/staff/orders/<id>/` | service+accountant | `staff_order_detail` | Управление статусом |
 | `/staff/orders/<id>/status/` | POST | `staff_change_status` | Смена статуса (с ролью) |
+| `/staff/orders/<id>/items/` | POST (service) | `staff_order_update_items` | Правка количества до подтверждения |
 | `/staff/orders/<id>/document/` | service+accountant | `staff_invoice_view` | Полный документ |
 | `/staff/orders/<id>/specification/` | service+accountant | `staff_specification_view` | Спецификация к договору |
 | `/staff/contracts/` | service | `staff_contracts` | Договоры дилеров |
@@ -637,7 +653,7 @@ buyer_inn                 = CharField
 buyer_contract_number     = CharField
 
 total_amount              = Decimal(14,2)
-status                    = CharField(choices=5 values, default='pending_payment')
+status                    = CharField(choices=5 values, default='pending_approval')
 
 cancelled_at              = DateTime (NULL пока не отменён)
 cancelled_by              = CharField  # username того, кто отменил
@@ -718,11 +734,11 @@ created_at
 
 Фильтр `number__isnull=True` → не найдёт → 404 «не найден или уже подтверждён».
 
-### Сервис пытается перепрыгнуть статус (например `pending_payment` → `in_transit`)
+### Сервис пытается перепрыгнуть статус (например `pending_approval` → `in_transit`)
 
-`_allowed_next_statuses(profile, 'pending_payment')` для service вернёт `[]` → 403 «У вашей роли нет права на этот переход».
+`in_transit` нет в `_allowed_next_statuses(profile, 'pending_approval')` для service → 403 «У вашей роли нет права на этот переход».
 
-### Дилер пытается отметить «получено» когда счёт ещё в `paid`
+### Дилер пытается отметить «получено» когда счёт ещё в `approved`
 
 `Invoice.objects.filter(..., status=in_transit)` → не найдёт → 404 «не в пути».
 

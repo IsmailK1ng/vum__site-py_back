@@ -60,8 +60,8 @@
       font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
       text-transform: uppercase; color: #fff;
     }
-    .status-badge--pending_payment { background: #e08b00; }
-    .status-badge--paid            { background: #2c9f4e; }
+    .status-badge--pending_approval { background: #8e44ad; }
+    .status-badge--approved { background: #2c9f4e; }
     .status-badge--in_transit      { background: #1f7ec7; }
     .status-badge--delivered       { background: #5a6470; }
     .status-badge--cancelled       { background: #c0392b; }
@@ -79,6 +79,23 @@
     .status-cancelled-info { color: #7d1f16; background: #fdecea; border-radius: 8px; padding: 10px 14px; font-size: 14px; line-height: 1.5; }
 
     .status-locked-hint { color: #888; font-size: 13px; font-style: italic; margin-top: 10px; }
+    .status-btn--approve { background: #2c9f4e; }
+    .status-btn--approve:hover { background: #238a42; }
+    .approval-hint { background: #f4ecf8; border: 1px solid #dcc6e8; color: #5e2d79; border-radius: 8px; padding: 10px 14px; font-size: 14px; line-height: 1.5; }
+
+    /* ===== Правка количества сервисом ===== */
+    .items-edit-hint { margin: 0 0 12px; color: #5a6470; font-size: 13px; line-height: 1.5; }
+    .qty-edit { display: inline-flex; align-items: center; gap: 4px; }
+    .qty-edit__btn { width: 28px; height: 28px; border: 1px solid #cfd6df; background: #fff; border-radius: 6px; font-size: 16px; line-height: 1; cursor: pointer; color: #1f3a5f; }
+    .qty-edit__btn:hover { background: #f0f4f9; }
+    .qty-edit__input { width: 64px; height: 28px; text-align: center; border: 1px solid #cfd6df; border-radius: 6px; font: inherit; font-weight: 600; }
+    .qty-edit__input.is-dirty { border-color: #e08b00; background: #fff7e8; }
+    .qty-edit__meta { font-size: 11px; color: #7a8290; margin-top: 3px; }
+    .qty-was { font-size: 11px; color: #8e44ad; margin-top: 2px; }
+    .items-table tr.is-removed td { color: #a0a7b1; text-decoration: line-through; }
+    .items-table tr.is-removed td.qty { text-decoration: none; }
+    .items-save { display: flex; justify-content: flex-end; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; padding-top: 14px; border-top: 1px dashed #e3e8ef; color: #a05f00; font-size: 13px; font-weight: 600; }
+    .items-save[hidden] { display: none; }
 
     /* ===== Toast ===== */
     .toast {
@@ -137,11 +154,21 @@
     {# ===== Действия по статусу ===== #}
     <div class="card">
       <h2 class="card__title">Управление статусом</h2>
+      {% if invoice.status == 'pending_approval' %}
+        <div class="approval-hint">
+          ⏳ Заказ ждёт вашего подтверждения. Бухгалтерия его пока не видит, дилеру счёт на оплату не выдан.
+          При необходимости поправьте количество в «Позициях» и сохраните, затем подтвердите заказ.
+        </div>
+      {% elif invoice.approved_by %}
+        <div class="status-locked-hint" style="margin:0 0 6px;">Подтверждён поставщиком{% if invoice.approved_at %} {{ invoice.approved_at }}{% endif %} — {{ invoice.approved_by }}.</div>
+      {% endif %}
       {% if next_options %}
         <div class="status-actions" id="status-actions">
           {% for opt in next_options %}
             {% if opt.value == 'cancelled' %}
               <button type="button" class="status-btn status-btn--danger" data-new-status="{{ opt.value }}">✕ Отменить заказ</button>
+            {% elif invoice.status == 'pending_approval' and opt.value == 'approved' %}
+              <button type="button" class="status-btn status-btn--approve" data-new-status="{{ opt.value }}" data-approve="1">✓ Подтвердить заказ</button>
             {% else %}
               <button type="button" class="status-btn" data-new-status="{{ opt.value }}">→ {{ opt.label }}</button>
             {% endif %}
@@ -150,9 +177,7 @@
         {% if invoice.status != 'cancelled' %}
           <div class="status-locked-hint">При отмене позиции заказа вернутся на склад.</div>
         {% endif %}
-      {% elif profile.is_service and invoice.status == 'pending_payment' %}
-        <div class="status-locked-hint">⏳ Сначала бухгалтер должен подтвердить оплату.</div>
-      {% elif profile.is_service and invoice.status == 'in_transit' %}
+      {% elif invoice.status == 'in_transit' %}
         <div class="status-locked-hint">Заказ в пути. Дилер сам подтвердит получение — статус сменится на «Доставлено» автоматически.</div>
       {% elif invoice.status == 'delivered' %}
         <div class="status-locked-hint">✓ Заказ доставлен и закрыт.</div>
@@ -162,6 +187,8 @@
           Позиции возвращены на склад.
           {% if invoice.cancel_reason %}<br>Причина: {{ invoice.cancel_reason }}{% endif %}
         </div>
+      {% elif profile.is_accountant %}
+        <div class="status-locked-hint">Статусом управляет сервис. Счёт на оплату и спецификация — внизу страницы.</div>
       {% else %}
         <div class="status-locked-hint">Доступных переходов для вашей роли нет.</div>
       {% endif %}
@@ -178,7 +205,10 @@
     {# ===== Позиции ===== #}
     <div class="card">
       <h2 class="card__title">Позиции</h2>
-      <table class="items-table">
+      {% if can_edit_items %}
+        <p class="items-edit-hint">Количество можно уменьшить или увеличить (не больше, чем есть на складе). 0 — убрать позицию из заказа. Разница сразу возвращается на склад или списывается. Цена остаётся та, по которой заказывал дилер.</p>
+      {% endif %}
+      <table class="items-table{% if can_edit_items %} items-table--edit{% endif %}" id="items-table">
         <thead>
           <tr>
             <th>№</th>
@@ -192,10 +222,25 @@
         </thead>
         <tbody>
           {% for item in items %}
-            <tr>
+            <tr{% if item.quantity == 0 %} class="is-removed"{% endif %}>
               <td>{{ forloop.counter }}</td>
               <td>{{ item.name }}</td>
-              <td class="qty">{{ item.quantity }}</td>
+              <td class="qty">
+                {% if can_edit_items %}
+                  <div class="qty-edit">
+                    <button type="button" class="qty-edit__btn" data-step="-1" aria-label="Меньше">−</button>
+                    <input type="number" class="qty-edit__input" min="0" max="{{ item.max_quantity }}" step="1"
+                           value="{{ item.quantity }}" data-item-id="{{ item.id }}" data-initial="{{ item.quantity }}">
+                    <button type="button" class="qty-edit__btn" data-step="1" aria-label="Больше">+</button>
+                  </div>
+                  <div class="qty-edit__meta">
+                    {% if item.stock is not None %}на складе ещё {{ item.stock }}{% else %}запчасть удалена{% endif %}
+                  </div>
+                {% else %}
+                  {{ item.quantity }}
+                {% endif %}
+                {% if item.is_changed %}<div class="qty-was">заказано {{ item.original_quantity }}</div>{% endif %}
+              </td>
               <td>{{ item.unit }}</td>
               {% if totals.has_vat %}<td class="price">{{ item.price_without_vat_formatted }}</td>{% endif %}
               <td class="price">{{ item.price_formatted }}</td>
@@ -214,6 +259,13 @@
       </div>
       {% endif %}
       <div style="margin-top:6px;color:#5a6470;font-size:13px;">{{ totals.amount_in_words }}</div>
+      {% if can_edit_items %}
+        <div class="items-save" id="items-save" hidden>
+          <span>Есть несохранённые изменения</span>
+          <button type="button" class="status-btn" id="items-reset-btn" style="background:#8a94a3;">Сбросить</button>
+          <button type="button" class="status-btn status-btn--approve" id="items-save-btn">💾 Сохранить количество</button>
+        </div>
+      {% endif %}
     </div>
 
     {# ===== Открыть полный документ ===== #}
@@ -271,6 +323,76 @@
         toastTimer = setTimeout(function(){ toast.classList.remove('is-visible'); }, 2200);
       }
 
+      // ===== Правка количества (сервис, до подтверждения) =====
+      var itemsTable = document.getElementById('items-table');
+      var saveBar = document.getElementById('items-save');
+      var qtyInputs = itemsTable ? Array.prototype.slice.call(itemsTable.querySelectorAll('.qty-edit__input')) : [];
+
+      function clampInput(input){
+        var max = parseInt(input.max, 10);
+        var v = parseInt(input.value, 10);
+        if (isNaN(v) || v < 0) v = 0;
+        if (!isNaN(max) && v > max) v = max;
+        input.value = v;
+      }
+      function dirtyInputs(){
+        return qtyInputs.filter(function(i){ return String(parseInt(i.value, 10)) !== i.dataset.initial; });
+      }
+      function refreshDirty(){
+        qtyInputs.forEach(function(i){
+          i.classList.toggle('is-dirty', String(parseInt(i.value, 10)) !== i.dataset.initial);
+        });
+        if (saveBar) saveBar.hidden = dirtyInputs().length === 0;
+      }
+
+      if (qtyInputs.length) {
+        itemsTable.addEventListener('click', function(e){
+          var b = e.target.closest('.qty-edit__btn');
+          if (!b) return;
+          var input = b.parentNode.querySelector('.qty-edit__input');
+          input.value = (parseInt(input.value, 10) || 0) + parseInt(b.dataset.step, 10);
+          clampInput(input);
+          refreshDirty();
+        });
+        qtyInputs.forEach(function(i){
+          i.addEventListener('input', refreshDirty);
+          i.addEventListener('change', function(){ clampInput(i); refreshDirty(); });
+        });
+        document.getElementById('items-reset-btn').addEventListener('click', function(){
+          qtyInputs.forEach(function(i){ i.value = i.dataset.initial; });
+          refreshDirty();
+        });
+        document.getElementById('items-save-btn').addEventListener('click', function(){
+          var btn = this;
+          qtyInputs.forEach(clampInput);
+          var changed = dirtyInputs();
+          if (!changed.length) { refreshDirty(); return; }
+          btn.disabled = true;
+          fetch('{% url "staff_order_update_items" invoice.id %}', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'X-CSRFToken': getCSRFToken(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: changed.map(function(i){
+              return { id: parseInt(i.dataset.itemId, 10), quantity: parseInt(i.value, 10) };
+            }) })
+          })
+            .then(function(r){ return r.json(); })
+            .then(function(json){
+              if (json && json.ok) {
+                showToast('Количество сохранено');
+                setTimeout(function(){ window.location.reload(); }, 600);
+              } else {
+                btn.disabled = false;
+                showToast(json && json.error ? json.error : 'Ошибка');
+              }
+            })
+            .catch(function(){ btn.disabled = false; showToast('Ошибка сети.'); });
+        });
+        window.addEventListener('beforeunload', function(e){
+          if (dirtyInputs().length) { e.preventDefault(); e.returnValue = ''; }
+        });
+      }
+
       var actions = document.getElementById('status-actions');
       if (!actions) return;
 
@@ -279,7 +401,13 @@
         if (!btn) return;
         var newStatus = btn.dataset.newStatus;
         var reason = '';
-        if (newStatus === 'cancelled') {
+        if (btn.dataset.approve && dirtyInputs().length) {
+          showToast('Сначала сохраните изменения количества');
+          return;
+        }
+        if (btn.dataset.approve) {
+          if (!confirm('Подтвердить заказ? Дилер получит счёт на оплату, заказ увидит бухгалтерия. Количество больше менять будет нельзя.')) return;
+        } else if (newStatus === 'cancelled') {
           reason = prompt('Отменить заказ? Позиции вернутся на склад.\nПричина (необязательно):', '');
           if (reason === null) return;
         } else if (!confirm('Перевести заказ в статус «' + btn.textContent.replace('→ ', '').trim() + '»?')) {

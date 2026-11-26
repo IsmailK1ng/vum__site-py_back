@@ -2443,14 +2443,17 @@ class Invoice(models.Model):
     confirmed_at = models.DateTimeField('Подтверждён', null=True, blank=True)
 
     # ===== Статусы заказа =====
-    STATUS_PENDING_PAYMENT = 'pending_payment'
-    STATUS_PAID            = 'paid'
+    # Дилер подтвердил → сначала заказ проверяет сервис (может поправить количество),
+    # и только после его подтверждения заказ виден бухгалтерии и дилеру выдаётся счёт.
+    # Статусов «Ожидание оплаты» / «Оплачено» нет: бухгалтерия только смотрит счёт и спецификацию.
+    STATUS_PENDING_APPROVAL = 'pending_approval'
+    STATUS_APPROVED        = 'approved'
     STATUS_IN_TRANSIT      = 'in_transit'
     STATUS_DELIVERED       = 'delivered'
     STATUS_CANCELLED       = 'cancelled'
     STATUS_CHOICES = [
-        (STATUS_PENDING_PAYMENT, 'Ожидание оплаты'),
-        (STATUS_PAID,            'Оплачено'),
+        (STATUS_PENDING_APPROVAL, 'На подтверждении'),
+        (STATUS_APPROVED,        'Подтверждён'),
         (STATUS_IN_TRANSIT,      'В пути'),
         (STATUS_DELIVERED,       'Доставлено'),
         (STATUS_CANCELLED,       'Отменён'),
@@ -2459,10 +2462,14 @@ class Invoice(models.Model):
         'Статус',
         max_length=20,
         choices=STATUS_CHOICES,
-        default=STATUS_PENDING_PAYMENT,
+        default=STATUS_PENDING_APPROVAL,
         db_index=True,
-        help_text='После подтверждения — "Ожидание оплаты". Меняется админом.',
+        help_text='После подтверждения дилером — «На подтверждении» (у сервиса), '
+                  'после подтверждения сервисом — «Подтверждён».',
     )
+    # Подтверждение заказа сервисом (поставщиком) → виден бухгалтерии
+    approved_at = models.DateTimeField('Подтверждён поставщиком', null=True, blank=True)
+    approved_by = models.CharField('Кем подтверждён (сервис)', max_length=150, blank=True)
 
     # Снапшот реквизитов покупателя — чтобы счёт не "поплыл" при изменении профиля
     buyer_company_name   = models.CharField('Покупатель — юр. название', max_length=255, blank=True)
@@ -2517,6 +2524,11 @@ class Invoice(models.Model):
     def is_draft(self):
         """True если счёт ещё не подтверждён (нет номера)."""
         return self.number is None
+
+    @property
+    def is_awaiting_approval(self):
+        """Подтверждён дилером, но ещё не подтверждён сервисом — бухгалтерии не виден."""
+        return self.number is not None and self.status == self.STATUS_PENDING_APPROVAL
 
     def set_cancelled(self, changed_by, reason=''):
         """Отмена подтверждённого заказа: возвращаем позиции на склад.
@@ -2578,6 +2590,9 @@ class InvoiceItem(models.Model):
     # price/sum — то, что платит дилер, т.е. С НДС (как и Invoice.total_amount).
     price    = models.DecimalField('Цена с НДС',  max_digits=14, decimal_places=2)
     sum      = models.DecimalField('Сумма с НДС', max_digits=14, decimal_places=2)
+    # Сколько заказал дилер, если сервис потом поменял количество (иначе пусто).
+    # quantity = 0 → позиция убрана сервисом: в документы не попадает.
+    original_quantity = models.PositiveIntegerField('Заказано дилером', null=True, blank=True)
     # Снапшот цены без НДС и ставки. Пусто у счетов, созданных до введения НДС.
     price_without_vat = models.DecimalField('Цена без НДС', max_digits=14, decimal_places=2,
                                             null=True, blank=True)
@@ -2592,6 +2607,10 @@ class InvoiceItem(models.Model):
     def __str__(self):
         return f'{self.name} × {self.quantity}'
 
+    @property
+    def is_changed_by_supplier(self):
+        return self.original_quantity is not None and self.original_quantity != self.quantity
+
 
 # ========== ДВИЖЕНИЕ СКЛАДА ==========
 
@@ -2602,11 +2621,13 @@ class StockMovement(models.Model):
 
     REASON_ORDER        = 'order'
     REASON_ORDER_CANCEL = 'order_cancel'
+    REASON_ORDER_EDIT   = 'order_edit'
     REASON_STAFF        = 'staff'
     REASON_ADMIN        = 'admin'
     REASON_CHOICES = [
         (REASON_ORDER,        'Заказ дилера'),
         (REASON_ORDER_CANCEL, 'Отмена заказа'),
+        (REASON_ORDER_EDIT,   'Правка заказа сервисом'),
         (REASON_STAFF,        'Сотрудник сервиса'),
         (REASON_ADMIN,        'Админка'),
     ]

@@ -1155,7 +1155,7 @@ class InvoiceItemInline(admin.TabularInline):
     model = InvoiceItem
     extra = 0
     can_delete = False
-    fields = ('name', 'part_number', 'quantity', 'unit', 'price_without_vat', 'vat_rate', 'price', 'sum')
+    fields = ('name', 'part_number', 'original_quantity', 'quantity', 'unit', 'price_without_vat', 'vat_rate', 'price', 'sum')
     readonly_fields = fields
 
     def has_add_permission(self, request, obj=None):
@@ -1197,6 +1197,7 @@ class InvoiceAdmin(admin.ModelAdmin):
         'buyer_company_name', 'buyer_inn', 'buyer_contract_number', 'buyer_contract_date', 'contract',
         'total_amount', 'created_at', 'confirmed_at',
         'cancelled_at', 'cancelled_by', 'cancel_reason',
+        'approved_at', 'approved_by',
     )
     inlines         = [InvoiceItemInline]
     ordering        = ('-confirmed_at', '-id')
@@ -1215,7 +1216,7 @@ class InvoiceAdmin(admin.ModelAdmin):
             'fields': ('buyer_company_name', 'buyer_inn', ('buyer_contract_number', 'buyer_contract_date'), 'contract'),
         }),
         ('Сумма и даты', {
-            'fields': ('total_amount', 'created_at', 'confirmed_at'),
+            'fields': ('total_amount', 'created_at', 'confirmed_at', ('approved_at', 'approved_by')),
         }),
     )
 
@@ -1227,8 +1228,8 @@ class InvoiceAdmin(admin.ModelAdmin):
     def status_badge(self, obj):
         """Цветной бейдж статуса — для визуальной фильтрации в списке."""
         colors = {
-            Invoice.STATUS_PENDING_PAYMENT: '#e08b00',  # оранжевый
-            Invoice.STATUS_PAID:            '#2c9f4e',  # зелёный
+            Invoice.STATUS_PENDING_APPROVAL: '#8e44ad',  # фиолетовый — ждёт сервис
+            Invoice.STATUS_APPROVED:         '#2c9f4e',  # зелёный
             Invoice.STATUS_IN_TRANSIT:      '#1f7ec7',  # синий
             Invoice.STATUS_DELIVERED:       '#5a6470',  # серый (завершено)
             Invoice.STATUS_CANCELLED:       '#c0392b',  # красный
